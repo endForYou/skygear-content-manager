@@ -9,3 +9,8 @@ install:
   - node_modules/.bin/prettier --list-different "src/**/*.js"
   - node_modules/.bin/eslint src
   - CI=1 npm run test
+deploy:
+  provider: script
+  script: scripts/deploy.sh
+  on:
+    branch: master
