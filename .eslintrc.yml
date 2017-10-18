@@ -29,9 +29,12 @@ rules:
   linebreak-style:
     - error
     - unix
+  no-console: 0
+  no-debugger: 0
   quotes:
     - error
     - single
+    - avoidEscape: true
   semi:
     - error
     - always
