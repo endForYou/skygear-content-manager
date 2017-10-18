@@ -1,28 +1,18 @@
+import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import skygear from 'skygear';
+import { connect } from 'react-redux';
+
+import { login } from '../actions/auth';
 
 import './LoginPage.css';
 
-const errorMessageFromError = error => {
-  if (error.error.code === skygear.ErrorCodes.ResourceNotFound) {
-    return "User with this username doesn't exists.";
-  }
-
-  if (error.error.code === skygear.ErrorCodes.InvalidCredentials) {
-    return "The password that you've entered is incorrect.";
-  }
-
-  return 'Failed to login: ' + error.error.message;
-};
-
-class LoginForm extends Component {
+class _LoginForm extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
       username: '',
       password: '',
-      errorMessage: '',
     };
 
     this.handleInputChange = this.handleInputChange.bind(this);
@@ -43,20 +33,7 @@ class LoginForm extends Component {
     event.preventDefault();
 
     let { username, password } = this.state;
-    skygear.auth.loginWithUsername(username, password).then(
-      user => {
-        console.log(`Login succeeded: ${user}`);
-
-        this.setState({
-          errorMessage: '',
-        });
-      },
-      error => {
-        this.setState({
-          errorMessage: errorMessageFromError(error),
-        });
-      }
-    );
+    this.props.onSubmit(username, password);
   }
 
   render() {
@@ -90,9 +67,9 @@ class LoginForm extends Component {
           value={this.state.value}
           onChange={this.handleInputChange}
         />
-        {this.state.errorMessage !== '' && (
+        {this.props.errorMessage !== '' && (
           <div className="alert alert-danger form-login-alert" role="alert">
-            {this.state.errorMessage}
+            {this.props.errorMessage}
           </div>
         )}
         <button type="submit" className="btn btn-primary btn-lg btn-block">
@@ -102,6 +79,27 @@ class LoginForm extends Component {
     );
   }
 }
+
+_LoginForm.propTypes = {
+  onSubmit: PropTypes.func.isRequired,
+  errorMessage: PropTypes.string.isRequired,
+};
+
+const mapStateToProps = state => {
+  return {
+    errorMessage: state.auth.errorMessage,
+  };
+};
+
+const mapDispatchToProps = dispatch => {
+  return {
+    onSubmit: (username, password) => {
+      dispatch(login(username, password));
+    },
+  };
+};
+
+const LoginForm = connect(mapStateToProps, mapDispatchToProps)(_LoginForm);
 
 class LoginPage extends Component {
   render() {
