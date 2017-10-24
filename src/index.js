@@ -21,7 +21,7 @@ const Root = ({ store }) => {
   return (
     <Provider store={store}>
       <Router>
-        <Route path="/" component={App} />
+        <Route exact path="/" component={App} />
       </Router>
     </Provider>
   );
@@ -33,7 +33,11 @@ Root.propTypes = {
 
 const fetchCurrentUserIfNeeded = () => {
   if (skygear.auth.currentUser) {
-    return skygear.auth.whoami();
+    return skygear.auth.whoami().catch(error => {
+      console.log(`failed to fetch current user: ${error}`);
+
+      throw error;
+    });
   } else {
     return Promise.resolve(null);
   }
@@ -47,22 +51,27 @@ skygear
   .then(() => {
     return fetchCurrentUserIfNeeded();
   })
-  .then(user => {
-    let initialState;
-    if (user !== null) {
-      initialState = {
-        auth: {
-          user: user,
-        },
-      };
-    }
+  .then(
+    user => {
+      let initialState;
+      if (user !== null) {
+        initialState = {
+          auth: {
+            user: user,
+          },
+        };
+      }
 
-    const store = createStore(
-      rootReducer,
-      initialState,
-      applyMiddleware(thunk)
-    );
-    ReactDOM.render(<Root store={store} />, document.getElementById('root'));
-  });
+      const store = createStore(
+        rootReducer,
+        initialState,
+        applyMiddleware(thunk)
+      );
+      ReactDOM.render(<Root store={store} />, document.getElementById('root'));
+    },
+    error => {
+      console.log(`Failed to initialize skygear: ${error}`);
+    }
+  );
 
 registerServiceWorker();

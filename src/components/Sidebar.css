@@ -1,0 +1,22 @@
+.sidebar {
+	background: #19c2bf;
+	min-height: 100vh;
+}
+.sidebar-logo {
+	display: inline-block;
+	padding: 32px 24px;
+}
+.sidebar-logo:hover {
+	opacity: 0.8;
+}
+.sidebar .nav-link {
+	color: white;
+	padding: 4px 24px;
+	opacity: 0.8;
+}
+.sidebar .nav-link:hover {
+	opacity: 1;
+}
+.sidebar .nav-link.active {
+	opacity: 1;
+}
