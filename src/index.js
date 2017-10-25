@@ -3,7 +3,7 @@ import 'whatwg-fetch';
 import './index.css';
 
 import { Provider } from 'react-redux';
-import { BrowserRouter as Router, Route } from 'react-router-dom';
+import { Route, BrowserRouter as Router, Switch } from 'react-router-dom';
 import { createStore, applyMiddleware } from 'redux';
 import Promise from 'promise';
 import PropTypes from 'prop-types';
@@ -15,6 +15,7 @@ import yaml from 'js-yaml';
 
 import { configFromEnv } from './config';
 import App from './containers/App';
+import NotFoundPage from './components/NotFoundPage';
 import registerServiceWorker from './registerServiceWorker';
 import rootReducer from './reducers';
 
@@ -24,7 +25,10 @@ const Root = ({ store }) => {
   return (
     <Provider store={store}>
       <Router>
-        <Route exact path="/" component={App} />
+        <Switch>
+          <Route exact path="/" component={App} />
+          <Route component={NotFoundPage} />
+        </Switch>
       </Router>
     </Provider>
   );
