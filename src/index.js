@@ -1,3 +1,5 @@
+import 'whatwg-fetch';
+
 import './index.css';
 
 import { Provider } from 'react-redux';
@@ -9,6 +11,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import skygear from 'skygear';
 import thunk from 'redux-thunk';
+import yaml from 'js-yaml';
 
 import { configFromEnv } from './config';
 import App from './containers/App';
@@ -31,6 +34,17 @@ Root.propTypes = {
   store: PropTypes.object.isRequired,
 };
 
+const fetchUser = config => {
+  return skygear
+    .config({
+      endPoint: config.skygearEndpoint,
+      apiKey: config.skygearApiKey,
+    })
+    .then(() => {
+      return fetchCurrentUserIfNeeded();
+    });
+};
+
 const fetchCurrentUserIfNeeded = () => {
   if (skygear.auth.currentUser) {
     return skygear.auth.whoami().catch(error => {
@@ -43,35 +57,41 @@ const fetchCurrentUserIfNeeded = () => {
   }
 };
 
-skygear
-  .config({
-    endPoint: config.skygearEndpoint,
-    apiKey: config.skygearApiKey,
-  })
-  .then(() => {
-    return fetchCurrentUserIfNeeded();
-  })
-  .then(
-    user => {
-      let initialState;
-      if (user !== null) {
-        initialState = {
-          auth: {
-            user: user,
-          },
-        };
-      }
+const fetchCmsConfig = config => {
+  return fetch(config.cmsConfigUri)
+    .then(resp => {
+      return resp.text();
+    })
+    .then(text => {
+      return yaml.safeLoad(text);
+    });
+};
 
-      const store = createStore(
-        rootReducer,
-        initialState,
-        applyMiddleware(thunk)
-      );
-      ReactDOM.render(<Root store={store} />, document.getElementById('root'));
-    },
-    error => {
-      console.log(`Failed to initialize skygear: ${error}`);
+Promise.all([fetchUser(config), fetchCmsConfig(config)]).then(
+  ([user, cmsConfig]) => {
+    let initialState = {
+      cmsConfig: cmsConfig,
+    };
+
+    if (user !== null) {
+      initialState = {
+        ...initialState,
+        auth: {
+          user: user,
+        },
+      };
     }
-  );
+
+    const store = createStore(
+      rootReducer,
+      initialState,
+      applyMiddleware(thunk)
+    );
+    ReactDOM.render(<Root store={store} />, document.getElementById('root'));
+  },
+  error => {
+    console.log(`Failed to initialize CMS: ${error}`);
+  }
+);
 
 registerServiceWorker();

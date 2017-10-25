@@ -1,0 +1,13 @@
+site:
+  - type: record
+    name: topic
+    label: Topic
+  - type: record
+    name: poll
+    label: Poll
+  - type: record
+    name: question
+    label: Question
+  - type: record
+    name: choice
+    label: Choice
