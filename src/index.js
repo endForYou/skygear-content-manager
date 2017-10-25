@@ -14,6 +14,7 @@ import thunk from 'redux-thunk';
 import yaml from 'js-yaml';
 
 import { configFromEnv } from './config';
+import { isObject } from './util';
 import App from './containers/App';
 import NotFoundPage from './components/NotFoundPage';
 import registerServiceWorker from './registerServiceWorker';
@@ -67,7 +68,12 @@ const fetchCmsConfig = config => {
       return resp.text();
     })
     .then(text => {
-      return yaml.safeLoad(text);
+      const parsed = yaml.safeLoad(text);
+      if (isObject(parsed)) {
+        return parsed;
+      } else {
+        throw new Error(`Couldn't parse config file: ${text}`);
+      }
     });
 };
 
