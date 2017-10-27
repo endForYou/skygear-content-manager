@@ -1,13 +1,35 @@
 site:
-  - type: record
+  - type: Record
     name: topic
     label: Topic
-  - type: record
+  - type: Record
     name: poll
-    label: Poll
-  - type: record
+    label: All Polls
+  - type: Record
     name: question
     label: Question
-  - type: record
+  - type: Record
     name: choice
     label: Choice
+records:
+  topic:
+    list:
+      fields:
+        - name: name
+          type: String
+  poll:
+    list:
+      label: Polls
+      fields:
+        - name: name
+          type: String
+  question:
+    list:
+      fields:
+        - name: name
+          type: String
+  choice:
+    list:
+      fields:
+        - name: name
+          type: String

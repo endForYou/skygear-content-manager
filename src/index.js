@@ -5,7 +5,7 @@ import './index.css';
 import { Provider } from 'react-redux';
 import { Route, BrowserRouter as Router, Switch } from 'react-router-dom';
 import { createStore, applyMiddleware } from 'redux';
-import Promise from 'promise';
+import Promise from 'bluebird';
 import PropTypes from 'prop-types';
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -15,10 +15,10 @@ import yaml from 'js-yaml';
 
 import { configFromEnv } from './config';
 import { isObject } from './util';
+import { parseCmsConfig } from './cmsConfig';
 import App from './containers/App';
-import NotFoundPage from './components/NotFoundPage';
 import registerServiceWorker from './registerServiceWorker';
-import rootReducer from './reducers';
+import rootReducerFactory from './reducers';
 
 const config = configFromEnv();
 
@@ -27,8 +27,7 @@ const Root = ({ store }) => {
     <Provider store={store}>
       <Router>
         <Switch>
-          <Route exact path="/" component={App} />
-          <Route component={NotFoundPage} />
+          <Route path="/" component={App} />
         </Switch>
       </Router>
     </Provider>
@@ -70,7 +69,7 @@ const fetchCmsConfig = config => {
     .then(text => {
       const parsed = yaml.safeLoad(text);
       if (isObject(parsed)) {
-        return parsed;
+        return parseCmsConfig(parsed);
       } else {
         throw new Error(`Couldn't parse config file: ${text}`);
       }
@@ -79,6 +78,8 @@ const fetchCmsConfig = config => {
 
 Promise.all([fetchUser(config), fetchCmsConfig(config)]).then(
   ([user, cmsConfig]) => {
+    const rootReducer = rootReducerFactory(Object.keys(cmsConfig.records));
+
     let initialState = {
       cmsConfig: cmsConfig,
     };
