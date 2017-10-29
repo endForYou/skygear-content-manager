@@ -42,6 +42,7 @@ export interface StringFieldConfig {
 
 interface FieldConfigInput {
   type: string;
+  // tslint:disable-next-line: no-any
   [key: string]: any;
 }
 
@@ -50,21 +51,25 @@ interface StringFieldConfigInput extends FieldConfigInput {
   label?: string;
 }
 
+// tslint:disable-next-line: no-any
 export function parseCmsConfig({ site, records }: any): CmsConfig {
   return {
-    site: parseSiteConfigs(site),
     records: Object.entries(
       records
+      // tslint:disable-next-line: no-any
     ).reduce((obj: object, [name, recordConfig]: [string, any]) => {
       return { ...obj, [name]: parseRecordConfig(name, recordConfig) };
     }, {}),
+    site: parseSiteConfigs(site),
   };
 }
 
+// tslint:disable-next-line: no-any
 function parseSiteConfigs(siteConfigs: any[]): SiteConfig {
   return siteConfigs.map(parseSiteConfig);
 }
 
+// tslint:disable-next-line: no-any
 function parseSiteConfig(siteConfig: any): SiteItemConfig {
   switch (siteConfig.type) {
     case 'Record':
@@ -74,39 +79,39 @@ function parseSiteConfig(siteConfig: any): SiteItemConfig {
   }
 }
 
-function parseSiteRecordConfig({
-  type,
-  name,
-  label,
-}: any): RecordSiteItemConfig {
+// tslint:disable-next-line: no-any
+function parseSiteRecordConfig(input: any): RecordSiteItemConfig {
+  const { type, name, label } = input;
+
   const parsedLabel = label ? label : humanize(name);
   return { type, name, label: parsedLabel };
 }
 
-function parseRecordConfig(
-  recordName: string,
-  { recordType, list: listPageConfig }: any
-): RecordConfig {
+// tslint:disable-next-line: no-any
+function parseRecordConfig(recordName: string, input: any): RecordConfig {
+  const { recordType, list: listPageConfig } = input;
+
   const parsedRecordType = recordType ? recordType : recordName;
   return {
+    list: parseListPageConfig(recordName, listPageConfig),
     recordName,
     recordType: parsedRecordType,
-    list: parseListPageConfig(recordName, listPageConfig),
   };
 }
 
-function parseListPageConfig(
-  recordName: string,
-  { label, perPage = 25, fields: fieldConfigs }: any
-): ListPageConfig {
+// tslint:disable-next-line: no-any
+function parseListPageConfig(recordName: string, input: any): ListPageConfig {
+  const { label, perPage = 25, fields: fieldConfigs } = input;
+
   const parsedLabel = label ? label : humanize(recordName);
   return {
+    fields: fieldConfigs.map(parseFieldConfig),
     label: parsedLabel,
     perPage,
-    fields: fieldConfigs.map(parseFieldConfig),
   };
 }
 
+// tslint:disable-next-line: no-any
 function parseFieldConfig(a: any): FieldConfig {
   switch (a.type) {
     case 'String':
@@ -117,17 +122,16 @@ function parseFieldConfig(a: any): FieldConfig {
 }
 
 function parseStringFieldConfig(input: FieldConfigInput): StringFieldConfig {
-  function isValidInput(
-    input: FieldConfigInput
-  ): input is StringFieldConfigInput {
-    return input.type === 'String' && typeof (input as any).name === 'string';
+  function isValidInput(i: FieldConfigInput): i is StringFieldConfigInput {
+    // tslint:disable-next-line: no-any
+    return i.type === 'String' && typeof (i as any).name === 'string';
   }
 
   if (isValidInput(input)) {
     return {
-      type: 'String',
-      name: input.name,
       label: input.label || humanize(name),
+      name: input.name,
+      type: 'String',
     };
   }
 

@@ -1,25 +1,25 @@
 import './index.css';
 
-import { ConnectedRouter, routerMiddleware } from 'react-router-redux';
-import { Provider } from 'react-redux';
-import { Route, Switch } from 'react-router-dom';
-import { Store, applyMiddleware, createStore } from 'redux';
 import * as Promise from 'bluebird';
+import { createBrowserHistory } from 'history';
+import * as yaml from 'js-yaml';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import createHistory from 'history/createBrowserHistory';
-import skygear from 'skygear';
+import { Provider } from 'react-redux';
+import { Route, Switch } from 'react-router-dom';
+import { ConnectedRouter, routerMiddleware } from 'react-router-redux';
+import { applyMiddleware, createStore, Store } from 'redux';
 import thunk from 'redux-thunk';
-import * as yaml from 'js-yaml';
+import skygear from 'skygear';
 
-import { CmsConfig } from './cmsConfig';
+import { CmsConfig, parseCmsConfig } from './cmsConfig';
 import { configFromEnv } from './config';
-import { isObject } from './util';
-import { parseCmsConfig } from './cmsConfig';
 import App from './containers/App';
-import registerServiceWorker from './registerServiceWorker';
 import rootReducerFactory from './reducers';
+import registerServiceWorker from './registerServiceWorker';
+import { isObject } from './util';
 
+// tslint:disable-next-line: no-any
 type User = any;
 
 export interface AuthState {
@@ -41,8 +41,8 @@ export interface AppConfig {
   cmsConfigUri: string;
 }
 
-const history = createHistory();
-const config: AppConfig = configFromEnv();
+const history = createBrowserHistory();
+const appConfig: AppConfig = configFromEnv();
 
 const Root = ({ store }: RootProps) => {
   return (
@@ -56,18 +56,18 @@ const Root = ({ store }: RootProps) => {
   );
 };
 
-const fetchUser = (config: AppConfig) => {
+function fetchUser(config: AppConfig) {
   return skygear
     .config({
-      endPoint: config.skygearEndpoint,
       apiKey: config.skygearApiKey,
+      endPoint: config.skygearEndpoint,
     })
     .then(() => {
       return fetchCurrentUserIfNeeded();
     });
-};
+}
 
-const fetchCurrentUserIfNeeded = () => {
+function fetchCurrentUserIfNeeded() {
   if (skygear.auth.currentUser) {
     return skygear.auth.whoami().catch((error: Error) => {
       console.log(`failed to fetch current user: ${error}`);
@@ -77,9 +77,9 @@ const fetchCurrentUserIfNeeded = () => {
   } else {
     return Promise.resolve(null);
   }
-};
+}
 
-const fetchCmsConfig = (config: AppConfig) => {
+function fetchCmsConfig(config: AppConfig) {
   return fetch(config.cmsConfigUri)
     .then((resp: Response) => {
       return resp.text();
@@ -92,22 +92,18 @@ const fetchCmsConfig = (config: AppConfig) => {
         throw new Error(`Couldn't parse config file: ${text}`);
       }
     });
-};
+}
 
-Promise.all([fetchUser(config), fetchCmsConfig(config)]).then(
+Promise.all([fetchUser(appConfig), fetchCmsConfig(appConfig)]).then(
   ([user, cmsConfig]: [User, CmsConfig]) => {
     const rootReducer = rootReducerFactory(Object.keys(cmsConfig.records));
 
-    let initialState: StoreState = {
-      cmsConfig: cmsConfig,
-    };
+    let initialState: StoreState = { cmsConfig };
 
     if (user !== null) {
       initialState = {
         ...initialState,
-        auth: {
-          user: user,
-        },
+        auth: { user },
       };
     }
 

@@ -57,7 +57,8 @@
   "scripts": {
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",
-    "test": "node scripts/test.js --env=jsdom"
+    "test": "node scripts/test.js --env=jsdom",
+    "lint": "tslint -p tsconfig.json -c tslint.json 'src/**/*.ts*'"
   },
   "jest": {
     "mapCoverage": true,
@@ -106,9 +107,6 @@
     "presets": [
       "react-app"
     ]
-  },
-  "eslintConfig": {
-    "extends": "react-app"
   },
   "devDependencies": {
     "@types/bluebird": "^3.5.17",
