@@ -36,9 +36,16 @@ function parseRecordConfig(recordName, { recordType, list: listPageConfig }) {
   };
 }
 
-function parseListPageConfig(recordName, { label, fields: fieldConfigs }) {
+function parseListPageConfig(
+  recordName,
+  { label, perPage = 25, fields: fieldConfigs }
+) {
   const parsedLabel = label ? label : humanize(recordName);
-  return { label: parsedLabel, fields: fieldConfigs.map(parseFieldConfig) };
+  return {
+    label: parsedLabel,
+    perPage,
+    fields: fieldConfigs.map(parseFieldConfig),
+  };
 }
 
 function parseFieldConfig(fieldConfig) {

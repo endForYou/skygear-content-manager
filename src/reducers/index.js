@@ -1,4 +1,5 @@
 import { combineReducers } from 'redux';
+import { routerReducer } from 'react-router-redux';
 
 import { recordViewsByNameReducerFactory } from './recordFactory';
 import auth from './auth';
@@ -12,6 +13,7 @@ function rootReducerFactory(recordNames) {
     auth,
     cmsConfig: constReducer,
     recordViewsByName: recordViewsByNameReducerFactory(recordNames),
+    router: routerReducer,
   });
 }
 

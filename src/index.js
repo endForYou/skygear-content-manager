@@ -2,13 +2,15 @@ import 'whatwg-fetch';
 
 import './index.css';
 
+import { ConnectedRouter, routerMiddleware } from 'react-router-redux';
 import { Provider } from 'react-redux';
-import { Route, BrowserRouter as Router, Switch } from 'react-router-dom';
+import { Route, Switch } from 'react-router-dom';
 import { createStore, applyMiddleware } from 'redux';
 import Promise from 'bluebird';
 import PropTypes from 'prop-types';
 import React from 'react';
 import ReactDOM from 'react-dom';
+import createHistory from 'history/createBrowserHistory';
 import skygear from 'skygear';
 import thunk from 'redux-thunk';
 import yaml from 'js-yaml';
@@ -20,16 +22,17 @@ import App from './containers/App';
 import registerServiceWorker from './registerServiceWorker';
 import rootReducerFactory from './reducers';
 
+const history = createHistory();
 const config = configFromEnv();
 
 const Root = ({ store }) => {
   return (
     <Provider store={store}>
-      <Router>
+      <ConnectedRouter history={history}>
         <Switch>
           <Route path="/" component={App} />
         </Switch>
-      </Router>
+      </ConnectedRouter>
     </Provider>
   );
 };
@@ -96,7 +99,7 @@ Promise.all([fetchUser(config), fetchCmsConfig(config)]).then(
     const store = createStore(
       rootReducer,
       initialState,
-      applyMiddleware(thunk)
+      applyMiddleware(thunk, routerMiddleware(history))
     );
     ReactDOM.render(<Root store={store} />, document.getElementById('root'));
   },

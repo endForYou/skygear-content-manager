@@ -1,8 +1,10 @@
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { PureComponent } from 'react';
+import qs from 'query-string';
 
 import { RecordActionCreator } from '../actions/record';
+import Pagination from '../components/Pagination';
 
 const StringFieldConfigType = PropTypes.shape({
   type: PropTypes.oneOf(['String']).isRequired,
@@ -60,7 +62,7 @@ TableBody.propTypes = {
 
 const ListTable = ({ fieldConfigs, records }) => {
   return (
-    <table className="table table-striped">
+    <table key="table" className="table table-striped">
       <TableHeader fieldConfigs={fieldConfigs} />
       <TableBody fieldConfigs={fieldConfigs} records={records} />
     </table>
@@ -72,23 +74,33 @@ ListTable.propTypes = {
   records: PropTypes.arrayOf(PropTypes.any).isRequired,
 };
 
-class ListPage extends React.PureComponent {
+class ListPage extends PureComponent {
   static propTypes = {
     dispatch: PropTypes.func.isRequired,
+    recordName: PropTypes.string.isRequired,
     recordActionCreator: PropTypes.instanceOf(RecordActionCreator),
     pageConfig: ListPageConfigType.isRequired,
+    page: PropTypes.number.isRequired,
+    maxPage: PropTypes.number.isRequired,
     isLoading: PropTypes.bool.isRequired,
     records: PropTypes.arrayOf(PropTypes.any).isRequired,
   };
 
   componentDidMount() {
-    const { dispatch, recordActionCreator } = this.props;
+    const { dispatch, recordActionCreator, page } = this.props;
 
-    dispatch(recordActionCreator.fetchList());
+    dispatch(recordActionCreator.fetchList(page));
   }
 
   render() {
-    const { pageConfig, isLoading, records } = this.props;
+    const {
+      recordName,
+      pageConfig,
+      page,
+      maxPage,
+      isLoading,
+      records,
+    } = this.props;
 
     return (
       <div className="pt-3">
@@ -104,27 +116,66 @@ class ListPage extends React.PureComponent {
                 return (
                   <ListTable
                     fieldConfigs={pageConfig.fields}
+                    page={page}
                     records={records}
                   />
                 );
               }
             }
           })()}
+          {maxPage > 0 ? (
+            <Pagination
+              key="pagination"
+              recordName={recordName}
+              currentPage={page}
+              maxPage={maxPage}
+              onItemClicked={this.onPageItemClicked}
+            />
+          ) : null}
         </div>
       </div>
     );
   }
+
+  onPageItemClicked = page => {
+    const { dispatch, recordActionCreator } = this.props;
+
+    dispatch(recordActionCreator.fetchList(page));
+  };
 }
 
 function ListPageFactory(recordName) {
   const mapStateToProps = state => {
-    const { recordType, list } = state.cmsConfig.records[recordName];
-    const { isLoading, records } = state.recordViewsByName[recordName].list;
+    const { location } = state.router;
+    const { page: pageStr = '1' } = qs.parse(location.search);
+    const page = parseInt(pageStr, 10);
 
-    const recordActionCreator = new RecordActionCreator(recordName, recordType);
+    const { recordType, list: pageConfig } = state.cmsConfig.records[
+      recordName
+    ];
+    const { isLoading, records, totalCount } = state.recordViewsByName[
+      recordName
+    ].list;
 
-    return { recordActionCreator, pageConfig: list, isLoading, records };
+    const recordActionCreator = new RecordActionCreator(
+      recordName,
+      recordType,
+      pageConfig.perPage
+    );
+
+    const maxPage = Math.ceil(totalCount / pageConfig.perPage);
+
+    return {
+      recordName,
+      recordActionCreator,
+      pageConfig,
+      page,
+      maxPage,
+      isLoading,
+      records,
+    };
   };
+
   return connect(mapStateToProps)(ListPage);
 }
 

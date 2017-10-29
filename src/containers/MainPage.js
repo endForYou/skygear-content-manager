@@ -1,14 +1,14 @@
 import { Route, Switch, withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { PureComponent } from 'react';
 
 import { ListPageFactory } from '../pages/ListPage';
 import FrontPage from './FrontPage';
 import Layout from '../components/Layout';
 import NotFoundPage from '../components/NotFoundPage';
 
-class _MainPage extends React.PureComponent {
+class _MainPage extends PureComponent {
   static propTypes = {
     recordNames: PropTypes.arrayOf(PropTypes.string).isRequired,
   };

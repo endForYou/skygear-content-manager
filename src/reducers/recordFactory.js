@@ -2,6 +2,7 @@ import { combineReducers } from 'redux';
 
 import {
   FETCH_RECORD_LIST_FAILURE,
+  FETCH_RECORD_LIST_REQUEST,
   FETCH_RECORD_LIST_SUCCESS,
   isRecordNamed,
 } from '../actions/record';
@@ -28,7 +29,13 @@ function recordViewsByNameReducerFactory(recordNames = []) {
 const recordViewsReducer = combineReducers({ list: recordListReducer });
 
 function recordListReducer(
-  state = { isLoading: true, records: [], error: null },
+  state = {
+    isLoading: true,
+    page: 1,
+    records: [],
+    totalCount: 0,
+    error: null,
+  },
   action
 ) {
   if (!action) {
@@ -36,8 +43,15 @@ function recordListReducer(
   }
 
   switch (action.type) {
+    case FETCH_RECORD_LIST_REQUEST:
+      return { ...state, page: action.page };
     case FETCH_RECORD_LIST_SUCCESS:
-      return { ...state, isLoading: false, records: action.records };
+      return {
+        ...state,
+        isLoading: false,
+        records: action.queryResult.map(record => record),
+        totalCount: action.queryResult.overallCount,
+      };
     case FETCH_RECORD_LIST_FAILURE:
       return { ...state, isLoading: false, error: action.error };
   }

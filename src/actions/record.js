@@ -12,20 +12,29 @@ export function isRecordNamed(action) {
   return action.CMS_RECORD_NAMED;
 }
 
-function fetchRecordListRequest(recordName, recordType) {
+function fetchRecordListRequest(recordName, recordType, page) {
   return recordNamed({
     type: FETCH_RECORD_LIST_REQUEST,
     recordName,
     recordType,
+    page,
   });
 }
 
-function fetchRecordListSuccess(recordName, recordType, records) {
+function fetchRecordListSuccess(
+  recordName,
+  recordType,
+  page,
+  perPage,
+  queryResult
+) {
   return recordNamed({
     type: FETCH_RECORD_LIST_SUCCESS,
     recordName,
     recordType,
-    records,
+    page,
+    perPage,
+    queryResult,
   });
 }
 
@@ -38,20 +47,32 @@ function fetchRecordListFailure(recordName, recordType, error) {
   });
 }
 
-export function fetchRecordList(recordName, recordType) {
+export function fetchRecordList(
+  recordName,
+  recordType,
+  page = 1,
+  perPage = 25
+) {
   const RecordCls = skygear.Record.extend(recordType);
 
   return dispatch => {
     const query = new skygear.Query(RecordCls);
+    query.overallCount = true;
+    query.limit = perPage;
+    query.offset = (page - 1) * perPage;
 
-    dispatch(fetchRecordListRequest(recordName, recordType));
+    dispatch(fetchRecordListRequest(recordName, recordType, page));
     skygear.publicDB.query(query).then(
-      records => {
-        // returned records is object instead of array when length = 0
-        // make sure it is array here for proptypes to work properly
-        const recordArray =
-          records.length === 0 ? [] : records.map(record => record);
-        dispatch(fetchRecordListSuccess(recordName, recordType, recordArray));
+      queryResult => {
+        dispatch(
+          fetchRecordListSuccess(
+            recordName,
+            recordType,
+            page,
+            perPage,
+            queryResult
+          )
+        );
       },
       error => {
         dispatch(fetchRecordListFailure(recordName, recordType, error));
@@ -61,12 +82,18 @@ export function fetchRecordList(recordName, recordType) {
 }
 
 export class RecordActionCreator {
-  constructor(recordName, recordType) {
+  constructor(recordName, recordType, perPage) {
     this.recordName = recordName;
     this.recordType = recordType;
+    this.perPage = perPage;
   }
 
-  fetchList() {
-    return fetchRecordList(this.recordName, this.recordType);
+  fetchList(page = 1) {
+    return fetchRecordList(
+      this.recordName,
+      this.recordType,
+      page,
+      this.perPage
+    );
   }
 }

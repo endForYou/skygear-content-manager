@@ -20,6 +20,7 @@ records:
   poll:
     list:
       label: Polls
+      perPage: 10
       fields:
         - name: name
           type: String
