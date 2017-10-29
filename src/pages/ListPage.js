@@ -1,5 +1,5 @@
 import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
+import * as PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import qs from 'query-string';
 

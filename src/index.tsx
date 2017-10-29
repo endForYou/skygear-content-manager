@@ -1,20 +1,18 @@
-import 'whatwg-fetch';
-
 import './index.css';
 
 import { ConnectedRouter, routerMiddleware } from 'react-router-redux';
 import { Provider } from 'react-redux';
 import { Route, Switch } from 'react-router-dom';
-import { createStore, applyMiddleware } from 'redux';
-import Promise from 'bluebird';
-import PropTypes from 'prop-types';
-import React from 'react';
-import ReactDOM from 'react-dom';
+import { Store, applyMiddleware, createStore } from 'redux';
+import * as Promise from 'bluebird';
+import * as React from 'react';
+import * as ReactDOM from 'react-dom';
 import createHistory from 'history/createBrowserHistory';
 import skygear from 'skygear';
 import thunk from 'redux-thunk';
-import yaml from 'js-yaml';
+import * as yaml from 'js-yaml';
 
+import { CmsConfig } from './cmsConfig';
 import { configFromEnv } from './config';
 import { isObject } from './util';
 import { parseCmsConfig } from './cmsConfig';
@@ -22,10 +20,31 @@ import App from './containers/App';
 import registerServiceWorker from './registerServiceWorker';
 import rootReducerFactory from './reducers';
 
-const history = createHistory();
-const config = configFromEnv();
+type User = any;
 
-const Root = ({ store }) => {
+export interface AuthState {
+  user: User;
+}
+
+export interface StoreState {
+  cmsConfig: CmsConfig;
+  auth?: AuthState;
+}
+
+export interface RootProps {
+  store: Store<StoreState>;
+}
+
+export interface AppConfig {
+  skygearEndpoint: string;
+  skygearApiKey: string;
+  cmsConfigUri: string;
+}
+
+const history = createHistory();
+const config: AppConfig = configFromEnv();
+
+const Root = ({ store }: RootProps) => {
   return (
     <Provider store={store}>
       <ConnectedRouter history={history}>
@@ -37,11 +56,7 @@ const Root = ({ store }) => {
   );
 };
 
-Root.propTypes = {
-  store: PropTypes.object.isRequired,
-};
-
-const fetchUser = config => {
+const fetchUser = (config: AppConfig) => {
   return skygear
     .config({
       endPoint: config.skygearEndpoint,
@@ -54,7 +69,7 @@ const fetchUser = config => {
 
 const fetchCurrentUserIfNeeded = () => {
   if (skygear.auth.currentUser) {
-    return skygear.auth.whoami().catch(error => {
+    return skygear.auth.whoami().catch((error: Error) => {
       console.log(`failed to fetch current user: ${error}`);
 
       throw error;
@@ -64,9 +79,9 @@ const fetchCurrentUserIfNeeded = () => {
   }
 };
 
-const fetchCmsConfig = config => {
+const fetchCmsConfig = (config: AppConfig) => {
   return fetch(config.cmsConfigUri)
-    .then(resp => {
+    .then((resp: Response) => {
       return resp.text();
     })
     .then(text => {
@@ -80,10 +95,10 @@ const fetchCmsConfig = config => {
 };
 
 Promise.all([fetchUser(config), fetchCmsConfig(config)]).then(
-  ([user, cmsConfig]) => {
+  ([user, cmsConfig]: [User, CmsConfig]) => {
     const rootReducer = rootReducerFactory(Object.keys(cmsConfig.records));
 
-    let initialState = {
+    let initialState: StoreState = {
       cmsConfig: cmsConfig,
     };
 

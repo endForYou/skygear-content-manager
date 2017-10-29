@@ -1,6 +1,6 @@
 import { Route, Switch, withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
+import * as PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 
 import { ListPageFactory } from '../pages/ListPage';

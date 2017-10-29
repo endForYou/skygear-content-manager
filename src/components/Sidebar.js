@@ -2,8 +2,8 @@ import './Sidebar.css';
 
 import { NavLink, withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
-import React from 'react';
+import * as PropTypes from 'prop-types';
+import * as React from 'react';
 
 import logo from '../assets/logo.png';
 
