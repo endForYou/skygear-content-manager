@@ -24,6 +24,11 @@ records:
       fields:
         - name: name
           type: String
+    view:
+      labe: View Poll
+      fields:
+        - name: name
+          type: String
   question:
     list:
       fields:

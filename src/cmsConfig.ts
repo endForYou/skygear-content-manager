@@ -23,12 +23,18 @@ export interface RecordConfigMap {
 export interface RecordConfig {
   recordName: string;
   recordType: string;
-  list: ListPageConfig;
+  list?: ListPageConfig;
+  show?: ShowPageConfig;
 }
 
 export interface ListPageConfig {
   label: string;
   perPage: number;
+  fields: FieldConfig[];
+}
+
+export interface ShowPageConfig {
+  label: string;
   fields: FieldConfig[];
 }
 
@@ -89,13 +95,14 @@ function parseSiteRecordConfig(input: any): RecordSiteItemConfig {
 
 // tslint:disable-next-line: no-any
 function parseRecordConfig(recordName: string, input: any): RecordConfig {
-  const { recordType, list: listPageConfig } = input;
+  const { recordType, list, show } = input;
 
   const parsedRecordType = recordType ? recordType : recordName;
   return {
-    list: parseListPageConfig(recordName, listPageConfig),
+    list: list == null ? undefined : parseListPageConfig(recordName, list),
     recordName,
     recordType: parsedRecordType,
+    show: show == null ? undefined : parseShowPageConfig(recordName, show),
   };
 }
 
@@ -108,6 +115,22 @@ function parseListPageConfig(recordName: string, input: any): ListPageConfig {
     fields: fieldConfigs.map(parseFieldConfig),
     label: parsedLabel,
     perPage,
+  };
+}
+
+// tslint:disable-next-line: no-any
+function parseShowPageConfig(recordName: string, input: any): ShowPageConfig {
+  if (!Array.isArray(input.fields)) {
+    throw new Error(`ShowPageConfig.fields must be an Array`);
+  }
+
+  if (typeof input.label !== 'string' && typeof input.label !== 'undefined') {
+    throw new Error(`ShowPageConfig.input must be a string`);
+  }
+
+  return {
+    fields: input.fields.map(parseFieldConfig),
+    label: input.label || humanize(recordName),
   };
 }
 
