@@ -1,27 +1,56 @@
+import { Route, Switch, withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
-import React from 'react';
+import * as PropTypes from 'prop-types';
+import React, { PureComponent } from 'react';
 
+import { ListPageFactory } from '../pages/ListPage';
+import FrontPage from './FrontPage';
 import Layout from '../components/Layout';
+import NotFoundPage from '../components/NotFoundPage';
 
-const _MainPage = ({ user }) => {
-  return (
-    <Layout>
-      <div>My name is {user.username} :D</div>
-    </Layout>
-  );
-};
+class _MainPage extends PureComponent {
+  static propTypes = {
+    recordNames: PropTypes.arrayOf(PropTypes.string).isRequired,
+  };
 
-_MainPage.propTypes = {
-  user: PropTypes.object,
-};
+  constructor(props) {
+    super(props);
+
+    const { recordNames } = props;
+    this.listPageFactoryByRecordName = recordNames.reduce((obj, recordName) => {
+      return { ...obj, [recordName]: ListPageFactory(recordName) };
+    }, {});
+  }
+
+  render() {
+    return (
+      <Layout>
+        <Switch>
+          <Route exact path="/" component={FrontPage} />
+
+          {this.props.recordNames.map((recordName, index) => {
+            return (
+              <Route
+                key={index}
+                path={`/record/${recordName}`}
+                component={this.listPageFactoryByRecordName[recordName]}
+              />
+            );
+          })}
+
+          <Route component={NotFoundPage} />
+        </Switch>
+      </Layout>
+    );
+  }
+}
 
 const mapStateToProps = state => {
   return {
-    user: state.auth.user,
+    recordNames: Object.keys(state.cmsConfig.records),
   };
 };
 
-const MainPage = connect(mapStateToProps)(_MainPage);
+const MainPage = withRouter(connect(mapStateToProps)(_MainPage));
 
 export default MainPage;

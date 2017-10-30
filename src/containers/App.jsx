@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
-import React from 'react';
+import * as PropTypes from 'prop-types';
+import * as React from 'react';
 
 import LoginPage from './LoginPage';
 import MainPage from './MainPage';
