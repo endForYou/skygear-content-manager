@@ -17,7 +17,7 @@ import { AppConfig, configFromEnv } from './config';
 import App from './containers/App';
 import rootReducerFactory from './reducers';
 import registerServiceWorker from './registerServiceWorker';
-import { isObject } from './util';
+import { getPath, isObject } from './util';
 
 // tslint:disable-next-line: no-any
 type User = any;
@@ -51,7 +51,7 @@ const Root = ({ config, history, store }: RootProps) => {
 
 function main(): void {
   const appConfig: AppConfig = configFromEnv();
-  const history = createBrowserHistory({ basename: appConfig.publicUrl });
+  const history: History = createHistoryFromPublicUrl(appConfig.publicUrl);
 
   Promise.all([fetchUser(appConfig), fetchCmsConfig(appConfig)]).then(
     ([user, cmsConfig]: [User, CmsConfig]) => {
@@ -80,6 +80,16 @@ function main(): void {
       console.log(`Failed to initialize CMS: ${error}`);
     }
   );
+}
+
+function createHistoryFromPublicUrl(publicUrl: string): History {
+  if (publicUrl === '.') {
+    return createBrowserHistory();
+  } else {
+    return createBrowserHistory({
+      basename: getPath(publicUrl),
+    });
+  }
 }
 
 function fetchUser(config: AppConfig) {
