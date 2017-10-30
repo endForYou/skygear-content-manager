@@ -1,7 +1,7 @@
 import './index.css';
 
 import * as Promise from 'bluebird';
-import { createBrowserHistory } from 'history';
+import { createBrowserHistory, History } from 'history';
 import * as yaml from 'js-yaml';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
@@ -13,7 +13,7 @@ import thunk from 'redux-thunk';
 import skygear from 'skygear';
 
 import { CmsConfig, parseCmsConfig } from './cmsConfig';
-import { configFromEnv } from './config';
+import { AppConfig, configFromEnv } from './config';
 import App from './containers/App';
 import rootReducerFactory from './reducers';
 import registerServiceWorker from './registerServiceWorker';
@@ -32,19 +32,12 @@ export interface StoreState {
 }
 
 export interface RootProps {
+  config: AppConfig;
+  history: History;
   store: Store<StoreState>;
 }
 
-export interface AppConfig {
-  skygearEndpoint: string;
-  skygearApiKey: string;
-  cmsConfigUri: string;
-}
-
-const history = createBrowserHistory();
-const appConfig: AppConfig = configFromEnv();
-
-const Root = ({ store }: RootProps) => {
+const Root = ({ config, history, store }: RootProps) => {
   return (
     <Provider store={store}>
       <ConnectedRouter history={history}>
@@ -55,6 +48,39 @@ const Root = ({ store }: RootProps) => {
     </Provider>
   );
 };
+
+function main(): void {
+  const appConfig: AppConfig = configFromEnv();
+  const history = createBrowserHistory({ basename: appConfig.publicUrl });
+
+  Promise.all([fetchUser(appConfig), fetchCmsConfig(appConfig)]).then(
+    ([user, cmsConfig]: [User, CmsConfig]) => {
+      const rootReducer = rootReducerFactory(Object.keys(cmsConfig.records));
+
+      let initialState: StoreState = { cmsConfig };
+
+      if (user !== null) {
+        initialState = {
+          ...initialState,
+          auth: { user },
+        };
+      }
+
+      const store = createStore<StoreState>(
+        rootReducer,
+        initialState,
+        applyMiddleware(thunk, routerMiddleware(history))
+      );
+      ReactDOM.render(
+        <Root config={appConfig} history={history} store={store} />,
+        document.getElementById('root')
+      );
+    },
+    error => {
+      console.log(`Failed to initialize CMS: ${error}`);
+    }
+  );
+}
 
 function fetchUser(config: AppConfig) {
   return skygear
@@ -94,29 +120,6 @@ function fetchCmsConfig(config: AppConfig) {
     });
 }
 
-Promise.all([fetchUser(appConfig), fetchCmsConfig(appConfig)]).then(
-  ([user, cmsConfig]: [User, CmsConfig]) => {
-    const rootReducer = rootReducerFactory(Object.keys(cmsConfig.records));
-
-    let initialState: StoreState = { cmsConfig };
-
-    if (user !== null) {
-      initialState = {
-        ...initialState,
-        auth: { user },
-      };
-    }
-
-    const store = createStore(
-      rootReducer,
-      initialState,
-      applyMiddleware(thunk, routerMiddleware(history))
-    );
-    ReactDOM.render(<Root store={store} />, document.getElementById('root'));
-  },
-  error => {
-    console.log(`Failed to initialize CMS: ${error}`);
-  }
-);
-
 registerServiceWorker();
+
+main();
