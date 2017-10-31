@@ -152,7 +152,7 @@ function parseStringFieldConfig(input: FieldConfigInput): StringFieldConfig {
 
   if (isValidInput(input)) {
     return {
-      label: input.label || humanize(name),
+      label: input.label || humanize(input.name),
       name: input.name,
       type: 'String',
     };
