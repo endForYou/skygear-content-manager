@@ -24,8 +24,8 @@ records:
       fields:
         - name: name
           type: String
-    view:
-      labe: View Poll
+    show:
+      label: View Poll
       fields:
         - name: name
           type: String
