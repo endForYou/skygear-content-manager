@@ -1,6 +1,7 @@
 import json
 import os
 
+from jose import JWTError, jwt
 import requests
 import skygear
 
@@ -9,7 +10,9 @@ CMS_SKYGEAR_ENDPOINT = \
     os.environ.get('CMS_SKYGEAR_ENDPOINT', 'http://localhost:3000/')
 CMS_SKYGEAR_MASTER_KEY = \
     os.environ.get('CMS_SKYGEAR_MASTER_KEY', 'FAKE_MASTER_KEY')
+
 CMS_USER_PERMITTED_ROLE = os.environ.get('CMS_USER_PERMITTED_ROLE', 'Admin')
+CMS_AUTH_SECRET = os.environ.get('CMS_AUTH_SECRET', 'FAKE_AUTH_SECRET')
 
 HEADER_BLACKLIST = [
     'Access-Control-Allow-Credentials',
@@ -18,9 +21,18 @@ HEADER_BLACKLIST = [
 ]
 
 
+def requests_request(req, json_body=None, headers=None):
+    return requests.Request(
+        method=req.method,
+        url=CMS_SKYGEAR_ENDPOINT,
+        data=transform_request_body(json_body) if json_body else req.data,
+        headers=headers if headers else transform_request_header(req.headers),
+    )
+
+
 @skygear.handler('cms/api/')
 def api(request):
-    log_request(request)
+    # log_request(request)
 
     parsed_request_body = parse_body(request.data)
 
@@ -29,44 +41,85 @@ def api(request):
             parsed_request_body.get('action') == 'auth:login'):
         return intercept_login(request, parsed_request_body)
 
-    resp = requests.request(
-        request.method,
-        url=CMS_SKYGEAR_ENDPOINT,
-        data=transform_request_body(parsed_request_body),
-        headers=transform_request_header(request.headers),
-    )
+    requests_req = intercept_request_body(request, parsed_request_body)
+    resp = requests.Session().send(requests_req.prepare())
 
-    log_response(resp)
+    # log_response(resp)
 
     return transform_resp(resp)
 
 
-def intercept_login(request, json_body):
-    resp = requests.request(
-        request.method,
-        url=CMS_SKYGEAR_ENDPOINT,
-        data=transform_request_body(json_body),
-        headers=transform_request_header(request.headers),
+def intercept_request_body(request, json_body):
+    cms_access_token = json_body['access_token']
+    try:
+        authdict = jwt.decode(
+            cms_access_token,
+            CMS_AUTH_SECRET,
+            algorithms=['HS256'],
+        )
+    except JWTError:
+        return requests_request(request, json_body)
+
+    if not authdict.get('is_admin', False):
+        return requests_request(request, json_body)
+
+    skygear_access_token = authdict['skygear_access_token']
+    headers = transform_request_header(request.headers)
+
+    json_body['access_token'] = skygear_access_token
+    headers['X-Skygear-Access-Token'] = skygear_access_token
+
+    return requests_request(
+        request,
+        json_body=json_body,
+        headers=headers,
     )
 
-    log_response(resp)
+
+def intercept_login(request, json_body):
+    prepared = requests_request(request, json_body).prepare()
+    resp = requests.Session().send(prepared)
+
+    # log_response(resp)
 
     if not (200 <= resp.status_code <= 299):
         return transform_resp(resp)
 
-    if not can_access_cms(resp):
-        return forbidden_resp(resp)
-
-    return transform_resp(resp)
-
-
-def can_access_cms(resp):
     resp_body = parse_body(resp.content)
 
     # unknown resp structure
     if not isinstance(resp_body, dict):
-        return False
+        return forbidden_resp(resp)
 
+    if not can_access_cms(resp_body):
+        return forbidden_resp(resp)
+
+    return authenticated_resp(resp, resp_body)
+
+
+def authenticated_resp(resp, resp_json_body):
+    skygear_access_token = resp_json_body['result']['access_token']
+
+    cms_access_token = jwt.encode({
+        'iss': 'skygear-content-manager',
+        'skygear_access_token': skygear_access_token,
+        'is_admin': True,
+    }, CMS_AUTH_SECRET, algorithm='HS256')
+
+    resp_json_body['result']['access_token'] = cms_access_token
+
+    return skygear.Response(
+        response=json.dumps(resp_json_body).encode('utf-8'),
+        status=str(resp.status_code),
+        headers=[
+            (k, v)
+            for k, v in resp.headers.items()
+            if k not in HEADER_BLACKLIST
+        ],
+    )
+
+
+def can_access_cms(resp_body):
     roles = get_roles(resp_body)
 
     # no roles field?
