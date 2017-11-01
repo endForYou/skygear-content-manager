@@ -188,7 +188,7 @@ export function fetchRecord(
 ): ThunkAction<Promise<QueryResult<Record>>, void, void> {
   return dispatch => {
     dispatch(fetchRecordRequest(recordName, recordType, id));
-    return skygear.publicDB.getRecordByID(id).then(
+    return skygear.publicDB.getRecordByID(`${recordType}/${id}`).then(
       (record: Record) => {
         dispatch(fetchRecordSuccess(recordName, recordType, id, record));
       },

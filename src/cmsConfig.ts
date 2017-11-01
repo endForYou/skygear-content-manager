@@ -17,7 +17,15 @@ export interface RecordSiteItemConfig {
 }
 
 export interface RecordConfigMap {
-  [key: string]: RecordConfig;
+  [key: string]: RecordConfig | undefined;
+}
+
+export interface CmsRecord {
+  // name of this CMS Record
+  name: string;
+  // the remote record type of this CMS record
+  // one record type might have multiple CMS record defined in the config
+  recordType: string;
 }
 
 export interface RecordConfig {
@@ -28,20 +36,25 @@ export interface RecordConfig {
 }
 
 export interface ListPageConfig {
+  cmsRecord: CmsRecord;
   label: string;
   perPage: number;
   fields: FieldConfig[];
 }
 
 export interface ShowPageConfig {
+  cmsRecord: CmsRecord;
   label: string;
   fields: FieldConfig[];
 }
 
 export type FieldConfig = StringFieldConfig;
+export enum FieldConfigType {
+  String = 'String',
+}
 
 export interface StringFieldConfig {
-  type: 'String';
+  type: FieldConfigType.String;
   name: string;
   label: string;
 }
@@ -95,23 +108,25 @@ function parseSiteRecordConfig(input: any): RecordSiteItemConfig {
 
 // tslint:disable-next-line: no-any
 function parseRecordConfig(recordName: string, input: any): RecordConfig {
-  const { recordType, list, show } = input;
+  const { list, show } = input;
 
-  const parsedRecordType = recordType ? recordType : recordName;
+  const recordType = parseOptionalString(input.recordType) || recordName;
+  const cmsRecord = { name: recordName, recordType };
   return {
-    list: list == null ? undefined : parseListPageConfig(recordName, list),
+    list: list == null ? undefined : parseListPageConfig(cmsRecord, list),
     recordName,
-    recordType: parsedRecordType,
-    show: show == null ? undefined : parseShowPageConfig(recordName, show),
+    recordType,
+    show: show == null ? undefined : parseShowPageConfig(cmsRecord, show),
   };
 }
 
 // tslint:disable-next-line: no-any
-function parseListPageConfig(recordName: string, input: any): ListPageConfig {
+function parseListPageConfig(cmsRecord: CmsRecord, input: any): ListPageConfig {
   const { label, perPage = 25, fields: fieldConfigs } = input;
 
-  const parsedLabel = label ? label : humanize(recordName);
+  const parsedLabel = label ? label : humanize(cmsRecord.name);
   return {
+    cmsRecord,
     fields: fieldConfigs.map(parseFieldConfig),
     label: parsedLabel,
     perPage,
@@ -119,18 +134,21 @@ function parseListPageConfig(recordName: string, input: any): ListPageConfig {
 }
 
 // tslint:disable-next-line: no-any
-function parseShowPageConfig(recordName: string, input: any): ShowPageConfig {
+function parseShowPageConfig(cmsRecord: CmsRecord, input: any): ShowPageConfig {
   if (!Array.isArray(input.fields)) {
     throw new Error(`ShowPageConfig.fields must be an Array`);
   }
+
+  const label = parseOptionalString(input.label) || humanize(cmsRecord.name);
 
   if (typeof input.label !== 'string' && typeof input.label !== 'undefined') {
     throw new Error(`ShowPageConfig.input must be a string`);
   }
 
   return {
+    cmsRecord,
     fields: input.fields.map(parseFieldConfig),
-    label: input.label || humanize(recordName),
+    label,
   };
 }
 
@@ -154,9 +172,22 @@ function parseStringFieldConfig(input: FieldConfigInput): StringFieldConfig {
     return {
       label: input.label || humanize(input.name),
       name: input.name,
-      type: 'String',
+      type: FieldConfigType.String,
     };
   }
 
   throw new Error(`Invalid input shape of string field: ${input}`);
+}
+
+// tslint:disable-next-line: no-any
+function parseOptionalString(a: any, error?: string): string | undefined {
+  if (a == null) {
+    return undefined;
+  }
+
+  if (typeof a === 'string') {
+    return a;
+  }
+
+  throw new Error(error || `unknown variable type: ${typeof a === 'string'}`);
 }
