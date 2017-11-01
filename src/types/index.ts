@@ -1,1 +1,1 @@
-export { Remote, RemoteLoading, RemoteSuccess, RemoteFailure } from './remote';
+export * from './remote';
