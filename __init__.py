@@ -9,6 +9,7 @@ CMS_SKYGEAR_ENDPOINT = \
     os.environ.get('CMS_SKYGEAR_ENDPOINT', 'http://localhost:3000/')
 CMS_SKYGEAR_MASTER_KEY = \
     os.environ.get('CMS_SKYGEAR_MASTER_KEY', 'FAKE_MASTER_KEY')
+CMS_USER_PERMITTED_ROLE = os.environ.get('CMS_USER_PERMITTED_ROLE', 'Admin')
 
 HEADER_BLACKLIST = [
     'Access-Control-Allow-Credentials',
@@ -21,15 +22,79 @@ HEADER_BLACKLIST = [
 def api(request):
     log_request(request)
 
+    parsed_request_body = parse_body(request.data)
+
+    # handle login request specially
+    if (isinstance(parsed_request_body, dict) and
+            parsed_request_body.get('action') == 'auth:login'):
+        return intercept_login(request, parsed_request_body)
+
     resp = requests.request(
         request.method,
         url=CMS_SKYGEAR_ENDPOINT,
-        data=transform_request_data(request.data),
+        data=transform_request_body(parsed_request_body),
         headers=transform_request_header(request.headers),
     )
 
     log_response(resp)
 
+    return transform_resp(resp)
+
+
+def intercept_login(request, json_body):
+    resp = requests.request(
+        request.method,
+        url=CMS_SKYGEAR_ENDPOINT,
+        data=transform_request_body(json_body),
+        headers=transform_request_header(request.headers),
+    )
+
+    log_response(resp)
+
+    if not (200 <= resp.status_code <= 299):
+        return transform_resp(resp)
+
+    if not can_access_cms(resp):
+        return forbidden_resp(resp)
+
+    return transform_resp(resp)
+
+
+def can_access_cms(resp):
+    resp_body = parse_body(resp.content)
+
+    # unknown resp structure
+    if not isinstance(resp_body, dict):
+        return False
+
+    roles = get_roles(resp_body)
+
+    # no roles field?
+    if roles is None:
+        return False
+
+    if not isinstance(roles, list):
+        return False
+
+    return CMS_USER_PERMITTED_ROLE in roles
+
+
+def get_roles(json_body):
+    roles = json_body.get('result', {}).get('roles', None)
+    if not isinstance(roles, list):
+        return None
+
+    return roles
+
+
+def forbidden_resp(requests_resp):
+    return skygear.Response(
+        'You are not permitted to access CMS',
+        403
+    )
+
+
+def transform_resp(resp):
     return skygear.Response(
         response=resp.content,
         status=str(resp.status_code),
@@ -49,21 +114,23 @@ def transform_request_header(environ_headers):
     return headers
 
 
-def transform_request_data(data):
-    if not data:
-        return data
+def parse_body(b):
+    if not b:
+        return b
 
     try:
-        json_body = json.loads(data.decode('utf-8'))
+        json_body = json.loads(b.decode('utf-8'))
     except json.decoder.JSONDecodeError:
-        return data
+        return b
 
-    if not isinstance(json_body, dict):
-        return data
+    return json_body
 
-    json_body['api_key'] = CMS_SKYGEAR_MASTER_KEY
 
-    return json.dumps(json_body).encode('utf-8')
+def transform_request_body(body):
+    if isinstance(body, dict):
+        body['api_key'] = CMS_SKYGEAR_MASTER_KEY
+
+    return json.dumps(body).encode('utf-8')
 
 
 def log_request(request):
