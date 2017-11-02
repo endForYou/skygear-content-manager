@@ -1,7 +1,9 @@
-import { connect } from 'react-redux';
+import { type } from 'os';
 import * as PropTypes from 'prop-types';
-import React, { PureComponent } from 'react';
 import qs from 'query-string';
+import React, { PureComponent } from 'react';
+import { connect } from 'react-redux';
+import { Link } from 'react-router-dom';
 
 import { RecordActionCreator } from '../actions/record';
 import Pagination from '../components/Pagination';
@@ -26,8 +28,11 @@ const TableHeader = ({ fieldConfigs }) => {
     return <th key={index}>{fieldConfig.label}</th>;
   });
   return (
-    <thead>
-      <tr>{columns}</tr>
+    <thead className="thead-light">
+      <tr>
+        {columns}
+        <th />
+      </tr>
     </thead>
   );
 };
@@ -40,7 +45,20 @@ const TableRow = ({ fieldConfigs, record }) => {
   const columns = fieldConfigs.map((fieldConfig, index) => {
     return <td key={index}>{record[fieldConfig.name]}</td>;
   });
-  return <tr>{columns}</tr>;
+  return (
+    <tr>
+      {columns}
+      <td>
+        <Link className="btn btn-light" to={`/record/${record.id}`}>
+          Show
+        </Link>
+        &nbsp;
+        <Link className="btn btn-light" to={`/record/${record.id}/edit`}>
+          Edit
+        </Link>
+      </td>
+    </tr>
+  );
 };
 
 TableRow.propTypes = {
@@ -62,7 +80,7 @@ TableBody.propTypes = {
 
 const ListTable = ({ fieldConfigs, records }) => {
   return (
-    <table key="table" className="table table-striped">
+    <table key="table" className="table table-sm table-hover table-responsive">
       <TableHeader fieldConfigs={fieldConfigs} />
       <TableBody fieldConfigs={fieldConfigs} records={records} />
     </table>
@@ -103,8 +121,8 @@ class ListPage extends PureComponent {
     } = this.props;
 
     return (
-      <div className="pt-3">
-        <h1>{pageConfig.label}</h1>
+      <div>
+        <h1 className="display-4">{pageConfig.label}</h1>
         <div className="table-responsive">
           {(() => {
             if (isLoading) {

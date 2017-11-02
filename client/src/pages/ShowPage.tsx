@@ -50,7 +50,7 @@ function RecordView({ config, record }: RecordViewProps): JSX.Element {
   });
   return (
     <form>
-      <h1 className="display-3 pt-3">{config.label}</h1>
+      <h1 className="display-4">{config.label}</h1>
       {formGroups}
     </form>
   );

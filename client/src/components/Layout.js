@@ -20,7 +20,7 @@ Layout.propTypes = {
 
 const Main = ({ children }) => {
   return (
-    <main className="col-9" role="main">
+    <main className="col-9 pt-3" role="main">
       {children}
     </main>
   );
