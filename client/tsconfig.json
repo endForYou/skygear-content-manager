@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "alwaysStrict": false,
     "outDir": "build/dist",
     "module": "esnext",
     "target": "es5",
@@ -11,9 +12,7 @@
     "rootDir": "src",
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,
-    "noImplicitThis": true,
-    "noImplicitAny": true,
-    "strictNullChecks": true,
+    "strict": true,
     "suppressImplicitAnyIndexErrors": true,
     "noUnusedLocals": true
   },
