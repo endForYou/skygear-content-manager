@@ -7,6 +7,7 @@ import NotFoundPage from '../components/NotFoundPage';
 import { ListPage, ListPageFactory } from '../pages/ListPage';
 import { ShowPageContainer } from '../pages/ShowPageContainer';
 import { RootState } from '../states';
+import { EditPageContainer } from './EditPageContainer';
 import FrontPage from './FrontPage';
 
 export interface MainPageProps {
@@ -47,6 +48,12 @@ class MainPage extends React.PureComponent<MainPageProps> {
             exact={true}
             path={'/record/:recordName/:recordId'}
             component={ShowPageContainer}
+          />
+
+          <Route
+            exact={true}
+            path={'/record/:recordName/:recordId/edit'}
+            component={EditPageContainer}
           />
 
           <Route component={NotFoundPage} />
