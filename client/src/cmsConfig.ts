@@ -10,10 +10,14 @@ export type SiteConfig = SiteItemConfig[];
 export type SiteItemConfig = RecordSiteItemConfig;
 
 export interface RecordSiteItemConfig {
-  type: string;
+  type: RecordSiteItemConfigType;
 
   name: string;
   label: string;
+}
+
+export enum RecordSiteItemConfigType {
+  Record = 'Record',
 }
 
 export interface RecordConfigMap {
