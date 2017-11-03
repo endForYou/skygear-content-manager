@@ -4,11 +4,12 @@
 
 declare module 'skygear' {
   // tslint:disable-next-line: no-any
-  const skygear: any;
+  const skygear: Container;
   export default skygear;
 
   // tslint:disable-next-line: no-any
   export type Record = any;
+  export const Record: Record;
 
   export type RecordCls = {};
 
@@ -32,6 +33,27 @@ declare module 'skygear' {
     $type: 'geo';
   }
 
+  export class Container {
+    public auth: AuthContainer;
+    public publicDB: Database;
+
+    public config(options: {
+      apiKey: string;
+      endPoint: string;
+    }): Promise<Container>;
+  }
+
+  export class AuthContainer {
+    public currentUser(): Record | undefined;
+
+    public whoami(): Promise<Record>;
+
+    public loginWithUsername(
+      username: string,
+      password: string
+    ): Promise<Record>;
+  }
+
   export class Database {
     public getRecordByID(id: string): Promise<Record>;
 
@@ -44,7 +66,7 @@ declare module 'skygear' {
   export class Query {
     constructor(recordCls: RecordCls);
 
-    public overallCount: number;
+    public overallCount: boolean;
     public limit: number;
     public offset: number;
     public page: number;

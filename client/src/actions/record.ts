@@ -1,5 +1,5 @@
 import { ThunkAction } from 'redux-thunk';
-import skygear, { QueryResult, Record } from 'skygear';
+import skygear, { Query, QueryResult, Record } from 'skygear';
 
 import { CmsRecord } from '../cmsConfig';
 
@@ -168,7 +168,7 @@ function fetchRecordListFailure(
 export function fetchRecord(
   cmsRecord: CmsRecord,
   id: string
-): ThunkAction<Promise<QueryResult<Record>>, void, void> {
+): ThunkAction<Promise<void>, {}, {}> {
   return dispatch => {
     dispatch(fetchRecordRequest(cmsRecord, id));
     return skygear.publicDB.getRecordByID(`${cmsRecord.recordType}/${id}`).then(
@@ -186,11 +186,11 @@ export function fetchRecordList(
   cmsRecord: CmsRecord,
   page: number = 1,
   perPage: number = 25
-): ThunkAction<Promise<QueryResult<Record>>, void, void> {
-  const RecordCls = skygear.Record.extend(cmsRecord.recordType);
+): ThunkAction<Promise<void>, {}, {}> {
+  const RecordCls = Record.extend(cmsRecord.recordType);
 
   return dispatch => {
-    const query = new skygear.Query(RecordCls);
+    const query = new Query(RecordCls);
     query.overallCount = true;
     query.limit = perPage;
     query.offset = (page - 1) * perPage;
@@ -216,15 +216,11 @@ export class RecordActionCreator {
     this.perPage = perPage;
   }
 
-  public fetch(
-    id: string
-  ): ThunkAction<Promise<QueryResult<Record>>, void, void> {
+  public fetch(id: string): ThunkAction<Promise<void>, {}, {}> {
     return fetchRecord(this.cmsRecord, id);
   }
 
-  public fetchList(
-    page: number = 1
-  ): ThunkAction<Promise<QueryResult<Record>>, void, void> {
+  public fetchList(page: number = 1): ThunkAction<Promise<void>, {}, {}> {
     return fetchRecordList(this.cmsRecord, page, this.perPage);
   }
 }
