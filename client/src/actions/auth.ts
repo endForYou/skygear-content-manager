@@ -3,28 +3,30 @@ import skygear, { Record } from 'skygear';
 
 import { AuthState } from '../states';
 
-export const LOGIN_SUCCESS = 'LOGIN_SUCCESS';
-export type LOGIN_SUCCESS = typeof LOGIN_SUCCESS;
+export type AuthActions = LoginSuccess | LoginFailure | UpdateUser;
+
+export enum AuthActionTypes {
+  LoginSuccess = 'LOGIN_SUCCESS',
+  LoginFailure = 'LOGIN_FAILURE',
+  UpdateUser = 'UPDATE_USER',
+}
+
 export interface LoginSuccess {
-  type: LOGIN_SUCCESS;
+  type: AuthActionTypes.LoginSuccess;
   payload: {
     user: Record;
   };
 }
 
-export const LOGIN_FAILURE = 'LOGIN_FAILURE';
-export type LOGIN_FAILURE = typeof LOGIN_FAILURE;
 export interface LoginFailure {
-  type: LOGIN_FAILURE;
+  type: AuthActionTypes.LoginFailure;
   payload: {
     error: Error;
   };
 }
 
-export const UPDATE_USER = 'UPDATE_USER';
-export type UPDATE_USER = typeof UPDATE_USER;
 export interface UpdateUser {
-  type: UPDATE_USER;
+  type: AuthActionTypes.UpdateUser;
   payload: {
     user: Record;
   };
@@ -35,7 +37,7 @@ export function loginSuccess(user: Record): LoginSuccess {
     payload: {
       user,
     },
-    type: LOGIN_SUCCESS,
+    type: AuthActionTypes.LoginSuccess,
   };
 }
 
@@ -44,7 +46,7 @@ export function loginFailure(error: Error): LoginFailure {
     payload: {
       error,
     },
-    type: LOGIN_FAILURE,
+    type: AuthActionTypes.LoginFailure,
   };
 }
 
@@ -53,7 +55,7 @@ export function updateUser(user: Record): UpdateUser {
     payload: {
       user,
     },
-    type: UPDATE_USER,
+    type: AuthActionTypes.UpdateUser,
   };
 }
 

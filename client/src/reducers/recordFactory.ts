@@ -1,14 +1,7 @@
 import { AnyAction, combineReducers, Reducer } from 'redux';
 import { Record } from 'skygear';
 
-import {
-  FETCH_RECORD_FAILURE,
-  FETCH_RECORD_LIST_FAILURE,
-  FETCH_RECORD_LIST_REQUEST,
-  FETCH_RECORD_LIST_SUCCESS,
-  FETCH_RECORD_REQUEST,
-  FETCH_RECORD_SUCCESS,
-} from '../actions/record';
+import { RecordActionTypes } from '../actions/record';
 import {
   initialListState,
   initialRecordViewState,
@@ -51,9 +44,9 @@ function recordListReducer(
   action: AnyAction
 ): ListState {
   switch (action.type) {
-    case FETCH_RECORD_LIST_REQUEST:
+    case RecordActionTypes.FetchListRequest:
       return { ...state, page: action.payload.page };
-    case FETCH_RECORD_LIST_SUCCESS:
+    case RecordActionTypes.FetchListSuccess:
       const { queryResult } = action.payload;
       return {
         ...state,
@@ -61,7 +54,7 @@ function recordListReducer(
         records: queryResult.map((record: Record) => record),
         totalCount: queryResult.overallCount,
       };
-    case FETCH_RECORD_LIST_FAILURE:
+    case RecordActionTypes.FetchListFailure:
       return { ...state, isLoading: false, error: action.payload.error };
     default:
       return state;
@@ -73,17 +66,17 @@ function recordShowReducer(
   action: AnyAction
 ): ShowState {
   switch (action.type) {
-    case FETCH_RECORD_REQUEST:
+    case RecordActionTypes.FetchRequest:
       return {
         ...state,
         remoteRecord: RemoteLoading,
       };
-    case FETCH_RECORD_SUCCESS:
+    case RecordActionTypes.FetchSuccess:
       return {
         ...state,
         remoteRecord: RemoteSuccess<Record>(action.payload.record),
       };
-    case FETCH_RECORD_FAILURE:
+    case RecordActionTypes.FetchFailure:
       return {
         ...state,
         remoteRecord: RemoteFailure(action.payload.error),

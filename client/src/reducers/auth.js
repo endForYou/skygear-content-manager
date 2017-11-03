@@ -1,6 +1,6 @@
 import skygear from 'skygear';
 
-import { LOGIN_SUCCESS, LOGIN_FAILURE, UPDATE_USER } from '../actions/auth';
+import { AuthActionTypes } from '../actions/auth';
 
 const errorMessageFromError = error => {
   if (error.error.code === skygear.ErrorCodes.ResourceNotFound) {
@@ -16,13 +16,13 @@ const errorMessageFromError = error => {
 
 export default function auth(state = { user: null, errorMessage: '' }, action) {
   switch (action.type) {
-    case LOGIN_SUCCESS:
+    case AuthActionTypes.LoginSuccess:
       console.log(`Login succeeded: ${action.user.username}`);
 
       return { ...state, user: action.user, errorMessage: '' };
-    case LOGIN_FAILURE:
+    case AuthActionTypes.LoginFailure:
       return { ...state, errorMessage: errorMessageFromError(action.error) };
-    case UPDATE_USER:
+    case AuthActionTypes.UpdateUser:
       return { ...state, user: action.user };
   }
 

@@ -3,71 +3,7 @@ import skygear, { Query, QueryResult, Record } from 'skygear';
 
 import { CmsRecord } from '../cmsConfig';
 
-export const FETCH_RECORD_REQUEST = 'FETCH_RECORD_REQUEST';
-export type FETCH_RECORD_REQUEST = typeof FETCH_RECORD_REQUEST;
-export interface FetchRecordReuest {
-  type: FETCH_RECORD_REQUEST;
-  payload: {
-    cmsRecord: CmsRecord;
-    id: string;
-  };
-}
-
-export const FETCH_RECORD_SUCCESS = 'FETCH_RECORD_SUCCESS';
-export type FETCH_RECORD_SUCCESS = typeof FETCH_RECORD_SUCCESS;
-export interface FetchRecordSuccess {
-  type: FETCH_RECORD_SUCCESS;
-  payload: {
-    cmsRecord: CmsRecord;
-    id: string;
-    record: Record;
-  };
-}
-
-export const FETCH_RECORD_FAILURE = 'FETCH_RECORD_FAILURE';
-export type FETCH_RECORD_FAILURE = typeof FETCH_RECORD_FAILURE;
-export interface FetchRecordFailure {
-  type: FETCH_RECORD_FAILURE;
-  payload: {
-    cmsRecord: CmsRecord;
-    id: string;
-    error: Error;
-  };
-}
-
-export const FETCH_RECORD_LIST_REQUEST = 'FETCH_RECORD_LIST_REQUEST';
-export type FETCH_RECORD_LIST_REQUEST = typeof FETCH_RECORD_LIST_REQUEST;
-export interface FetchRecordListReuest {
-  payload: {
-    cmsRecord: CmsRecord;
-    page: number;
-  };
-  type: FETCH_RECORD_LIST_REQUEST;
-}
-
-export const FETCH_RECORD_LIST_SUCCESS = 'FETCH_RECORD_LIST_SUCCESS';
-export type FETCH_RECORD_LIST_SUCCESS = typeof FETCH_RECORD_LIST_SUCCESS;
-export interface FetchRecordListSuccess {
-  payload: {
-    cmsRecord: CmsRecord;
-    page: number;
-    perPage: number;
-    queryResult: QueryResult<Record>;
-  };
-  type: FETCH_RECORD_LIST_SUCCESS;
-}
-
-export const FETCH_RECORD_LIST_FAILURE = 'FETCH_RECORD_LIST_FAILURE';
-export type FETCH_RECORD_LIST_FAILURE = typeof FETCH_RECORD_LIST_FAILURE;
-export interface FetchRecordListFailure {
-  payload: {
-    cmsRecord: CmsRecord;
-    error: Error;
-  };
-  type: FETCH_RECORD_LIST_FAILURE;
-}
-
-export type RecordAction =
+export type RecordActions =
   | FetchRecordReuest
   | FetchRecordSuccess
   | FetchRecordFailure
@@ -75,8 +11,65 @@ export type RecordAction =
   | FetchRecordListSuccess
   | FetchRecordListFailure;
 
-export interface RecordNamed {
-  recordName: string;
+export enum RecordActionTypes {
+  FetchRequest = 'FETCH_RECORD_REQUEST',
+  FetchSuccess = 'FETCH_RECORD_SUCCESS',
+  FetchFailure = 'FETCH_RECORD_FAILURE',
+  FetchListRequest = 'FETCH_RECORD_LIST_REQUEST',
+  FetchListSuccess = 'FETCH_RECORD_LIST_SUCCESS',
+  FetchListFailure = 'FETCH_RECORD_LIST_FAILURE',
+}
+
+export interface FetchRecordReuest {
+  type: RecordActionTypes.FetchRequest;
+  payload: {
+    cmsRecord: CmsRecord;
+    id: string;
+  };
+}
+
+export interface FetchRecordSuccess {
+  type: RecordActionTypes.FetchSuccess;
+  payload: {
+    cmsRecord: CmsRecord;
+    id: string;
+    record: Record;
+  };
+}
+
+export interface FetchRecordFailure {
+  type: RecordActionTypes.FetchFailure;
+  payload: {
+    cmsRecord: CmsRecord;
+    id: string;
+    error: Error;
+  };
+}
+
+export interface FetchRecordListReuest {
+  payload: {
+    cmsRecord: CmsRecord;
+    page: number;
+  };
+  type: RecordActionTypes.FetchListRequest;
+}
+
+export interface FetchRecordListSuccess {
+  payload: {
+    cmsRecord: CmsRecord;
+    page: number;
+    perPage: number;
+    queryResult: QueryResult<Record>;
+  };
+  type: RecordActionTypes.FetchListSuccess;
+}
+
+export interface FetchRecordListFailure {
+  payload: {
+    cmsRecord: CmsRecord;
+    error: Error;
+  };
+  type: RecordActionTypes.FetchListFailure;
 }
 
 function fetchRecordRequest(
@@ -88,7 +81,7 @@ function fetchRecordRequest(
       cmsRecord,
       id,
     },
-    type: FETCH_RECORD_REQUEST,
+    type: RecordActionTypes.FetchRequest,
   };
 }
 
@@ -103,7 +96,7 @@ function fetchRecordSuccess(
       id,
       record,
     },
-    type: FETCH_RECORD_SUCCESS,
+    type: RecordActionTypes.FetchSuccess,
   };
 }
 
@@ -118,7 +111,7 @@ function fetchRecordFailure(
       error,
       id,
     },
-    type: FETCH_RECORD_FAILURE,
+    type: RecordActionTypes.FetchFailure,
   };
 }
 
@@ -131,7 +124,7 @@ function fetchRecordListRequest(
       cmsRecord,
       page,
     },
-    type: FETCH_RECORD_LIST_REQUEST,
+    type: RecordActionTypes.FetchListRequest,
   };
 }
 
@@ -148,7 +141,7 @@ function fetchRecordListSuccess(
       perPage,
       queryResult,
     },
-    type: FETCH_RECORD_LIST_SUCCESS,
+    type: RecordActionTypes.FetchListSuccess,
   };
 }
 
@@ -161,7 +154,7 @@ function fetchRecordListFailure(
       cmsRecord,
       error,
     },
-    type: FETCH_RECORD_LIST_FAILURE,
+    type: RecordActionTypes.FetchListFailure,
   };
 }
 
