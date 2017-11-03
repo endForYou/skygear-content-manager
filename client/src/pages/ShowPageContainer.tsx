@@ -73,7 +73,7 @@ export class ShowPageConfigFetcher extends React.PureComponent<
         return (
           <div>
             Couldn&apos;t find view for CMS record name ={' '}
-            {configResult.recordConfig.recordName}
+            {configResult.recordConfig.cmsRecord.name}
           </div>
         );
       default:

@@ -33,8 +33,7 @@ export interface CmsRecord {
 }
 
 export interface RecordConfig {
-  recordName: string;
-  recordType: string;
+  cmsRecord: CmsRecord;
   list?: ListPageConfig;
   show?: ShowPageConfig;
 }
@@ -117,9 +116,8 @@ function parseRecordConfig(recordName: string, input: any): RecordConfig {
   const recordType = parseOptionalString(input.recordType) || recordName;
   const cmsRecord = { name: recordName, recordType };
   return {
+    cmsRecord,
     list: list == null ? undefined : parseListPageConfig(cmsRecord, list),
-    recordName,
-    recordType,
     show: show == null ? undefined : parseShowPageConfig(cmsRecord, show),
   };
 }

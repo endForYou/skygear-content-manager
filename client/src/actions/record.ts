@@ -1,13 +1,14 @@
 import { ThunkAction } from 'redux-thunk';
 import skygear, { QueryResult, Record } from 'skygear';
 
+import { CmsRecord } from '../cmsConfig';
+
 export const FETCH_RECORD_REQUEST = 'FETCH_RECORD_REQUEST';
 export type FETCH_RECORD_REQUEST = typeof FETCH_RECORD_REQUEST;
 export interface FetchRecordReuest {
   type: FETCH_RECORD_REQUEST;
   payload: {
-    recordName: string;
-    recordType: string;
+    cmsRecord: CmsRecord;
     id: string;
   };
 }
@@ -17,8 +18,7 @@ export type FETCH_RECORD_SUCCESS = typeof FETCH_RECORD_SUCCESS;
 export interface FetchRecordSuccess {
   type: FETCH_RECORD_SUCCESS;
   payload: {
-    recordName: string;
-    recordType: string;
+    cmsRecord: CmsRecord;
     id: string;
     record: Record;
   };
@@ -29,8 +29,7 @@ export type FETCH_RECORD_FAILURE = typeof FETCH_RECORD_FAILURE;
 export interface FetchRecordFailure {
   type: FETCH_RECORD_FAILURE;
   payload: {
-    recordName: string;
-    recordType: string;
+    cmsRecord: CmsRecord;
     id: string;
     error: Error;
   };
@@ -40,8 +39,7 @@ export const FETCH_RECORD_LIST_REQUEST = 'FETCH_RECORD_LIST_REQUEST';
 export type FETCH_RECORD_LIST_REQUEST = typeof FETCH_RECORD_LIST_REQUEST;
 export interface FetchRecordListReuest {
   payload: {
-    recordName: string;
-    recordType: string;
+    cmsRecord: CmsRecord;
     page: number;
   };
   type: FETCH_RECORD_LIST_REQUEST;
@@ -51,8 +49,7 @@ export const FETCH_RECORD_LIST_SUCCESS = 'FETCH_RECORD_LIST_SUCCESS';
 export type FETCH_RECORD_LIST_SUCCESS = typeof FETCH_RECORD_LIST_SUCCESS;
 export interface FetchRecordListSuccess {
   payload: {
-    recordName: string;
-    recordType: string;
+    cmsRecord: CmsRecord;
     page: number;
     perPage: number;
     queryResult: QueryResult<Record>;
@@ -64,8 +61,7 @@ export const FETCH_RECORD_LIST_FAILURE = 'FETCH_RECORD_LIST_FAILURE';
 export type FETCH_RECORD_LIST_FAILURE = typeof FETCH_RECORD_LIST_FAILURE;
 export interface FetchRecordListFailure {
   payload: {
-    recordName: string;
-    recordType: string;
+    cmsRecord: CmsRecord;
     error: Error;
   };
   type: FETCH_RECORD_LIST_FAILURE;
@@ -84,128 +80,114 @@ export interface RecordNamed {
 }
 
 function fetchRecordRequest(
-  recordName: string,
-  recordType: string,
+  cmsRecord: CmsRecord,
   id: string
 ): FetchRecordReuest {
   return {
     payload: {
+      cmsRecord,
       id,
-      recordName,
-      recordType,
     },
     type: FETCH_RECORD_REQUEST,
   };
 }
 
 function fetchRecordSuccess(
-  recordName: string,
-  recordType: string,
+  cmsRecord: CmsRecord,
   id: string,
   record: Record
 ): FetchRecordSuccess {
   return {
     payload: {
+      cmsRecord,
       id,
       record,
-      recordName,
-      recordType,
     },
     type: FETCH_RECORD_SUCCESS,
   };
 }
 
 function fetchRecordFailure(
-  recordName: string,
-  recordType: string,
+  cmsRecord: CmsRecord,
   id: string,
   error: Error
 ): FetchRecordFailure {
   return {
     payload: {
+      cmsRecord,
       error,
       id,
-      recordName,
-      recordType,
     },
     type: FETCH_RECORD_FAILURE,
   };
 }
 
 function fetchRecordListRequest(
-  recordName: string,
-  recordType: string,
+  cmsRecord: CmsRecord,
   page: number
 ): FetchRecordListReuest {
   return {
     payload: {
+      cmsRecord,
       page,
-      recordName,
-      recordType,
     },
     type: FETCH_RECORD_LIST_REQUEST,
   };
 }
 
 function fetchRecordListSuccess(
-  recordName: string,
-  recordType: string,
+  cmsRecord: CmsRecord,
   page: number,
   perPage: number,
   queryResult: QueryResult<Record>
 ): FetchRecordListSuccess {
   return {
     payload: {
+      cmsRecord,
       page,
       perPage,
       queryResult,
-      recordName,
-      recordType,
     },
     type: FETCH_RECORD_LIST_SUCCESS,
   };
 }
 
 function fetchRecordListFailure(
-  recordName: string,
-  recordType: string,
+  cmsRecord: CmsRecord,
   error: Error
 ): FetchRecordListFailure {
   return {
     payload: {
+      cmsRecord,
       error,
-      recordName,
-      recordType,
     },
     type: FETCH_RECORD_LIST_FAILURE,
   };
 }
 
 export function fetchRecord(
-  recordName: string,
-  recordType: string,
+  cmsRecord: CmsRecord,
   id: string
 ): ThunkAction<Promise<QueryResult<Record>>, void, void> {
   return dispatch => {
-    dispatch(fetchRecordRequest(recordName, recordType, id));
-    return skygear.publicDB.getRecordByID(`${recordType}/${id}`).then(
+    dispatch(fetchRecordRequest(cmsRecord, id));
+    return skygear.publicDB.getRecordByID(`${cmsRecord.recordType}/${id}`).then(
       (record: Record) => {
-        dispatch(fetchRecordSuccess(recordName, recordType, id, record));
+        dispatch(fetchRecordSuccess(cmsRecord, id, record));
       },
       (error: Error) => {
-        dispatch(fetchRecordFailure(recordName, recordType, id, error));
+        dispatch(fetchRecordFailure(cmsRecord, id, error));
       }
     );
   };
 }
 
 export function fetchRecordList(
-  recordName: string,
-  recordType: string,
+  cmsRecord: CmsRecord,
   page: number = 1,
   perPage: number = 25
 ): ThunkAction<Promise<QueryResult<Record>>, void, void> {
-  const RecordCls = skygear.Record.extend(recordType);
+  const RecordCls = skygear.Record.extend(cmsRecord.recordType);
 
   return dispatch => {
     const query = new skygear.Query(RecordCls);
@@ -213,51 +195,36 @@ export function fetchRecordList(
     query.limit = perPage;
     query.offset = (page - 1) * perPage;
 
-    dispatch(fetchRecordListRequest(recordName, recordType, page));
+    dispatch(fetchRecordListRequest(cmsRecord, page));
     return skygear.publicDB.query(query).then(
       (queryResult: QueryResult<Record>) => {
-        dispatch(
-          fetchRecordListSuccess(
-            recordName,
-            recordType,
-            page,
-            perPage,
-            queryResult
-          )
-        );
+        dispatch(fetchRecordListSuccess(cmsRecord, page, perPage, queryResult));
       },
       (error: Error) => {
-        dispatch(fetchRecordListFailure(recordName, recordType, error));
+        dispatch(fetchRecordListFailure(cmsRecord, error));
       }
     ) as Promise<Record>;
   };
 }
 
 export class RecordActionCreator {
-  private recordName: string;
-  private recordType: string;
+  private cmsRecord: CmsRecord;
   private perPage: number;
 
-  constructor(recordName: string, recordType: string, perPage: number) {
-    this.recordName = recordName;
-    this.recordType = recordType;
+  constructor(cmsRecord: CmsRecord, perPage: number) {
+    this.cmsRecord = cmsRecord;
     this.perPage = perPage;
   }
 
   public fetch(
     id: string
   ): ThunkAction<Promise<QueryResult<Record>>, void, void> {
-    return fetchRecord(this.recordName, this.recordType, id);
+    return fetchRecord(this.cmsRecord, id);
   }
 
   public fetchList(
     page: number = 1
   ): ThunkAction<Promise<QueryResult<Record>>, void, void> {
-    return fetchRecordList(
-      this.recordName,
-      this.recordType,
-      page,
-      this.perPage
-    );
+    return fetchRecordList(this.cmsRecord, page, this.perPage);
   }
 }

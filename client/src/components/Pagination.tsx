@@ -1,17 +1,16 @@
-import { Link } from 'react-router-dom';
-import * as PropTypes from 'prop-types';
-import React, { PureComponent } from 'react';
-import classNames from 'classnames';
+import * as React from 'react';
 
-export default class Pagination extends PureComponent {
-  static propTypes = {
-    recordName: PropTypes.string.isRequired,
-    currentPage: PropTypes.number.isRequired,
-    maxPage: PropTypes.number.isRequired,
-    onItemClicked: PropTypes.func.isRequired,
-  };
+import { OnPageItemClickedType, PageItem } from './PageItem';
 
-  render() {
+export interface PaginationProps {
+  recordName: string;
+  currentPage: number;
+  maxPage: number;
+  onItemClicked: OnPageItemClickedType;
+}
+
+export default class Pagination extends React.PureComponent<PaginationProps> {
+  public render() {
     return (
       <nav>
         <ul className="pagination justify-content-end">
@@ -21,7 +20,7 @@ export default class Pagination extends PureComponent {
     );
   }
 
-  renderPaginationItems() {
+  protected renderPaginationItems() {
     const { recordName, currentPage, maxPage, onItemClicked } = this.props;
 
     const middleItems = getPages(currentPage, maxPage).map(page => {
@@ -66,52 +65,7 @@ export default class Pagination extends PureComponent {
   }
 }
 
-class PageItem extends PureComponent {
-  static propTypes = {
-    children: PropTypes.node,
-    recordName: PropTypes.string.isRequired,
-    page: PropTypes.number.isRequired,
-    onClick: PropTypes.func.isRequired,
-    isDisabled: PropTypes.bool,
-    isActive: PropTypes.bool,
-  };
-
-  render() {
-    const {
-      children,
-      recordName,
-      page,
-      onClick,
-      isDisabled = false,
-      isActive = false,
-    } = this.props;
-
-    if (isDisabled) {
-      return (
-        <li className="page-item disabled">
-          <span className="page-link">{children}</span>
-        </li>
-      );
-    } else {
-      const itemClassName = classNames('page-item', {
-        active: isActive,
-      });
-      return (
-        <li className={itemClassName}>
-          <Link
-            className="page-link"
-            to={`/record/${recordName}?page=${page}`}
-            onClick={() => onClick(page)}
-          >
-            {children}
-          </Link>
-        </li>
-      );
-    }
-  }
-}
-
-function getPages(page, maxPage) {
+function getPages(page: number, maxPage: number): number[] {
   const minPage = 1;
   const step = 5;
 

@@ -32,8 +32,7 @@ export function makeShowPage(
 
   const HOC = class extends React.Component {
     public componentDidMount() {
-      const { name, recordType } = config.cmsRecord;
-      dispatch(fetchRecord(name, recordType, recordId));
+      dispatch(fetchRecord(config.cmsRecord, recordId));
     }
 
     public render() {

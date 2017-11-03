@@ -34,8 +34,8 @@ function recordViewsByNameReducerFactory(
   }, {});
 
   return (state = initialState, action) => {
-    if (action.payload && action.payload.recordName) {
-      const recordName = action.payload.recordName;
+    if (action.payload && action.payload.cmsRecord) {
+      const recordName = action.payload.cmsRecord.name;
       return {
         ...state,
         [recordName]: recordViewsReducer(state[recordName], action),
