@@ -79,7 +79,7 @@ function Field(props: FieldProps): JSX.Element {
         <StringField
           className="form-control"
           name={fieldConfig.name}
-          content={record[fieldConfig.name] as string}
+          value={record[fieldConfig.name]}
         />
       );
     default:

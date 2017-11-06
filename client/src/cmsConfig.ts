@@ -64,6 +64,8 @@ export enum FieldConfigType {
 }
 
 export interface StringFieldConfig {
+  editable?: boolean;
+
   type: FieldConfigType.String;
   name: string;
   label: string;
@@ -174,9 +176,12 @@ function parseEditPageConfig(cmsRecord: CmsRecord, input: any): EditPageConfig {
     throw new Error(`EditPageConfig.label must be a string`);
   }
 
+  const fields = input.fields.map(parseFieldConfig) as StringFieldConfig[];
+  const editableFields = fields.map(config => ({ editable: true, ...config }));
+
   return {
     cmsRecord,
-    fields: input.fields.map(parseFieldConfig),
+    fields: editableFields,
     label,
   };
 }

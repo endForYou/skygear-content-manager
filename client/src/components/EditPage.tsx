@@ -13,25 +13,28 @@ export class EditPage extends React.PureComponent<EditPageProps> {
   public render() {
     const { config, record } = this.props;
 
-    return <RecordView config={config} record={record} />;
+    const formGroups = config.fields.map((fieldConfig, index) => {
+      return (
+        <FormGroup key={index} fieldConfig={fieldConfig} record={record} />
+      );
+    });
+
+    return (
+      <form onSubmit={this.handleSubmit}>
+        <h1 className="display-4">{config.label}</h1>
+        {formGroups}
+        <button type="submit" className="btn btn-primary">
+          Save
+        </button>
+      </form>
+    );
   }
-}
 
-interface RecordViewProps {
-  config: EditPageConfig;
-  record: Record;
-}
+  public handleSubmit: React.FormEventHandler<HTMLFormElement> = event => {
+    alert('Form submitted');
 
-function RecordView({ config, record }: RecordViewProps): JSX.Element {
-  const formGroups = config.fields.map((fieldConfig, index) => {
-    return <FormGroup key={index} fieldConfig={fieldConfig} record={record} />;
-  });
-  return (
-    <form>
-      <h1 className="display-4">{config.label}</h1>
-      {formGroups}
-    </form>
-  );
+    event.preventDefault();
+  };
 }
 
 interface FieldProps {
@@ -57,7 +60,8 @@ function Field(props: FieldProps): JSX.Element {
         <StringField
           className="form-control"
           name={fieldConfig.name}
-          content={record[fieldConfig.name] as string}
+          editable={fieldConfig.editable}
+          value={record[fieldConfig.name]}
         />
       );
     default:
