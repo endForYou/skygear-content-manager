@@ -32,6 +32,7 @@ export function makeShowPage(
 
   const HOC = class extends React.Component {
     public componentDidMount() {
+      // TODO: use RecordActionDispatcher instead of direct dispatch
       dispatch(fetchRecord(config.cmsRecord, recordId));
     }
 

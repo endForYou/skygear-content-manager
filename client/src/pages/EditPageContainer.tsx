@@ -1,9 +1,9 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
-import { bindActionCreators, Dispatch } from 'redux';
+import { Dispatch } from 'redux';
 import { Record } from 'skygear';
 
-import { fetchRecord, saveRecord } from '../actions/record';
+import { RecordActionDispatcher } from '../actions/record';
 import { EditPageConfig } from '../cmsConfig';
 import { EditPage } from '../components/EditPage';
 import { RootState } from '../states';
@@ -21,13 +21,23 @@ interface StateProps {
 }
 
 interface DispatchProps {
-  fetchRecord: typeof fetchRecord;
-  saveRecord: typeof saveRecord;
+  dispatch: Dispatch<RootState>;
 }
 
 class EditPageContainer extends React.PureComponent<EditPageContainerProps> {
+  public recordDispatcher: RecordActionDispatcher;
+
+  constructor(props: EditPageContainerProps) {
+    super(props);
+
+    this.recordDispatcher = new RecordActionDispatcher(
+      props.dispatch,
+      props.config.cmsRecord
+    );
+  }
+
   public componentDidMount() {
-    this.props.fetchRecord(this.props.config.cmsRecord, this.props.recordId);
+    this.recordDispatcher.fetch(this.props.recordId);
   }
 
   public render() {
@@ -40,7 +50,7 @@ class EditPageContainer extends React.PureComponent<EditPageContainerProps> {
           <EditPage
             config={this.props.config}
             record={remoteRecord.value}
-            saveRecord={this.props.saveRecord}
+            recordDispatcher={this.recordDispatcher}
           />
         );
       case RemoteType.Failure:
@@ -63,13 +73,7 @@ function mapStateToProps(state: RootState, ownProps: OwnProps): StateProps {
 }
 
 function mapDispatchToProps(dispatch: Dispatch<RootState>): DispatchProps {
-  return bindActionCreators(
-    {
-      fetchRecord,
-      saveRecord,
-    },
-    dispatch
-  );
+  return { dispatch };
 }
 
 const ConnectedEditPageContainer = connect(mapStateToProps, mapDispatchToProps)(

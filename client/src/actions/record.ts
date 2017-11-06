@@ -1,7 +1,9 @@
+import { Dispatch } from 'redux';
 import { ThunkAction } from 'redux-thunk';
 import skygear, { Query, QueryResult, Record } from 'skygear';
 
 import { CmsRecord } from '../cmsConfig';
+import { RootState } from '../states';
 
 export type RecordActions =
   | FetchRecordReuest
@@ -247,7 +249,7 @@ export function fetchRecord(
   };
 }
 
-export function saveRecord(
+function saveRecord(
   cmsRecord: CmsRecord,
   record: Record
 ): ThunkAction<Promise<void>, {}, {}> {
@@ -264,7 +266,7 @@ export function saveRecord(
   };
 }
 
-export function fetchRecordList(
+function fetchRecordList(
   cmsRecord: CmsRecord,
   page: number = 1,
   perPage: number = 25
@@ -289,21 +291,24 @@ export function fetchRecordList(
   };
 }
 
-export class RecordActionCreator {
+export class RecordActionDispatcher {
+  private dispatch: Dispatch<RootState>;
   private cmsRecord: CmsRecord;
 
-  constructor(cmsRecord: CmsRecord) {
+  constructor(dispatch: Dispatch<RootState>, cmsRecord: CmsRecord) {
+    this.dispatch = dispatch;
     this.cmsRecord = cmsRecord;
   }
 
-  public fetch(id: string): ThunkAction<Promise<void>, {}, {}> {
-    return fetchRecord(this.cmsRecord, id);
+  public fetch(id: string): Promise<void> {
+    return this.dispatch(fetchRecord(this.cmsRecord, id));
   }
 
-  public fetchList(
-    page: number,
-    perPage: number
-  ): ThunkAction<Promise<void>, {}, {}> {
-    return fetchRecordList(this.cmsRecord, page, perPage);
+  public fetchList(page: number, perPage: number): Promise<void> {
+    return this.dispatch(fetchRecordList(this.cmsRecord, page, perPage));
+  }
+
+  public save(record: Record): Promise<void> {
+    return this.dispatch(saveRecord(this.cmsRecord, record));
   }
 }

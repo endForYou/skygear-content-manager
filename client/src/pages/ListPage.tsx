@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import { Dispatch } from 'redux';
 import { Record } from 'skygear';
 
-import { RecordActionCreator } from '../actions/record';
+import { RecordActionDispatcher } from '../actions/record';
 import { FieldConfig, ListPageConfig } from '../cmsConfig';
 import Pagination from '../components/Pagination';
 import { RootState } from '../states';
@@ -79,11 +79,10 @@ const ListTable: React.SFC<ListTableProps> = ({ fieldConfigs, records }) => {
   );
 };
 
-export type ListPageProps = StateProps & OwnProps;
+export type ListPageProps = StateProps & DispatchProps;
 
 interface StateProps {
   recordName: string;
-  recordActionCreator: RecordActionCreator;
   pageConfig: ListPageConfig;
   page: number;
   maxPage: number;
@@ -91,15 +90,25 @@ interface StateProps {
   records: Record[];
 }
 
-interface OwnProps {
+interface DispatchProps {
   dispatch: Dispatch<RootState>;
 }
 
 class ListPage extends React.PureComponent<ListPageProps> {
-  public componentDidMount() {
-    const { dispatch, recordActionCreator, page, pageConfig } = this.props;
+  public recordActionCreator: RecordActionDispatcher;
 
-    dispatch(recordActionCreator.fetchList(page, pageConfig.perPage));
+  constructor(props: ListPageProps) {
+    super(props);
+
+    const { dispatch, pageConfig: { cmsRecord } } = this.props;
+
+    this.recordActionCreator = new RecordActionDispatcher(dispatch, cmsRecord);
+  }
+
+  public componentDidMount() {
+    const { page, pageConfig } = this.props;
+
+    this.recordActionCreator.fetchList(page, pageConfig.perPage);
   }
 
   public render() {
@@ -147,14 +156,14 @@ class ListPage extends React.PureComponent<ListPageProps> {
   }
 
   public onPageItemClicked = (page: number) => {
-    const { dispatch, pageConfig, recordActionCreator } = this.props;
+    const { pageConfig } = this.props;
 
-    dispatch(recordActionCreator.fetchList(page, pageConfig.perPage));
+    this.recordActionCreator.fetchList(page, pageConfig.perPage);
   };
 }
 
 function ListPageFactory(recordName: string) {
-  function mapStateToProps(state: RootState, ownProps: OwnProps): StateProps {
+  function mapStateToProps(state: RootState): StateProps {
     const { location } = state.router;
     const { page: pageStr = '1' } = qs.parse(location ? location.search : '');
     const page = parseInt(pageStr, 10);
@@ -166,7 +175,7 @@ function ListPageFactory(recordName: string) {
       );
     }
 
-    const { cmsRecord, list: pageConfig } = recordConfig;
+    const { list: pageConfig } = recordConfig;
     if (pageConfig == null) {
       throw new Error(`Couldn't find PageConfig of list view`);
     }
@@ -175,8 +184,6 @@ function ListPageFactory(recordName: string) {
       recordName
     ].list;
 
-    const recordActionCreator = new RecordActionCreator(cmsRecord);
-
     const maxPage = Math.ceil(totalCount / pageConfig.perPage);
 
     return {
@@ -184,13 +191,16 @@ function ListPageFactory(recordName: string) {
       maxPage,
       page,
       pageConfig,
-      recordActionCreator,
       recordName,
       records,
     };
   }
 
-  return connect(mapStateToProps)(ListPage);
+  function mapDispatchToProps(dispatch: Dispatch<RootState>): DispatchProps {
+    return { dispatch };
+  }
+
+  return connect(mapStateToProps, mapDispatchToProps)(ListPage);
 }
 
 export { ListPage, ListPageFactory };

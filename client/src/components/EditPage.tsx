@@ -1,14 +1,14 @@
 import * as React from 'react';
 import { Record } from 'skygear';
 
-import { saveRecord } from '../actions/record';
+import { RecordActionDispatcher } from '../actions/record';
 import { EditPageConfig, FieldConfig, FieldConfigType } from '../cmsConfig';
 import { StringField } from '../fields';
 
 export interface EditPageProps {
   config: EditPageConfig;
   record: Record;
-  saveRecord: typeof saveRecord;
+  recordDispatcher: RecordActionDispatcher;
 }
 
 interface State {
@@ -66,16 +66,12 @@ export class EditPage extends React.PureComponent<EditPageProps, State> {
     event.preventDefault();
 
     // better clone the record if possible
-    const {
-      config: { cmsRecord },
-      record,
-      saveRecord: saveRecordFunc,
-    } = this.props;
+    const { record, recordDispatcher } = this.props;
     const { recordChange } = this.state;
 
     mergeRecordChange(record, recordChange);
 
-    saveRecordFunc(cmsRecord, record);
+    recordDispatcher.save(record);
   };
 }
 
