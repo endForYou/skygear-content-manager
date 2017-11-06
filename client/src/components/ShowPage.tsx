@@ -4,7 +4,7 @@ import { Record } from 'skygear';
 import {
   CmsRecord,
   FieldConfig,
-  FieldConfigType,
+  FieldConfigTypes,
   ShowPageConfig,
 } from '../cmsConfig';
 import { StringField } from '../fields';
@@ -74,7 +74,7 @@ function FormGroup(props: FieldProps): JSX.Element {
 function Field(props: FieldProps): JSX.Element {
   const { fieldConfig, record } = props;
   switch (fieldConfig.type) {
-    case FieldConfigType.String:
+    case FieldConfigTypes.String:
       return (
         <StringField
           className="form-control"

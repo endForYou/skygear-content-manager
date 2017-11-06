@@ -58,28 +58,30 @@ export interface EditPageConfig {
   fields: FieldConfig[];
 }
 
-export type FieldConfig = StringFieldConfig;
-export enum FieldConfigType {
+export type FieldConfig = StringFieldConfig | DateTimeFieldConfig;
+export enum FieldConfigTypes {
   String = 'String',
+  DateTime = 'DateTime',
 }
-
-export interface StringFieldConfig {
-  editable?: boolean;
-
-  type: FieldConfigType.String;
+interface FieldConfigAttrs {
   name: string;
   label: string;
+
+  editable?: boolean;
+}
+
+export interface StringFieldConfig extends FieldConfigAttrs {
+  type: FieldConfigTypes.String;
+}
+
+export interface DateTimeFieldConfig extends FieldConfigAttrs {
+  type: FieldConfigTypes.DateTime;
 }
 
 interface FieldConfigInput {
   type: string;
   // tslint:disable-next-line: no-any
   [key: string]: any;
-}
-
-interface StringFieldConfigInput extends FieldConfigInput {
-  name: string;
-  label?: string;
 }
 
 // tslint:disable-next-line: no-any
@@ -191,26 +193,39 @@ function parseFieldConfig(a: any): FieldConfig {
   switch (a.type) {
     case 'String':
       return parseStringFieldConfig(a);
+    case 'DateTime':
+      return parseDateTimeFieldConfig(a);
     default:
       throw new Error(`Received unknown field config type: ${a.type}`);
   }
 }
 
 function parseStringFieldConfig(input: FieldConfigInput): StringFieldConfig {
-  function isValidInput(i: FieldConfigInput): i is StringFieldConfigInput {
-    // tslint:disable-next-line: no-any
-    return i.type === 'String' && typeof (i as any).name === 'string';
+  return { ...parseFieldConfigAttrs(input), type: FieldConfigTypes.String };
+}
+
+function parseDateTimeFieldConfig(
+  input: FieldConfigInput
+): DateTimeFieldConfig {
+  return { ...parseFieldConfigAttrs(input), type: FieldConfigTypes.DateTime };
+}
+
+// tslint:disable-next-line: no-any
+function parseFieldConfigAttrs(input: any): FieldConfigAttrs {
+  const name = parseString(input.name);
+  const label = parseOptionalString(input.label) || humanize(name);
+
+  return { name, label };
+}
+
+// tslint:disable-next-line: no-any
+function parseString(a: any, error?: string): string {
+  const optionalString = parseOptionalString(a, error);
+  if (optionalString === undefined) {
+    throw new Error(error || 'expect a string, got undefined');
   }
 
-  if (isValidInput(input)) {
-    return {
-      label: input.label || humanize(input.name),
-      name: input.name,
-      type: FieldConfigType.String,
-    };
-  }
-
-  throw new Error(`Invalid input shape of string field: ${input}`);
+  return optionalString;
 }
 
 // tslint:disable-next-line: no-any

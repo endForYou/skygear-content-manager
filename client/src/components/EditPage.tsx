@@ -2,7 +2,7 @@ import * as React from 'react';
 import { OutlawError, Record } from 'skygear';
 
 import { RecordActionDispatcher } from '../actions/record';
-import { EditPageConfig, FieldConfig, FieldConfigType } from '../cmsConfig';
+import { EditPageConfig, FieldConfig, FieldConfigTypes } from '../cmsConfig';
 import { StringField } from '../fields';
 import { Remote, RemoteType } from '../types';
 
@@ -107,7 +107,7 @@ function Field(props: FieldProps): JSX.Element {
   const { name } = fieldConfig;
 
   switch (fieldConfig.type) {
-    case FieldConfigType.String:
+    case FieldConfigTypes.String:
       const fieldValue =
         recordChange[name] === undefined ? record[name] : recordChange[name];
       return (

@@ -24,6 +24,9 @@ records:
       fields:
         - name: name
           type: String
+        - name: _created_at
+          label: Created at
+          type: DateTime
     show:
       label: View Poll
       fields:
