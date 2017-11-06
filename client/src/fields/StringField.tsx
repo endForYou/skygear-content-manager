@@ -1,21 +1,16 @@
 import * as React from 'react';
 
-export type StringFieldProps = Props & React.HTMLAttributes<HTMLElement>;
+import { RequiredFieldProps } from './Field';
 
-interface Props {
-  editable?: boolean;
-  onFieldChange?: (value: string) => void;
-
-  value: string;
-  name?: string; // <input /> name
-}
+export type StringFieldProps = RequiredFieldProps &
+  React.HTMLAttributes<HTMLElement>;
 
 interface State {
   value: string;
 }
 
 export class StringField extends React.PureComponent<StringFieldProps, State> {
-  constructor(props: Props) {
+  constructor(props: StringFieldProps) {
     super(props);
 
     this.state = {
