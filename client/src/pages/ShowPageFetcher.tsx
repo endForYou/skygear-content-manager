@@ -7,7 +7,7 @@ import { fetchRecord } from '../actions/record';
 import { ShowPageConfig } from '../cmsConfig';
 import { RootState } from '../states';
 import { Remote } from '../types';
-import { ShowPage } from './ShowPage';
+import { ShowPage } from './../components/ShowPage';
 
 export type ShowPageFetcherType = React.ComponentType;
 

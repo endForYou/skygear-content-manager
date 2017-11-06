@@ -3,10 +3,10 @@ import * as PropTypes from 'prop-types';
 import * as React from 'react';
 
 import LoginPage from './LoginPage';
-import { MainPageConnected } from './MainPage';
+import { MainPage } from './MainPage';
 
 const _App = ({ isLoggedIn }) => {
-  return isLoggedIn ? <MainPageConnected /> : <LoginPage />;
+  return isLoggedIn ? <MainPage /> : <LoginPage />;
 };
 
 _App.propTypes = {
