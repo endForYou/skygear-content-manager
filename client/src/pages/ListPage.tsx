@@ -97,9 +97,9 @@ interface OwnProps {
 
 class ListPage extends React.PureComponent<ListPageProps> {
   public componentDidMount() {
-    const { dispatch, recordActionCreator, page } = this.props;
+    const { dispatch, recordActionCreator, page, pageConfig } = this.props;
 
-    dispatch(recordActionCreator.fetchList(page));
+    dispatch(recordActionCreator.fetchList(page, pageConfig.perPage));
   }
 
   public render() {
@@ -147,9 +147,9 @@ class ListPage extends React.PureComponent<ListPageProps> {
   }
 
   public onPageItemClicked = (page: number) => {
-    const { dispatch, recordActionCreator } = this.props;
+    const { dispatch, pageConfig, recordActionCreator } = this.props;
 
-    dispatch(recordActionCreator.fetchList(page));
+    dispatch(recordActionCreator.fetchList(page, pageConfig.perPage));
   };
 }
 
@@ -175,10 +175,7 @@ function ListPageFactory(recordName: string) {
       recordName
     ].list;
 
-    const recordActionCreator = new RecordActionCreator(
-      cmsRecord,
-      pageConfig.perPage
-    );
+    const recordActionCreator = new RecordActionCreator(cmsRecord);
 
     const maxPage = Math.ceil(totalCount / pageConfig.perPage);
 

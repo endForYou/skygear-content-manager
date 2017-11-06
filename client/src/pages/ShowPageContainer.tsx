@@ -9,7 +9,7 @@ import { makeShowPage, ShowPageFetcherType } from './ShowPageFetcher';
 type PureShowPageContainerProps = Props & DispatchProps;
 
 interface Props {
-  pageConfig: ShowPageConfig;
+  config: ShowPageConfig;
   recordId: string;
 }
 
@@ -25,9 +25,9 @@ class PureShowPageContainer extends React.PureComponent<
   constructor(props: PureShowPageContainerProps) {
     super(props);
 
-    const { dispatch, pageConfig, recordId } = props;
+    const { dispatch, config, recordId } = props;
 
-    this.showPageFetcher = makeShowPage(dispatch, pageConfig, recordId);
+    this.showPageFetcher = makeShowPage(dispatch, config, recordId);
   }
 
   public render() {

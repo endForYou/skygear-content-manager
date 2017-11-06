@@ -1,7 +1,13 @@
 import * as React from 'react';
 import { Route } from 'react-router';
 
-import { ListPageConfig, RecordConfig, ShowPageConfig } from '../../cmsConfig';
+import {
+  EditPageConfig,
+  ListPageConfig,
+  RecordConfig,
+  ShowPageConfig,
+} from '../../cmsConfig';
+import { EditPageContainer } from '../../pages/EditPageContainer';
 import { ListPageFactory } from '../../pages/ListPage';
 import { ShowPageContainer } from '../../pages/ShowPageContainer';
 
@@ -20,6 +26,9 @@ function routesFromRecordConfig(config: RecordConfig): JSX.Element[] {
   }
   if (config.show) {
     routes.push(makeShowRoute(config.show));
+  }
+  if (config.edit) {
+    routes.push(makeEditRoute(config.edit));
   }
 
   return routes;
@@ -46,7 +55,24 @@ function makeShowRoute(config: ShowPageConfig): JSX.Element {
       path={`/record/${recordName}/:recordId`}
       render={routeProps => (
         <ShowPageContainer
-          pageConfig={config}
+          config={config}
+          recordId={routeProps.match.params.recordId}
+        />
+      )}
+    />
+  );
+}
+
+function makeEditRoute(config: EditPageConfig): JSX.Element {
+  const recordName = config.cmsRecord.name;
+  return (
+    <Route
+      key={`${recordName}-list`}
+      exact={true}
+      path={`/record/${recordName}/:recordId/edit`}
+      render={routeProps => (
+        <EditPageContainer
+          config={config}
           recordId={routeProps.match.params.recordId}
         />
       )}

@@ -36,6 +36,7 @@ export interface RecordConfig {
   cmsRecord: CmsRecord;
   list?: ListPageConfig;
   show?: ShowPageConfig;
+  edit?: EditPageConfig;
 }
 
 export interface ListPageConfig {
@@ -46,6 +47,12 @@ export interface ListPageConfig {
 }
 
 export interface ShowPageConfig {
+  cmsRecord: CmsRecord;
+  label: string;
+  fields: FieldConfig[];
+}
+
+export interface EditPageConfig {
   cmsRecord: CmsRecord;
   label: string;
   fields: FieldConfig[];
@@ -111,12 +118,13 @@ function parseSiteRecordConfig(input: any): RecordSiteItemConfig {
 
 // tslint:disable-next-line: no-any
 function parseRecordConfig(recordName: string, input: any): RecordConfig {
-  const { list, show } = input;
+  const { list, show, edit } = input;
 
   const recordType = parseOptionalString(input.recordType) || recordName;
   const cmsRecord = { name: recordName, recordType };
   return {
     cmsRecord,
+    edit: edit == null ? undefined : parseEditPageConfig(cmsRecord, edit),
     list: list == null ? undefined : parseListPageConfig(cmsRecord, list),
     show: show == null ? undefined : parseShowPageConfig(cmsRecord, show),
   };
@@ -144,7 +152,26 @@ function parseShowPageConfig(cmsRecord: CmsRecord, input: any): ShowPageConfig {
   const label = parseOptionalString(input.label) || humanize(cmsRecord.name);
 
   if (typeof input.label !== 'string' && typeof input.label !== 'undefined') {
-    throw new Error(`ShowPageConfig.input must be a string`);
+    throw new Error(`ShowPageConfig.label must be a string`);
+  }
+
+  return {
+    cmsRecord,
+    fields: input.fields.map(parseFieldConfig),
+    label,
+  };
+}
+
+// tslint:disable-next-line: no-any
+function parseEditPageConfig(cmsRecord: CmsRecord, input: any): EditPageConfig {
+  if (!Array.isArray(input.fields)) {
+    throw new Error(`EditPageConfig.fields must be an Array`);
+  }
+
+  const label = parseOptionalString(input.label) || humanize(cmsRecord.name);
+
+  if (typeof input.label !== 'string' && typeof input.label !== 'undefined') {
+    throw new Error(`EditPageConfig.label must be a string`);
   }
 
   return {

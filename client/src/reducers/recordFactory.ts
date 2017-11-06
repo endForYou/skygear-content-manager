@@ -3,6 +3,8 @@ import { Record } from 'skygear';
 
 import { RecordActionTypes } from '../actions/record';
 import {
+  EditState,
+  initialEditState,
   initialListState,
   initialRecordViewState,
   initialShowState,
@@ -14,6 +16,7 @@ import {
 import { RemoteFailure, RemoteLoading, RemoteSuccess } from '../types';
 
 const recordViewsReducer = combineReducers<RecordViewState>({
+  edit: recordEditReducer,
   list: recordListReducer,
   show: recordShowReducer,
 });
@@ -77,6 +80,46 @@ function recordShowReducer(
         remoteRecord: RemoteSuccess<Record>(action.payload.record),
       };
     case RecordActionTypes.FetchFailure:
+      return {
+        ...state,
+        remoteRecord: RemoteFailure(action.payload.error),
+      };
+    default:
+      return state;
+  }
+}
+
+function recordEditReducer(
+  state: EditState = initialEditState,
+  action: AnyAction
+): EditState {
+  switch (action.type) {
+    case RecordActionTypes.FetchRequest:
+      return {
+        ...state,
+        remoteRecord: RemoteLoading,
+      };
+    case RecordActionTypes.FetchSuccess:
+      return {
+        ...state,
+        remoteRecord: RemoteSuccess<Record>(action.payload.record),
+      };
+    case RecordActionTypes.FetchFailure:
+      return {
+        ...state,
+        remoteRecord: RemoteFailure(action.payload.error),
+      };
+    case RecordActionTypes.SaveRequest:
+      return {
+        ...state,
+        remoteRecord: RemoteLoading,
+      };
+    case RecordActionTypes.SaveSuccess:
+      return {
+        ...state,
+        remoteRecord: RemoteSuccess<Record>(action.payload.record),
+      };
+    case RecordActionTypes.SaveFailure:
       return {
         ...state,
         remoteRecord: RemoteFailure(action.payload.error),

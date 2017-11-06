@@ -9,7 +9,10 @@ export type RecordActions =
   | FetchRecordFailure
   | FetchRecordListReuest
   | FetchRecordListSuccess
-  | FetchRecordListFailure;
+  | FetchRecordListFailure
+  | SaveRecordReuest
+  | SaveRecordSuccess
+  | SaveRecordFailure;
 
 export enum RecordActionTypes {
   FetchRequest = 'FETCH_RECORD_REQUEST',
@@ -18,6 +21,9 @@ export enum RecordActionTypes {
   FetchListRequest = 'FETCH_RECORD_LIST_REQUEST',
   FetchListSuccess = 'FETCH_RECORD_LIST_SUCCESS',
   FetchListFailure = 'FETCH_RECORD_LIST_FAILURE',
+  SaveRequest = 'SAVE_RECORD_REQUEST',
+  SaveSuccess = 'SAVE_RECORD_SUCCESS',
+  SaveFailure = 'SAVE_RECORD_FAILURE',
 }
 
 export interface FetchRecordReuest {
@@ -70,6 +76,31 @@ export interface FetchRecordListFailure {
     error: Error;
   };
   type: RecordActionTypes.FetchListFailure;
+}
+
+export interface SaveRecordReuest {
+  type: RecordActionTypes.SaveRequest;
+  payload: {
+    cmsRecord: CmsRecord;
+    record: Record;
+  };
+}
+
+export interface SaveRecordSuccess {
+  type: RecordActionTypes.SaveSuccess;
+  payload: {
+    cmsRecord: CmsRecord;
+    record: Record;
+  };
+}
+
+export interface SaveRecordFailure {
+  type: RecordActionTypes.SaveFailure;
+  payload: {
+    cmsRecord: CmsRecord;
+    record: Record;
+    error: Error;
+  };
 }
 
 function fetchRecordRequest(
@@ -158,6 +189,47 @@ function fetchRecordListFailure(
   };
 }
 
+function saveRecordRequest(
+  cmsRecord: CmsRecord,
+  record: Record
+): SaveRecordReuest {
+  return {
+    payload: {
+      cmsRecord,
+      record,
+    },
+    type: RecordActionTypes.SaveRequest,
+  };
+}
+
+function saveRecordSuccess(
+  cmsRecord: CmsRecord,
+  record: Record
+): SaveRecordSuccess {
+  return {
+    payload: {
+      cmsRecord,
+      record,
+    },
+    type: RecordActionTypes.SaveSuccess,
+  };
+}
+
+function saveRecordFailure(
+  cmsRecord: CmsRecord,
+  record: Record,
+  error: Error
+): SaveRecordFailure {
+  return {
+    payload: {
+      cmsRecord,
+      error,
+      record,
+    },
+    type: RecordActionTypes.SaveFailure,
+  };
+}
+
 export function fetchRecord(
   cmsRecord: CmsRecord,
   id: string
@@ -170,6 +242,23 @@ export function fetchRecord(
       },
       (error: Error) => {
         dispatch(fetchRecordFailure(cmsRecord, id, error));
+      }
+    );
+  };
+}
+
+export function saveRecord(
+  cmsRecord: CmsRecord,
+  record: Record
+): ThunkAction<Promise<void>, {}, {}> {
+  return dispatch => {
+    dispatch(saveRecordRequest(cmsRecord, record));
+    return skygear.publicDB.save(record).then(
+      (savedRecord: Record) => {
+        dispatch(saveRecordSuccess(cmsRecord, savedRecord));
+      },
+      (error: Error) => {
+        dispatch(saveRecordFailure(cmsRecord, record, error));
       }
     );
   };
@@ -202,18 +291,19 @@ export function fetchRecordList(
 
 export class RecordActionCreator {
   private cmsRecord: CmsRecord;
-  private perPage: number;
 
-  constructor(cmsRecord: CmsRecord, perPage: number) {
+  constructor(cmsRecord: CmsRecord) {
     this.cmsRecord = cmsRecord;
-    this.perPage = perPage;
   }
 
   public fetch(id: string): ThunkAction<Promise<void>, {}, {}> {
     return fetchRecord(this.cmsRecord, id);
   }
 
-  public fetchList(page: number = 1): ThunkAction<Promise<void>, {}, {}> {
-    return fetchRecordList(this.cmsRecord, page, this.perPage);
+  public fetchList(
+    page: number,
+    perPage: number
+  ): ThunkAction<Promise<void>, {}, {}> {
+    return fetchRecordList(this.cmsRecord, page, perPage);
   }
 }

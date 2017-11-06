@@ -57,10 +57,27 @@ declare module 'skygear' {
   export class Database {
     public getRecordByID(id: string): Promise<Record>;
 
+    public save(
+      records: Record,
+      options?: DatabaseSaveOptions
+    ): Promise<Record>;
+    public save(
+      records: Record[],
+      options?: DatabaseSaveOptions
+    ): Promise<DatabaseSaveBatchResult>;
+
     public query<T extends Record>(
       query: Query,
       cacheCallback?: boolean
     ): Promise<QueryResult<T>>;
+  }
+
+  interface DatabaseSaveOptions {
+    atomic?: Boolean;
+  }
+  interface DatabaseSaveBatchResult {
+    savedRecords: Record[];
+    errors: Error[];
   }
 
   export class Query {
