@@ -4,7 +4,7 @@ export type StringFieldProps = Props & React.HTMLAttributes<HTMLElement>;
 
 interface Props {
   editable?: boolean;
-  changeHandler?: (value: string) => void;
+  onFieldChange?: (value: string) => void;
 
   value: string;
   name?: string; // <input /> name
@@ -24,7 +24,7 @@ export class StringField extends React.PureComponent<StringFieldProps, State> {
   }
 
   public render() {
-    const { changeHandler, editable, ...rest } = this.props;
+    const { onChange, editable, onFieldChange: _, ...rest } = this.props;
 
     if (editable) {
       return (
@@ -44,8 +44,8 @@ export class StringField extends React.PureComponent<StringFieldProps, State> {
     const value = event.target.value;
     this.setState({ ...this.state, value });
 
-    if (this.props.changeHandler) {
-      this.props.changeHandler(value);
+    if (this.props.onFieldChange) {
+      this.props.onFieldChange(value);
     }
   };
 }

@@ -37,7 +37,11 @@ class EditPageContainer extends React.PureComponent<EditPageContainerProps> {
         return <div>Loading record...</div>;
       case RemoteType.Success:
         return (
-          <EditPage config={this.props.config} record={remoteRecord.value} />
+          <EditPage
+            config={this.props.config}
+            record={remoteRecord.value}
+            saveRecord={this.props.saveRecord}
+          />
         );
       case RemoteType.Failure:
         return (
