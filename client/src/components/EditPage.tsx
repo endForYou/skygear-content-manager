@@ -1,13 +1,15 @@
 import * as React from 'react';
-import { Record } from 'skygear';
+import { OutlawError, Record } from 'skygear';
 
 import { RecordActionDispatcher } from '../actions/record';
 import { EditPageConfig, FieldConfig, FieldConfigType } from '../cmsConfig';
 import { StringField } from '../fields';
+import { Remote, RemoteType } from '../types';
 
 export interface EditPageProps {
   config: EditPageConfig;
   record: Record;
+  savingRecord?: Remote<Record>;
   recordDispatcher: RecordActionDispatcher;
 }
 
@@ -33,7 +35,7 @@ export class EditPage extends React.PureComponent<EditPageProps, State> {
   }
 
   public render() {
-    const { config, record } = this.props;
+    const { config, record, savingRecord } = this.props;
 
     const formGroups = config.fields.map((fieldConfig, index) => {
       return (
@@ -47,13 +49,21 @@ export class EditPage extends React.PureComponent<EditPageProps, State> {
       );
     });
 
+    const errorMessage =
+      savingRecord && savingRecord.type === RemoteType.Failure ? (
+        <div className="alert alert-danger" role="alert">
+          {errorMessageFromError(savingRecord.error)}
+        </div>
+      ) : (
+        undefined
+      );
+
     return (
       <form onSubmit={this.handleSubmit}>
         <h1 className="display-4">{config.label}</h1>
         {formGroups}
-        <button type="submit" className="btn btn-primary">
-          Save
-        </button>
+        {errorMessage}
+        <SubmitButton savingRecord={savingRecord} />
       </form>
     );
   }
@@ -111,6 +121,38 @@ function Field(props: FieldProps): JSX.Element {
       );
     default:
       throw new Error(`unknown field type = ${fieldConfig.type}`);
+  }
+}
+
+export function errorMessageFromError(e: Error) {
+  // tslint:disable-next-line: no-any
+  const anyError = e as any;
+  if (!anyError.error) {
+    return `Failed to save record: ${anyError}`;
+  }
+
+  const error = anyError as OutlawError;
+  return `Failed to save record: ${error.error.message}`;
+}
+
+interface SubmitProps {
+  savingRecord?: Remote<Record>;
+}
+
+function SubmitButton(props: SubmitProps): JSX.Element {
+  const { savingRecord } = props;
+  if (savingRecord !== undefined && savingRecord.type === RemoteType.Loading) {
+    return (
+      <button type="submit" className="btn btn-primary" disabled={true}>
+        Save
+      </button>
+    );
+  } else {
+    return (
+      <button type="submit" className="btn btn-primary">
+        Save
+      </button>
+    );
   }
 }
 

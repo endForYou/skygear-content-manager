@@ -98,11 +98,12 @@ function recordEditReducer(
       return {
         ...state,
         remoteRecord: RemoteLoading,
+        savingRecord: undefined,
       };
     case RecordActionTypes.FetchSuccess:
       return {
         ...state,
-        remoteRecord: RemoteSuccess<Record>(action.payload.record),
+        remoteRecord: RemoteSuccess(action.payload.record),
       };
     case RecordActionTypes.FetchFailure:
       return {
@@ -112,17 +113,18 @@ function recordEditReducer(
     case RecordActionTypes.SaveRequest:
       return {
         ...state,
-        remoteRecord: RemoteLoading,
+        savingRecord: RemoteLoading,
       };
     case RecordActionTypes.SaveSuccess:
       return {
         ...state,
-        remoteRecord: RemoteSuccess<Record>(action.payload.record),
+        remoteRecord: RemoteSuccess(action.payload.record),
+        savingRecord: RemoteSuccess(action.payload.record),
       };
     case RecordActionTypes.SaveFailure:
       return {
         ...state,
-        remoteRecord: RemoteFailure(action.payload.error),
+        savingRecord: RemoteFailure(action.payload.error),
       };
     default:
       return state;

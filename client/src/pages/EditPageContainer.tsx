@@ -18,6 +18,7 @@ interface OwnProps {
 
 interface StateProps {
   remoteRecord: Remote<Record>;
+  savingRecord?: Remote<Record>;
 }
 
 interface DispatchProps {
@@ -41,7 +42,7 @@ class EditPageContainer extends React.PureComponent<EditPageContainerProps> {
   }
 
   public render() {
-    const { remoteRecord } = this.props;
+    const { remoteRecord, savingRecord } = this.props;
     switch (remoteRecord.type) {
       case RemoteType.Loading:
         return <div>Loading record...</div>;
@@ -51,6 +52,7 @@ class EditPageContainer extends React.PureComponent<EditPageContainerProps> {
             config={this.props.config}
             record={remoteRecord.value}
             recordDispatcher={this.recordDispatcher}
+            savingRecord={savingRecord}
           />
         );
       case RemoteType.Failure:
@@ -66,9 +68,10 @@ class EditPageContainer extends React.PureComponent<EditPageContainerProps> {
 }
 
 function mapStateToProps(state: RootState, ownProps: OwnProps): StateProps {
+  const recordName = ownProps.config.cmsRecord.name;
   return {
-    remoteRecord:
-      state.recordViewsByName[ownProps.config.cmsRecord.name].edit.remoteRecord,
+    remoteRecord: state.recordViewsByName[recordName].edit.remoteRecord,
+    savingRecord: state.recordViewsByName[recordName].edit.savingRecord,
   };
 }
 

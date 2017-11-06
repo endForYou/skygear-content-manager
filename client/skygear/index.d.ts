@@ -144,4 +144,43 @@ declare module 'skygear' {
   export interface QueryResult<T> extends Array<T> {
     overallCount: number;
   }
+
+  // an error outlaw that doesn't follow any rules
+  // returned by Container & Database Promise failure
+  export interface OutlawError {
+    status: number;
+    error: SkygearError;
+  }
+
+  export interface SkygearError extends Error {
+    code: ErrorCodeType[keyof ErrorCodeType];
+    info: KVObject | null;
+  }
+
+  export interface ErrorCodeType {
+    NotAuthenticated: 101;
+    PermissionDenied: 102;
+    AccessKeyNotAccepted: 103;
+    AccessTokenNotAccepted: 104;
+    InvalidCredentials: 105;
+    InvalidSignature: 106;
+    BadRequest: 107;
+    InvalidArgument: 108;
+    Duplicated: 109;
+    ResourceNotFound: 110;
+    NotSupported: 111;
+    NotImplemented: 112;
+    ConstraintViolated: 113;
+    IncompatibleSchema: 114;
+    AtomicOperationFailure: 115;
+    PartialOperationFailure: 116;
+    UndefinedOperation: 117;
+    PluginUnavailable: 118;
+    PluginTimeout: 119;
+    RecordQueryInvalid: 120;
+    PluginInitializing: 121;
+    UnexpectedError: 1000;
+  }
+
+  export const ErrorCodes: ErrorCodeType;
 }
