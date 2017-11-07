@@ -58,9 +58,13 @@ export interface EditPageConfig {
   fields: FieldConfig[];
 }
 
-export type FieldConfig = StringFieldConfig | DateTimeFieldConfig;
+export type FieldConfig =
+  | StringFieldConfig
+  | TextAreaFieldConfig
+  | DateTimeFieldConfig;
 export enum FieldConfigTypes {
   String = 'String',
+  TextArea = 'TextArea',
   DateTime = 'DateTime',
 }
 interface FieldConfigAttrs {
@@ -72,6 +76,10 @@ interface FieldConfigAttrs {
 
 export interface StringFieldConfig extends FieldConfigAttrs {
   type: FieldConfigTypes.String;
+}
+
+export interface TextAreaFieldConfig extends FieldConfigAttrs {
+  type: FieldConfigTypes.TextArea;
 }
 
 export interface DateTimeFieldConfig extends FieldConfigAttrs {
@@ -193,6 +201,8 @@ function parseFieldConfig(a: any): FieldConfig {
   switch (a.type) {
     case 'String':
       return parseStringFieldConfig(a);
+    case 'TextArea':
+      return parseTextAreaFieldConfig(a);
     case 'DateTime':
       return parseDateTimeFieldConfig(a);
 
@@ -210,6 +220,15 @@ function parseFieldConfig(a: any): FieldConfig {
 
 function parseStringFieldConfig(input: FieldConfigInput): StringFieldConfig {
   return { ...parseFieldConfigAttrs(input), type: FieldConfigTypes.String };
+}
+
+function parseTextAreaFieldConfig(
+  input: FieldConfigInput
+): TextAreaFieldConfig {
+  return {
+    ...parseFieldConfigAttrs(input),
+    type: FieldConfigTypes.TextArea,
+  };
 }
 
 function parseDateTimeFieldConfig(

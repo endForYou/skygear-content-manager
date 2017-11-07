@@ -3,6 +3,7 @@ import * as React from 'react';
 import { FieldConfig, FieldConfigTypes } from '../cmsConfig';
 import { DateTimeField } from './DateTimeField';
 import { StringField } from './StringField';
+import { TextArea } from './TextArea';
 
 // tslint:disable-next-line: no-any
 export type FieldChangeHandler = (value: any) => void;
@@ -39,6 +40,8 @@ export class Field extends React.PureComponent<FieldProps> {
         return <StringField {...rest} {...childProps} />;
       case FieldConfigTypes.DateTime:
         return <DateTimeField {...rest} {...childProps} />;
+      case FieldConfigTypes.TextArea:
+        return <TextArea {...rest} {...childProps} />;
     }
   }
 }

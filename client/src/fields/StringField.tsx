@@ -1,26 +1,8 @@
 import * as React from 'react';
 
-import { RequiredFieldProps } from './Field';
+import { BaseStringField } from './BaseStringField';
 
-export type StringFieldProps = RequiredFieldProps;
-
-interface State {
-  value: string;
-}
-
-export class StringField extends React.PureComponent<StringFieldProps, State> {
-  constructor(props: StringFieldProps) {
-    super(props);
-
-    this.state = {
-      value: this.props.value,
-    };
-  }
-
-  public componentWillReceiveProps(nextProps: StringFieldProps) {
-    this.setState({ ...this.state, value: nextProps.value });
-  }
-
+export class StringField extends BaseStringField {
   public render() {
     const { editable, onFieldChange: _, ...rest } = this.props;
 
@@ -38,12 +20,8 @@ export class StringField extends React.PureComponent<StringFieldProps, State> {
     }
   }
 
-  public handleChange: React.ChangeEventHandler<HTMLInputElement> = event => {
+  private handleChange: React.ChangeEventHandler<HTMLInputElement> = event => {
     const value = event.target.value;
-    this.setState({ ...this.state, value });
-
-    if (this.props.onFieldChange) {
-      this.props.onFieldChange(value);
-    }
+    this.handleValueChange(value);
   };
 }
