@@ -195,6 +195,14 @@ function parseFieldConfig(a: any): FieldConfig {
       return parseStringFieldConfig(a);
     case 'DateTime':
       return parseDateTimeFieldConfig(a);
+
+    // built-in fields
+    case '_id':
+      return parseIdFieldConfig(a);
+    case '_created_at':
+      return parseCreatedAtFieldConfig(a);
+    case '_updated_at':
+      return parseUpdatedAtFieldConfig(a);
     default:
       throw new Error(`Received unknown field config type: ${a.type}`);
   }
@@ -216,6 +224,37 @@ function parseFieldConfigAttrs(input: any): FieldConfigAttrs {
   const label = parseOptionalString(input.label) || humanize(name);
 
   return { name, label };
+}
+
+function parseIdFieldConfig(input: FieldConfigInput): StringFieldConfig {
+  return {
+    editable: false,
+    label: 'ID',
+    name: '_id',
+    type: FieldConfigTypes.String,
+  };
+}
+
+function parseCreatedAtFieldConfig(
+  input: FieldConfigInput
+): DateTimeFieldConfig {
+  return {
+    editable: false,
+    label: 'Created at',
+    name: 'createdAt',
+    type: FieldConfigTypes.DateTime,
+  };
+}
+
+function parseUpdatedAtFieldConfig(
+  input: FieldConfigInput
+): DateTimeFieldConfig {
+  return {
+    editable: false,
+    label: 'Updated at',
+    name: 'updatedAt',
+    type: FieldConfigTypes.DateTime,
+  };
 }
 
 // tslint:disable-next-line: no-any
