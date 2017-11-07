@@ -281,6 +281,8 @@ function fetchRecordList(
     query.limit = perPage;
     query.offset = (page - 1) * perPage;
 
+    query.addDescending('_created_at');
+
     dispatch(fetchRecordListRequest(cmsRecord, page));
     return skygear.publicDB.query(query).then(
       (queryResult: QueryResult<Record>) => {
