@@ -28,6 +28,8 @@ records:
         - name: datetime
           label: Some Datetime
           type: DateTime
+        - name: is_active
+          type: Boolean
         - type: _created_at
         - type: _updated_at
     show:
@@ -35,10 +37,12 @@ records:
       fields:
         - type: _id
         - name: name
-          type: String
+          type: TextArea
         - name: datetime
           label: Some Datetime
           type: DateTime
+        - name: is_active
+          type: Boolean
         - type: _created_at
         - type: _updated_at
     edit:
@@ -46,10 +50,12 @@ records:
       fields:
         - type: _id
         - name: name
-          type: String
+          type: TextArea
         - name: datetime
           label: Some Datetime
           type: DateTime
+        - name: is_active
+          type: Boolean
         - type: _created_at
         - type: _updated_at
   question:

@@ -61,11 +61,13 @@ export interface EditPageConfig {
 export type FieldConfig =
   | StringFieldConfig
   | TextAreaFieldConfig
-  | DateTimeFieldConfig;
+  | DateTimeFieldConfig
+  | BooleanFieldConfig;
 export enum FieldConfigTypes {
   String = 'String',
   TextArea = 'TextArea',
   DateTime = 'DateTime',
+  Boolean = 'Boolean',
 }
 interface FieldConfigAttrs {
   name: string;
@@ -84,6 +86,10 @@ export interface TextAreaFieldConfig extends FieldConfigAttrs {
 
 export interface DateTimeFieldConfig extends FieldConfigAttrs {
   type: FieldConfigTypes.DateTime;
+}
+
+export interface BooleanFieldConfig extends FieldConfigAttrs {
+  type: FieldConfigTypes.Boolean;
 }
 
 interface FieldConfigInput {
@@ -205,6 +211,8 @@ function parseFieldConfig(a: any): FieldConfig {
       return parseTextAreaFieldConfig(a);
     case 'DateTime':
       return parseDateTimeFieldConfig(a);
+    case 'Boolean':
+      return parseBooleanFieldConfig(a);
 
     // built-in fields
     case '_id':
@@ -235,6 +243,10 @@ function parseDateTimeFieldConfig(
   input: FieldConfigInput
 ): DateTimeFieldConfig {
   return { ...parseFieldConfigAttrs(input), type: FieldConfigTypes.DateTime };
+}
+
+function parseBooleanFieldConfig(input: FieldConfigInput): BooleanFieldConfig {
+  return { ...parseFieldConfigAttrs(input), type: FieldConfigTypes.Boolean };
 }
 
 // tslint:disable-next-line: no-any

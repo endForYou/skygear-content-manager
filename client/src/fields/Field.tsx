@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 import { FieldConfig, FieldConfigTypes } from '../cmsConfig';
+import { BooleanField } from './BooleanField';
 import { DateTimeField } from './DateTimeField';
 import { StringField } from './StringField';
 import { TextArea } from './TextArea';
@@ -42,6 +43,8 @@ export class Field extends React.PureComponent<FieldProps> {
         return <DateTimeField {...rest} {...childProps} />;
       case FieldConfigTypes.TextArea:
         return <TextArea {...rest} {...childProps} />;
+      case FieldConfigTypes.Boolean:
+        return <BooleanField {...rest} {...childProps} />;
     }
   }
 }
