@@ -2,8 +2,7 @@ import * as React from 'react';
 
 import { RequiredFieldProps } from './Field';
 
-export type StringFieldProps = RequiredFieldProps &
-  React.HTMLAttributes<HTMLElement>;
+export type StringFieldProps = RequiredFieldProps;
 
 interface State {
   value: string;
@@ -19,7 +18,7 @@ export class StringField extends React.PureComponent<StringFieldProps, State> {
   }
 
   public render() {
-    const { onChange, editable, onFieldChange: _, ...rest } = this.props;
+    const { editable, onFieldChange: _, ...rest } = this.props;
 
     if (editable) {
       return (

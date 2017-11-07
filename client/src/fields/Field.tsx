@@ -1,22 +1,28 @@
 import * as React from 'react';
 
 import { FieldConfig, FieldConfigTypes } from '../cmsConfig';
+import { DateTimeField } from './DateTimeField';
 import { StringField } from './StringField';
 
 // tslint:disable-next-line: no-any
 export type FieldChangeHandler = (value: any) => void;
 
+// props that child component must possess
 export type RequiredFieldProps = {
   editable?: boolean;
 } & ChildProps;
 
 // props that passes from this component to its child field
-type ChildProps = {
+interface ChildProps {
+  // HTML related attrs
+  name?: string;
+  className?: string;
+
   onFieldChange?: FieldChangeHandler;
 
   // tslint:disable-next-line: no-any
   value: any;
-} & React.HTMLAttributes<HTMLElement>;
+}
 
 type FieldProps = ChildProps & {
   config: FieldConfig;
@@ -32,7 +38,7 @@ export class Field extends React.PureComponent<FieldProps> {
       case FieldConfigTypes.String:
         return <StringField {...rest} {...childProps} />;
       case FieldConfigTypes.DateTime:
-        return null;
+        return <DateTimeField {...rest} {...childProps} />;
     }
   }
 }
