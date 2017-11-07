@@ -17,6 +17,10 @@ export class StringField extends React.PureComponent<StringFieldProps, State> {
     };
   }
 
+  public componentWillReceiveProps(nextProps: StringFieldProps) {
+    this.setState({ ...this.state, value: nextProps.value });
+  }
+
   public render() {
     const { editable, onFieldChange: _, ...rest } = this.props;
 

@@ -28,6 +28,10 @@ export class DateTimeField extends React.PureComponent<
     };
   }
 
+  public componentWillReceiveProps(nextProps: DateTimeFieldProps) {
+    this.setState({ ...this.state, value: nextProps.value });
+  }
+
   public render() {
     const {
       editable,
