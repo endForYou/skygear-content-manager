@@ -1,4 +1,4 @@
-import { replace } from 'react-router-redux';
+import { push } from 'react-router-redux';
 import { Dispatch } from 'redux';
 import { ThunkAction } from 'redux-thunk';
 import skygear, { Query, QueryResult, Record } from 'skygear';
@@ -259,7 +259,7 @@ function saveRecord(
     return skygear.publicDB.save(record).then(
       (savedRecord: Record) => {
         dispatch(saveRecordSuccess(cmsRecord, savedRecord));
-        dispatch(replace(`/record/${cmsRecord.name}/${record._id}`));
+        dispatch(push(`/record/${cmsRecord.name}/${record._id}`));
       },
       (error: Error) => {
         dispatch(saveRecordFailure(cmsRecord, record, error));
