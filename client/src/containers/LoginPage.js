@@ -67,7 +67,7 @@ class _LoginForm extends Component {
           value={this.state.value}
           onChange={this.handleInputChange}
         />
-        {this.props.errorMessage !== '' && (
+        {this.props.errorMessage !== undefined && (
           <div className="alert alert-danger form-login-alert" role="alert">
             {this.props.errorMessage}
           </div>
@@ -82,7 +82,7 @@ class _LoginForm extends Component {
 
 _LoginForm.propTypes = {
   onSubmit: PropTypes.func.isRequired,
-  errorMessage: PropTypes.string.isRequired,
+  errorMessage: PropTypes.string,
 };
 
 const mapStateToProps = state => {

@@ -3,6 +3,7 @@ import { Record } from 'skygear';
 
 import { CmsConfig } from './cmsConfig';
 import { Remote, RemoteLoading } from './types';
+import { objectFrom } from './util';
 
 export interface RootState {
   auth: AuthState;
@@ -13,6 +14,7 @@ export interface RootState {
 
 export interface AuthState {
   user?: Record;
+  errorMessage?: string;
 }
 
 export interface RecordViewsByName {
@@ -64,3 +66,27 @@ export const initialRecordViewState: RecordViewState = {
   list: initialListState,
   show: initialShowState,
 };
+
+export function initialRootState(
+  cmsConfig: CmsConfig,
+  recordNames: string[],
+  user: Record
+): RootState {
+  return {
+    auth: {
+      user: user === null ? undefined : user,
+    },
+    cmsConfig,
+    recordViewsByName: objectFrom(
+      recordNames.map(recordName => {
+        return [recordName, initialRecordViewState] as [
+          string,
+          RecordViewState
+        ];
+      })
+    ),
+    router: {
+      location: null,
+    },
+  };
+}

@@ -14,27 +14,19 @@ import skygear from 'skygear';
 
 import { CmsConfig, parseCmsConfig } from './cmsConfig';
 import { AppConfig, configFromEnv } from './config';
-import App from './containers/App';
+import { App } from './containers/App';
 import rootReducerFactory from './reducers';
 import registerServiceWorker from './registerServiceWorker';
+import { initialRootState, RootState } from './states';
 import { getPath, isObject } from './util';
 
 // tslint:disable-next-line: no-any
 type User = any;
 
-export interface AuthState {
-  user: User;
-}
-
-export interface StoreState {
-  cmsConfig: CmsConfig;
-  auth?: AuthState;
-}
-
-export interface RootProps {
+interface RootProps {
   config: AppConfig;
   history: History;
-  store: Store<StoreState>;
+  store: Store<RootState>;
 }
 
 const Root = ({ config, history, store }: RootProps) => {
@@ -55,18 +47,12 @@ function main(): void {
 
   Promise.all([fetchUser(appConfig), fetchCmsConfig(appConfig)]).then(
     ([user, cmsConfig]: [User, CmsConfig]) => {
-      const rootReducer = rootReducerFactory(Object.keys(cmsConfig.records));
+      const recordNames = Object.keys(cmsConfig.records);
 
-      let initialState: StoreState = { cmsConfig };
+      const rootReducer = rootReducerFactory(recordNames);
+      const initialState = initialRootState(cmsConfig, recordNames, user);
 
-      if (user !== null) {
-        initialState = {
-          ...initialState,
-          auth: { user },
-        };
-      }
-
-      const store = createStore<StoreState>(
+      const store = createStore<RootState>(
         rootReducer,
         initialState,
         applyMiddleware(thunk, routerMiddleware(history))

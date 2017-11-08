@@ -1,9 +1,10 @@
 import * as React from 'react';
-import { OutlawError, Record } from 'skygear';
+import { Record } from 'skygear';
 
 import { RecordActionDispatcher } from '../actions/record';
 import { EditPageConfig, FieldConfig } from '../cmsConfig';
 import { Field } from '../fields';
+import { errorMessageFromError } from '../recordUtil';
 import { Remote, RemoteType } from '../types';
 
 export interface EditPageProps {
@@ -52,7 +53,7 @@ export class EditPage extends React.PureComponent<EditPageProps, State> {
     const errorMessage =
       savingRecord && savingRecord.type === RemoteType.Failure ? (
         <div className="alert alert-danger" role="alert">
-          {errorMessageFromError(savingRecord.error)}
+          Failed to save record: {errorMessageFromError(savingRecord.error)}
         </div>
       ) : (
         undefined
@@ -116,17 +117,6 @@ function FormField(props: FieldProps): JSX.Element {
       onFieldChange={value => onRecordChange(name, value)}
     />
   );
-}
-
-export function errorMessageFromError(e: Error) {
-  // tslint:disable-next-line: no-any
-  const anyError = e as any;
-  if (!anyError.error) {
-    return `Failed to save record: ${anyError}`;
-  }
-
-  const error = anyError as OutlawError;
-  return `Failed to save record: ${error.error.message}`;
 }
 
 interface SubmitProps {

@@ -1,6 +1,7 @@
-import { AnyAction, combineReducers, Reducer } from 'redux';
+import { combineReducers, Reducer } from 'redux';
 import { Record } from 'skygear';
 
+import { Actions } from '../actions';
 import { RecordActionTypes } from '../actions/record';
 import {
   EditState,
@@ -44,7 +45,7 @@ function recordViewsByNameReducerFactory(
 
 function recordListReducer(
   state: ListState = initialListState,
-  action: AnyAction
+  action: Actions
 ): ListState {
   switch (action.type) {
     case RecordActionTypes.FetchListRequest:
@@ -66,7 +67,7 @@ function recordListReducer(
 
 function recordShowReducer(
   state: ShowState = initialShowState,
-  action: AnyAction
+  action: Actions
 ): ShowState {
   switch (action.type) {
     case RecordActionTypes.FetchRequest:
@@ -91,7 +92,7 @@ function recordShowReducer(
 
 function recordEditReducer(
   state: EditState = initialEditState,
-  action: AnyAction
+  action: Actions
 ): EditState {
   switch (action.type) {
     case RecordActionTypes.FetchRequest:

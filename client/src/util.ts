@@ -4,6 +4,14 @@ export function isObject(o: any): boolean {
   return o === Object(o);
 }
 
+export function objectFrom<V>(
+  entries: Array<[string, V]>
+): { [key: string]: V } {
+  return entries.reduce((obj, [k, v]) => {
+    return { ...obj, [k]: v };
+  }, {});
+}
+
 export function capitalize(str: string): string {
   return str.charAt(0).toUpperCase() + str.substring(1);
 }
