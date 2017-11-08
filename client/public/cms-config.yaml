@@ -30,6 +30,8 @@ records:
           type: DateTime
         - name: is_active
           type: Boolean
+        - name: view_count
+          type: Integer
         - type: _created_at
         - type: _updated_at
     show:
@@ -43,6 +45,8 @@ records:
           type: DateTime
         - name: is_active
           type: Boolean
+        - name: view_count
+          type: Integer
         - type: _created_at
         - type: _updated_at
     edit:
@@ -56,6 +60,8 @@ records:
           type: DateTime
         - name: is_active
           type: Boolean
+        - name: view_count
+          type: Integer
         - type: _created_at
         - type: _updated_at
   question:
