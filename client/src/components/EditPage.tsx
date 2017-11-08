@@ -2,8 +2,8 @@ import * as React from 'react';
 import { OutlawError, Record } from 'skygear';
 
 import { RecordActionDispatcher } from '../actions/record';
-import { EditPageConfig, FieldConfig, FieldConfigType } from '../cmsConfig';
-import { StringField } from '../fields';
+import { EditPageConfig, FieldConfig } from '../cmsConfig';
+import { Field } from '../fields';
 import { Remote, RemoteType } from '../types';
 
 export interface EditPageProps {
@@ -97,31 +97,25 @@ function FormGroup(props: FieldProps): JSX.Element {
   return (
     <div className="form-group">
       <label htmlFor={fieldConfig.name}>{fieldConfig.label}</label>
-      <Field {...props} />
+      <FormField {...props} />
     </div>
   );
 }
 
-function Field(props: FieldProps): JSX.Element {
+function FormField(props: FieldProps): JSX.Element {
   const { fieldConfig, onRecordChange, record, recordChange } = props;
   const { name } = fieldConfig;
 
-  switch (fieldConfig.type) {
-    case FieldConfigType.String:
-      const fieldValue =
-        recordChange[name] === undefined ? record[name] : recordChange[name];
-      return (
-        <StringField
-          className="form-control"
-          name={name}
-          editable={fieldConfig.editable}
-          value={fieldValue}
-          onFieldChange={value => onRecordChange(name, value)}
-        />
-      );
-    default:
-      throw new Error(`unknown field type = ${fieldConfig.type}`);
-  }
+  const fieldValue =
+    recordChange[name] === undefined ? record[name] : recordChange[name];
+  return (
+    <Field
+      className="form-control"
+      config={fieldConfig}
+      value={fieldValue}
+      onFieldChange={value => onRecordChange(name, value)}
+    />
+  );
 }
 
 export function errorMessageFromError(e: Error) {

@@ -22,18 +22,48 @@ records:
       label: Polls
       perPage: 10
       fields:
+        - type: _id
         - name: name
           type: String
+        - name: datetime
+          label: Some Datetime
+          type: DateTime
+        - name: is_active
+          type: Boolean
+        - name: view_count
+          type: Integer
+        - type: _created_at
+        - type: _updated_at
     show:
       label: View Poll
       fields:
+        - type: _id
         - name: name
-          type: String
+          type: TextArea
+        - name: datetime
+          label: Some Datetime
+          type: DateTime
+        - name: is_active
+          type: Boolean
+        - name: view_count
+          type: Integer
+        - type: _created_at
+        - type: _updated_at
     edit:
       label: Edit Poll
       fields:
+        - type: _id
         - name: name
-          type: String
+          type: TextArea
+        - name: datetime
+          label: Some Datetime
+          type: DateTime
+        - name: is_active
+          type: Boolean
+        - name: view_count
+          type: Integer
+        - type: _created_at
+        - type: _updated_at
   question:
     list:
       fields:

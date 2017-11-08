@@ -8,6 +8,7 @@ import { Record } from 'skygear';
 import { RecordActionDispatcher } from '../actions/record';
 import { FieldConfig, ListPageConfig } from '../cmsConfig';
 import Pagination from '../components/Pagination';
+import { Field } from '../fields';
 import { RootState } from '../states';
 
 interface TableHeaderProps {
@@ -35,7 +36,11 @@ interface TableRowProps {
 
 const TableRow: React.SFC<TableRowProps> = ({ fieldConfigs, record }) => {
   const columns = fieldConfigs.map((fieldConfig, index) => {
-    return <td key={index}>{record[fieldConfig.name]}</td>;
+    return (
+      <td key={index}>
+        <Field config={fieldConfig} value={record[fieldConfig.name]} />
+      </td>
+    );
   });
   return (
     <tr>

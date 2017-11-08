@@ -58,28 +58,50 @@ export interface EditPageConfig {
   fields: FieldConfig[];
 }
 
-export type FieldConfig = StringFieldConfig;
-export enum FieldConfigType {
+export type FieldConfig =
+  | StringFieldConfig
+  | TextAreaFieldConfig
+  | DateTimeFieldConfig
+  | BooleanFieldConfig
+  | IntegerFieldConfig;
+export enum FieldConfigTypes {
   String = 'String',
+  TextArea = 'TextArea',
+  DateTime = 'DateTime',
+  Boolean = 'Boolean',
+  Integer = 'Integer',
 }
-
-export interface StringFieldConfig {
-  editable?: boolean;
-
-  type: FieldConfigType.String;
+interface FieldConfigAttrs {
   name: string;
   label: string;
+
+  editable?: boolean;
+}
+
+export interface StringFieldConfig extends FieldConfigAttrs {
+  type: FieldConfigTypes.String;
+}
+
+export interface TextAreaFieldConfig extends FieldConfigAttrs {
+  type: FieldConfigTypes.TextArea;
+}
+
+export interface DateTimeFieldConfig extends FieldConfigAttrs {
+  type: FieldConfigTypes.DateTime;
+}
+
+export interface BooleanFieldConfig extends FieldConfigAttrs {
+  type: FieldConfigTypes.Boolean;
+}
+
+export interface IntegerFieldConfig extends FieldConfigAttrs {
+  type: FieldConfigTypes.Integer;
 }
 
 interface FieldConfigInput {
   type: string;
   // tslint:disable-next-line: no-any
   [key: string]: any;
-}
-
-interface StringFieldConfigInput extends FieldConfigInput {
-  name: string;
-  label?: string;
 }
 
 // tslint:disable-next-line: no-any
@@ -191,26 +213,101 @@ function parseFieldConfig(a: any): FieldConfig {
   switch (a.type) {
     case 'String':
       return parseStringFieldConfig(a);
+    case 'TextArea':
+      return parseTextAreaFieldConfig(a);
+    case 'DateTime':
+      return parseDateTimeFieldConfig(a);
+    case 'Boolean':
+      return parseBooleanFieldConfig(a);
+    case 'Integer':
+      return parseIntegerFieldConfig(a);
+
+    // built-in fields
+    case '_id':
+      return parseIdFieldConfig(a);
+    case '_created_at':
+      return parseCreatedAtFieldConfig(a);
+    case '_updated_at':
+      return parseUpdatedAtFieldConfig(a);
     default:
       throw new Error(`Received unknown field config type: ${a.type}`);
   }
 }
 
 function parseStringFieldConfig(input: FieldConfigInput): StringFieldConfig {
-  function isValidInput(i: FieldConfigInput): i is StringFieldConfigInput {
-    // tslint:disable-next-line: no-any
-    return i.type === 'String' && typeof (i as any).name === 'string';
+  return { ...parseFieldConfigAttrs(input), type: FieldConfigTypes.String };
+}
+
+function parseTextAreaFieldConfig(
+  input: FieldConfigInput
+): TextAreaFieldConfig {
+  return {
+    ...parseFieldConfigAttrs(input),
+    type: FieldConfigTypes.TextArea,
+  };
+}
+
+function parseDateTimeFieldConfig(
+  input: FieldConfigInput
+): DateTimeFieldConfig {
+  return { ...parseFieldConfigAttrs(input), type: FieldConfigTypes.DateTime };
+}
+
+function parseBooleanFieldConfig(input: FieldConfigInput): BooleanFieldConfig {
+  return { ...parseFieldConfigAttrs(input), type: FieldConfigTypes.Boolean };
+}
+
+function parseIntegerFieldConfig(input: FieldConfigInput): IntegerFieldConfig {
+  return { ...parseFieldConfigAttrs(input), type: FieldConfigTypes.Integer };
+}
+
+// tslint:disable-next-line: no-any
+function parseFieldConfigAttrs(input: any): FieldConfigAttrs {
+  const name = parseString(input.name);
+  const label = parseOptionalString(input.label) || humanize(name);
+
+  return { name, label };
+}
+
+function parseIdFieldConfig(input: FieldConfigInput): StringFieldConfig {
+  return {
+    editable: false,
+    label: 'ID',
+    name: '_id',
+    type: FieldConfigTypes.String,
+  };
+}
+
+function parseCreatedAtFieldConfig(
+  input: FieldConfigInput
+): DateTimeFieldConfig {
+  return {
+    editable: false,
+    label: 'Created at',
+    name: 'createdAt',
+    type: FieldConfigTypes.DateTime,
+  };
+}
+
+function parseUpdatedAtFieldConfig(
+  input: FieldConfigInput
+): DateTimeFieldConfig {
+  return {
+    editable: false,
+    label: 'Updated at',
+    name: 'updatedAt',
+    type: FieldConfigTypes.DateTime,
+  };
+}
+
+// tslint:disable-next-line: no-any
+function parseString(a: any, error?: string): string {
+  const optionalString = parseOptionalString(a, error);
+  if (optionalString === undefined) {
+    throw new Error(error || 'expect a string, got undefined');
   }
 
-  if (isValidInput(input)) {
-    return {
-      label: input.label || humanize(input.name),
-      name: input.name,
-      type: FieldConfigType.String,
-    };
-  }
-
-  throw new Error(`Invalid input shape of string field: ${input}`);
+  return optionalString;
 }
 
 // tslint:disable-next-line: no-any

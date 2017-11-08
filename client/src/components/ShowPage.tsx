@@ -1,13 +1,8 @@
 import * as React from 'react';
 import { Record } from 'skygear';
 
-import {
-  CmsRecord,
-  FieldConfig,
-  FieldConfigType,
-  ShowPageConfig,
-} from '../cmsConfig';
-import { StringField } from '../fields';
+import { CmsRecord, FieldConfig, ShowPageConfig } from '../cmsConfig';
+import { Field } from '../fields';
 import { Remote, RemoteType } from '../types';
 
 export interface ShowPageProps {
@@ -62,27 +57,15 @@ interface FieldProps {
 }
 
 function FormGroup(props: FieldProps): JSX.Element {
-  const { fieldConfig } = props;
+  const { fieldConfig, record } = props;
   return (
     <div className="form-group">
       <label htmlFor={fieldConfig.name}>{fieldConfig.label}</label>
-      <Field {...props} />
+      <Field
+        className="form-control"
+        config={fieldConfig}
+        value={record[fieldConfig.name]}
+      />
     </div>
   );
-}
-
-function Field(props: FieldProps): JSX.Element {
-  const { fieldConfig, record } = props;
-  switch (fieldConfig.type) {
-    case FieldConfigType.String:
-      return (
-        <StringField
-          className="form-control"
-          name={fieldConfig.name}
-          value={record[fieldConfig.name]}
-        />
-      );
-    default:
-      throw new Error(`unknown field type = ${fieldConfig.type}`);
-  }
 }

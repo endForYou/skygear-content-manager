@@ -1,30 +1,10 @@
 import * as React from 'react';
 
-export type StringFieldProps = Props & React.HTMLAttributes<HTMLElement>;
+import { BaseStringField } from './BaseStringField';
 
-interface Props {
-  editable?: boolean;
-  onFieldChange?: (value: string) => void;
-
-  value: string;
-  name?: string; // <input /> name
-}
-
-interface State {
-  value: string;
-}
-
-export class StringField extends React.PureComponent<StringFieldProps, State> {
-  constructor(props: Props) {
-    super(props);
-
-    this.state = {
-      value: this.props.value,
-    };
-  }
-
+export class StringField extends BaseStringField {
   public render() {
-    const { onChange, editable, onFieldChange: _, ...rest } = this.props;
+    const { editable, onFieldChange: _, ...rest } = this.props;
 
     if (editable) {
       return (
@@ -40,12 +20,8 @@ export class StringField extends React.PureComponent<StringFieldProps, State> {
     }
   }
 
-  public handleChange: React.ChangeEventHandler<HTMLInputElement> = event => {
+  private handleChange: React.ChangeEventHandler<HTMLInputElement> = event => {
     const value = event.target.value;
-    this.setState({ ...this.state, value });
-
-    if (this.props.onFieldChange) {
-      this.props.onFieldChange(value);
-    }
+    this.handleValueChange(value);
   };
 }
