@@ -5,16 +5,18 @@ cache:
   directories:
     - client/node_modules
 script:
+  - pushd .
   - cd client
   - npm install
   - node_modules/.bin/prettier --list-different "src/**/*.js"
   - npm run lint
   - CI=1 npm run test
+  - popd
 notifications:
   slack:
     secure: kFX9V98DQtvacmrFLoZNzjUhdccFiXHX8emP4sQRG1xEj35sA3J+xiKCQM7cEiOFJQ90k5uXWVHD/33DmMobWbJ7waXY+dcDSTaiGtqm8X2c1S9oXili7WMlO088PSmpI1wcVmvqoJhbmUzhnBN1NfA6mvRcSwIbXu+yAuMfolUGtOfIU4WYCyuBh9rO5AS5zN5dguxDYCT7pxNJVAp8MOEHsrZ09pYzkwFnhDopgEYQMntoRKSPcx7S1/h8eNXF06Jn7PyO4jhUHuGWFPHqB5J0VwlCxhJxYHUMcRy82YlDNWwsFMPceo0TF0vGuiksWog5qKRwMLOPbDNHLDq5Gj9w2QeK54seEJP0+n3lV8sqUKsgfETjCcK/f1JgVhiiiXi4GlSMc9JpW8c8wTA0hGRgku5te8VK7y6laCfJ5H7Au72fW6eAi7LGz914oGFlJVjLy9CrDPT+0not4b9AAUOYrt/BvN7FsuqymTgQFJsiS0gQ8bvvQagh0qw7PU5/GGrvmYoCvqHk9OD+zq+HSOkwka8DSMyvDdpJgdR3DSPfsgQYnmLi105p/9jCnYXqEXhTp769YyxHKaImSPXBLfZA89etL1/8XX5wlpKdkBdgYo/6MKPy8/Xcq2znBk79N1O7XQb62JlGtZZRdAghZOOuSVdoaxc7AxooNTN/6rU=
 deploy:
   provider: script
-  script: scripts/deploy.sh
+  script: ./scripts/deploy.sh
   on:
     branch: master

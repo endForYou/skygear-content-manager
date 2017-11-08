@@ -1,15 +1,11 @@
 set -ex
 
-pushd .
-
 cd client
 
 npm install --production
 npm run build
-rm -rf public_html
-mv build public_html
 
-popd
+cd ..
 
 mv client/build public_html
 rm -rf client
