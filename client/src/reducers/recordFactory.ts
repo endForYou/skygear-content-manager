@@ -1,15 +1,10 @@
 import { AnyAction, combineReducers, Reducer } from 'redux';
 import { Record } from 'skygear';
 
+import { RecordActionTypes } from '../actions/record';
 import {
-  FETCH_RECORD_FAILURE,
-  FETCH_RECORD_LIST_FAILURE,
-  FETCH_RECORD_LIST_REQUEST,
-  FETCH_RECORD_LIST_SUCCESS,
-  FETCH_RECORD_REQUEST,
-  FETCH_RECORD_SUCCESS,
-} from '../actions/record';
-import {
+  EditState,
+  initialEditState,
   initialListState,
   initialRecordViewState,
   initialShowState,
@@ -21,6 +16,7 @@ import {
 import { RemoteFailure, RemoteLoading, RemoteSuccess } from '../types';
 
 const recordViewsReducer = combineReducers<RecordViewState>({
+  edit: recordEditReducer,
   list: recordListReducer,
   show: recordShowReducer,
 });
@@ -34,8 +30,8 @@ function recordViewsByNameReducerFactory(
   }, {});
 
   return (state = initialState, action) => {
-    if (action.payload && action.payload.recordName) {
-      const recordName = action.payload.recordName;
+    if (action.payload && action.payload.cmsRecord) {
+      const recordName = action.payload.cmsRecord.name;
       return {
         ...state,
         [recordName]: recordViewsReducer(state[recordName], action),
@@ -51,9 +47,9 @@ function recordListReducer(
   action: AnyAction
 ): ListState {
   switch (action.type) {
-    case FETCH_RECORD_LIST_REQUEST:
+    case RecordActionTypes.FetchListRequest:
       return { ...state, page: action.payload.page };
-    case FETCH_RECORD_LIST_SUCCESS:
+    case RecordActionTypes.FetchListSuccess:
       const { queryResult } = action.payload;
       return {
         ...state,
@@ -61,7 +57,7 @@ function recordListReducer(
         records: queryResult.map((record: Record) => record),
         totalCount: queryResult.overallCount,
       };
-    case FETCH_RECORD_LIST_FAILURE:
+    case RecordActionTypes.FetchListFailure:
       return { ...state, isLoading: false, error: action.payload.error };
     default:
       return state;
@@ -73,20 +69,62 @@ function recordShowReducer(
   action: AnyAction
 ): ShowState {
   switch (action.type) {
-    case FETCH_RECORD_REQUEST:
+    case RecordActionTypes.FetchRequest:
       return {
         ...state,
         remoteRecord: RemoteLoading,
       };
-    case FETCH_RECORD_SUCCESS:
+    case RecordActionTypes.FetchSuccess:
       return {
         ...state,
         remoteRecord: RemoteSuccess<Record>(action.payload.record),
       };
-    case FETCH_RECORD_FAILURE:
+    case RecordActionTypes.FetchFailure:
       return {
         ...state,
         remoteRecord: RemoteFailure(action.payload.error),
+      };
+    default:
+      return state;
+  }
+}
+
+function recordEditReducer(
+  state: EditState = initialEditState,
+  action: AnyAction
+): EditState {
+  switch (action.type) {
+    case RecordActionTypes.FetchRequest:
+      return {
+        ...state,
+        remoteRecord: RemoteLoading,
+        savingRecord: undefined,
+      };
+    case RecordActionTypes.FetchSuccess:
+      return {
+        ...state,
+        remoteRecord: RemoteSuccess(action.payload.record),
+      };
+    case RecordActionTypes.FetchFailure:
+      return {
+        ...state,
+        remoteRecord: RemoteFailure(action.payload.error),
+      };
+    case RecordActionTypes.SaveRequest:
+      return {
+        ...state,
+        savingRecord: RemoteLoading,
+      };
+    case RecordActionTypes.SaveSuccess:
+      return {
+        ...state,
+        remoteRecord: RemoteSuccess(action.payload.record),
+        savingRecord: RemoteSuccess(action.payload.record),
+      };
+    case RecordActionTypes.SaveFailure:
+      return {
+        ...state,
+        savingRecord: RemoteFailure(action.payload.error),
       };
     default:
       return state;

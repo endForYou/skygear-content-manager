@@ -29,6 +29,11 @@ records:
       fields:
         - name: name
           type: String
+    edit:
+      label: Edit Poll
+      fields:
+        - name: name
+          type: String
   question:
     list:
       fields:

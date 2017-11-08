@@ -4,11 +4,12 @@
 
 declare module 'skygear' {
   // tslint:disable-next-line: no-any
-  const skygear: any;
+  const skygear: Container;
   export default skygear;
 
   // tslint:disable-next-line: no-any
   export type Record = any;
+  export const Record: Record;
 
   export type RecordCls = {};
 
@@ -32,8 +33,38 @@ declare module 'skygear' {
     $type: 'geo';
   }
 
+  export class Container {
+    public auth: AuthContainer;
+    public publicDB: Database;
+
+    public config(options: {
+      apiKey: string;
+      endPoint: string;
+    }): Promise<Container>;
+  }
+
+  export class AuthContainer {
+    public currentUser(): Record | undefined;
+
+    public whoami(): Promise<Record>;
+
+    public loginWithUsername(
+      username: string,
+      password: string
+    ): Promise<Record>;
+  }
+
   export class Database {
     public getRecordByID(id: string): Promise<Record>;
+
+    public save(
+      records: Record,
+      options?: DatabaseSaveOptions
+    ): Promise<Record>;
+    public save(
+      records: Record[],
+      options?: DatabaseSaveOptions
+    ): Promise<DatabaseSaveBatchResult>;
 
     public query<T extends Record>(
       query: Query,
@@ -41,10 +72,18 @@ declare module 'skygear' {
     ): Promise<QueryResult<T>>;
   }
 
+  interface DatabaseSaveOptions {
+    atomic?: Boolean;
+  }
+  interface DatabaseSaveBatchResult {
+    savedRecords: Record[];
+    errors: Error[];
+  }
+
   export class Query {
     constructor(recordCls: RecordCls);
 
-    public overallCount: number;
+    public overallCount: boolean;
     public limit: number;
     public offset: number;
     public page: number;
@@ -105,4 +144,43 @@ declare module 'skygear' {
   export interface QueryResult<T> extends Array<T> {
     overallCount: number;
   }
+
+  // an error outlaw that doesn't follow any rules
+  // returned by Container & Database Promise failure
+  export interface OutlawError {
+    status: number;
+    error: SkygearError;
+  }
+
+  export interface SkygearError extends Error {
+    code: ErrorCodeType[keyof ErrorCodeType];
+    info: KVObject | null;
+  }
+
+  export interface ErrorCodeType {
+    NotAuthenticated: 101;
+    PermissionDenied: 102;
+    AccessKeyNotAccepted: 103;
+    AccessTokenNotAccepted: 104;
+    InvalidCredentials: 105;
+    InvalidSignature: 106;
+    BadRequest: 107;
+    InvalidArgument: 108;
+    Duplicated: 109;
+    ResourceNotFound: 110;
+    NotSupported: 111;
+    NotImplemented: 112;
+    ConstraintViolated: 113;
+    IncompatibleSchema: 114;
+    AtomicOperationFailure: 115;
+    PartialOperationFailure: 116;
+    UndefinedOperation: 117;
+    PluginUnavailable: 118;
+    PluginTimeout: 119;
+    RecordQueryInvalid: 120;
+    PluginInitializing: 121;
+    UnexpectedError: 1000;
+  }
+
+  export const ErrorCodes: ErrorCodeType;
 }

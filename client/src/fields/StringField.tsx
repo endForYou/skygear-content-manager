@@ -2,14 +2,50 @@ import * as React from 'react';
 
 export type StringFieldProps = Props & React.HTMLAttributes<HTMLElement>;
 
-export interface Props {
-  content: string;
-  name?: string;
+interface Props {
+  editable?: boolean;
+  onFieldChange?: (value: string) => void;
+
+  value: string;
+  name?: string; // <input /> name
 }
 
-export class StringField extends React.PureComponent<StringFieldProps> {
-  public render() {
-    const { content, ...rest } = this.props;
-    return <span {...rest}>{content}</span>;
+interface State {
+  value: string;
+}
+
+export class StringField extends React.PureComponent<StringFieldProps, State> {
+  constructor(props: Props) {
+    super(props);
+
+    this.state = {
+      value: this.props.value,
+    };
   }
+
+  public render() {
+    const { onChange, editable, onFieldChange: _, ...rest } = this.props;
+
+    if (editable) {
+      return (
+        <input
+          {...rest}
+          type="text"
+          value={this.state.value}
+          onChange={this.handleChange}
+        />
+      );
+    } else {
+      return <span {...rest}>{this.state.value}</span>;
+    }
+  }
+
+  public handleChange: React.ChangeEventHandler<HTMLInputElement> = event => {
+    const value = event.target.value;
+    this.setState({ ...this.state, value });
+
+    if (this.props.onFieldChange) {
+      this.props.onFieldChange(value);
+    }
+  };
 }

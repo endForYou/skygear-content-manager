@@ -2,8 +2,8 @@ import * as React from 'react';
 
 const NotFoundPage = () => {
   return (
-    <div className="pt-3">
-      <h2>Page Not Found</h2>
+    <div>
+      <h1 className="display-4">Page Not Found</h1>
       <p>The page you have requested doesn&apos;t exist.</p>
     </div>
   );

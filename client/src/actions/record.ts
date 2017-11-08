@@ -1,263 +1,316 @@
+import { replace } from 'react-router-redux';
+import { Dispatch } from 'redux';
 import { ThunkAction } from 'redux-thunk';
-import skygear, { QueryResult, Record } from 'skygear';
+import skygear, { Query, QueryResult, Record } from 'skygear';
 
-export const FETCH_RECORD_REQUEST = 'FETCH_RECORD_REQUEST';
-export type FETCH_RECORD_REQUEST = typeof FETCH_RECORD_REQUEST;
-export interface FetchRecordReuest {
-  type: FETCH_RECORD_REQUEST;
-  payload: {
-    recordName: string;
-    recordType: string;
-    id: string;
-  };
-}
+import { CmsRecord } from '../cmsConfig';
+import { RootState } from '../states';
 
-export const FETCH_RECORD_SUCCESS = 'FETCH_RECORD_SUCCESS';
-export type FETCH_RECORD_SUCCESS = typeof FETCH_RECORD_SUCCESS;
-export interface FetchRecordSuccess {
-  type: FETCH_RECORD_SUCCESS;
-  payload: {
-    recordName: string;
-    recordType: string;
-    id: string;
-    record: Record;
-  };
-}
-
-export const FETCH_RECORD_FAILURE = 'FETCH_RECORD_FAILURE';
-export type FETCH_RECORD_FAILURE = typeof FETCH_RECORD_FAILURE;
-export interface FetchRecordFailure {
-  type: FETCH_RECORD_FAILURE;
-  payload: {
-    recordName: string;
-    recordType: string;
-    id: string;
-    error: Error;
-  };
-}
-
-export const FETCH_RECORD_LIST_REQUEST = 'FETCH_RECORD_LIST_REQUEST';
-export type FETCH_RECORD_LIST_REQUEST = typeof FETCH_RECORD_LIST_REQUEST;
-export interface FetchRecordListReuest {
-  payload: {
-    recordName: string;
-    recordType: string;
-    page: number;
-  };
-  type: FETCH_RECORD_LIST_REQUEST;
-}
-
-export const FETCH_RECORD_LIST_SUCCESS = 'FETCH_RECORD_LIST_SUCCESS';
-export type FETCH_RECORD_LIST_SUCCESS = typeof FETCH_RECORD_LIST_SUCCESS;
-export interface FetchRecordListSuccess {
-  payload: {
-    recordName: string;
-    recordType: string;
-    page: number;
-    perPage: number;
-    queryResult: QueryResult<Record>;
-  };
-  type: FETCH_RECORD_LIST_SUCCESS;
-}
-
-export const FETCH_RECORD_LIST_FAILURE = 'FETCH_RECORD_LIST_FAILURE';
-export type FETCH_RECORD_LIST_FAILURE = typeof FETCH_RECORD_LIST_FAILURE;
-export interface FetchRecordListFailure {
-  payload: {
-    recordName: string;
-    recordType: string;
-    error: Error;
-  };
-  type: FETCH_RECORD_LIST_FAILURE;
-}
-
-export type RecordAction =
+export type RecordActions =
   | FetchRecordReuest
   | FetchRecordSuccess
   | FetchRecordFailure
   | FetchRecordListReuest
   | FetchRecordListSuccess
-  | FetchRecordListFailure;
+  | FetchRecordListFailure
+  | SaveRecordReuest
+  | SaveRecordSuccess
+  | SaveRecordFailure;
 
-export interface RecordNamed {
-  recordName: string;
+export enum RecordActionTypes {
+  FetchRequest = 'FETCH_RECORD_REQUEST',
+  FetchSuccess = 'FETCH_RECORD_SUCCESS',
+  FetchFailure = 'FETCH_RECORD_FAILURE',
+  FetchListRequest = 'FETCH_RECORD_LIST_REQUEST',
+  FetchListSuccess = 'FETCH_RECORD_LIST_SUCCESS',
+  FetchListFailure = 'FETCH_RECORD_LIST_FAILURE',
+  SaveRequest = 'SAVE_RECORD_REQUEST',
+  SaveSuccess = 'SAVE_RECORD_SUCCESS',
+  SaveFailure = 'SAVE_RECORD_FAILURE',
+}
+
+export interface FetchRecordReuest {
+  type: RecordActionTypes.FetchRequest;
+  payload: {
+    cmsRecord: CmsRecord;
+    id: string;
+  };
+}
+
+export interface FetchRecordSuccess {
+  type: RecordActionTypes.FetchSuccess;
+  payload: {
+    cmsRecord: CmsRecord;
+    id: string;
+    record: Record;
+  };
+}
+
+export interface FetchRecordFailure {
+  type: RecordActionTypes.FetchFailure;
+  payload: {
+    cmsRecord: CmsRecord;
+    id: string;
+    error: Error;
+  };
+}
+
+export interface FetchRecordListReuest {
+  payload: {
+    cmsRecord: CmsRecord;
+    page: number;
+  };
+  type: RecordActionTypes.FetchListRequest;
+}
+
+export interface FetchRecordListSuccess {
+  payload: {
+    cmsRecord: CmsRecord;
+    page: number;
+    perPage: number;
+    queryResult: QueryResult<Record>;
+  };
+  type: RecordActionTypes.FetchListSuccess;
+}
+
+export interface FetchRecordListFailure {
+  payload: {
+    cmsRecord: CmsRecord;
+    error: Error;
+  };
+  type: RecordActionTypes.FetchListFailure;
+}
+
+export interface SaveRecordReuest {
+  type: RecordActionTypes.SaveRequest;
+  payload: {
+    cmsRecord: CmsRecord;
+    record: Record;
+  };
+}
+
+export interface SaveRecordSuccess {
+  type: RecordActionTypes.SaveSuccess;
+  payload: {
+    cmsRecord: CmsRecord;
+    record: Record;
+  };
+}
+
+export interface SaveRecordFailure {
+  type: RecordActionTypes.SaveFailure;
+  payload: {
+    cmsRecord: CmsRecord;
+    record: Record;
+    error: Error;
+  };
 }
 
 function fetchRecordRequest(
-  recordName: string,
-  recordType: string,
+  cmsRecord: CmsRecord,
   id: string
 ): FetchRecordReuest {
   return {
     payload: {
+      cmsRecord,
       id,
-      recordName,
-      recordType,
     },
-    type: FETCH_RECORD_REQUEST,
+    type: RecordActionTypes.FetchRequest,
   };
 }
 
 function fetchRecordSuccess(
-  recordName: string,
-  recordType: string,
+  cmsRecord: CmsRecord,
   id: string,
   record: Record
 ): FetchRecordSuccess {
   return {
     payload: {
+      cmsRecord,
       id,
       record,
-      recordName,
-      recordType,
     },
-    type: FETCH_RECORD_SUCCESS,
+    type: RecordActionTypes.FetchSuccess,
   };
 }
 
 function fetchRecordFailure(
-  recordName: string,
-  recordType: string,
+  cmsRecord: CmsRecord,
   id: string,
   error: Error
 ): FetchRecordFailure {
   return {
     payload: {
+      cmsRecord,
       error,
       id,
-      recordName,
-      recordType,
     },
-    type: FETCH_RECORD_FAILURE,
+    type: RecordActionTypes.FetchFailure,
   };
 }
 
 function fetchRecordListRequest(
-  recordName: string,
-  recordType: string,
+  cmsRecord: CmsRecord,
   page: number
 ): FetchRecordListReuest {
   return {
     payload: {
+      cmsRecord,
       page,
-      recordName,
-      recordType,
     },
-    type: FETCH_RECORD_LIST_REQUEST,
+    type: RecordActionTypes.FetchListRequest,
   };
 }
 
 function fetchRecordListSuccess(
-  recordName: string,
-  recordType: string,
+  cmsRecord: CmsRecord,
   page: number,
   perPage: number,
   queryResult: QueryResult<Record>
 ): FetchRecordListSuccess {
   return {
     payload: {
+      cmsRecord,
       page,
       perPage,
       queryResult,
-      recordName,
-      recordType,
     },
-    type: FETCH_RECORD_LIST_SUCCESS,
+    type: RecordActionTypes.FetchListSuccess,
   };
 }
 
 function fetchRecordListFailure(
-  recordName: string,
-  recordType: string,
+  cmsRecord: CmsRecord,
   error: Error
 ): FetchRecordListFailure {
   return {
     payload: {
+      cmsRecord,
       error,
-      recordName,
-      recordType,
     },
-    type: FETCH_RECORD_LIST_FAILURE,
+    type: RecordActionTypes.FetchListFailure,
+  };
+}
+
+function saveRecordRequest(
+  cmsRecord: CmsRecord,
+  record: Record
+): SaveRecordReuest {
+  return {
+    payload: {
+      cmsRecord,
+      record,
+    },
+    type: RecordActionTypes.SaveRequest,
+  };
+}
+
+function saveRecordSuccess(
+  cmsRecord: CmsRecord,
+  record: Record
+): SaveRecordSuccess {
+  return {
+    payload: {
+      cmsRecord,
+      record,
+    },
+    type: RecordActionTypes.SaveSuccess,
+  };
+}
+
+function saveRecordFailure(
+  cmsRecord: CmsRecord,
+  record: Record,
+  error: Error
+): SaveRecordFailure {
+  return {
+    payload: {
+      cmsRecord,
+      error,
+      record,
+    },
+    type: RecordActionTypes.SaveFailure,
   };
 }
 
 export function fetchRecord(
-  recordName: string,
-  recordType: string,
+  cmsRecord: CmsRecord,
   id: string
-): ThunkAction<Promise<QueryResult<Record>>, void, void> {
+): ThunkAction<Promise<void>, {}, {}> {
   return dispatch => {
-    dispatch(fetchRecordRequest(recordName, recordType, id));
-    return skygear.publicDB.getRecordByID(`${recordType}/${id}`).then(
+    dispatch(fetchRecordRequest(cmsRecord, id));
+    return skygear.publicDB.getRecordByID(`${cmsRecord.recordType}/${id}`).then(
       (record: Record) => {
-        dispatch(fetchRecordSuccess(recordName, recordType, id, record));
+        dispatch(fetchRecordSuccess(cmsRecord, id, record));
       },
       (error: Error) => {
-        dispatch(fetchRecordFailure(recordName, recordType, id, error));
+        dispatch(fetchRecordFailure(cmsRecord, id, error));
       }
     );
   };
 }
 
-export function fetchRecordList(
-  recordName: string,
-  recordType: string,
+function saveRecord(
+  cmsRecord: CmsRecord,
+  record: Record
+): ThunkAction<Promise<void>, {}, {}> {
+  return dispatch => {
+    dispatch(saveRecordRequest(cmsRecord, record));
+    return skygear.publicDB.save(record).then(
+      (savedRecord: Record) => {
+        dispatch(saveRecordSuccess(cmsRecord, savedRecord));
+        dispatch(replace(`/record/${cmsRecord.name}/${record._id}`));
+      },
+      (error: Error) => {
+        dispatch(saveRecordFailure(cmsRecord, record, error));
+      }
+    );
+  };
+}
+
+function fetchRecordList(
+  cmsRecord: CmsRecord,
   page: number = 1,
   perPage: number = 25
-): ThunkAction<Promise<QueryResult<Record>>, void, void> {
-  const RecordCls = skygear.Record.extend(recordType);
+): ThunkAction<Promise<void>, {}, {}> {
+  const RecordCls = Record.extend(cmsRecord.recordType);
 
   return dispatch => {
-    const query = new skygear.Query(RecordCls);
+    const query = new Query(RecordCls);
     query.overallCount = true;
     query.limit = perPage;
     query.offset = (page - 1) * perPage;
 
-    dispatch(fetchRecordListRequest(recordName, recordType, page));
+    dispatch(fetchRecordListRequest(cmsRecord, page));
     return skygear.publicDB.query(query).then(
       (queryResult: QueryResult<Record>) => {
-        dispatch(
-          fetchRecordListSuccess(
-            recordName,
-            recordType,
-            page,
-            perPage,
-            queryResult
-          )
-        );
+        dispatch(fetchRecordListSuccess(cmsRecord, page, perPage, queryResult));
       },
       (error: Error) => {
-        dispatch(fetchRecordListFailure(recordName, recordType, error));
+        dispatch(fetchRecordListFailure(cmsRecord, error));
       }
     ) as Promise<Record>;
   };
 }
 
-export class RecordActionCreator {
-  private recordName: string;
-  private recordType: string;
-  private perPage: number;
+export class RecordActionDispatcher {
+  private dispatch: Dispatch<RootState>;
+  private cmsRecord: CmsRecord;
 
-  constructor(recordName: string, recordType: string, perPage: number) {
-    this.recordName = recordName;
-    this.recordType = recordType;
-    this.perPage = perPage;
+  constructor(dispatch: Dispatch<RootState>, cmsRecord: CmsRecord) {
+    this.dispatch = dispatch;
+    this.cmsRecord = cmsRecord;
   }
 
-  public fetch(
-    id: string
-  ): ThunkAction<Promise<QueryResult<Record>>, void, void> {
-    return fetchRecord(this.recordName, this.recordType, id);
+  public fetch(id: string): Promise<void> {
+    return this.dispatch(fetchRecord(this.cmsRecord, id));
   }
 
-  public fetchList(
-    page: number = 1
-  ): ThunkAction<Promise<QueryResult<Record>>, void, void> {
-    return fetchRecordList(
-      this.recordName,
-      this.recordType,
-      page,
-      this.perPage
-    );
+  public fetchList(page: number, perPage: number): Promise<void> {
+    return this.dispatch(fetchRecordList(this.cmsRecord, page, perPage));
+  }
+
+  public save(record: Record): Promise<void> {
+    return this.dispatch(saveRecord(this.cmsRecord, record));
   }
 }

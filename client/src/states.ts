@@ -22,6 +22,7 @@ export interface RecordViewsByName {
 export interface RecordViewState {
   list: ListState;
   show: ShowState;
+  edit: EditState;
 }
 
 export interface ListState {
@@ -36,6 +37,11 @@ export interface ShowState {
   remoteRecord: Remote<Record>;
 }
 
+export interface EditState {
+  remoteRecord: Remote<Record>;
+  savingRecord?: Remote<Record>;
+}
+
 export const initialListState: ListState = {
   error: undefined,
   isLoading: true,
@@ -48,7 +54,13 @@ export const initialShowState: ShowState = {
   remoteRecord: RemoteLoading,
 };
 
+export const initialEditState: EditState = {
+  remoteRecord: RemoteLoading,
+  savingRecord: undefined,
+};
+
 export const initialRecordViewState: RecordViewState = {
+  edit: initialEditState,
   list: initialListState,
   show: initialShowState,
 };

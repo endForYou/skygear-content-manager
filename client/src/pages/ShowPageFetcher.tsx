@@ -7,7 +7,7 @@ import { fetchRecord } from '../actions/record';
 import { ShowPageConfig } from '../cmsConfig';
 import { RootState } from '../states';
 import { Remote } from '../types';
-import { ShowPage } from './ShowPage';
+import { ShowPage } from './../components/ShowPage';
 
 export type ShowPageFetcherType = React.ComponentType;
 
@@ -32,8 +32,8 @@ export function makeShowPage(
 
   const HOC = class extends React.Component {
     public componentDidMount() {
-      const { name, recordType } = config.cmsRecord;
-      dispatch(fetchRecord(name, recordType, recordId));
+      // TODO: use RecordActionDispatcher instead of direct dispatch
+      dispatch(fetchRecord(config.cmsRecord, recordId));
     }
 
     public render() {

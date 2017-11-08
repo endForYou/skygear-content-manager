@@ -3,7 +3,7 @@ import * as PropTypes from 'prop-types';
 import * as React from 'react';
 
 const _FrontPage = user => {
-  return <div className="pt-3">My name is {user.username} :D</div>;
+  return <div>My name is {user.username} :D</div>;
 };
 
 _FrontPage.propTypes = {
