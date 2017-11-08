@@ -20,3 +20,10 @@
 .sidebar .nav-link.active {
 	opacity: 1;
 }
+
+@media (max-width: 767px) {
+	.sidebar {
+		min-height: auto;
+		padding-bottom: 1rem;
+	}	
+}

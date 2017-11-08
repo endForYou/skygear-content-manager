@@ -17,7 +17,7 @@ class Sidebar extends React.PureComponent<SidebarProps> {
     const { items } = this.props;
 
     return (
-      <nav className="col-3 sidebar">
+      <nav className="col-sm-3 sidebar">
         <Link className="sidebar-logo" to="/">
           <img className="img-fluid" src={logo} alt="Skygear CMS" />
         </Link>

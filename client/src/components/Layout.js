@@ -5,7 +5,7 @@ import Sidebar from './Sidebar';
 
 const Layout = ({ children, ...rest }) => {
   return (
-    <div className="container">
+    <div className="container-fluid">
       <div className="row">
         <Sidebar {...rest} />
         <Main>{children}</Main>
@@ -20,7 +20,7 @@ Layout.propTypes = {
 
 const Main = ({ children }) => {
   return (
-    <main className="col-9 pt-3" role="main">
+    <main className="col-sm-9 pt-3" role="main">
       {children}
     </main>
   );
