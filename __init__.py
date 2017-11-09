@@ -21,106 +21,260 @@ HEADER_BLACKLIST = [
 ]
 
 
-def requests_request(req, json_body=None, headers=None):
-    return requests.Request(
-        method=req.method,
-        url=CMS_SKYGEAR_ENDPOINT,
-        data=transform_request_body(json_body) if json_body else req.data,
-        headers=headers if headers else transform_request_header(req.headers),
-    )
-
-
 @skygear.handler('cms/api/')
 def api(request):
     # log_request(request)
 
-    parsed_request_body = parse_body(request.data)
+    req = SkygearRequest.from_werkzeug(request)
 
-    # handle login request specially
-    if (isinstance(parsed_request_body, dict) and
-            parsed_request_body.get('action') == 'auth:login'):
-        return intercept_login(request, parsed_request_body)
+    if req.body.is_json and req.body.data.get('action') == 'auth:login':
+        return intercept_login(req).to_werkzeug()
 
-    requests_req = intercept_request_body(request, parsed_request_body)
-    resp = requests.Session().send(requests_req.prepare())
+    cms_access_token = req.access_token
+    if not cms_access_token:
+        return request_skygear(req).to_werkzeug()
 
-    # log_response(resp)
+    authdata = AuthData.from_cms_token(cms_access_token)
+    if not authdata:
+        return request_skygear(req).to_werkzeug()
 
-    return transform_resp(resp)
+    req.access_token = authdata.skygear_token
+
+    if not authdata.is_admin:
+        return request_skygear(req).to_werkzeug()
+
+    req.is_master = True
+    return request_skygear(req).to_werkzeug()
 
 
-def intercept_request_body(request, json_body):
-    cms_access_token = json_body['access_token']
-    try:
-        authdict = jwt.decode(
-            cms_access_token,
-            CMS_AUTH_SECRET,
-            algorithms=['HS256'],
+class SkygearRequest:
+
+    method = None
+    headers = {}
+    body = None
+
+    is_master = False
+
+    def __init__(self, method, headers, body):
+        self.method = method
+        self.headers = headers
+        self.body = body
+
+    # req: skygear's wrapped werkzeug request
+    @classmethod
+    def from_werkzeug(cls, req):
+        return cls(
+            method=req.method,
+            body=Body(req.data),
+            headers={k: v for k, v in req.headers},
         )
-    except JWTError:
-        return requests_request(request, json_body)
 
-    if not authdict.get('is_admin', False):
-        return requests_request(request, json_body)
+    @property
+    def access_token(self):
+        if self.body.is_json:
+            access_token = self.body.data.get('access_token')
+            if access_token:
+                return access_token
 
-    skygear_access_token = authdict['skygear_access_token']
-    headers = transform_request_header(request.headers)
+        return self.headers.get('X-Skygear-Access-Token')
 
-    json_body['access_token'] = skygear_access_token
-    headers['X-Skygear-Access-Token'] = skygear_access_token
+    @access_token.setter
+    def access_token(self, access_token):
+        if self.body.is_json:
+            self.body.data['access_token'] = access_token
 
-    return requests_request(
-        request,
-        json_body=json_body,
-        headers=headers,
-    )
+        self.headers['X-Skygear-Access-Token'] = access_token
+
+    def to_requests(self):
+        method = self.method
+        # TODO: should clone body here
+        body = self.body
+        headers = self.headers.copy()
+
+        if self.is_master:
+            if body.is_json:
+                body.data['api_key'] = CMS_SKYGEAR_MASTER_KEY
+            headers['X-Skygear-Api-Key'] = CMS_SKYGEAR_MASTER_KEY
+
+        return requests.Request(
+            method=method,
+            url=CMS_SKYGEAR_ENDPOINT,
+            data=body.to_data(),
+            headers=headers,
+        )
 
 
-def intercept_login(request, json_body):
-    prepared = requests_request(request, json_body).prepare()
-    resp = requests.Session().send(prepared)
+class SkygearResponse:
 
-    # log_response(resp)
+    is_forbidden = False
+
+    status_code = None
+    headers = {}
+    body = None
+
+    # resp: requests response
+    def __init__(self, status_code, headers, body, is_forbidden=False):
+        self.is_forbidden = is_forbidden
+
+        self.status_code = status_code
+        self.headers = headers
+        self.body = body
+
+    @classmethod
+    def forbidden(cls):
+        return cls(
+            status_code=None,
+            headers=None,
+            body=None,
+            is_forbidden=True,
+        )
+
+    @classmethod
+    def from_requests(cls, resp):
+        status_code = resp.status_code
+        body = Body(resp.content)
+        headers = {k: v for k, v in resp.headers.items()}
+
+        return cls(
+            status_code=status_code,
+            headers=headers,
+            body=body,
+        )
+
+    @property
+    def access_token(self):
+        if self.body.is_json:
+            access_token = self.body.data.get('result', {}).get('access_token')
+            if access_token:
+                return access_token
+
+        return self.headers.get('X-Skygear-Access-Token')
+
+    @access_token.setter
+    def access_token(self, access_token):
+        if self.body.is_json:
+            self.body.data['result']['access_token'] = access_token
+
+        self.headers['X-Skygear-Access-Token'] = access_token
+
+    def to_werkzeug(self):
+        if self.is_forbidden:
+            return skygear.Response(
+                'You are not permitted to access CMS',
+                403
+            )
+
+        filtered_headers = [
+            (k, v)
+            for k, v in self.headers.items()
+            if k not in HEADER_BLACKLIST
+        ]
+
+        return skygear.Response(
+            response=self.body.to_data(),
+            status=str(self.status_code),
+            headers=filtered_headers,
+        )
+
+
+class Body:
+
+    KIND_JSON = 'json'
+    KIND_OTHER = 'other'
+
+    kind = KIND_OTHER
+    data = None
+
+    # b: bytes
+    def __init__(self, b):
+        if not b:
+            self.data = b
+
+        try:
+            json_body = json.loads(b.decode('utf-8'))
+        except json.decoder.JSONDecodeError:
+            self.data = b
+            return
+
+        self.kind = self.KIND_JSON
+        self.data = json_body
+
+    @property
+    def is_json(self):
+        return self.kind == self.KIND_JSON
+
+    def to_data(self):
+        data = self.data
+
+        if self.is_json:
+            return json.dumps(data).encode('utf-8')
+
+        return data
+
+
+class AuthData:
+
+    is_admin = False
+    skygear_token = None
+
+    def __init__(self, is_admin, skygear_token):
+        self.is_admin = is_admin
+        self.skygear_token = skygear_token
+
+    @classmethod
+    def from_cms_token(cls, cms_token):
+        try:
+            authdict = jwt.decode(
+                cms_token,
+                CMS_AUTH_SECRET,
+                algorithms=['HS256'],
+            )
+        except JWTError:
+            return None
+
+        return cls(
+            is_admin=authdict.get('is_admin', False),
+            skygear_token=authdict.get('skygear_access_token', None)
+        )
+
+    def to_cms_token(self):
+        jwt.encode({
+            'iss': 'skygear-content-manager',
+            'skygear_access_token': self.skygear_token,
+            'is_admin': self.is_admin,
+        }, CMS_AUTH_SECRET, algorithm='HS256')
+
+
+# req: SkygearRequest
+def request_skygear(req):
+    requests_req = req.to_requests()
+    requests_resp = requests.Session().send(requests_req.prepare())
+    return SkygearResponse.from_requests(requests_resp)
+
+
+def intercept_login(req):
+    resp = request_skygear(req)
 
     if not (200 <= resp.status_code <= 299):
-        return transform_resp(resp)
-
-    resp_body = parse_body(resp.content)
+        return resp
 
     # unknown resp structure
-    if not isinstance(resp_body, dict):
-        return forbidden_resp(resp)
+    if not resp.body.is_json:
+        return SkygearResponse.forbidden()
 
-    if not can_access_cms(resp_body):
-        return forbidden_resp(resp)
+    if not can_access_cms(resp):
+        return SkygearResponse.forbidden()
 
-    return authenticated_resp(resp, resp_body)
+    resp.access_token = AuthData(
+        is_admin=True,
+        skygear_token=resp.access_token,
+    ).to_cms_token()
 
-
-def authenticated_resp(resp, resp_json_body):
-    skygear_access_token = resp_json_body['result']['access_token']
-
-    cms_access_token = jwt.encode({
-        'iss': 'skygear-content-manager',
-        'skygear_access_token': skygear_access_token,
-        'is_admin': True,
-    }, CMS_AUTH_SECRET, algorithm='HS256')
-
-    resp_json_body['result']['access_token'] = cms_access_token
-
-    return skygear.Response(
-        response=json.dumps(resp_json_body).encode('utf-8'),
-        status=str(resp.status_code),
-        headers=[
-            (k, v)
-            for k, v in resp.headers.items()
-            if k not in HEADER_BLACKLIST
-        ],
-    )
+    return resp
 
 
-def can_access_cms(resp_body):
-    roles = get_roles(resp_body)
+def can_access_cms(resp):
+    roles = get_roles(resp.body.data)
 
     # no roles field?
     if roles is None:
@@ -138,65 +292,3 @@ def get_roles(json_body):
         return None
 
     return roles
-
-
-def forbidden_resp(requests_resp):
-    return skygear.Response(
-        'You are not permitted to access CMS',
-        403
-    )
-
-
-def transform_resp(resp):
-    return skygear.Response(
-        response=resp.content,
-        status=str(resp.status_code),
-        headers=[
-            (k, v)
-            for k, v in resp.headers.items()
-            if k not in HEADER_BLACKLIST
-        ],
-    )
-
-
-def transform_request_header(environ_headers):
-    # we are losing headers with multiple values here
-    headers = dict((k, v) for k, v in environ_headers)
-    headers['X-Skygear-Api-Key'] = CMS_SKYGEAR_MASTER_KEY
-
-    return headers
-
-
-def parse_body(b):
-    if not b:
-        return b
-
-    try:
-        json_body = json.loads(b.decode('utf-8'))
-    except json.decoder.JSONDecodeError:
-        return b
-
-    return json_body
-
-
-def transform_request_body(body):
-    if isinstance(body, dict):
-        body['api_key'] = CMS_SKYGEAR_MASTER_KEY
-
-    return json.dumps(body).encode('utf-8')
-
-
-def log_request(request):
-    print(
-        request.method,
-        request.data,
-        request.headers,
-    )
-
-
-def log_response(resp):
-    print(
-        resp.status_code,
-        resp.headers,
-        resp.content,
-    )
