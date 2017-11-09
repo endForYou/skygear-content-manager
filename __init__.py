@@ -242,7 +242,7 @@ class AuthData:
         )
 
     def to_cms_token(self):
-        jwt.encode({
+        return jwt.encode({
             'iss': 'skygear-content-manager',
             'skygear_access_token': self.skygear_token,
             'is_admin': self.is_admin,
