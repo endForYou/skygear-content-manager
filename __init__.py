@@ -17,6 +17,7 @@ CMS_AUTH_SECRET = os.environ.get('CMS_AUTH_SECRET', 'FAKE_AUTH_SECRET')
 HEADER_BLACKLIST = [
     'Access-Control-Allow-Credentials',
     'Access-Control-Allow-Origin',
+    'Content-Encoding',
     'Server',
 ]
 
