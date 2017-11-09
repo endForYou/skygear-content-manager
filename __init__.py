@@ -27,7 +27,7 @@ def api(request):
 
     req = SkygearRequest.from_werkzeug(request)
 
-    if req.body.is_json and req.body.data.get('action') == 'auth:login':
+    if req.body.is_dict and req.body.data.get('action') == 'auth:login':
         return intercept_login(req).to_werkzeug()
 
     cms_access_token = req.access_token
@@ -71,7 +71,7 @@ class SkygearRequest:
 
     @property
     def access_token(self):
-        if self.body.is_json:
+        if self.body.is_dict:
             access_token = self.body.data.get('access_token')
             if access_token:
                 return access_token
@@ -80,7 +80,7 @@ class SkygearRequest:
 
     @access_token.setter
     def access_token(self, access_token):
-        if self.body.is_json:
+        if self.body.is_dict:
             self.body.data['access_token'] = access_token
 
         self.headers['X-Skygear-Access-Token'] = access_token
@@ -92,7 +92,7 @@ class SkygearRequest:
         headers = self.headers.copy()
 
         if self.is_master:
-            if body.is_json:
+            if body.is_dict:
                 body.data['api_key'] = CMS_SKYGEAR_MASTER_KEY
             headers['X-Skygear-Api-Key'] = CMS_SKYGEAR_MASTER_KEY
 
@@ -143,7 +143,7 @@ class SkygearResponse:
 
     @property
     def access_token(self):
-        if self.body.is_json:
+        if self.body.is_dict:
             access_token = self.body.data.get('result', {}).get('access_token')
             if access_token:
                 return access_token
@@ -152,7 +152,7 @@ class SkygearResponse:
 
     @access_token.setter
     def access_token(self, access_token):
-        if self.body.is_json:
+        if self.body.is_dict:
             self.body.data['result']['access_token'] = access_token
 
         self.headers['X-Skygear-Access-Token'] = access_token
@@ -202,6 +202,10 @@ class Body:
     @property
     def is_json(self):
         return self.kind == self.KIND_JSON
+
+    @property
+    def is_dict(self):
+        return self.is_json and isinstance(self.data, dict)
 
     def to_data(self):
         data = self.data
@@ -259,7 +263,7 @@ def intercept_login(req):
         return resp
 
     # unknown resp structure
-    if not resp.body.is_json:
+    if not resp.body.is_dict:
         return SkygearResponse.forbidden()
 
     if not can_access_cms(resp):
