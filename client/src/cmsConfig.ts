@@ -1,4 +1,4 @@
-import { humanize } from './util';
+import { humanize, objectFrom } from './util';
 
 export interface CmsConfig {
   site: SiteConfig;
@@ -63,13 +63,15 @@ export type FieldConfig =
   | TextAreaFieldConfig
   | DateTimeFieldConfig
   | BooleanFieldConfig
-  | IntegerFieldConfig;
+  | IntegerFieldConfig
+  | ReferenceFieldConfig;
 export enum FieldConfigTypes {
   String = 'String',
   TextArea = 'TextArea',
   DateTime = 'DateTime',
   Boolean = 'Boolean',
   Integer = 'Integer',
+  Reference = 'Reference',
 }
 interface FieldConfigAttrs {
   name: string;
@@ -98,6 +100,11 @@ export interface IntegerFieldConfig extends FieldConfigAttrs {
   type: FieldConfigTypes.Integer;
 }
 
+export interface ReferenceFieldConfig extends FieldConfigAttrs {
+  type: FieldConfigTypes.Reference;
+  cmsRecord: CmsRecord;
+}
+
 interface FieldConfigInput {
   type: string;
   // tslint:disable-next-line: no-any
@@ -106,12 +113,14 @@ interface FieldConfigInput {
 
 // tslint:disable-next-line: no-any
 export function parseCmsConfig({ site, records }: any): CmsConfig {
+  const context = preparseRecordConfigs(records);
+
   return {
     records: Object.entries(
       records
       // tslint:disable-next-line: no-any
     ).reduce((obj: object, [name, recordConfig]: [string, any]) => {
-      return { ...obj, [name]: parseRecordConfig(name, recordConfig) };
+      return { ...obj, [name]: parseRecordConfig(context, name, recordConfig) };
     }, {}),
     site: parseSiteConfigs(site),
   };
@@ -140,65 +149,124 @@ function parseSiteRecordConfig(input: any): RecordSiteItemConfig {
   return { type, name, label: parsedLabel };
 }
 
-// tslint:disable-next-line: no-any
-function parseRecordConfig(recordName: string, input: any): RecordConfig {
-  const { list, show, edit } = input;
-
-  const recordType = parseOptionalString(input.recordType) || recordName;
-  const cmsRecord = { name: recordName, recordType };
-  return {
-    cmsRecord,
-    edit: edit == null ? undefined : parseEditPageConfig(cmsRecord, edit),
-    list: list == null ? undefined : parseListPageConfig(cmsRecord, list),
-    show: show == null ? undefined : parseShowPageConfig(cmsRecord, show),
-  };
+interface ConfigContext {
+  cmsRecordByName: { [key: string]: CmsRecord | undefined };
 }
 
 // tslint:disable-next-line: no-any
-function parseListPageConfig(cmsRecord: CmsRecord, input: any): ListPageConfig {
-  const { label, perPage = 25, fields: fieldConfigs } = input;
+function preparseRecordConfigs(records: any): ConfigContext {
+  const cmsRecords: CmsRecord[] = Object.entries(
+    records
+  ).map(([recordName, value]) => {
+    const recordType =
+      parseOptionalString(value, 'recordType', recordName) || recordName;
+    return { name: recordName, recordType };
+  });
+  const cmsRecordByName = objectFrom(
+    cmsRecords.map(cmsRecord => {
+      return [cmsRecord.name, cmsRecord] as [string, CmsRecord];
+    })
+  );
 
-  const parsedLabel = label ? label : humanize(cmsRecord.name);
+  return { cmsRecordByName };
+}
+
+function parseRecordConfig(
+  context: ConfigContext,
+  recordName: string,
+  // tslint:disable-next-line: no-any
+  input: any
+): RecordConfig {
+  const { list, show, edit } = input;
+
+  const recordType =
+    parseOptionalString(input, 'recordType', recordName) || recordName;
+  const cmsRecord = { name: recordName, recordType };
   return {
     cmsRecord,
-    fields: fieldConfigs.map(parseFieldConfig),
-    label: parsedLabel,
+    edit:
+      edit == null ? undefined : parseEditPageConfig(context, cmsRecord, edit),
+    list:
+      list == null ? undefined : parseListPageConfig(context, cmsRecord, list),
+    show:
+      show == null ? undefined : parseShowPageConfig(context, cmsRecord, show),
+  };
+}
+
+function parseListPageConfig(
+  context: ConfigContext,
+  cmsRecord: CmsRecord,
+  // tslint:disable-next-line: no-any
+  input: any
+): ListPageConfig {
+  const { perPage = 25 } = input;
+
+  const label =
+    parseOptionalString(input, 'label', 'List') || humanize(cmsRecord.name);
+
+  // tslint:disable-next-line: no-any
+  const fields = input.fields.map((f: any) =>
+    parseFieldConfig(context, f)
+  ) as FieldConfig[];
+
+  return {
+    cmsRecord,
+    fields,
+    label,
     perPage,
   };
 }
 
-// tslint:disable-next-line: no-any
-function parseShowPageConfig(cmsRecord: CmsRecord, input: any): ShowPageConfig {
+function parseShowPageConfig(
+  context: ConfigContext,
+  cmsRecord: CmsRecord,
+  // tslint:disable-next-line: no-any
+  input: any
+): ShowPageConfig {
   if (!Array.isArray(input.fields)) {
     throw new Error(`ShowPageConfig.fields must be an Array`);
   }
 
-  const label = parseOptionalString(input.label) || humanize(cmsRecord.name);
+  const label =
+    parseOptionalString(input, 'label', 'label') || humanize(cmsRecord.name);
 
   if (typeof input.label !== 'string' && typeof input.label !== 'undefined') {
     throw new Error(`ShowPageConfig.label must be a string`);
   }
 
+  // tslint:disable-next-line: no-any
+  const fields = input.fields.map((f: any) =>
+    parseFieldConfig(context, f)
+  ) as FieldConfig[];
+
   return {
     cmsRecord,
-    fields: input.fields.map(parseFieldConfig),
+    fields,
     label,
   };
 }
 
-// tslint:disable-next-line: no-any
-function parseEditPageConfig(cmsRecord: CmsRecord, input: any): EditPageConfig {
+function parseEditPageConfig(
+  context: ConfigContext,
+  cmsRecord: CmsRecord,
+  // tslint:disable-next-line: no-any
+  input: any
+): EditPageConfig {
   if (!Array.isArray(input.fields)) {
     throw new Error(`EditPageConfig.fields must be an Array`);
   }
 
-  const label = parseOptionalString(input.label) || humanize(cmsRecord.name);
+  const label =
+    parseOptionalString(input, 'label', 'Edit') || humanize(cmsRecord.name);
 
   if (typeof input.label !== 'string' && typeof input.label !== 'undefined') {
     throw new Error(`EditPageConfig.label must be a string`);
   }
 
-  const fields = input.fields.map(parseFieldConfig) as StringFieldConfig[];
+  // tslint:disable-next-line: no-any
+  const fields = input.fields.map((f: any) =>
+    parseFieldConfig(context, f)
+  ) as FieldConfig[];
   const editableFields = fields.map(config => ({ editable: true, ...config }));
 
   return {
@@ -209,7 +277,7 @@ function parseEditPageConfig(cmsRecord: CmsRecord, input: any): EditPageConfig {
 }
 
 // tslint:disable-next-line: no-any
-function parseFieldConfig(a: any): FieldConfig {
+function parseFieldConfig(context: ConfigContext, a: any): FieldConfig {
   switch (a.type) {
     case 'String':
       return parseStringFieldConfig(a);
@@ -221,6 +289,8 @@ function parseFieldConfig(a: any): FieldConfig {
       return parseBooleanFieldConfig(a);
     case 'Integer':
       return parseIntegerFieldConfig(a);
+    case 'Reference':
+      return parseReferenceFieldConfig(context, a);
 
     // built-in fields
     case '_id':
@@ -235,14 +305,17 @@ function parseFieldConfig(a: any): FieldConfig {
 }
 
 function parseStringFieldConfig(input: FieldConfigInput): StringFieldConfig {
-  return { ...parseFieldConfigAttrs(input), type: FieldConfigTypes.String };
+  return {
+    ...parseFieldConfigAttrs(input, 'String'),
+    type: FieldConfigTypes.String,
+  };
 }
 
 function parseTextAreaFieldConfig(
   input: FieldConfigInput
 ): TextAreaFieldConfig {
   return {
-    ...parseFieldConfigAttrs(input),
+    ...parseFieldConfigAttrs(input, 'TextArea'),
     type: FieldConfigTypes.TextArea,
   };
 }
@@ -250,21 +323,54 @@ function parseTextAreaFieldConfig(
 function parseDateTimeFieldConfig(
   input: FieldConfigInput
 ): DateTimeFieldConfig {
-  return { ...parseFieldConfigAttrs(input), type: FieldConfigTypes.DateTime };
+  return {
+    ...parseFieldConfigAttrs(input, 'DateTime'),
+    type: FieldConfigTypes.DateTime,
+  };
 }
 
 function parseBooleanFieldConfig(input: FieldConfigInput): BooleanFieldConfig {
-  return { ...parseFieldConfigAttrs(input), type: FieldConfigTypes.Boolean };
+  return {
+    ...parseFieldConfigAttrs(input, 'Boolean'),
+    type: FieldConfigTypes.Boolean,
+  };
 }
 
 function parseIntegerFieldConfig(input: FieldConfigInput): IntegerFieldConfig {
-  return { ...parseFieldConfigAttrs(input), type: FieldConfigTypes.Integer };
+  return {
+    ...parseFieldConfigAttrs(input, 'Integer'),
+    type: FieldConfigTypes.Integer,
+  };
 }
 
-// tslint:disable-next-line: no-any
-function parseFieldConfigAttrs(input: any): FieldConfigAttrs {
-  const name = parseString(input.name);
-  const label = parseOptionalString(input.label) || humanize(name);
+function parseReferenceFieldConfig(
+  context: ConfigContext,
+  input: FieldConfigInput
+): ReferenceFieldConfig {
+  const referenceName = parseString(input, 'referencing', 'Reference');
+  const referenceCmsRecord = context.cmsRecordByName[referenceName];
+
+  if (referenceCmsRecord === undefined) {
+    throw new Error(
+      `Couldn't find configuration of Reference.referencing = ${referenceName}`
+    );
+  }
+
+  return {
+    ...parseFieldConfigAttrs(input, 'Reference'),
+    cmsRecord: referenceCmsRecord,
+    type: FieldConfigTypes.Reference,
+  };
+}
+
+function parseFieldConfigAttrs(
+  // tslint:disable-next-line: no-any
+  input: any,
+  fieldType: string
+): FieldConfigAttrs {
+  const name = parseString(input, 'name', fieldType);
+  const label =
+    parseOptionalString(input, 'label', fieldType) || humanize(name);
 
   return { name, label };
 }
@@ -301,24 +407,30 @@ function parseUpdatedAtFieldConfig(
 }
 
 // tslint:disable-next-line: no-any
-function parseString(a: any, error?: string): string {
-  const optionalString = parseOptionalString(a, error);
+function parseString(a: any, fieldName: string, context: string): string {
+  const optionalString = parseOptionalString(a, fieldName, context);
   if (optionalString === undefined) {
-    throw new Error(error || 'expect a string, got undefined');
+    throw new Error(`${context}.${fieldName} want a string, got undefined`);
   }
 
   return optionalString;
 }
 
-// tslint:disable-next-line: no-any
-function parseOptionalString(a: any, error?: string): string | undefined {
-  if (a == null) {
+function parseOptionalString(
+  // tslint:disable-next-line: no-any
+  a: any,
+  fieldName: string,
+  context: string
+): string | undefined {
+  const value = a[fieldName];
+
+  if (value == null) {
     return undefined;
   }
 
-  if (typeof a === 'string') {
-    return a;
+  if (typeof value === 'string') {
+    return value;
   }
 
-  throw new Error(error || `unknown variable type: ${typeof a === 'string'}`);
+  throw new Error(`${context}.${fieldName} want a string, got ${typeof a}`);
 }

@@ -48,6 +48,8 @@ export class Field extends React.PureComponent<FieldProps> {
         return <BooleanField {...rest} {...childProps} />;
       case FieldConfigTypes.Integer:
         return <IntegerField {...rest} {...childProps} />;
+      case FieldConfigTypes.Reference:
+        return <div>Ref#</div>;
     }
   }
 }

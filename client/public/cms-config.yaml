@@ -25,13 +25,29 @@ records:
         - type: _id
         - name: name
           type: String
-        - name: datetime
-          label: Some Datetime
+        # - name: user_id
+        #   type: Reference
+        - name: start_time
           type: DateTime
+        - name: end_time
+          type: DateTime
+        # - name: image_id
+        #   label: Image
+        #   type: Image
         - name: is_active
           type: Boolean
-        - name: view_count
+        - name: is_live
+          type: Boolean
+        - name: likes
           type: Integer
+        - name: answers
+          type: Integer
+        - name: views
+          type: Integer
+        # - name: country_id
+        #   type: Reference
+        - name: promoted
+          type: Boolean
         - type: _created_at
         - type: _updated_at
     show:
@@ -39,14 +55,32 @@ records:
       fields:
         - type: _id
         - name: name
-          type: TextArea
-        - name: datetime
-          label: Some Datetime
+          type: String
+        - name: description
+          type: String
+        # - name: user_id
+        #   type: Reference
+        - name: start_time
           type: DateTime
+        - name: end_time
+          type: DateTime
+        # - name: image_id
+        #   label: Image
+        #   type: Image
         - name: is_active
           type: Boolean
-        - name: view_count
+        - name: is_live
+          type: Boolean
+        - name: likes
           type: Integer
+        - name: answers
+          type: Integer
+        - name: views
+          type: Integer
+        # - name: country_id
+        #   type: Reference
+        - name: promoted
+          type: Boolean
         - type: _created_at
         - type: _updated_at
     edit:
@@ -54,21 +88,74 @@ records:
       fields:
         - type: _id
         - name: name
-          type: TextArea
-        - name: datetime
-          label: Some Datetime
+          type: String
+        - name: description
+          type: String
+        # - name: user_id
+        #   type: Reference
+        - name: start_time
           type: DateTime
+        - name: end_time
+          type: DateTime
+        # - name: image_id
+        #   label: Image
+        #   type: Image
         - name: is_active
           type: Boolean
-        - name: view_count
+        - name: is_live
+          type: Boolean
+        - name: likes
           type: Integer
+        - name: answers
+          type: Integer
+        - name: views
+          type: Integer
+        # - name: country_id
+        #   type: Reference
+        - name: promoted
+          type: Boolean
         - type: _created_at
         - type: _updated_at
   question:
     list:
       fields:
-        - name: name
+        - name: title
           type: String
+        - name: type
+          type: String
+        - name: poll_id
+          type: Reference
+          referencing: poll
+        - name: ordering
+          type: Integer
+        - name: deleted
+          type: Boolean
+    show:
+      fields:
+        - name: title
+          type: String
+        - name: type
+          type: String
+        - name: poll_id
+          type: Reference
+          referencing: poll
+        - name: ordering
+          type: Integer
+        - name: deleted
+          type: Boolean
+    edit:
+      fields:
+        - name: title
+          type: String
+        - name: type
+          type: String
+        - name: poll_id
+          type: Reference
+          referencing: poll
+        - name: ordering
+          type: Integer
+        - name: deleted
+          type: Boolean
   choice:
     list:
       fields:
