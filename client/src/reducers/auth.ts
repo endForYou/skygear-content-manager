@@ -27,7 +27,7 @@ export default function auth(
 ) {
   switch (action.type) {
     case AuthActionTypes.LoginSuccess:
-      console.log(`Login succeeded: ${action.payload.user.name}`);
+      console.log('Login succeeded:', action.payload.user.name);
 
       return { ...state, user: action.payload.user, errorMessage: undefined };
     case AuthActionTypes.LoginFailure:

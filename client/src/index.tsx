@@ -63,7 +63,7 @@ function main(): void {
       );
     },
     error => {
-      console.log(`Failed to initialize CMS: ${error}`);
+      console.log('Failed to initialize CMS:', error);
     }
   );
 }
@@ -92,7 +92,7 @@ function fetchUser(config: AppConfig) {
 function fetchCurrentUserIfNeeded() {
   if (skygear.auth.currentUser) {
     return skygear.auth.whoami().catch((error: Error) => {
-      console.log(`failed to fetch current user: ${error}`);
+      console.log('Failed to fetch current user:', error);
 
       throw error;
     });
