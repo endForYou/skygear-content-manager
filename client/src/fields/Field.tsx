@@ -4,6 +4,7 @@ import { FieldConfig, FieldConfigTypes } from '../cmsConfig';
 import { BooleanField } from './BooleanField';
 import { DateTimeField } from './DateTimeField';
 import { IntegerField } from './IntegerField';
+import { ReferenceField } from './ReferenceField';
 import { StringField } from './StringField';
 import { TextArea } from './TextArea';
 
@@ -49,7 +50,14 @@ export class Field extends React.PureComponent<FieldProps> {
       case FieldConfigTypes.Integer:
         return <IntegerField {...rest} {...childProps} />;
       case FieldConfigTypes.Reference:
-        return <div>Ref#</div>;
+        return (
+          <ReferenceField
+            {...rest}
+            {...childProps}
+            remoteRecordName={config.remoteRecordName}
+            remoteRecordType={config.remoteRecordType}
+          />
+        );
     }
   }
 }

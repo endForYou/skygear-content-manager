@@ -126,6 +126,7 @@ records:
         - name: poll_id
           type: Reference
           referencing: poll
+          displayFieldName: name
         - name: ordering
           type: Integer
         - name: deleted
@@ -139,6 +140,7 @@ records:
         - name: poll_id
           type: Reference
           referencing: poll
+          displayFieldName: name
         - name: ordering
           type: Integer
         - name: deleted
@@ -152,6 +154,7 @@ records:
         - name: poll_id
           type: Reference
           referencing: poll
+          displayFieldName: name
         - name: ordering
           type: Integer
         - name: deleted
