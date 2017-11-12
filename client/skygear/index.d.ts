@@ -78,7 +78,7 @@ declare module 'skygear' {
       options?: DatabaseSaveOptions
     ): Promise<DatabaseSaveBatchResult>;
 
-    public query<T extends Record>(
+    public query<T extends Record = Record>(
       query: Query,
       cacheCallback?: boolean
     ): Promise<QueryResult<T>>;
