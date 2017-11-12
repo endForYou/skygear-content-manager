@@ -1,10 +1,17 @@
 import * as React from 'react';
 
+import { TextAreaFieldConfig } from '../cmsConfig';
 import { BaseStringField } from './BaseStringField';
+import { RequiredFieldProps } from './Field';
 
-export class TextArea extends BaseStringField {
+export type TextAreaProps = RequiredFieldProps<TextAreaFieldConfig>;
+
+export class TextArea extends BaseStringField<
+  TextAreaFieldConfig,
+  TextAreaProps
+> {
   public render() {
-    const { editable, onFieldChange: _, ...rest } = this.props;
+    const { config: { editable }, onFieldChange: _, ...rest } = this.props;
     const disabled = editable === undefined ? false : !editable;
 
     return (

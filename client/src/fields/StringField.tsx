@@ -1,10 +1,18 @@
 import * as React from 'react';
 
 import { BaseStringField } from './BaseStringField';
+import { RequiredFieldProps } from './Field';
 
-export class StringField extends BaseStringField {
+import { StringFieldConfig } from '../cmsConfig';
+
+export type StringFieldProps = RequiredFieldProps<StringFieldConfig>;
+
+export class StringField extends BaseStringField<
+  StringFieldConfig,
+  StringFieldProps
+> {
   public render() {
-    const { editable, onFieldChange: _, ...rest } = this.props;
+    const { config: { editable }, onFieldChange: _, ...rest } = this.props;
 
     if (editable) {
       return (

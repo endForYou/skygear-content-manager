@@ -4,9 +4,10 @@ import * as Datetime from 'react-datetime';
 // tslint:disable-next-line: no-submodule-imports
 import 'react-datetime/css/react-datetime.css';
 
+import { DateTimeFieldConfig } from '../cmsConfig';
 import { RequiredFieldProps } from './Field';
 
-export type DateTimeFieldProps = RequiredFieldProps;
+export type DateTimeFieldProps = RequiredFieldProps<DateTimeFieldConfig>;
 
 interface State {
   value: Date;
@@ -34,7 +35,7 @@ export class DateTimeField extends React.PureComponent<
 
   public render() {
     const {
-      editable,
+      config: { editable },
       className: className,
       onFieldChange: _onFieldChange,
       value: _value,
@@ -64,7 +65,10 @@ export class DateTimeField extends React.PureComponent<
     }
   }
 
-  public handleChange: (event: moment.Moment | string) => void = event => {
+  public handleChange: (
+    // tslint:disable-next-line: no-any
+    event: string | moment.Moment | React.ChangeEvent<any>
+  ) => void = event => {
     if (!moment.isMoment(event)) {
       return;
     }

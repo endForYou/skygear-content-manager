@@ -3,7 +3,7 @@ import { Record } from 'skygear';
 
 import { RecordActionDispatcher } from '../actions/record';
 import { EditPageConfig, FieldConfig } from '../cmsConfig';
-import { Field } from '../fields';
+import { Field, FieldContext } from '../fields';
 import { errorMessageFromError } from '../recordUtil';
 import { Remote, RemoteType } from '../types';
 
@@ -114,6 +114,7 @@ function FormField(props: FieldProps): JSX.Element {
       className="form-control"
       config={fieldConfig}
       value={fieldValue}
+      context={FieldContext(record)}
       onFieldChange={value => onRecordChange(name, value)}
     />
   );

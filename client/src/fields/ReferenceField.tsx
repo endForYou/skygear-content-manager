@@ -2,12 +2,10 @@ import * as React from 'react';
 import { Link } from 'react-router-dom';
 import { Reference } from 'skygear';
 
+import { ReferenceFieldConfig } from '../cmsConfig';
 import { RequiredFieldProps } from './Field';
 
-export type ReferenceFieldProps = RequiredFieldProps & {
-  remoteRecordName: string;
-  remoteRecordType: string;
-};
+export type ReferenceFieldProps = RequiredFieldProps<ReferenceFieldConfig>;
 
 interface State {
   value: ParsedReference;
@@ -31,13 +29,14 @@ export class ReferenceField extends React.PureComponent<
 
   public render() {
     const {
-      editable,
+      context,
+      config: config,
       onFieldChange: _onFieldChange,
-      remoteRecordName,
-      remoteRecordType,
       value: _value,
       ...rest,
     } = this.props;
+
+    const { editable, remoteRecordName, displayFieldName } = config;
 
     const { value: ref } = this.state;
 
@@ -53,7 +52,7 @@ export class ReferenceField extends React.PureComponent<
           to={`/record/${remoteRecordName}/${ref.recordId}`}
           title={`${remoteRecordName}/${ref.recordId}`}
         >
-          {remoteRecordType}/{ref.recordId.substring(0, 8)}
+          {context.record.$transient[config.name][displayFieldName]}
         </Link>
       );
     }
