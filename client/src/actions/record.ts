@@ -3,7 +3,7 @@ import { Dispatch } from 'redux';
 import { ThunkAction } from 'redux-thunk';
 import skygear, { Query, QueryResult, Record } from 'skygear';
 
-import { CmsRecord } from '../cmsConfig';
+import { CmsRecord, FieldConfigTypes, ReferenceConfig } from '../cmsConfig';
 import { RootState } from '../states';
 
 export type RecordActions =
@@ -238,15 +238,33 @@ export function fetchRecord(
   id: string
 ): ThunkAction<Promise<void>, {}, {}> {
   return dispatch => {
+    const RecordCls = Record.extend(cmsRecord.recordType);
+
+    const query = new Query(RecordCls);
+    query.limit = 1;
+
+    modifyQueryWithReferenceConfigs(query, cmsRecord.references);
+
     dispatch(fetchRecordRequest(cmsRecord, id));
-    return skygear.publicDB.getRecordByID(`${cmsRecord.recordType}/${id}`).then(
-      (record: Record) => {
-        dispatch(fetchRecordSuccess(cmsRecord, id, record));
-      },
-      (error: Error) => {
-        dispatch(fetchRecordFailure(cmsRecord, id, error));
-      }
-    );
+    return skygear.publicDB
+      .query(query)
+      .then((queryResult: QueryResult<Record>) => {
+        const [record] = queryResult;
+
+        if (record === undefined) {
+          throw new Error(`Couldn't find ${cmsRecord.name} with id = ${id}`);
+        }
+
+        return record;
+      })
+      .then(
+        (record: Record) => {
+          dispatch(fetchRecordSuccess(cmsRecord, id, record));
+        },
+        (error: Error) => {
+          dispatch(fetchRecordFailure(cmsRecord, id, error));
+        }
+      );
   };
 }
 
@@ -273,15 +291,17 @@ function fetchRecordList(
   page: number = 1,
   perPage: number = 25
 ): ThunkAction<Promise<void>, {}, {}> {
-  const RecordCls = Record.extend(cmsRecord.recordType);
-
   return dispatch => {
+    const RecordCls = Record.extend(cmsRecord.recordType);
+
     const query = new Query(RecordCls);
     query.overallCount = true;
     query.limit = perPage;
     query.offset = (page - 1) * perPage;
 
     query.addDescending('_created_at');
+
+    modifyQueryWithReferenceConfigs(query, cmsRecord.references);
 
     dispatch(fetchRecordListRequest(cmsRecord, page));
     return skygear.publicDB.query(query).then(
@@ -291,8 +311,23 @@ function fetchRecordList(
       (error: Error) => {
         dispatch(fetchRecordListFailure(cmsRecord, error));
       }
-    ) as Promise<Record>;
+    );
   };
+}
+
+function modifyQueryWithReferenceConfigs(
+  query: Query,
+  configs: ReferenceConfig[]
+) {
+  configs.forEach(config => {
+    switch (config.type) {
+      case FieldConfigTypes.Reference:
+        query.transientInclude(config.name);
+        break;
+      default:
+        throw new Error(`unknown ReferenceConfig.type = ${config.type}`);
+    }
+  });
 }
 
 export class RecordActionDispatcher {

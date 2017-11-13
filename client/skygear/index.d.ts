@@ -17,6 +17,18 @@ declare module 'skygear' {
   export type AnyValue = any;
   export type KVObject = { [key: string]: any };
 
+  export class Reference {
+    constructor(attrs: Record | string);
+
+    readonly id: string;
+    public toJSON: ReferenceJson;
+  }
+
+  export interface ReferenceJson {
+    $id: string;
+    $type: 'ref';
+  }
+
   export class GeoLocation {
     public latitude: string;
     public longitude: string;
@@ -66,7 +78,7 @@ declare module 'skygear' {
       options?: DatabaseSaveOptions
     ): Promise<DatabaseSaveBatchResult>;
 
-    public query<T extends Record>(
+    public query<T extends Record = Record>(
       query: Query,
       cacheCallback?: boolean
     ): Promise<QueryResult<T>>;
@@ -123,10 +135,10 @@ declare module 'skygear' {
     public addDescendingByDistance(key: string, loc: Geolocation): this;
     public addAscendingByDistance(key: string, loc: Geolocation): this;
 
-    public transientInclude(key: string, mapToKey: string): this;
+    public transientInclude(key: string, mapToKey?: string): this;
     public transientIncludeDistance(
       key: string,
-      mapToKey: string,
+      mapToKey: string | undefined,
       loc: Geolocation
     ): this;
 

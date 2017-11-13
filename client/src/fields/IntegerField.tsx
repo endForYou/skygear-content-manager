@@ -3,9 +3,10 @@ import * as NumericInput from 'react-numeric-input';
 // tslint:disable-next-line: no-submodule-imports
 import 'react-toggle/style.css';
 
+import { IntegerFieldConfig } from '../cmsConfig';
 import { RequiredFieldProps } from './Field';
 
-export type IntegerFieldProps = RequiredFieldProps;
+export type IntegerFieldProps = RequiredFieldProps<IntegerFieldConfig>;
 
 interface State {
   value: number;
@@ -29,7 +30,7 @@ export class IntegerField extends React.PureComponent<
 
   public render() {
     const {
-      editable,
+      config: { editable },
       onFieldChange: _onFieldChange,
       value: _value,
       ...rest,

@@ -19,5 +19,5 @@ export function errorMessageFromError(e: Error) {
     return e.error.message;
   }
 
-  return `${e}`;
+  return e.message;
 }

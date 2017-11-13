@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Record } from 'skygear';
 
 import { CmsRecord, FieldConfig, ShowPageConfig } from '../cmsConfig';
-import { Field } from '../fields';
+import { Field, FieldContext } from '../fields';
 import { Remote, RemoteType } from '../types';
 
 export interface ShowPageProps {
@@ -65,6 +65,7 @@ function FormGroup(props: FieldProps): JSX.Element {
         className="form-control"
         config={fieldConfig}
         value={record[fieldConfig.name]}
+        context={FieldContext(record)}
       />
     </div>
   );

@@ -50,7 +50,7 @@ function makeShowRoute(config: ShowPageConfig): JSX.Element {
   const recordName = config.cmsRecord.name;
   return (
     <Route
-      key={`${recordName}-list`}
+      key={`${recordName}-show`}
       exact={true}
       path={`/record/${recordName}/:recordId`}
       render={routeProps => (
@@ -67,7 +67,7 @@ function makeEditRoute(config: EditPageConfig): JSX.Element {
   const recordName = config.cmsRecord.name;
   return (
     <Route
-      key={`${recordName}-list`}
+      key={`${recordName}-edit`}
       exact={true}
       path={`/record/${recordName}/:recordId/edit`}
       render={routeProps => (

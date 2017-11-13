@@ -3,9 +3,10 @@ import ReactToggle, { ReactToggleElement } from 'react-toggle';
 // tslint:disable-next-line: no-submodule-imports
 import 'react-toggle/style.css';
 
+import { BooleanFieldConfig } from '../cmsConfig';
 import { RequiredFieldProps } from './Field';
 
-export type BooleanFieldProps = RequiredFieldProps;
+export type BooleanFieldProps = RequiredFieldProps<BooleanFieldConfig>;
 
 interface State {
   value: boolean;
@@ -29,7 +30,7 @@ export class BooleanField extends React.PureComponent<
 
   public render() {
     const {
-      editable,
+      config: { editable },
       onFieldChange: _onFieldChange,
       value: _value,
       ...rest,
