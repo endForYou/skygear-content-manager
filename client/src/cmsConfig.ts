@@ -68,7 +68,8 @@ export type FieldConfig =
   | DateTimeFieldConfig
   | BooleanFieldConfig
   | IntegerFieldConfig
-  | ReferenceFieldConfig;
+  | ReferenceFieldConfig
+  | ImageAssetFieldConfig;
 export enum FieldConfigTypes {
   String = 'String',
   TextArea = 'TextArea',
@@ -76,6 +77,7 @@ export enum FieldConfigTypes {
   Boolean = 'Boolean',
   Integer = 'Integer',
   Reference = 'Reference',
+  ImageAsset = 'ImageAsset',
 }
 interface FieldConfigAttrs {
   name: string;
@@ -109,6 +111,10 @@ export interface ReferenceFieldConfig extends FieldConfigAttrs {
   remoteRecordName: string;
   remoteRecordType: string;
   displayFieldName: string;
+}
+
+export interface ImageAssetFieldConfig extends FieldConfigAttrs {
+  type: FieldConfigTypes.ImageAsset;
 }
 
 interface FieldConfigInput {
@@ -318,6 +324,8 @@ function parseFieldConfig(context: ConfigContext, a: any): FieldConfig {
       return parseIntegerFieldConfig(a);
     case 'Reference':
       return parseReferenceFieldConfig(context, a);
+    case 'ImageAsset':
+      return parseImageAssetFieldConfig(a);
 
     // built-in fields
     case '_id':
@@ -390,6 +398,15 @@ function parseReferenceFieldConfig(
     remoteRecordName: referenceName,
     remoteRecordType,
     type: FieldConfigTypes.Reference,
+  };
+}
+
+function parseImageAssetFieldConfig(
+  input: FieldConfigInput
+): ImageAssetFieldConfig {
+  return {
+    ...parseFieldConfigAttrs(input, 'Reference'),
+    type: FieldConfigTypes.ImageAsset,
   };
 }
 

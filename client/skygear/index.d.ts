@@ -17,11 +17,28 @@ declare module 'skygear' {
   export type AnyValue = any;
   export type KVObject = { [key: string]: any };
 
+  export class Asset {
+    name: string;
+    file?: File | Blob;
+    contentType?: string;
+    url?: string;
+    base64?: string;
+
+    public static fromJSON(attrs: AssetJson): Asset;
+    public toJSON(): AssetJson;
+  }
+
+  export interface AssetJson {
+    $type: 'asset';
+    $name: string;
+    $url: string;
+  }
+
   export class Reference {
     constructor(attrs: Record | string);
 
     readonly id: string;
-    public toJSON: ReferenceJson;
+    public toJSON(): ReferenceJson;
   }
 
   export interface ReferenceJson {

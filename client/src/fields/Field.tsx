@@ -4,6 +4,7 @@ import { Record } from 'skygear';
 import { FieldConfig, FieldConfigTypes } from '../cmsConfig';
 import { BooleanField } from './BooleanField';
 import { DateTimeField } from './DateTimeField';
+import { ImageAssetField } from './ImageAssetField';
 import { IntegerField } from './IntegerField';
 import { ReferenceField } from './ReferenceField';
 import { StringField } from './StringField';
@@ -58,6 +59,8 @@ export class Field extends React.PureComponent<FieldProps> {
         return <IntegerField {...rest} config={config} />;
       case FieldConfigTypes.Reference:
         return <ReferenceField {...rest} config={config} />;
+      case FieldConfigTypes.ImageAsset:
+        return <ImageAssetField {...rest} config={config} />;
     }
   }
 }
