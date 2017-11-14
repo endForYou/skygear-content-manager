@@ -125,7 +125,7 @@ records:
           type: String
         - name: poll_id
           type: Reference
-          referencing: poll
+          target: poll
           displayFieldName: name
         - name: ordering
           type: Integer
@@ -139,7 +139,7 @@ records:
           type: String
         - name: poll_id
           type: Reference
-          referencing: poll
+          target: poll
           displayFieldName: name
         - name: ordering
           type: Integer
@@ -153,7 +153,7 @@ records:
           type: String
         - name: poll_id
           type: Reference
-          referencing: poll
+          target: poll
           displayFieldName: name
         - name: ordering
           type: Integer

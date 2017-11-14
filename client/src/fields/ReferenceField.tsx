@@ -69,13 +69,13 @@ export class ReferenceField extends React.PureComponent<
       if (value === null) {
         return <NullField />;
       } else {
-        const { remoteRecordName } = config;
+        const { targetRecordName } = config;
 
         return (
           <span className={className}>
             <Link
-              to={`/record/${remoteRecordName}/${value.value}`}
-              title={`${remoteRecordName}/${value.value}`}
+              to={`/record/${targetRecordName}/${value.value}`}
+              title={`${targetRecordName}/${value.value}`}
             >
               {value.label}
             </Link>
@@ -86,9 +86,9 @@ export class ReferenceField extends React.PureComponent<
   }
 
   public loadOptions: LoadOptionsAsyncHandler<string> = input => {
-    const { displayFieldName, remoteRecordType } = this.props.config;
+    const { displayFieldName, targetRecordType } = this.props.config;
 
-    const RecordCls = Record.extend(remoteRecordType);
+    const RecordCls = Record.extend(targetRecordType);
     const query = new Query(RecordCls);
     return skygear.publicDB.query(query).then(records => {
       const options = records.map(record => {
@@ -131,7 +131,7 @@ export class ReferenceField extends React.PureComponent<
 
     if (this.props.onFieldChange) {
       this.props.onFieldChange(
-        new Reference(`${this.props.config.remoteRecordType}/${value.value}`)
+        new Reference(`${this.props.config.targetRecordType}/${value.value}`)
       );
     }
   };

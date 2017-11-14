@@ -108,8 +108,8 @@ export interface IntegerFieldConfig extends FieldConfigAttrs {
 
 export interface ReferenceFieldConfig extends FieldConfigAttrs {
   type: FieldConfigTypes.Reference;
-  remoteRecordName: string;
-  remoteRecordType: string;
+  targetRecordName: string;
+  targetRecordType: string;
   displayFieldName: string;
 }
 
@@ -382,21 +382,21 @@ function parseReferenceFieldConfig(
   context: ConfigContext,
   input: FieldConfigInput
 ): ReferenceFieldConfig {
-  const referenceName = parseString(input, 'referencing', 'Reference');
-  const remoteRecordType = context.recordTypeByName[referenceName];
+  const targetRecordName = parseString(input, 'target', 'Reference');
+  const targetRecordType = context.recordTypeByName[targetRecordName];
   const displayFieldName = parseString(input, 'displayFieldName', 'Reference');
 
-  if (remoteRecordType === undefined) {
+  if (targetRecordType === undefined) {
     throw new Error(
-      `Couldn't find configuration of Reference.referencing = ${referenceName}`
+      `Couldn't find configuration of Reference.target = ${targetRecordName}`
     );
   }
 
   return {
     ...parseFieldConfigAttrs(input, 'Reference'),
     displayFieldName,
-    remoteRecordName: referenceName,
-    remoteRecordType,
+    targetRecordName,
+    targetRecordType,
     type: FieldConfigTypes.Reference,
   };
 }
