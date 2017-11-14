@@ -241,6 +241,7 @@ export function fetchRecord(
     const RecordCls = Record.extend(cmsRecord.recordType);
 
     const query = new Query(RecordCls);
+    query.equalTo('_id', id);
     query.limit = 1;
 
     modifyQueryWithReferenceConfigs(query, cmsRecord.references);
