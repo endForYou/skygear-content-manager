@@ -28,8 +28,11 @@ def api(request):
 
     req = SkygearRequest.from_werkzeug(request)
 
-    if req.body.is_dict and req.body.data.get('action') == 'auth:login':
-        return intercept_login(req).to_werkzeug()
+    if req.body.is_dict:
+        if req.body.data.get('action') == 'auth:login':
+            return intercept_login(req).to_werkzeug()
+        elif req.body.data.get('action') == 'asset:put':
+            return intercept_asset_put(req).to_werkzeug()
 
     cms_access_token = req.access_token
     if not cms_access_token:
@@ -274,6 +277,29 @@ def intercept_login(req):
         is_admin=True,
         skygear_token=resp.access_token,
     ).to_cms_token()
+
+    return resp
+
+
+def intercept_asset_put(req):
+    resp = request_skygear(req)
+
+    if not (200 <= resp.status_code <= 299):
+        return resp
+
+    # unknown resp structure
+    if not resp.body.is_dict:
+        return resp
+
+    action_url = resp.body.data\
+        .get('result', {})\
+        .get('post-request', {})\
+        .get('action', '')
+    if not action_url.startswith('/'):
+        return resp
+
+    resp.body.data['result']['post-request']['action'] = \
+        CMS_SKYGEAR_ENDPOINT + action_url[1:]
 
     return resp
 
