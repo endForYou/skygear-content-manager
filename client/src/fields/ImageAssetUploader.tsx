@@ -25,6 +25,32 @@ function DroppedImage(file: ImageFile, previewURL: string): DroppedImage {
   };
 }
 
+const Image: React.SFC<{ url: string }> = props => {
+  return (
+    <div
+      className="dropzone-image"
+      style={{
+        backgroundImage: `url(${props.url})`,
+        height: 200,
+        width: 200,
+      }}
+    />
+  );
+};
+
+const DropArea: React.SFC<State> = props => {
+  const { value, droppedImage } = props;
+  if (droppedImage !== undefined) {
+    return <Image url={droppedImage.previewURL} />;
+  }
+
+  if (value === undefined || value.url === undefined) {
+    return <div>Drop image here or click to upload.</div>;
+  }
+
+  return <Image url={value.url} />;
+};
+
 export class ImageAssetUploader extends React.PureComponent<
   ImageAssetUploaderProps,
   State
@@ -90,32 +116,6 @@ export class ImageAssetUploader extends React.PureComponent<
     }
   };
 }
-
-const DropArea: React.SFC<State> = props => {
-  const { value, droppedImage } = props;
-  if (droppedImage !== undefined) {
-    return <Image url={droppedImage.previewURL} />;
-  }
-
-  if (value === undefined || value.url === undefined) {
-    return <div>Drop image here or click to upload.</div>;
-  }
-
-  return <Image url={value.url} />;
-};
-
-const Image: React.SFC<{ url: string }> = props => {
-  return (
-    <div
-      className="dropzone-image"
-      style={{
-        backgroundImage: `url(${props.url})`,
-        height: 200,
-        width: 200,
-      }}
-    />
-  );
-};
 
 function releaseDroppedImage(droppedImage: DroppedImage): void {
   URL.revokeObjectURL(droppedImage.previewURL);
