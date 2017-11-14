@@ -17,6 +17,13 @@ declare module 'skygear' {
   export type AnyValue = any;
   export type KVObject = { [key: string]: any };
 
+  export interface AssetAttrs {
+    name: string;
+    file?: File | Blob;
+    contentType?: string;
+    url?: string;
+    base64?: string;
+  }
   export class Asset {
     name: string;
     file?: File | Blob;
@@ -24,6 +31,7 @@ declare module 'skygear' {
     url?: string;
     base64?: string;
 
+    public constructor(attrs: AssetAttrs);
     public static fromJSON(attrs: AssetJson): Asset;
     public toJSON(): AssetJson;
   }

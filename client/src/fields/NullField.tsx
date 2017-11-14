@@ -1,5 +1,14 @@
 import * as React from 'react';
 
-export const NullField: React.SFC = props => {
-  return <span style={{ color: 'silver' }}>NULL</span>;
+export interface NullFieldProps {
+  className?: string;
+  name?: string;
+}
+
+export const NullField: React.SFC<NullFieldProps> = props => {
+  return (
+    <div {...props} style={{ color: 'silver' }}>
+      NULL
+    </div>
+  );
 };

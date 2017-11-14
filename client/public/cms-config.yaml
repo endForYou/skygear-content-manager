@@ -64,9 +64,9 @@ records:
           type: DateTime
         - name: end_time
           type: DateTime
-        # - name: image_id
-        #   label: Image
-        #   type: Image
+        - name: image_id
+          label: Image
+          type: ImageAsset
         - name: is_active
           type: Boolean
         - name: is_live
@@ -97,9 +97,9 @@ records:
           type: DateTime
         - name: end_time
           type: DateTime
-        # - name: image_id
-        #   label: Image
-        #   type: Image
+        - name: image_id
+          label: Image
+          type: ImageAsset
         - name: is_active
           type: Boolean
         - name: is_live
