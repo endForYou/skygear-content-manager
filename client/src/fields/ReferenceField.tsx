@@ -12,6 +12,7 @@ import skygear, { Query, Record, Reference } from 'skygear';
 
 import { ReferenceFieldConfig } from '../cmsConfig';
 import { RequiredFieldProps } from './Field';
+import { NullField } from './NullField';
 
 export type ReferenceFieldProps = RequiredFieldProps<ReferenceFieldConfig>;
 
@@ -66,7 +67,7 @@ export class ReferenceField extends React.PureComponent<
       );
     } else {
       if (value === null) {
-        return <span style={{ color: 'silver' }}>NULL</span>;
+        return <NullField />;
       } else {
         const { remoteRecordName } = config;
 
