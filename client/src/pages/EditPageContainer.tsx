@@ -33,7 +33,8 @@ class EditPageContainer extends React.PureComponent<EditPageContainerProps> {
 
     this.recordDispatcher = new RecordActionDispatcher(
       props.dispatch,
-      props.config.cmsRecord
+      props.config.cmsRecord,
+      props.config.references
     );
   }
 

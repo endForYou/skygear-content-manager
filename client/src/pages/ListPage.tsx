@@ -109,9 +109,13 @@ class ListPage extends React.PureComponent<ListPageProps> {
   constructor(props: ListPageProps) {
     super(props);
 
-    const { dispatch, pageConfig: { cmsRecord } } = this.props;
+    const { dispatch, pageConfig: { cmsRecord, references } } = this.props;
 
-    this.recordActionCreator = new RecordActionDispatcher(dispatch, cmsRecord);
+    this.recordActionCreator = new RecordActionDispatcher(
+      dispatch,
+      cmsRecord,
+      references
+    );
   }
 
   public componentDidMount() {

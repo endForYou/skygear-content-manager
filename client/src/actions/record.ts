@@ -243,6 +243,7 @@ function saveRecordFailure(
 
 export function fetchRecord(
   cmsRecord: CmsRecord,
+  references: ReferenceConfig[],
   id: string
 ): ThunkAction<Promise<void>, {}, {}> {
   return dispatch => {
@@ -252,7 +253,7 @@ export function fetchRecord(
     query.equalTo('_id', id);
     query.limit = 1;
 
-    modifyQueryWithReferenceConfigs(query, cmsRecord.references);
+    modifyQueryWithReferenceConfigs(query, references);
 
     dispatch(fetchRecordRequest(cmsRecord, id));
     return skygear.publicDB
@@ -297,6 +298,7 @@ function saveRecord(
 
 function fetchRecordList(
   cmsRecord: CmsRecord,
+  references: ReferenceConfig[],
   page: number = 1,
   perPage: number = 25
 ): ThunkAction<Promise<void>, {}, {}> {
@@ -310,7 +312,7 @@ function fetchRecordList(
 
     query.addDescending('_created_at');
 
-    const [refs, assoRefs] = separateReferenceConfigs(cmsRecord.references);
+    const [refs, assoRefs] = separateReferenceConfigs(references);
 
     refs.forEach(config => {
       query.transientInclude(config.name);
@@ -411,7 +413,9 @@ function fetchAssociationRecordsWithTarget(
     targetReference: targetRef,
   } = assoRefConfig;
 
-  const associationRecordCls = Record.extend(assoRecordConfig.recordType);
+  const associationRecordCls = Record.extend(
+    assoRecordConfig.cmsRecord.recordType
+  );
   const query = new Query(associationRecordCls);
   query.limit = 1024;
   query.addDescending('_created_at');
@@ -462,18 +466,26 @@ function separateReferenceConfigs(
 export class RecordActionDispatcher {
   private dispatch: Dispatch<RootState>;
   private cmsRecord: CmsRecord;
+  private references: ReferenceConfig[];
 
-  constructor(dispatch: Dispatch<RootState>, cmsRecord: CmsRecord) {
+  constructor(
+    dispatch: Dispatch<RootState>,
+    cmsRecord: CmsRecord,
+    references: ReferenceConfig[]
+  ) {
     this.dispatch = dispatch;
     this.cmsRecord = cmsRecord;
+    this.references = references;
   }
 
   public fetch(id: string): Promise<void> {
-    return this.dispatch(fetchRecord(this.cmsRecord, id));
+    return this.dispatch(fetchRecord(this.cmsRecord, this.references, id));
   }
 
   public fetchList(page: number, perPage: number): Promise<void> {
-    return this.dispatch(fetchRecordList(this.cmsRecord, page, perPage));
+    return this.dispatch(
+      fetchRecordList(this.cmsRecord, this.references, page, perPage)
+    );
   }
 
   public save(record: Record): Promise<void> {
