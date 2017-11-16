@@ -8,14 +8,65 @@ declare module 'skygear' {
   export default skygear;
 
   // tslint:disable-next-line: no-any
-  export type Record = any;
-  export const Record: Record;
+  export class Record {
+    _id: string;
+    _type: string;
 
-  export type RecordCls = {};
+    // meta attrs
+    createdAt: Date;
+    updatedAt: Date;
+    ownerID: string;
+    createdBy: string;
+    updatedBy: string;
+    access: ACL;
+
+    public static extend(recordType: string, instFunc?: Function): RecordCls;
+
+    public constructor(recordType: string, attrs: KVObject);
+
+    readonly recordType: string;
+    readonly id: string;
+
+    readonly attributeKeys: string[];
+    readonly $transient: KVObject;
+
+    public update(attrs: KVObject): void;
+
+    public setPublicNoAccess(): void;
+    public setPublicReadOnly(): void;
+    public setPublicReadWriteAccess(): void;
+    public setNoAccessForRole(role: Role): void;
+    public setReadOnlyForRole(role: Role): void;
+    public setReadWriteAccessForRole(role: Role): void;
+    public setNoAccessForUser(user: Record): void;
+    public setReadOnlyForUser(user: Record): void;
+    public setReadWriteAccessForUser(user: Record): void;
+
+    public hasPublicReadAccess(): boolean;
+    public hasPublicWriteAccess(): boolean;
+    public hasReadAccessForRole(role: Role): boolean;
+    public hasWriteAccessForRole(role: Role): boolean;
+    public hasReadAccessForUser(user: Record): boolean;
+    public hasWriteAccessForUser(user: Record): boolean;
+
+    public toJSON(): KVObject;
+
+    [key: string]: any;
+  }
+
+  export type RecordCls = {
+    new (attrs: KVObject): Record;
+  };
 
   // tslint:disable-next-line: no-any
   export type AnyValue = any;
   export type KVObject = { [key: string]: any };
+
+  // TODO: write better definition
+  export class ACL {}
+
+  // tslint:disable-next-line: no-any
+  export type Role = any;
 
   export interface AssetAttrs {
     name: string;

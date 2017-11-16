@@ -388,6 +388,8 @@ function distributeAssociationRecords(
     const source = sourceById.get(sourceId);
     if (source === undefined) {
       console.warn(`Couldn't find source.id = ${sourceId} for association`);
+
+      return;
     }
 
     const targetRecords = assoRecords.map(
