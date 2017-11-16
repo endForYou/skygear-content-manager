@@ -59,6 +59,8 @@ export class Field extends React.PureComponent<FieldProps> {
         return <IntegerField {...rest} config={config} />;
       case FieldConfigTypes.Reference:
         return <ReferenceField {...rest} config={config} />;
+      case FieldConfigTypes.AssociationReference:
+        return <div>to-many refs</div>;
       case FieldConfigTypes.ImageAsset:
         return <ImageAssetField {...rest} config={config} />;
     }

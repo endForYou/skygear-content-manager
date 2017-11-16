@@ -1,10 +1,18 @@
 import { push } from 'react-router-redux';
 import { Dispatch } from 'redux';
 import { ThunkAction } from 'redux-thunk';
-import skygear, { Query, QueryResult, Record } from 'skygear';
+import skygear, { Query, QueryResult, Record, Reference } from 'skygear';
 
-import { CmsRecord, FieldConfigTypes, ReferenceConfig } from '../cmsConfig';
+import {
+  AssociationReferenceFieldConfig,
+  CmsRecord,
+  FieldConfigTypes,
+  ReferenceConfig,
+  ReferenceFieldConfig,
+} from '../cmsConfig';
+import { parseReference } from '../recordUtil';
 import { RootState } from '../states';
+import { groupBy } from '../util';
 
 export type RecordActions =
   | FetchRecordReuest
@@ -302,18 +310,116 @@ function fetchRecordList(
 
     query.addDescending('_created_at');
 
-    modifyQueryWithReferenceConfigs(query, cmsRecord.references);
+    const [refs, assoRefs] = separateReferenceConfigs(cmsRecord.references);
+
+    refs.forEach(config => {
+      query.transientInclude(config.name);
+    });
 
     dispatch(fetchRecordListRequest(cmsRecord, page));
-    return skygear.publicDB.query(query).then(
-      (queryResult: QueryResult<Record>) => {
-        dispatch(fetchRecordListSuccess(cmsRecord, page, perPage, queryResult));
-      },
-      (error: Error) => {
-        dispatch(fetchRecordListFailure(cmsRecord, error));
-      }
-    );
+    return skygear.publicDB
+      .query(query)
+      .then((queryResult: QueryResult<Record>) => {
+        const sources = queryResult.map(r => r);
+
+        return fetchToManyRecordsWithAssociations(
+          sources,
+          assoRefs
+        ).then(refAssoRecordsPairs => {
+          // mutate queryResult s.t. it has target records and association
+          // records in $transient
+
+          refAssoRecordsPairs.forEach(([ref, assoRecords]) => {
+            const sourceById = new Map(
+              sources.map(r => [r._id, r] as [string, Record])
+            );
+
+            distributeAssociationRecords(sourceById, ref, assoRecords);
+          });
+
+          return queryResult;
+        });
+      })
+      .then(
+        queryResult => {
+          dispatch(
+            fetchRecordListSuccess(cmsRecord, page, perPage, queryResult)
+          );
+        },
+        error => {
+          dispatch(fetchRecordListFailure(cmsRecord, error));
+        }
+      );
   };
+}
+
+function fetchToManyRecordsWithAssociations(
+  sources: Record[],
+  refs: AssociationReferenceFieldConfig[]
+): Promise<Array<[AssociationReferenceFieldConfig, Record[]]>> {
+  if (refs.length === 0) {
+    return Promise.resolve([]);
+  }
+
+  const sourceIds = sources.map(r => r._id);
+
+  const assoRecordsPromises = refs.map(ref => {
+    return fetchAssociationRecordsWithTarget(sourceIds, ref).then(
+      assoRecords =>
+        [ref, assoRecords] as [AssociationReferenceFieldConfig, Record[]]
+    );
+  });
+
+  return Promise.all(assoRecordsPromises);
+}
+
+// assign association records and its transient target records into
+// `${ref.name}_associations` and ref.name record.$transient respectively
+function distributeAssociationRecords(
+  sourceById: Map<string, Record>,
+  ref: AssociationReferenceFieldConfig,
+  associationRecords: Record[]
+): void {
+  const assoRecordsBySourceId = groupBy(associationRecords, assoRecord => {
+    const sourceRef: Reference = assoRecord[ref.sourceReference.name];
+    return parseReference(sourceRef).recordId;
+  });
+  assoRecordsBySourceId.forEach((assoRecords, sourceId) => {
+    const source = sourceById.get(sourceId);
+    if (source === undefined) {
+      console.warn(`Couldn't find source.id = ${sourceId} for association`);
+    }
+
+    const targetRecords = assoRecords.map(
+      r => r.$transient[ref.targetReference.name]
+    );
+
+    source.$transient[ref.name] = targetRecords;
+    source.$transient[`${ref.name}_associations`] = targetRecords;
+  });
+}
+
+function fetchAssociationRecordsWithTarget(
+  sourceIds: string[],
+  assoRefConfig: AssociationReferenceFieldConfig
+): Promise<Record[]> {
+  const {
+    associationRecordConfig: assoRecordConfig,
+    sourceReference: sourceRef,
+    targetReference: targetRef,
+  } = assoRefConfig;
+
+  const associationRecordCls = Record.extend(assoRecordConfig.recordType);
+  const query = new Query(associationRecordCls);
+  query.limit = 1024;
+  query.addDescending('_created_at');
+
+  query.contains(sourceRef.name, sourceIds);
+  query.transientInclude(targetRef.name);
+
+  return skygear.publicDB
+    .query(query)
+    .then(queryResult => queryResult.map(r => r));
 }
 
 function modifyQueryWithReferenceConfigs(
@@ -329,6 +435,26 @@ function modifyQueryWithReferenceConfigs(
         throw new Error(`unknown ReferenceConfig.type = ${config.type}`);
     }
   });
+}
+
+function separateReferenceConfigs(
+  configs: ReferenceConfig[]
+): [ReferenceFieldConfig[], AssociationReferenceFieldConfig[]] {
+  const refs: ReferenceFieldConfig[] = [];
+  const assoRefs: AssociationReferenceFieldConfig[] = [];
+
+  configs.forEach(config => {
+    switch (config.type) {
+      case FieldConfigTypes.Reference:
+        refs.push(config);
+        break;
+      case FieldConfigTypes.AssociationReference:
+        assoRefs.push(config);
+        break;
+    }
+  });
+
+  return [refs, assoRefs];
 }
 
 export class RecordActionDispatcher {

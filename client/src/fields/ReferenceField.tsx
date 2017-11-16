@@ -11,6 +11,8 @@ import 'react-select/dist/react-select.css';
 import skygear, { Query, Record, Reference } from 'skygear';
 
 import { ReferenceFieldConfig } from '../cmsConfig';
+import { parseReference } from '../recordUtil';
+
 import { RequiredFieldProps } from './Field';
 import { NullField } from './NullField';
 
@@ -157,16 +159,4 @@ function recordToOption(r: Record, fieldName: string): Option<string> {
     label: r[fieldName],
     value: r._id,
   };
-}
-
-interface ParsedReference {
-  recordType: string;
-  recordId: string;
-}
-
-function parseReference(ref: Reference): ParsedReference {
-  const [recordType] = ref.id.split('/', 1);
-  const recordId = ref.id.substring(recordType.length + 1);
-
-  return { recordType, recordId };
 }

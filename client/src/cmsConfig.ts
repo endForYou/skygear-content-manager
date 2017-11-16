@@ -1,8 +1,10 @@
-import { humanize, objectFrom } from './util';
+import { isArray } from 'util';
+import { humanize, isObject, objectFrom } from './util';
 
 export interface CmsConfig {
   site: SiteConfig;
   records: RecordConfigMap;
+  associationRecordByName: AssociationRecordByName;
 }
 
 export type SiteConfig = SiteItemConfig[];
@@ -60,7 +62,9 @@ export interface EditPageConfig {
   fields: FieldConfig[];
 }
 
-export type ReferenceConfig = ReferenceFieldConfig;
+export type ReferenceConfig =
+  | ReferenceFieldConfig
+  | AssociationReferenceFieldConfig;
 
 export type FieldConfig =
   | StringFieldConfig
@@ -69,6 +73,7 @@ export type FieldConfig =
   | BooleanFieldConfig
   | IntegerFieldConfig
   | ReferenceFieldConfig
+  | AssociationReferenceFieldConfig
   | ImageAssetFieldConfig;
 export enum FieldConfigTypes {
   String = 'String',
@@ -77,6 +82,7 @@ export enum FieldConfigTypes {
   Boolean = 'Boolean',
   Integer = 'Integer',
   Reference = 'Reference',
+  AssociationReference = 'AssociationReference',
   ImageAsset = 'ImageAsset',
 }
 interface FieldConfigAttrs {
@@ -113,6 +119,25 @@ export interface ReferenceFieldConfig extends FieldConfigAttrs {
   displayFieldName: string;
 }
 
+export interface AssociationReferenceFieldConfig extends FieldConfigAttrs {
+  type: FieldConfigTypes.AssociationReference;
+
+  // the AssociationRecordConfig that this reference is made on
+  associationRecordConfig: AssociationRecordConfig;
+
+  // source ReferenceFieldConfig for this field in
+  // associationRecordConfig.referenceConfigPair
+  sourceReference: ReferenceFieldConfig;
+
+  // target ReferenceFieldConfig for this field in
+  // associationRecordConfig.referenceConfigPair
+  targetReference: ReferenceFieldConfig;
+
+  // display field name in the target record.
+  // override targetReference.displayFieldName
+  displayFieldName: string;
+}
+
 export interface ImageAssetFieldConfig extends FieldConfigAttrs {
   type: FieldConfigTypes.ImageAsset;
 }
@@ -123,11 +148,46 @@ interface FieldConfigInput {
   [key: string]: any;
 }
 
+export interface AssociationRecordByName {
+  [key: string]: AssociationRecordConfig | undefined;
+}
+
+export interface AssociationRecordConfig {
+  recordName: string;
+  recordType: string;
+  referenceConfigPair: [ReferenceFieldConfig, ReferenceFieldConfig];
+}
+
+interface RecordTypeByName {
+  [key: string]: string | undefined;
+}
+
+interface RecordTypeContext {
+  recordTypeByName: RecordTypeByName;
+}
+
+interface ConfigContext {
+  recordTypeByName: RecordTypeByName;
+  associationRecordByName: AssociationRecordByName;
+}
+
 // tslint:disable-next-line: no-any
-export function parseCmsConfig({ site, records }: any): CmsConfig {
-  const context = preparseRecordConfigs(records);
+export function parseCmsConfig(input: any): CmsConfig {
+  const { site, records, association_records: associationRecords } = input;
+
+  const recordTypeByName = preparseRecordConfigs(records);
+  const associationRecordByName = parseAssociationRecordByName(
+    { recordTypeByName },
+    associationRecords
+  );
+
+  const context = {
+    associationRecordByName,
+    recordTypeByName,
+  };
 
   return {
+    associationRecordByName,
     records: Object.entries(
       records
       // tslint:disable-next-line: no-any
@@ -161,12 +221,8 @@ function parseSiteRecordConfig(input: any): RecordSiteItemConfig {
   return { type, name, label: parsedLabel };
 }
 
-interface ConfigContext {
-  recordTypeByName: { [key: string]: string | undefined };
-}
-
 // tslint:disable-next-line: no-any
-function preparseRecordConfigs(records: any): ConfigContext {
+function preparseRecordConfigs(records: any): RecordTypeByName {
   const recordTypeByName = objectFrom(
     Object.entries(records).map(([recordName, value]) => {
       const recordType =
@@ -174,7 +230,7 @@ function preparseRecordConfigs(records: any): ConfigContext {
       return [recordName, recordType] as [string, string];
     })
   );
-  return { recordTypeByName };
+  return recordTypeByName;
 }
 
 function parseRecordConfig(
@@ -323,7 +379,11 @@ function parseFieldConfig(context: ConfigContext, a: any): FieldConfig {
     case 'Integer':
       return parseIntegerFieldConfig(a);
     case 'Reference':
-      return parseReferenceFieldConfig(context, a);
+      if (a.via_association_record) {
+        return parseAssociationReferenceFieldConfig(context, a);
+      } else {
+        return parseReferenceFieldConfig(context, a);
+      }
     case 'ImageAsset':
       return parseImageAssetFieldConfig(a);
 
@@ -379,13 +439,14 @@ function parseIntegerFieldConfig(input: FieldConfigInput): IntegerFieldConfig {
 }
 
 function parseReferenceFieldConfig(
-  context: ConfigContext,
+  context: RecordTypeContext,
   input: FieldConfigInput
 ): ReferenceFieldConfig {
   const targetRecordName = parseString(input, 'target', 'Reference');
-  const targetRecordType = context.recordTypeByName[targetRecordName];
-  const displayFieldName = parseString(input, 'displayFieldName', 'Reference');
+  const displayFieldName =
+    parseOptionalString(input, 'displayFieldName', 'Reference') || '_id';
 
+  const targetRecordType = context.recordTypeByName[targetRecordName];
   if (targetRecordType === undefined) {
     throw new Error(
       `Couldn't find configuration of Reference.target = ${targetRecordName}`
@@ -399,6 +460,60 @@ function parseReferenceFieldConfig(
     targetRecordType,
     type: FieldConfigTypes.Reference,
   };
+}
+
+function parseAssociationReferenceFieldConfig(
+  context: ConfigContext,
+  input: FieldConfigInput
+): AssociationReferenceFieldConfig {
+  const targetRecordName = parseString(input, 'target', 'Reference');
+  const displayFieldName = parseString(input, 'displayFieldName', 'Reference');
+
+  const associationRecordName = parseString(
+    input,
+    'via_association_record',
+    'Reference'
+  );
+  const associationRecordConfig =
+    context.associationRecordByName[associationRecordName];
+  if (associationRecordConfig === undefined) {
+    throw new Error(
+      `Couldn't find AssociationRecord with name = ${associationRecordName}`
+    );
+  }
+
+  // look for the target reference
+  const [sourceReference, targetReference] = deriveReferencesByTargetName(
+    associationRecordConfig.referenceConfigPair,
+    targetRecordName,
+    associationRecordConfig.recordName
+  );
+
+  return {
+    ...parseFieldConfigAttrs(input, 'Reference'),
+    associationRecordConfig,
+    displayFieldName,
+    sourceReference,
+    targetReference,
+    type: FieldConfigTypes.AssociationReference,
+  };
+}
+
+// return a pair of ReferenceFieldConfig in the order of [SourceRef, TargetRef]
+function deriveReferencesByTargetName(
+  refPair: [ReferenceFieldConfig, ReferenceFieldConfig],
+  targetRecordName: string,
+  associationRecordName: string
+): [ReferenceFieldConfig, ReferenceFieldConfig] {
+  if (refPair[0].targetRecordName === targetRecordName) {
+    return [refPair[1], refPair[0]];
+  } else if (refPair[1].targetRecordName === targetRecordName) {
+    return refPair;
+  } else {
+    throw new Error(
+      `Couldn't find Reference.target = ${targetRecordName} in AssociationRecord.name = ${associationRecordName}`
+    );
+  }
 }
 
 function parseImageAssetFieldConfig(
@@ -453,6 +568,92 @@ function parseUpdatedAtFieldConfig(
   };
 }
 
+function parseAssociationRecordByName(
+  context: RecordTypeContext,
+  // tslint:disable-next-line: no-any
+  input: any
+): AssociationRecordByName {
+  if (input === undefined) {
+    return {};
+  }
+
+  if (!isObject(input)) {
+    throw new Error(
+      `want association_records to be object, got ${typeof input}`
+    );
+  }
+
+  const recordNameConfigPairs = Object.entries(
+    input
+  ).map(([recordName, recordConfig]) => {
+    if (!isObject(recordConfig)) {
+      throw new Error(
+        `want association_record to be object, got ${typeof recordConfig}`
+      );
+    }
+
+    return [
+      recordName,
+      parseAssociationRecord(context, recordName, recordConfig),
+    ] as [string, AssociationRecordConfig];
+  });
+
+  return objectFrom(recordNameConfigPairs);
+}
+
+function parseAssociationRecord(
+  context: RecordTypeContext,
+  recordName: string,
+  // tslint:disable-next-line: no-any
+  input: any
+): AssociationRecordConfig {
+  const recordType =
+    parseOptionalString(input, 'recordType', 'association_record') ||
+    recordName;
+
+  const fields = input.fields;
+  if (!isArray(fields)) {
+    throw new Error(
+      `want association_record.fields to be Array, got ${typeof fields}`
+    );
+  }
+
+  if (fields.length !== 2) {
+    throw new Error(
+      `want association_record.fields has length 2, got ${fields.length}`
+    );
+  }
+
+  const ref0 = parseReferenceFieldConfig(context, fields[0]);
+  const ref1 = parseReferenceFieldConfig(context, fields[1]);
+  const referenceConfigPair: [ReferenceFieldConfig, ReferenceFieldConfig] = [
+    ref0,
+    ref1,
+  ];
+
+  return {
+    recordName,
+    recordType,
+    referenceConfigPair,
+  };
+}
+
+function filterReferences(fieldConfigs: FieldConfig[]): ReferenceConfig[] {
+  return fieldConfigs.reduce(
+    (refs, config) => {
+      switch (config.type) {
+        case FieldConfigTypes.Reference:
+          return [...refs, config];
+        case FieldConfigTypes.AssociationReference:
+          return [...refs, config];
+        default:
+          return refs;
+      }
+    },
+    [] as ReferenceConfig[]
+  );
+}
+
 // tslint:disable-next-line: no-any
 function parseString(a: any, fieldName: string, context: string): string {
   const optionalString = parseOptionalString(a, fieldName, context);
@@ -480,20 +681,4 @@ function parseOptionalString(
   }
 
   throw new Error(`${context}.${fieldName} want a string, got ${typeof a}`);
-}
-
-export function filterReferences(
-  fieldConfigs: FieldConfig[]
-): ReferenceConfig[] {
-  return fieldConfigs.reduce(
-    (refs, config) => {
-      switch (config.type) {
-        case FieldConfigTypes.Reference:
-          return [...refs, config];
-        default:
-          return refs;
-      }
-    },
-    [] as ReferenceConfig[]
-  );
 }

@@ -1,6 +1,6 @@
 // See https://stackoverflow.com/a/14706877
 // tslint:disable-next-line: no-any
-export function isObject(o: any): boolean {
+export function isObject(o: any): o is { [key: string]: any } {
   return o === Object(o);
 }
 
@@ -10,6 +10,22 @@ export function objectFrom<V>(
   return entries.reduce((obj, [k, v]) => {
     return { ...obj, [k]: v };
   }, {});
+}
+
+export function groupBy<K, V>(xs: V[], keyFn: ((v: V) => K)): Map<K, V[]> {
+  const map = new Map<K, V[]>();
+
+  xs.forEach(v => {
+    const k = keyFn(v);
+    const vs = map.get(k);
+    if (vs === undefined) {
+      map.set(k, [v]);
+    } else {
+      vs.push(v);
+    }
+  });
+
+  return map;
 }
 
 export function capitalize(str: string): string {
