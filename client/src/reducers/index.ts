@@ -1,5 +1,5 @@
 import { routerReducer } from 'react-router-redux';
-import { combineReducers } from 'redux';
+import { combineReducers, Reducer } from 'redux';
 
 import { RootState } from '../states';
 
@@ -11,12 +11,18 @@ const constReducer = (state = {}) => {
 };
 
 function rootReducerFactory(recordNames: string[]) {
+  // fix issue with incorrect redux definition file.
+  // See https://github.com/reactjs/redux/issues/2709
+  // tslint:disable: no-any
   return combineReducers<RootState>({
-    auth,
-    cmsConfig: constReducer,
-    recordViewsByName: recordViewsByNameReducerFactory(recordNames),
-    router: routerReducer,
+    auth: auth as Reducer<any>,
+    cmsConfig: constReducer as Reducer<any>,
+    recordViewsByName: recordViewsByNameReducerFactory(recordNames) as Reducer<
+      any
+    >,
+    router: routerReducer as Reducer<any>,
   });
+  // tslint:enable: no-any
 }
 
 export default rootReducerFactory;

@@ -27,6 +27,9 @@ interface RefOption {
   value: string;
 }
 
+type StringSelectAsyncCtor<T> = new () => SelectAsync<T>;
+const StringSelectAsync = SelectAsync as StringSelectAsyncCtor<string>;
+
 export class ReferenceField extends React.PureComponent<
   ReferenceFieldProps,
   State
@@ -59,7 +62,7 @@ export class ReferenceField extends React.PureComponent<
 
     if (editable) {
       return (
-        <SelectAsync
+        <StringSelectAsync
           {...rest}
           loadOptions={this.loadOptions}
           onChange={this.onChange}
