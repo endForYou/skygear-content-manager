@@ -2,6 +2,8 @@ import * as React from 'react';
 import { Record } from 'skygear';
 
 import { FieldConfig, FieldConfigTypes } from '../cmsConfig';
+
+import { AssociationReferenceField } from './AssociationReferenceField';
 import { BooleanField } from './BooleanField';
 import { DateTimeField } from './DateTimeField';
 import { ImageAssetField } from './ImageAssetField';
@@ -60,7 +62,7 @@ export class Field extends React.PureComponent<FieldProps> {
       case FieldConfigTypes.Reference:
         return <ReferenceField {...rest} config={config} />;
       case FieldConfigTypes.AssociationReference:
-        return <div>to-many refs</div>;
+        return <AssociationReferenceField {...rest} config={config} />;
       case FieldConfigTypes.ImageAsset:
         return <ImageAssetField {...rest} config={config} />;
     }

@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { Link } from 'react-router-dom';
 import {
   Async as SelectAsync,
   LoadOptionsAsyncHandler,
@@ -11,6 +10,7 @@ import 'react-select/dist/react-select.css';
 import skygear, { Query, Record, Reference } from 'skygear';
 
 import { ReferenceFieldConfig } from '../cmsConfig';
+import { ReferenceLink } from '../components/ReferenceLink';
 import { parseReference } from '../recordUtil';
 
 import { RequiredFieldProps } from './Field';
@@ -78,12 +78,12 @@ export class ReferenceField extends React.PureComponent<
 
         return (
           <span className={className}>
-            <Link
-              to={`/record/${targetCmsRecord.name}/${value.value}`}
-              title={`${targetCmsRecord.name}/${value.value}`}
+            <ReferenceLink
+              recordName={targetCmsRecord.name}
+              recordId={value.value}
             >
               {value.label}
-            </Link>
+            </ReferenceLink>
           </span>
         );
       }

@@ -28,6 +28,13 @@ export function groupBy<K, V>(xs: V[], keyFn: ((v: V) => K)): Map<K, V[]> {
   return map;
 }
 
+export function join<V, S>(xs: V[], sep: S): Array<V | S> {
+  return xs.reduce(
+    (acc, x) => (acc.length ? [...acc, sep, x] : [x]),
+    [] as Array<V | S>
+  );
+}
+
 export function capitalize(str: string): string {
   return str.charAt(0).toUpperCase() + str.substring(1);
 }
