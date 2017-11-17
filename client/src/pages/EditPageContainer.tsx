@@ -33,7 +33,8 @@ class EditPageContainer extends React.PureComponent<EditPageContainerProps> {
 
     this.recordDispatcher = new RecordActionDispatcher(
       props.dispatch,
-      props.config.cmsRecord
+      props.config.cmsRecord,
+      props.config.references
     );
   }
 
@@ -50,6 +51,7 @@ class EditPageContainer extends React.PureComponent<EditPageContainerProps> {
         return (
           <EditPage
             config={this.props.config}
+            dispatch={this.props.dispatch}
             record={remoteRecord.value}
             recordDispatcher={this.recordDispatcher}
             savingRecord={savingRecord}

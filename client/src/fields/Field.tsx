@@ -2,6 +2,9 @@ import * as React from 'react';
 import { Record } from 'skygear';
 
 import { FieldConfig, FieldConfigTypes } from '../cmsConfig';
+import { Effect } from '../components/EditPage';
+
+import { AssociationReferenceField } from './AssociationReferenceField';
 import { BooleanField } from './BooleanField';
 import { DateTimeField } from './DateTimeField';
 import { ImageAssetField } from './ImageAssetField';
@@ -31,7 +34,7 @@ interface ChildProps<C extends FieldConfig> {
 }
 
 // tslint:disable-next-line: no-any
-export type FieldChangeHandler = (value: any) => void;
+export type FieldChangeHandler = (value: any, effect?: Effect) => void;
 
 export interface FieldContext {
   record: Record;
@@ -59,6 +62,8 @@ export class Field extends React.PureComponent<FieldProps> {
         return <IntegerField {...rest} config={config} />;
       case FieldConfigTypes.Reference:
         return <ReferenceField {...rest} config={config} />;
+      case FieldConfigTypes.AssociationReference:
+        return <AssociationReferenceField {...rest} config={config} />;
       case FieldConfigTypes.ImageAsset:
         return <ImageAssetField {...rest} config={config} />;
     }

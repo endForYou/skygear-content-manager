@@ -15,8 +15,34 @@ records:
   topic:
     list:
       fields:
+        - type: _id
         - name: name
           type: String
+        - name: image_id
+          label: Image
+          type: ImageAsset
+        - type: _created_at
+        - type: _updated_at
+    show:
+      fields:
+        - type: _id
+        - name: name
+          type: String
+        - name: image_id
+          label: Image
+          type: ImageAsset
+        - type: _created_at
+        - type: _updated_at
+    edit:
+      fields:
+        - type: _id
+        - name: name
+          type: String
+        - name: image_id
+          label: Image
+          type: ImageAsset
+        - type: _created_at
+        - type: _updated_at
   poll:
     list:
       label: Polls
@@ -27,6 +53,11 @@ records:
           type: String
         # - name: user_id
         #   type: Reference
+        - name: topics
+          type: Reference
+          target: topic
+          displayFieldName: name
+          via_association_record: poll_topic
         - name: start_time
           type: DateTime
         - name: end_time
@@ -60,6 +91,11 @@ records:
           type: String
         # - name: user_id
         #   type: Reference
+        - name: topics
+          type: Reference
+          target: topic
+          displayFieldName: name
+          via_association_record: poll_topic
         - name: start_time
           type: DateTime
         - name: end_time
@@ -93,6 +129,11 @@ records:
           type: String
         # - name: user_id
         #   type: Reference
+        - name: topics
+          type: Reference
+          target: topic
+          displayFieldName: name
+          via_association_record: poll_topic
         - name: start_time
           type: DateTime
         - name: end_time
@@ -125,7 +166,7 @@ records:
           type: String
         - name: poll_id
           type: Reference
-          referencing: poll
+          target: poll
           displayFieldName: name
         - name: ordering
           type: Integer
@@ -139,7 +180,7 @@ records:
           type: String
         - name: poll_id
           type: Reference
-          referencing: poll
+          target: poll
           displayFieldName: name
         - name: ordering
           type: Integer
@@ -153,7 +194,7 @@ records:
           type: String
         - name: poll_id
           type: Reference
-          referencing: poll
+          target: poll
           displayFieldName: name
         - name: ordering
           type: Integer
@@ -164,3 +205,12 @@ records:
       fields:
         - name: name
           type: String
+association_records:
+  poll_topic:
+    fields:
+      - name: poll_id
+        type: Reference
+        target: poll
+      - name: topic_id
+        type: Reference
+        target: topic

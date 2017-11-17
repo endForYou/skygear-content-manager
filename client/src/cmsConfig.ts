@@ -1,8 +1,10 @@
-import { humanize, objectFrom } from './util';
+import { isArray } from 'util';
+import { humanize, isObject, objectFrom } from './util';
 
 export interface CmsConfig {
   site: SiteConfig;
   records: RecordConfigMap;
+  associationRecordByName: AssociationRecordByName;
 }
 
 export type SiteConfig = SiteItemConfig[];
@@ -30,12 +32,14 @@ export interface CmsRecord {
   // the remote record type of this CMS record
   // one record type might have multiple CMS record defined in the config
   recordType: string;
-  references: ReferenceConfig[];
+}
+
+export function CmsRecord(name: string, recordType: string): CmsRecord {
+  return { name, recordType };
 }
 
 export interface RecordConfig {
-  recordName: string;
-  recordType: string;
+  cmsRecord: CmsRecord;
   list?: ListPageConfig;
   show?: ShowPageConfig;
   edit?: EditPageConfig;
@@ -46,21 +50,26 @@ export interface ListPageConfig {
   label: string;
   perPage: number;
   fields: FieldConfig[];
+  references: ReferenceConfig[];
 }
 
 export interface ShowPageConfig {
   cmsRecord: CmsRecord;
   label: string;
   fields: FieldConfig[];
+  references: ReferenceConfig[];
 }
 
 export interface EditPageConfig {
   cmsRecord: CmsRecord;
   label: string;
   fields: FieldConfig[];
+  references: ReferenceConfig[];
 }
 
-export type ReferenceConfig = ReferenceFieldConfig;
+export type ReferenceConfig =
+  | ReferenceFieldConfig
+  | AssociationReferenceFieldConfig;
 
 export type FieldConfig =
   | StringFieldConfig
@@ -69,6 +78,7 @@ export type FieldConfig =
   | BooleanFieldConfig
   | IntegerFieldConfig
   | ReferenceFieldConfig
+  | AssociationReferenceFieldConfig
   | ImageAssetFieldConfig;
 export enum FieldConfigTypes {
   String = 'String',
@@ -77,12 +87,15 @@ export enum FieldConfigTypes {
   Boolean = 'Boolean',
   Integer = 'Integer',
   Reference = 'Reference',
+  AssociationReference = 'AssociationReference',
   ImageAsset = 'ImageAsset',
 }
 interface FieldConfigAttrs {
   name: string;
   label: string;
 
+  // derived attrs depending on which page the field lives in
+  compact: boolean;
   editable?: boolean;
 }
 
@@ -108,8 +121,26 @@ export interface IntegerFieldConfig extends FieldConfigAttrs {
 
 export interface ReferenceFieldConfig extends FieldConfigAttrs {
   type: FieldConfigTypes.Reference;
-  remoteRecordName: string;
-  remoteRecordType: string;
+  targetCmsRecord: CmsRecord;
+  displayFieldName: string;
+}
+
+export interface AssociationReferenceFieldConfig extends FieldConfigAttrs {
+  type: FieldConfigTypes.AssociationReference;
+
+  // the AssociationRecordConfig that this reference is made on
+  associationRecordConfig: AssociationRecordConfig;
+
+  // source ReferenceFieldConfig for this field in
+  // associationRecordConfig.referenceConfigPair
+  sourceReference: ReferenceFieldConfig;
+
+  // target ReferenceFieldConfig for this field in
+  // associationRecordConfig.referenceConfigPair
+  targetReference: ReferenceFieldConfig;
+
+  // display field name in the target record.
+  // override targetReference.displayFieldName
   displayFieldName: string;
 }
 
@@ -123,11 +154,45 @@ interface FieldConfigInput {
   [key: string]: any;
 }
 
+export interface AssociationRecordByName {
+  [key: string]: AssociationRecordConfig | undefined;
+}
+
+export interface AssociationRecordConfig {
+  cmsRecord: CmsRecord;
+  referenceConfigPair: [ReferenceFieldConfig, ReferenceFieldConfig];
+}
+
+interface CmsRecordByName {
+  [key: string]: CmsRecord | undefined;
+}
+
+interface RecordTypeContext {
+  cmsRecordByName: CmsRecordByName;
+}
+
+interface ConfigContext {
+  cmsRecordByName: CmsRecordByName;
+  associationRecordByName: AssociationRecordByName;
+}
+
 // tslint:disable-next-line: no-any
-export function parseCmsConfig({ site, records }: any): CmsConfig {
-  const context = preparseRecordConfigs(records);
+export function parseCmsConfig(input: any): CmsConfig {
+  const { site, records, association_records: associationRecords } = input;
+
+  const cmsRecordByName = preparseRecordConfigs(records);
+  const associationRecordByName = parseAssociationRecordByName(
+    { cmsRecordByName },
+    associationRecords
+  );
+
+  const context = {
+    associationRecordByName,
+    cmsRecordByName,
+  };
 
   return {
+    associationRecordByName,
     records: Object.entries(
       records
       // tslint:disable-next-line: no-any
@@ -161,20 +226,17 @@ function parseSiteRecordConfig(input: any): RecordSiteItemConfig {
   return { type, name, label: parsedLabel };
 }
 
-interface ConfigContext {
-  recordTypeByName: { [key: string]: string | undefined };
-}
-
 // tslint:disable-next-line: no-any
-function preparseRecordConfigs(records: any): ConfigContext {
-  const recordTypeByName = objectFrom(
+function preparseRecordConfigs(records: any): CmsRecordByName {
+  const cmsRecordByName = objectFrom(
     Object.entries(records).map(([recordName, value]) => {
       const recordType =
         parseOptionalString(value, 'recordType', recordName) || recordName;
-      return [recordName, recordType] as [string, string];
+      const cmsRecord = CmsRecord(recordName, recordType);
+      return [recordName, cmsRecord] as [string, CmsRecord];
     })
   );
-  return { recordTypeByName };
+  return cmsRecordByName;
 }
 
 function parseRecordConfig(
@@ -187,59 +249,47 @@ function parseRecordConfig(
 
   const recordType =
     parseOptionalString(input, 'recordType', recordName) || recordName;
+  const cmsRecord = CmsRecord(recordName, recordType);
+
   return {
+    cmsRecord,
     edit:
-      edit == null
-        ? undefined
-        : parseEditPageConfig(context, recordName, recordType, edit),
+      edit == null ? undefined : parseEditPageConfig(context, cmsRecord, edit),
     list:
-      list == null
-        ? undefined
-        : parseListPageConfig(context, recordName, recordType, list),
-    recordName,
-    recordType,
+      list == null ? undefined : parseListPageConfig(context, cmsRecord, list),
     show:
-      show == null
-        ? undefined
-        : parseShowPageConfig(context, recordName, recordType, show),
+      show == null ? undefined : parseShowPageConfig(context, cmsRecord, show),
   };
 }
 
 function parseListPageConfig(
   context: ConfigContext,
-  recordName: string,
-  recordType: string,
+  cmsRecord: CmsRecord,
   // tslint:disable-next-line: no-any
   input: any
 ): ListPageConfig {
   const { perPage = 25 } = input;
 
   const label =
-    parseOptionalString(input, 'label', 'List') || humanize(recordName);
+    parseOptionalString(input, 'label', 'List') || humanize(cmsRecord.name);
 
   // tslint:disable-next-line: no-any
   const fields = input.fields.map((f: any) =>
     parseFieldConfig(context, f)
   ) as FieldConfig[];
 
-  const cmsRecord = {
-    name: recordName,
-    recordType,
-    references: filterReferences(fields),
-  };
-
   return {
     cmsRecord,
     fields,
     label,
     perPage,
+    references: filterReferences(fields),
   };
 }
 
 function parseShowPageConfig(
   context: ConfigContext,
-  recordName: string,
-  recordType: string,
+  cmsRecord: CmsRecord,
   // tslint:disable-next-line: no-any
   input: any
 ): ShowPageConfig {
@@ -248,7 +298,7 @@ function parseShowPageConfig(
   }
 
   const label =
-    parseOptionalString(input, 'label', 'label') || humanize(recordName);
+    parseOptionalString(input, 'label', 'label') || humanize(cmsRecord.name);
 
   if (typeof input.label !== 'string' && typeof input.label !== 'undefined') {
     throw new Error(`ShowPageConfig.label must be a string`);
@@ -258,24 +308,19 @@ function parseShowPageConfig(
   const fields = input.fields.map((f: any) =>
     parseFieldConfig(context, f)
   ) as FieldConfig[];
-
-  const cmsRecord = {
-    name: recordName,
-    recordType,
-    references: filterReferences(fields),
-  };
+  const compactFields = fields.map(config => ({ compact: true, ...config }));
 
   return {
     cmsRecord,
-    fields,
+    fields: compactFields,
     label,
+    references: filterReferences(compactFields),
   };
 }
 
 function parseEditPageConfig(
   context: ConfigContext,
-  recordName: string,
-  recordType: string,
+  cmsRecord: CmsRecord,
   // tslint:disable-next-line: no-any
   input: any
 ): EditPageConfig {
@@ -284,7 +329,7 @@ function parseEditPageConfig(
   }
 
   const label =
-    parseOptionalString(input, 'label', 'Edit') || humanize(recordName);
+    parseOptionalString(input, 'label', 'Edit') || humanize(cmsRecord.name);
 
   if (typeof input.label !== 'string' && typeof input.label !== 'undefined') {
     throw new Error(`EditPageConfig.label must be a string`);
@@ -296,16 +341,11 @@ function parseEditPageConfig(
   ) as FieldConfig[];
   const editableFields = fields.map(config => ({ editable: true, ...config }));
 
-  const cmsRecord = {
-    name: recordName,
-    recordType,
-    references: filterReferences(fields),
-  };
-
   return {
     cmsRecord,
     fields: editableFields,
     label,
+    references: filterReferences(fields),
   };
 }
 
@@ -323,7 +363,11 @@ function parseFieldConfig(context: ConfigContext, a: any): FieldConfig {
     case 'Integer':
       return parseIntegerFieldConfig(a);
     case 'Reference':
-      return parseReferenceFieldConfig(context, a);
+      if (a.via_association_record) {
+        return parseAssociationReferenceFieldConfig(context, a);
+      } else {
+        return parseReferenceFieldConfig(context, a);
+      }
     case 'ImageAsset':
       return parseImageAssetFieldConfig(a);
 
@@ -379,26 +423,80 @@ function parseIntegerFieldConfig(input: FieldConfigInput): IntegerFieldConfig {
 }
 
 function parseReferenceFieldConfig(
-  context: ConfigContext,
+  context: RecordTypeContext,
   input: FieldConfigInput
 ): ReferenceFieldConfig {
-  const referenceName = parseString(input, 'referencing', 'Reference');
-  const remoteRecordType = context.recordTypeByName[referenceName];
-  const displayFieldName = parseString(input, 'displayFieldName', 'Reference');
+  const targetRecordName = parseString(input, 'target', 'Reference');
+  const displayFieldName =
+    parseOptionalString(input, 'displayFieldName', 'Reference') || '_id';
 
-  if (remoteRecordType === undefined) {
+  const targetCmsRecord = context.cmsRecordByName[targetRecordName];
+  if (targetCmsRecord === undefined) {
     throw new Error(
-      `Couldn't find configuration of Reference.referencing = ${referenceName}`
+      `Couldn't find configuration of Reference.target = ${targetRecordName}`
     );
   }
 
   return {
     ...parseFieldConfigAttrs(input, 'Reference'),
     displayFieldName,
-    remoteRecordName: referenceName,
-    remoteRecordType,
+    targetCmsRecord,
     type: FieldConfigTypes.Reference,
   };
+}
+
+function parseAssociationReferenceFieldConfig(
+  context: ConfigContext,
+  input: FieldConfigInput
+): AssociationReferenceFieldConfig {
+  const targetRecordName = parseString(input, 'target', 'Reference');
+  const displayFieldName = parseString(input, 'displayFieldName', 'Reference');
+
+  const associationRecordName = parseString(
+    input,
+    'via_association_record',
+    'Reference'
+  );
+  const associationRecordConfig =
+    context.associationRecordByName[associationRecordName];
+  if (associationRecordConfig === undefined) {
+    throw new Error(
+      `Couldn't find AssociationRecord with name = ${associationRecordName}`
+    );
+  }
+
+  // look for the target reference
+  const [sourceReference, targetReference] = deriveReferencesByTargetName(
+    associationRecordConfig.referenceConfigPair,
+    targetRecordName,
+    associationRecordConfig.cmsRecord.name
+  );
+
+  return {
+    ...parseFieldConfigAttrs(input, 'Reference'),
+    associationRecordConfig,
+    displayFieldName,
+    sourceReference,
+    targetReference,
+    type: FieldConfigTypes.AssociationReference,
+  };
+}
+
+// return a pair of ReferenceFieldConfig in the order of [SourceRef, TargetRef]
+function deriveReferencesByTargetName(
+  refPair: [ReferenceFieldConfig, ReferenceFieldConfig],
+  targetRecordName: string,
+  associationRecordName: string
+): [ReferenceFieldConfig, ReferenceFieldConfig] {
+  if (refPair[0].targetCmsRecord.name === targetRecordName) {
+    return [refPair[1], refPair[0]];
+  } else if (refPair[1].targetCmsRecord.name === targetRecordName) {
+    return refPair;
+  } else {
+    throw new Error(
+      `Couldn't find Reference.target = ${targetRecordName} in AssociationRecord.name = ${associationRecordName}`
+    );
+  }
 }
 
 function parseImageAssetFieldConfig(
@@ -419,11 +517,12 @@ function parseFieldConfigAttrs(
   const label =
     parseOptionalString(input, 'label', fieldType) || humanize(name);
 
-  return { name, label };
+  return { compact: false, name, label };
 }
 
 function parseIdFieldConfig(input: FieldConfigInput): StringFieldConfig {
   return {
+    compact: false,
     editable: false,
     label: 'ID',
     name: '_id',
@@ -435,6 +534,7 @@ function parseCreatedAtFieldConfig(
   input: FieldConfigInput
 ): DateTimeFieldConfig {
   return {
+    compact: false,
     editable: false,
     label: 'Created at',
     name: 'createdAt',
@@ -446,11 +546,97 @@ function parseUpdatedAtFieldConfig(
   input: FieldConfigInput
 ): DateTimeFieldConfig {
   return {
+    compact: false,
     editable: false,
     label: 'Updated at',
     name: 'updatedAt',
     type: FieldConfigTypes.DateTime,
   };
+}
+
+function parseAssociationRecordByName(
+  context: RecordTypeContext,
+  // tslint:disable-next-line: no-any
+  input: any
+): AssociationRecordByName {
+  if (input === undefined) {
+    return {};
+  }
+
+  if (!isObject(input)) {
+    throw new Error(
+      `want association_records to be object, got ${typeof input}`
+    );
+  }
+
+  const recordNameConfigPairs = Object.entries(
+    input
+  ).map(([recordName, recordConfig]) => {
+    if (!isObject(recordConfig)) {
+      throw new Error(
+        `want association_record to be object, got ${typeof recordConfig}`
+      );
+    }
+
+    return [
+      recordName,
+      parseAssociationRecord(context, recordName, recordConfig),
+    ] as [string, AssociationRecordConfig];
+  });
+
+  return objectFrom(recordNameConfigPairs);
+}
+
+function parseAssociationRecord(
+  context: RecordTypeContext,
+  recordName: string,
+  // tslint:disable-next-line: no-any
+  input: any
+): AssociationRecordConfig {
+  const recordType =
+    parseOptionalString(input, 'recordType', 'association_record') ||
+    recordName;
+
+  const fields = input.fields;
+  if (!isArray(fields)) {
+    throw new Error(
+      `want association_record.fields to be Array, got ${typeof fields}`
+    );
+  }
+
+  if (fields.length !== 2) {
+    throw new Error(
+      `want association_record.fields has length 2, got ${fields.length}`
+    );
+  }
+
+  const ref0 = parseReferenceFieldConfig(context, fields[0]);
+  const ref1 = parseReferenceFieldConfig(context, fields[1]);
+  const referenceConfigPair: [ReferenceFieldConfig, ReferenceFieldConfig] = [
+    ref0,
+    ref1,
+  ];
+
+  return {
+    cmsRecord: CmsRecord(recordName, recordType),
+    referenceConfigPair,
+  };
+}
+
+function filterReferences(fieldConfigs: FieldConfig[]): ReferenceConfig[] {
+  return fieldConfigs.reduce(
+    (refs, config) => {
+      switch (config.type) {
+        case FieldConfigTypes.Reference:
+          return [...refs, config];
+        case FieldConfigTypes.AssociationReference:
+          return [...refs, config];
+        default:
+          return refs;
+      }
+    },
+    [] as ReferenceConfig[]
+  );
 }
 
 // tslint:disable-next-line: no-any
@@ -480,20 +666,4 @@ function parseOptionalString(
   }
 
   throw new Error(`${context}.${fieldName} want a string, got ${typeof a}`);
-}
-
-export function filterReferences(
-  fieldConfigs: FieldConfig[]
-): ReferenceConfig[] {
-  return fieldConfigs.reduce(
-    (refs, config) => {
-      switch (config.type) {
-        case FieldConfigTypes.Reference:
-          return [...refs, config];
-        default:
-          return refs;
-      }
-    },
-    [] as ReferenceConfig[]
-  );
 }

@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { Link } from 'react-router-dom';
 import {
   Async as SelectAsync,
   LoadOptionsAsyncHandler,
@@ -11,6 +10,9 @@ import 'react-select/dist/react-select.css';
 import skygear, { Query, Record, Reference } from 'skygear';
 
 import { ReferenceFieldConfig } from '../cmsConfig';
+import { ReferenceLink } from '../components/ReferenceLink';
+import { parseReference } from '../recordUtil';
+
 import { RequiredFieldProps } from './Field';
 import { NullField } from './NullField';
 
@@ -24,6 +26,9 @@ interface RefOption {
   label: string;
   value: string;
 }
+
+type StringSelectAsyncCtor<T> = new () => SelectAsync<T>;
+const StringSelectAsync = SelectAsync as StringSelectAsyncCtor<string>;
 
 export class ReferenceField extends React.PureComponent<
   ReferenceFieldProps,
@@ -57,7 +62,7 @@ export class ReferenceField extends React.PureComponent<
 
     if (editable) {
       return (
-        <SelectAsync
+        <StringSelectAsync
           {...rest}
           loadOptions={this.loadOptions}
           onChange={this.onChange}
@@ -69,16 +74,16 @@ export class ReferenceField extends React.PureComponent<
       if (value === null) {
         return <NullField />;
       } else {
-        const { remoteRecordName } = config;
+        const { targetCmsRecord } = config;
 
         return (
           <span className={className}>
-            <Link
-              to={`/record/${remoteRecordName}/${value.value}`}
-              title={`${remoteRecordName}/${value.value}`}
+            <ReferenceLink
+              recordName={targetCmsRecord.name}
+              recordId={value.value}
             >
               {value.label}
-            </Link>
+            </ReferenceLink>
           </span>
         );
       }
@@ -86,9 +91,9 @@ export class ReferenceField extends React.PureComponent<
   }
 
   public loadOptions: LoadOptionsAsyncHandler<string> = input => {
-    const { displayFieldName, remoteRecordType } = this.props.config;
+    const { displayFieldName, targetCmsRecord } = this.props.config;
 
-    const RecordCls = Record.extend(remoteRecordType);
+    const RecordCls = Record.extend(targetCmsRecord.recordType);
     const query = new Query(RecordCls);
     return skygear.publicDB.query(query).then(records => {
       const options = records.map(record => {
@@ -130,9 +135,8 @@ export class ReferenceField extends React.PureComponent<
     });
 
     if (this.props.onFieldChange) {
-      this.props.onFieldChange(
-        new Reference(`${this.props.config.remoteRecordType}/${value.value}`)
-      );
+      const recordType = this.props.config.targetCmsRecord.recordType;
+      this.props.onFieldChange(new Reference(`${recordType}/${value.value}`));
     }
   };
 }
@@ -157,16 +161,4 @@ function recordToOption(r: Record, fieldName: string): Option<string> {
     label: r[fieldName],
     value: r._id,
   };
-}
-
-interface ParsedReference {
-  recordType: string;
-  recordId: string;
-}
-
-function parseReference(ref: Reference): ParsedReference {
-  const [recordType] = ref.id.split('/', 1);
-  const recordId = ref.id.substring(recordType.length + 1);
-
-  return { recordType, recordId };
 }

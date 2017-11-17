@@ -14,6 +14,9 @@ export interface MainPageProps {
   recordConfigs: RecordConfig[];
 }
 
+// tslint:disable-next-line: no-any
+const AnyFrontPage = FrontPage as any;
+
 class MainPage extends React.PureComponent<MainPageProps> {
   private recordRoutes: JSX.Element[];
 
@@ -27,7 +30,7 @@ class MainPage extends React.PureComponent<MainPageProps> {
     return (
       <Layout>
         <Switch>
-          <Route exact={true} path="/" component={FrontPage} />
+          <Route exact={true} path="/" component={AnyFrontPage} />
 
           {this.recordRoutes}
 

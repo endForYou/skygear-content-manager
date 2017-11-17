@@ -16,11 +16,15 @@ import {
 } from '../states';
 import { RemoteFailure, RemoteLoading, RemoteSuccess } from '../types';
 
+// fix issue with incorrect redux definition file.
+// See https://github.com/reactjs/redux/issues/2709
+// tslint:disable: no-any
 const recordViewsReducer = combineReducers<RecordViewState>({
-  edit: recordEditReducer,
-  list: recordListReducer,
-  show: recordShowReducer,
+  edit: recordEditReducer as Reducer<any>,
+  list: recordListReducer as Reducer<any>,
+  show: recordShowReducer as Reducer<any>,
 });
+// tslint:enable: no-any
 
 function recordViewsByNameReducerFactory(
   recordNames: string[] = []
