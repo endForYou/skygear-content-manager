@@ -15,7 +15,13 @@ export class AssociationReferenceField extends React.PureComponent<
   AssociationReferenceFieldProps
 > {
   public render() {
-    const { context, config } = this.props;
+    const {
+      context,
+      config,
+      onFieldChange: _onFieldChange,
+      value: _value,
+      ...rest,
+    } = this.props;
 
     const targetFieldName = config.name;
     const targetRecords =
@@ -32,6 +38,6 @@ export class AssociationReferenceField extends React.PureComponent<
       );
     });
 
-    return <span>{join(items, ', ')}</span>;
+    return <span {...rest}>{join(items, ', ')}</span>;
   }
 }

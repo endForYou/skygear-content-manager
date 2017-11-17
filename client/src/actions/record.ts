@@ -253,11 +253,8 @@ export function fetchRecord(
     query.equalTo('_id', id);
     query.limit = 1;
 
-    modifyQueryWithReferenceConfigs(query, references);
-
     dispatch(fetchRecordRequest(cmsRecord, id));
-    return skygear.publicDB
-      .query(query)
+    return queryWithTarget(query, references)
       .then((queryResult: QueryResult<Record>) => {
         const [record] = queryResult;
 
@@ -268,10 +265,10 @@ export function fetchRecord(
         return record;
       })
       .then(
-        (record: Record) => {
+        record => {
           dispatch(fetchRecordSuccess(cmsRecord, id, record));
         },
-        (error: Error) => {
+        error => {
           dispatch(fetchRecordFailure(cmsRecord, id, error));
         }
       );
@@ -312,50 +309,54 @@ function fetchRecordList(
 
     query.addDescending('_created_at');
 
-    const [refs, assoRefs] = separateReferenceConfigs(references);
-
-    refs.forEach(config => {
-      query.transientInclude(config.name);
-    });
-
     dispatch(fetchRecordListRequest(cmsRecord, page));
-    return skygear.publicDB
-      .query(query)
-      .then((queryResult: QueryResult<Record>) => {
-        const sources = queryResult.map(r => r);
-
-        return fetchToManyRecordsWithAssociations(
-          sources,
-          assoRefs
-        ).then(refAssoRecordsPairs => {
-          // mutate queryResult s.t. it has target records and association
-          // records in $transient
-
-          refAssoRecordsPairs.forEach(([ref, assoRecords]) => {
-            const sourceById = new Map(
-              sources.map(r => [r._id, r] as [string, Record])
-            );
-
-            distributeAssociationRecords(sourceById, ref, assoRecords);
-          });
-
-          return queryResult;
-        });
-      })
-      .then(
-        queryResult => {
-          dispatch(
-            fetchRecordListSuccess(cmsRecord, page, perPage, queryResult)
-          );
-        },
-        error => {
-          dispatch(fetchRecordListFailure(cmsRecord, error));
-        }
-      );
+    return queryWithTarget(query, references).then(
+      queryResult => {
+        dispatch(fetchRecordListSuccess(cmsRecord, page, perPage, queryResult));
+      },
+      error => {
+        dispatch(fetchRecordListFailure(cmsRecord, error));
+      }
+    );
   };
 }
 
-function fetchToManyRecordsWithAssociations(
+function queryWithTarget(
+  query: Query,
+  references: ReferenceConfig[]
+): Promise<QueryResult<Record>> {
+  const [refs, assoRefs] = separateReferenceConfigs(references);
+
+  refs.forEach(config => {
+    query.transientInclude(config.name);
+  });
+
+  return skygear.publicDB
+    .query(query)
+    .then((queryResult: QueryResult<Record>) => {
+      const sources = queryResult.map(r => r);
+
+      return fetchAllAssociationRecordsWithTarget(
+        sources,
+        assoRefs
+      ).then(refAssoRecordsPairs => {
+        // mutate queryResult s.t. it has target records and association
+        // records in $transient
+
+        refAssoRecordsPairs.forEach(([ref, assoRecords]) => {
+          const sourceById = new Map(
+            sources.map(r => [r._id, r] as [string, Record])
+          );
+
+          distributeAssociationRecords(sourceById, ref, assoRecords);
+        });
+
+        return queryResult;
+      });
+    });
+}
+
+function fetchAllAssociationRecordsWithTarget(
   sources: Record[],
   refs: AssociationReferenceFieldConfig[]
 ): Promise<Array<[AssociationReferenceFieldConfig, Record[]]>> {
@@ -426,21 +427,6 @@ function fetchAssociationRecordsWithTarget(
   return skygear.publicDB
     .query(query)
     .then(queryResult => queryResult.map(r => r));
-}
-
-function modifyQueryWithReferenceConfigs(
-  query: Query,
-  configs: ReferenceConfig[]
-) {
-  configs.forEach(config => {
-    switch (config.type) {
-      case FieldConfigTypes.Reference:
-        query.transientInclude(config.name);
-        break;
-      default:
-        throw new Error(`unknown ReferenceConfig.type = ${config.type}`);
-    }
-  });
 }
 
 function separateReferenceConfigs(
