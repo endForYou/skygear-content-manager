@@ -154,7 +154,7 @@ declare module 'skygear' {
     public delete(record: Record): Promise<Record>;
     public delete(
       records: Record[] | QueryResult<Record>
-    ): Promise<SkygearError[] | undefined>;
+    ): Promise<(SkygearError | undefined)[] | undefined>;
 
     public query<T extends Record = Record>(
       query: Query,
