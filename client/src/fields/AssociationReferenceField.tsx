@@ -5,7 +5,8 @@ import { AssociationReferenceFieldConfig } from '../cmsConfig';
 import { ReferenceLink } from '../components/ReferenceLink';
 import { join } from '../util';
 
-import { RequiredFieldProps } from './index';
+import { AssociationRecordSelect } from './AssociationRecordSelect';
+import { RequiredFieldProps } from './Field';
 
 export type AssociationReferenceFieldProps = RequiredFieldProps<
   AssociationReferenceFieldConfig
@@ -23,9 +24,15 @@ export class AssociationReferenceField extends React.PureComponent<
       ...rest,
     } = this.props;
 
+    const $transient = context.record.$transient;
+
+    if (config.editable) {
+      return <AssociationRecordSelect {...this.props} />;
+    }
+
     const targetFieldName = config.name;
-    const targetRecords =
-      (context.record.$transient[targetFieldName] as Record[]) || [];
+    const targetRecords = $transient[targetFieldName] as Record[];
+
     const items = targetRecords.map(r => {
       return (
         <ReferenceLink

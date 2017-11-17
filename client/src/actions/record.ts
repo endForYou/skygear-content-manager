@@ -377,7 +377,7 @@ function fetchAllAssociationRecordsWithTarget(
 }
 
 // assign association records and its transient target records into
-// `${ref.name}_associations` and ref.name record.$transient respectively
+// `${ref.name}Associations` and ref.name record.$transient respectively
 function distributeAssociationRecords(
   sourceById: Map<string, Record>,
   ref: AssociationReferenceFieldConfig,
@@ -387,20 +387,14 @@ function distributeAssociationRecords(
     const sourceRef: Reference = assoRecord[ref.sourceReference.name];
     return parseReference(sourceRef).recordId;
   });
-  assoRecordsBySourceId.forEach((assoRecords, sourceId) => {
-    const source = sourceById.get(sourceId);
-    if (source === undefined) {
-      console.warn(`Couldn't find source.id = ${sourceId} for association`);
-
-      return;
-    }
-
+  sourceById.forEach((source, sourceId) => {
+    const assoRecords = assoRecordsBySourceId.get(sourceId) || [];
     const targetRecords = assoRecords.map(
       r => r.$transient[ref.targetReference.name]
     );
 
     source.$transient[ref.name] = targetRecords;
-    source.$transient[`${ref.name}_associations`] = targetRecords;
+    source.$transient[`${ref.name}Associations`] = assoRecords;
   });
 }
 

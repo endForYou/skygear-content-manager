@@ -96,7 +96,7 @@ interface FieldConfigAttrs {
 
   // derived attrs depending on which page the field lives in
   compact: boolean;
-  editable: boolean;
+  editable?: boolean;
 }
 
 export interface StringFieldConfig extends FieldConfigAttrs {
@@ -517,7 +517,7 @@ function parseFieldConfigAttrs(
   const label =
     parseOptionalString(input, 'label', fieldType) || humanize(name);
 
-  return { compact: false, editable: false, name, label };
+  return { compact: false, name, label };
 }
 
 function parseIdFieldConfig(input: FieldConfigInput): StringFieldConfig {

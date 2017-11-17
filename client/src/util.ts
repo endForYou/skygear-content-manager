@@ -12,6 +12,16 @@ export function objectFrom<V>(
   }, {});
 }
 
+export function makeArray<T>(value: T | T[] | null | undefined): T[] {
+  if (Array.isArray(value)) {
+    return value;
+  } else if (value == null) {
+    return [];
+  } else {
+    return [value];
+  }
+}
+
 export function groupBy<K, V>(xs: V[], keyFn: ((v: V) => K)): Map<K, V[]> {
   const map = new Map<K, V[]>();
 
@@ -46,4 +56,46 @@ export function humanize(str: string): string {
 export function getPath(urlString: string): string {
   const url = new URL(urlString);
   return url.pathname;
+}
+
+export function debouncePromise1<T1, R>(
+  f: ((a0: T1) => Promise<R>),
+  wait: number
+): ((a0: T1) => Promise<R>) {
+  type PromiseResolver<T> = (value?: T | PromiseLike<T>) => void;
+
+  let resolver: PromiseResolver<R> | undefined;
+  let p: Promise<R> | undefined;
+  let timeout: number | undefined;
+
+  return a0 => {
+    if (p === undefined) {
+      p = new Promise<R>(resolve => {
+        resolver = resolve;
+      });
+    }
+
+    if (timeout !== undefined) {
+      clearTimeout(timeout);
+    }
+
+    timeout = window.setTimeout(() => {
+      f(a0).then(r => {
+        if (resolver === undefined) {
+          throw new Error('debouncePromise1: resolver is undefined');
+        }
+
+        resolver(r);
+
+        p = undefined;
+        resolver = undefined;
+      });
+    }, wait);
+
+    if (p === undefined) {
+      throw new Error('debouncePromise1: fatal error: no promise to return');
+    }
+
+    return p;
+  };
 }
