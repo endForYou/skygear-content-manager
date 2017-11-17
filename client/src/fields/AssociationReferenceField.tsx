@@ -38,6 +38,12 @@ export class AssociationReferenceField extends React.PureComponent<
       );
     });
 
-    return <span {...rest}>{join(items, ', ')}</span>;
+    if (config.compact) {
+      return <span {...rest}>{join(items, ', ')}</span>;
+    } else {
+      const { className: _className, ...restWithoutClassName } = rest;
+      const listItems = items.map((item, i) => <li key={i}>{item}</li>);
+      return <ul {...restWithoutClassName}>{listItems}</ul>;
+    }
   }
 }

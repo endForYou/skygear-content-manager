@@ -94,7 +94,9 @@ interface FieldConfigAttrs {
   name: string;
   label: string;
 
-  editable?: boolean;
+  // derived attrs depending on which page the field lives in
+  compact: boolean;
+  editable: boolean;
 }
 
 export interface StringFieldConfig extends FieldConfigAttrs {
@@ -306,12 +308,13 @@ function parseShowPageConfig(
   const fields = input.fields.map((f: any) =>
     parseFieldConfig(context, f)
   ) as FieldConfig[];
+  const compactFields = fields.map(config => ({ compact: true, ...config }));
 
   return {
     cmsRecord,
-    fields,
+    fields: compactFields,
     label,
-    references: filterReferences(fields),
+    references: filterReferences(compactFields),
   };
 }
 
@@ -514,11 +517,12 @@ function parseFieldConfigAttrs(
   const label =
     parseOptionalString(input, 'label', fieldType) || humanize(name);
 
-  return { name, label };
+  return { compact: false, editable: false, name, label };
 }
 
 function parseIdFieldConfig(input: FieldConfigInput): StringFieldConfig {
   return {
+    compact: false,
     editable: false,
     label: 'ID',
     name: '_id',
@@ -530,6 +534,7 @@ function parseCreatedAtFieldConfig(
   input: FieldConfigInput
 ): DateTimeFieldConfig {
   return {
+    compact: false,
     editable: false,
     label: 'Created at',
     name: 'createdAt',
@@ -541,6 +546,7 @@ function parseUpdatedAtFieldConfig(
   input: FieldConfigInput
 ): DateTimeFieldConfig {
   return {
+    compact: false,
     editable: false,
     label: 'Updated at',
     name: 'updatedAt',
