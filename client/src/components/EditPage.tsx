@@ -1,21 +1,33 @@
 import * as React from 'react';
+import { Dispatch } from 'react-redux';
+import { push } from 'react-router-redux';
 import { Record } from 'skygear';
 
 import { RecordActionDispatcher } from '../actions/record';
 import { EditPageConfig, FieldConfig } from '../cmsConfig';
 import { Field, FieldContext } from '../fields';
 import { errorMessageFromError } from '../recordUtil';
+import { RootState } from '../states';
 import { Remote, RemoteType } from '../types';
 
 export interface EditPageProps {
   config: EditPageConfig;
+  dispatch: Dispatch<RootState>;
   record: Record;
   savingRecord?: Remote<Record>;
   recordDispatcher: RecordActionDispatcher;
 }
 
+// Effectively a Promise Factory
+// tslint:disable-next-line: no-any
+export type Effect = () => Promise<any>;
+
 interface State {
   recordChange: RecordChange;
+
+  // Side effects produced by fields. They will get executed after record is
+  // saved successfully.
+  effectChange: RecordEffect;
 }
 
 interface RecordChange {
@@ -23,14 +35,21 @@ interface RecordChange {
   [key: string]: any;
 }
 
+interface RecordEffect {
+  [key: string]: Effect | undefined;
+}
+
+// Handle change propagated from Field. A undefined value would yield no changes
+// on State.recordChange[name].
 // tslint:disable-next-line: no-any
-type RecordChangeHandler = (name: string, value: any) => void;
+type RecordChangeHandler = (name: string, value: any, effect?: Effect) => void;
 
 export class EditPage extends React.PureComponent<EditPageProps, State> {
   constructor(props: EditPageProps) {
     super(props);
 
     this.state = {
+      effectChange: {},
       recordChange: {},
     };
   }
@@ -69,8 +88,20 @@ export class EditPage extends React.PureComponent<EditPageProps, State> {
     );
   }
 
-  public handleRecordChange: RecordChangeHandler = (name, value) => {
-    this.state.recordChange[name] = value;
+  public handleRecordChange: RecordChangeHandler = (name, value, effect) => {
+    if (value !== undefined) {
+      this.setState(prevState => {
+        return {
+          recordChange: { ...prevState.recordChange, [name]: value },
+        };
+      });
+    }
+
+    this.setState(prevState => {
+      return {
+        effectChange: { ...prevState.effectChange, [name]: effect },
+      };
+    });
   };
 
   public handleSubmit: React.FormEventHandler<HTMLFormElement> = event => {
@@ -78,11 +109,22 @@ export class EditPage extends React.PureComponent<EditPageProps, State> {
 
     // better clone the record if possible
     const { record, recordDispatcher } = this.props;
-    const { recordChange } = this.state;
+    const { recordChange, effectChange } = this.state;
 
     mergeRecordChange(record, recordChange);
 
-    recordDispatcher.save(record);
+    recordDispatcher
+      .save(record)
+      .then(() => {
+        const effects = Object.values(effectChange).filter(
+          eff => eff !== undefined
+        ) as Effect[];
+        return Promise.all(effects.map(eff => eff()));
+      })
+      .then(() => {
+        const { config: { cmsRecord }, dispatch } = this.props;
+        dispatch(push(`/record/${cmsRecord.name}/${record._id}`));
+      });
   };
 }
 
@@ -115,7 +157,7 @@ function FormField(props: FieldProps): JSX.Element {
       config={fieldConfig}
       value={fieldValue}
       context={FieldContext(record)}
-      onFieldChange={value => onRecordChange(name, value)}
+      onFieldChange={(value, effect) => onRecordChange(name, value, effect)}
     />
   );
 }

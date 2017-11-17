@@ -1,4 +1,4 @@
-import { OutlawError, Reference } from 'skygear';
+import { Database, OutlawError, Record, Reference } from 'skygear';
 
 export interface ParsedReference {
   recordType: string;
@@ -36,4 +36,21 @@ export function errorMessageFromError(e: Error) {
   }
 
   return e.message;
+}
+
+export function deleteRecordsProperly(
+  database: Database,
+  records: Record[]
+): Promise<void> {
+  return database.delete(records).then(errors => {
+    if (errors && errors.length) {
+      errors.forEach(error => {
+        console.log('Failed to delete record:', error);
+      });
+
+      throw new Error(
+        'Failed to delete records, see console.error for details'
+      );
+    }
+  });
 }

@@ -55,7 +55,7 @@ declare module 'skygear' {
   }
 
   export type RecordCls = {
-    new (attrs: KVObject): Record;
+    new (attrs?: KVObject): Record;
   };
 
   // tslint:disable-next-line: no-any
@@ -145,14 +145,16 @@ declare module 'skygear' {
   export class Database {
     public getRecordByID(id: string): Promise<Record>;
 
-    public save(
-      records: Record,
-      options?: DatabaseSaveOptions
-    ): Promise<Record>;
+    public save(record: Record, options?: DatabaseSaveOptions): Promise<Record>;
     public save(
       records: Record[],
       options?: DatabaseSaveOptions
     ): Promise<DatabaseSaveBatchResult>;
+
+    public delete(record: Record): Promise<Record>;
+    public delete(
+      records: Record[] | QueryResult<Record>
+    ): Promise<SkygearError[] | undefined>;
 
     public query<T extends Record = Record>(
       query: Query,

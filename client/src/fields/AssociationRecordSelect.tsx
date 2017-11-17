@@ -5,10 +5,12 @@ import {
   OnChangeHandler,
   Option,
 } from 'react-select';
-import skygear, { Query, Record } from 'skygear';
+import skygear, { Query, Record, Reference } from 'skygear';
 
 import { AssociationReferenceFieldConfig } from '../cmsConfig';
-import { debouncePromise1, makeArray } from '../util';
+import { Effect } from '../components/EditPage';
+import { deleteRecordsProperly, parseReference } from '../recordUtil';
+import { debouncePromise1, makeArray, objectFrom } from '../util';
 
 import { RequiredFieldProps } from './Field';
 
@@ -108,7 +110,95 @@ export class AssociationRecordSelect extends React.PureComponent<
   public onChange: OnChangeHandler<string> = value => {
     const options = makeArray(value).map(optionToTargetOption);
     this.setState({ options });
+
+    const { config, context } = this.props;
+
+    const [newTargetIds, deletedTargetIds] = diffOptions(
+      this.targets.map(r => targetToOption(r, config)),
+      options
+    );
+
+    const eff: Effect = () => {
+      // tslint:disable-next-line: no-any
+      const promises: Array<Promise<any>> = [];
+
+      const newRecords = newAssoRecords(
+        config,
+        context.record._id,
+        newTargetIds
+      );
+      if (newRecords.length > 0) {
+        promises.push(skygear.publicDB.save(newRecords));
+      }
+
+      const recordsToDelete = assoRecordsToDelete(
+        config,
+        this.assoRecords,
+        deletedTargetIds
+      );
+      if (recordsToDelete.length > 0) {
+        promises.push(deleteRecordsProperly(skygear.publicDB, recordsToDelete));
+      }
+
+      return Promise.all(promises);
+    };
+
+    if (this.props.onFieldChange) {
+      this.props.onFieldChange(undefined, eff);
+    }
   };
+}
+
+function diffOptions(
+  oldOptions: TargetOption[],
+  newOptions: TargetOption[]
+): [string[], string[]] {
+  const oldIds = new Set(oldOptions.map(opt => opt.value));
+  const newIds = new Set(newOptions.map(opt => opt.value));
+
+  const idsToCreate = Array.from(newIds).filter(id => !oldIds.has(id));
+  const idsToDelete = Array.from(oldIds).filter(id => !newIds.has(id));
+
+  return [idsToCreate, idsToDelete];
+}
+
+function newAssoRecords(
+  config: AssociationReferenceFieldConfig,
+  sourceRecordId: string,
+  targetRecordIds: string[]
+): Record[] {
+  const { associationRecordConfig, sourceReference, targetReference } = config;
+
+  const RecordCls = Record.extend(associationRecordConfig.cmsRecord.recordType);
+  const sourceRecordType = sourceReference.targetCmsRecord.recordType;
+  const targetRecordType = targetReference.targetCmsRecord.recordType;
+
+  return targetRecordIds.map(
+    targetRecordId =>
+      new RecordCls({
+        [sourceReference.name]: new Reference(
+          `${sourceRecordType}/${sourceRecordId}`
+        ),
+        [targetReference.name]: new Reference(
+          `${targetRecordType}/${targetRecordId}`
+        ),
+      })
+  );
+}
+
+function assoRecordsToDelete(
+  config: AssociationReferenceFieldConfig,
+  assoRecords: Record[],
+  targetRecordIds: string[]
+): Record[] {
+  const recordByTargetId = objectFrom(
+    assoRecords.map(r => {
+      const targetRef: Reference = r[config.targetReference.name];
+      return [parseReference(targetRef).recordId, r] as [string, Record];
+    })
+  );
+
+  return targetRecordIds.map(id => recordByTargetId[id]);
 }
 
 function targetToOption(
