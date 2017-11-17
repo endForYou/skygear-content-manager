@@ -277,13 +277,14 @@ function parseListPageConfig(
   const fields = input.fields.map((f: any) =>
     parseFieldConfig(context, f)
   ) as FieldConfig[];
+  const compactFields = fields.map(config => ({ ...config, compact: true }));
 
   return {
     cmsRecord,
-    fields,
+    fields: compactFields,
     label,
     perPage,
-    references: filterReferences(fields),
+    references: filterReferences(compactFields),
   };
 }
 
@@ -308,13 +309,12 @@ function parseShowPageConfig(
   const fields = input.fields.map((f: any) =>
     parseFieldConfig(context, f)
   ) as FieldConfig[];
-  const compactFields = fields.map(config => ({ compact: true, ...config }));
 
   return {
     cmsRecord,
-    fields: compactFields,
+    fields,
     label,
-    references: filterReferences(compactFields),
+    references: filterReferences(fields),
   };
 }
 
