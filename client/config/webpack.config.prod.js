@@ -151,15 +151,6 @@ module.exports = {
               name: 'static/media/[name].[hash:8].[ext]',
             },
           },
-          // Process JS with Babel.
-          {
-            test: /\.(js|jsx)$/,
-            include: paths.appSrc,
-            loader: require.resolve('babel-loader'),
-            options: {
-              compact: true,
-            },
-          },
           //Compile .tsx?
           {
             test: /\.(ts|tsx)$/,

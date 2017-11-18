@@ -1,6 +1,5 @@
 import './index.css';
 
-import * as Promise from 'bluebird';
 import { createBrowserHistory, History } from 'history';
 import * as yaml from 'js-yaml';
 import * as React from 'react';
