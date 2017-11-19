@@ -16,6 +16,6 @@ const mapStateToProps: MapStateToProps<StateProps, {}> = state => {
   };
 };
 
-export const FrontPage: React.ComponentType = connect(mapStateToProps)(
-  FrontPageImpl
-);
+const FrontPage: React.ComponentType = connect(mapStateToProps)(FrontPageImpl);
+
+export default FrontPage;
