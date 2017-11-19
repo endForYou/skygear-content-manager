@@ -1,4 +1,3 @@
-import { isArray } from 'util';
 import { humanize, isObject, objectFrom } from './util';
 
 export interface CmsConfig {
@@ -599,7 +598,7 @@ function parseAssociationRecord(
     recordName;
 
   const fields = input.fields;
-  if (!isArray(fields)) {
+  if (!Array.isArray(fields)) {
     throw new Error(
       `want association_record.fields to be Array, got ${typeof fields}`
     );
