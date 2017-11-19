@@ -3,14 +3,14 @@ import * as React from 'react';
 import { FieldConfig } from '../cmsConfig';
 import { RequiredFieldProps } from './Field';
 
-interface State {
+export interface BaseStringFieldState {
   value: string;
 }
 
 export class BaseStringField<
   C extends FieldConfig,
   Props extends RequiredFieldProps<C>
-> extends React.PureComponent<Props, State> {
+> extends React.PureComponent<Props, BaseStringFieldState> {
   constructor(props: Props) {
     super(props);
 

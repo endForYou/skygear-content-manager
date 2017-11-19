@@ -12,10 +12,7 @@ interface State {
   value: boolean;
 }
 
-export class BooleanField extends React.PureComponent<
-  BooleanFieldProps,
-  State
-> {
+class BooleanFieldImpl extends React.PureComponent<BooleanFieldProps, State> {
   constructor(props: BooleanFieldProps) {
     super(props);
 
@@ -57,3 +54,7 @@ export class BooleanField extends React.PureComponent<
     }
   };
 }
+
+export const BooleanField: React.ComponentClass<
+  BooleanFieldProps
+> = BooleanFieldImpl;

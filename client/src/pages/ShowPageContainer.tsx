@@ -6,23 +6,21 @@ import { ShowPageConfig } from '../cmsConfig';
 import { RootState } from '../states';
 import { makeShowPage, ShowPageFetcherType } from './ShowPageFetcher';
 
-type PureShowPageContainerProps = Props & DispatchProps;
-
-interface Props {
+export interface ShowPageContainerProps {
   config: ShowPageConfig;
   recordId: string;
 }
+
+type Props = ShowPageContainerProps & DispatchProps;
 
 interface DispatchProps {
   dispatch: Dispatch<RootState>;
 }
 
-class PureShowPageContainer extends React.PureComponent<
-  PureShowPageContainerProps
-> {
+class ShowPageContainerImpl extends React.PureComponent<Props> {
   private showPageFetcher: ShowPageFetcherType;
 
-  constructor(props: PureShowPageContainerProps) {
+  constructor(props: Props) {
     super(props);
 
     const { dispatch, config, recordId } = props;
@@ -42,8 +40,6 @@ function mapDispatchToProps(dispatch: Dispatch<RootState>): DispatchProps {
   };
 }
 
-const ShowPageContainer = connect(undefined, mapDispatchToProps)(
-  PureShowPageContainer
-);
-
-export { ShowPageContainer };
+export const ShowPageContainer: React.ComponentType<
+  ShowPageContainerProps
+> = connect(undefined, mapDispatchToProps)(ShowPageContainerImpl);

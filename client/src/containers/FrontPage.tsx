@@ -6,7 +6,7 @@ interface StateProps {
   user: Record;
 }
 
-const _FrontPage: React.SFC<StateProps> = ({ user }) => {
+const FrontPageImpl: React.SFC<StateProps> = ({ user }) => {
   return <div>My name is {user.username} :D</div>;
 };
 
@@ -16,6 +16,6 @@ const mapStateToProps: MapStateToProps<StateProps, {}> = state => {
   };
 };
 
-const FrontPage = connect(mapStateToProps)(_FrontPage);
-
-export default FrontPage;
+export const FrontPage: React.ComponentType = connect(mapStateToProps)(
+  FrontPageImpl
+);

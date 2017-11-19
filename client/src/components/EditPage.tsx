@@ -44,7 +44,7 @@ interface RecordEffect {
 // tslint:disable-next-line: no-any
 type RecordChangeHandler = (name: string, value: any, effect?: Effect) => void;
 
-export class EditPage extends React.PureComponent<EditPageProps, State> {
+class EditPageImpl extends React.PureComponent<EditPageProps, State> {
   constructor(props: EditPageProps) {
     super(props);
 
@@ -188,3 +188,5 @@ function mergeRecordChange(record: Record, change: RecordChange) {
     record[key] = value;
   });
 }
+
+export const EditPage: React.ComponentClass<EditPageProps> = EditPageImpl;

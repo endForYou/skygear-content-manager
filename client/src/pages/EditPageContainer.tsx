@@ -9,12 +9,12 @@ import { EditPage } from '../components/EditPage';
 import { RootState } from '../states';
 import { Remote, RemoteType } from '../types';
 
-type EditPageContainerProps = OwnProps & StateProps & DispatchProps;
-
-interface OwnProps {
+export interface EditPageContainerProps {
   config: EditPageConfig;
   recordId: string;
 }
+
+type Props = EditPageContainerProps & StateProps & DispatchProps;
 
 interface StateProps {
   remoteRecord: Remote<Record>;
@@ -25,10 +25,10 @@ interface DispatchProps {
   dispatch: Dispatch<RootState>;
 }
 
-class EditPageContainer extends React.PureComponent<EditPageContainerProps> {
+class EditPageContainerImpl extends React.PureComponent<Props> {
   public recordDispatcher: RecordActionDispatcher;
 
-  constructor(props: EditPageContainerProps) {
+  constructor(props: Props) {
     super(props);
 
     this.recordDispatcher = new RecordActionDispatcher(
@@ -69,7 +69,10 @@ class EditPageContainer extends React.PureComponent<EditPageContainerProps> {
   }
 }
 
-function mapStateToProps(state: RootState, ownProps: OwnProps): StateProps {
+function mapStateToProps(
+  state: RootState,
+  ownProps: EditPageContainerProps
+): StateProps {
   const recordName = ownProps.config.cmsRecord.name;
   return {
     remoteRecord: state.recordViewsByName[recordName].edit.remoteRecord,
@@ -82,7 +85,9 @@ function mapDispatchToProps(dispatch: Dispatch<RootState>): DispatchProps {
 }
 
 const ConnectedEditPageContainer = connect(mapStateToProps, mapDispatchToProps)(
-  EditPageContainer
+  EditPageContainerImpl
 );
 
-export { ConnectedEditPageContainer as EditPageContainer };
+export const EditPageContainer: React.ComponentType<
+  EditPageContainerProps
+> = ConnectedEditPageContainer;

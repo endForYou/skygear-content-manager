@@ -19,7 +19,7 @@ export type FieldProps = ChildProps<FieldConfig>;
 export type RequiredFieldProps<C extends FieldConfig> = ChildProps<C>;
 
 // props that pass through from Field to concerte field implementation
-interface ChildProps<C extends FieldConfig> {
+export interface ChildProps<C extends FieldConfig> {
   config: C;
 
   // HTML related attrs

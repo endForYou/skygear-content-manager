@@ -12,10 +12,7 @@ interface State {
   value: number;
 }
 
-export class IntegerField extends React.PureComponent<
-  IntegerFieldProps,
-  State
-> {
+class IntegerFieldImpl extends React.PureComponent<IntegerFieldProps, State> {
   constructor(props: IntegerFieldProps) {
     super(props);
 
@@ -61,3 +58,7 @@ export class IntegerField extends React.PureComponent<
     }
   };
 }
+
+export const IntegerField: React.ComponentClass<
+  IntegerFieldProps
+> = IntegerFieldImpl;

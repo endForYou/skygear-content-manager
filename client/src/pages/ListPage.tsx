@@ -90,7 +90,7 @@ const ListTable: React.SFC<ListTableProps> = ({ fieldConfigs, records }) => {
 
 export type ListPageProps = StateProps & DispatchProps;
 
-interface StateProps {
+export interface StateProps {
   recordName: string;
   pageConfig: ListPageConfig;
   page: number;
@@ -99,11 +99,11 @@ interface StateProps {
   records: Record[];
 }
 
-interface DispatchProps {
+export interface DispatchProps {
   dispatch: Dispatch<RootState>;
 }
 
-class ListPage extends React.PureComponent<ListPageProps> {
+class ListPageImpl extends React.PureComponent<ListPageProps> {
   public recordActionCreator: RecordActionDispatcher;
 
   constructor(props: ListPageProps) {
@@ -213,7 +213,9 @@ function ListPageFactory(recordName: string) {
     return { dispatch };
   }
 
-  return connect(mapStateToProps, mapDispatchToProps)(ListPage);
+  return connect(mapStateToProps, mapDispatchToProps)(ListPageImpl);
 }
 
-export { ListPage, ListPageFactory };
+export const ListPage: React.ComponentClass<ListPageProps> = ListPageImpl;
+
+export { ListPageFactory };

@@ -34,7 +34,7 @@ function TargetOption(label: string, value: string): TargetOption {
 type StringSelectAsyncCtor<T> = new () => SelectAsync<T>;
 const StringSelectAsync = SelectAsync as StringSelectAsyncCtor<string>;
 
-export class AssociationRecordSelect extends React.PureComponent<
+class AssociationRecordSelectImpl extends React.PureComponent<
   AssociationRecordSelectProps,
   State
 > {
@@ -221,3 +221,7 @@ function optionToTargetOption(opt: Option<string>): TargetOption {
     value: opt.value,
   };
 }
+
+export const AssociationRecordSelect: React.ComponentClass<
+  AssociationRecordSelectProps
+> = AssociationRecordSelectImpl;

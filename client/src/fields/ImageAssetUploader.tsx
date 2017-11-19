@@ -6,7 +6,7 @@ import { ImageAssetFieldConfig } from '../cmsConfig';
 import { RequiredFieldProps } from './Field';
 import './ImageAssetUploader.css';
 
-type ImageAssetUploaderProps = RequiredFieldProps<ImageAssetFieldConfig>;
+export type ImageAssetUploaderProps = RequiredFieldProps<ImageAssetFieldConfig>;
 
 interface State {
   value?: Asset;
@@ -51,7 +51,7 @@ const DropArea: React.SFC<State> = props => {
   return <Image url={value.url} />;
 };
 
-export class ImageAssetUploader extends React.PureComponent<
+class ImageAssetUploaderImpl extends React.PureComponent<
   ImageAssetUploaderProps,
   State
 > {
@@ -127,3 +127,7 @@ function fileToAsset(file: File): Asset {
     name: file.name,
   });
 }
+
+export const ImageAssetUploader: React.ComponentClass<
+  ImageAssetUploaderProps
+> = ImageAssetUploaderImpl;

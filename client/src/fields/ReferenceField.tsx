@@ -30,7 +30,7 @@ interface RefOption {
 type StringSelectAsyncCtor<T> = new () => SelectAsync<T>;
 const StringSelectAsync = SelectAsync as StringSelectAsyncCtor<string>;
 
-export class ReferenceField extends React.PureComponent<
+class ReferenceFieldImpl extends React.PureComponent<
   ReferenceFieldProps,
   State
 > {
@@ -162,3 +162,7 @@ function recordToOption(r: Record, fieldName: string): Option<string> {
     value: r._id,
   };
 }
+
+export const ReferenceField: React.ComponentClass<
+  ReferenceFieldProps
+> = ReferenceFieldImpl;

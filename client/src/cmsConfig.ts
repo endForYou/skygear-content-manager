@@ -90,7 +90,8 @@ export enum FieldConfigTypes {
   AssociationReference = 'AssociationReference',
   ImageAsset = 'ImageAsset',
 }
-interface FieldConfigAttrs {
+
+export interface FieldConfigAttrs {
   name: string;
   label: string;
 

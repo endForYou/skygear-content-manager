@@ -17,10 +17,7 @@ const DATE_FORMAT = 'YYYY-MM-DD';
 const TIME_FORMAT = 'HH:mm:ss[Z]';
 const DATETIME_FORMAT = 'YYYY-MM-DD HH:mm:ss[Z]';
 
-export class DateTimeField extends React.PureComponent<
-  DateTimeFieldProps,
-  State
-> {
+class DateTimeFieldImpl extends React.PureComponent<DateTimeFieldProps, State> {
   constructor(props: DateTimeFieldProps) {
     super(props);
 
@@ -81,3 +78,7 @@ export class DateTimeField extends React.PureComponent<
     }
   };
 }
+
+export const DateTimeField: React.ComponentClass<
+  DateTimeFieldProps
+> = DateTimeFieldImpl;
