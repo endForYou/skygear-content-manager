@@ -372,8 +372,8 @@ INDEX_HTML_FORMAT = """<!doctype html>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="theme-color" content="#000000">
-    <link rel="manifest" href="{CMS_SKYGEAR_ENDPOINT}cms-static/manifest.json">
-    <link rel="stylesheet" href="{CMS_SKYGEAR_ENDPOINT}cms-static/css/bootstrap.min.css">
+    <link rel="manifest" href="{CMS_SKYGEAR_ENDPOINT}static/manifest.json">
+    <link rel="stylesheet" href="{CMS_SKYGEAR_ENDPOINT}static/css/bootstrap.min.css">
     <link rel="stylesheet" href="{CMS_CSS_URL}">
     <title>{CMS_SITE_TITLE}</title>
   </head>
