@@ -4,6 +4,8 @@ import os
 from jose import JWTError, jwt
 import requests
 import skygear
+from skygear import static_assets
+from skygear.utils.assets import directory_assets
 
 
 CMS_SKYGEAR_ENDPOINT = \
@@ -13,6 +15,17 @@ CMS_SKYGEAR_MASTER_KEY = \
 
 CMS_USER_PERMITTED_ROLE = os.environ.get('CMS_USER_PERMITTED_ROLE', 'Admin')
 CMS_AUTH_SECRET = os.environ.get('CMS_AUTH_SECRET', 'FAKE_AUTH_SECRET')
+
+# cms index params
+
+CMS_CSS_URL = \
+    os.environ.get('CMS_CSS_URL', '')
+CMS_JS_URL = \
+    os.environ.get('CMS_JS_URL', '')
+CMS_SITE_TITLE = \
+    os.environ.get('REACT_APP_PUBLIC_URL', 'Skygear CMS')
+
+# other constants
 
 REQUEST_HEADER_BLACKLIST = [
     'Host',
@@ -25,7 +38,21 @@ RESPONSE_HEADER_BLACKLIST = [
 ]
 
 
-@skygear.handler('cms/api/')
+@skygear.handler('cms/')
+def index(request):
+    context = {
+        'CMS_SKYGEAR_ENDPOINT': CMS_SKYGEAR_ENDPOINT,
+        'CMS_CSS_URL': CMS_CSS_URL,
+        'CMS_JS_URL': CMS_JS_URL,
+        'CMS_SITE_TITLE': CMS_SITE_TITLE,
+    }
+    return skygear.Response(
+        INDEX_HTML_FORMAT.format(**context),
+        content_type='text/html',
+    )
+
+
+@skygear.handler('cms-api/')
 def api(request):
     # log_request(request)
 
@@ -52,6 +79,11 @@ def api(request):
 
     req.is_master = True
     return request_skygear(req).to_werkzeug()
+
+
+@static_assets('cms-static')
+def hello_world():
+    return directory_assets('files')
 
 
 class SkygearRequest:
@@ -330,3 +362,25 @@ def get_roles(json_body):
         return None
 
     return roles
+
+
+INDEX_HTML_FORMAT = """<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="theme-color" content="#000000">
+    <link rel="manifest" href="{CMS_SKYGEAR_ENDPOINT}cms-static/manifest.json">
+    <link rel="stylesheet" href="{CMS_SKYGEAR_ENDPOINT}cms-static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{CMS_CSS_URL}">
+    <title>{CMS_SITE_TITLE}</title>
+  </head>
+  <body>
+    <noscript>
+      You need to enable JavaScript to run this app.
+    </noscript>
+    <div id="root"></div>
+    <script type="text/javascript" src="{CMS_JS_URL}"></script>
+  </body>
+</html>
+"""
