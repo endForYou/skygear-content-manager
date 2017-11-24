@@ -16,7 +16,6 @@ import { CmsConfig, parseCmsConfig } from './cmsConfig';
 import { AppConfig, configFromEnv } from './config';
 import { App } from './containers/App';
 import rootReducerFactory from './reducers';
-import registerServiceWorker from './registerServiceWorker';
 import { initialRootState, RootState } from './states';
 import { getPath, isObject } from './util';
 
@@ -115,7 +114,5 @@ function fetchCmsConfig(config: AppConfig) {
       }
     });
 }
-
-registerServiceWorker();
 
 main();
