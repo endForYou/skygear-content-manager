@@ -14,7 +14,10 @@ CMS_SKYGEAR_MASTER_KEY = \
 CMS_USER_PERMITTED_ROLE = os.environ.get('CMS_USER_PERMITTED_ROLE', 'Admin')
 CMS_AUTH_SECRET = os.environ.get('CMS_AUTH_SECRET', 'FAKE_AUTH_SECRET')
 
-HEADER_BLACKLIST = [
+REQUEST_HEADER_BLACKLIST = [
+    'Host',
+]
+RESPONSE_HEADER_BLACKLIST = [
     'Access-Control-Allow-Credentials',
     'Access-Control-Allow-Origin',
     'Content-Encoding',
@@ -93,7 +96,11 @@ class SkygearRequest:
         method = self.method
         # TODO: should clone body here
         body = self.body
-        headers = self.headers.copy()
+        headers = {
+            k: v
+            for k, v in self.headers.items()
+            if k not in REQUEST_HEADER_BLACKLIST
+        }
 
         if self.is_master:
             if body.is_dict:
@@ -171,7 +178,7 @@ class SkygearResponse:
         filtered_headers = [
             (k, v)
             for k, v in self.headers.items()
-            if k not in HEADER_BLACKLIST
+            if k not in RESPONSE_HEADER_BLACKLIST
         ]
 
         return skygear.Response(
