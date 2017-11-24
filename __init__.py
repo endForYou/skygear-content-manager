@@ -12,6 +12,8 @@ CMS_SKYGEAR_ENDPOINT = \
     os.environ.get('CMS_SKYGEAR_ENDPOINT', 'http://localhost:3000/')
 CMS_SKYGEAR_MASTER_KEY = \
     os.environ.get('CMS_SKYGEAR_MASTER_KEY', 'FAKE_MASTER_KEY')
+CMS_STATIC_ASSETS_PATH = \
+    os.environ.get('CMS_STATIC_ASSETS_PATH', 'files')
 
 CMS_USER_PERMITTED_ROLE = os.environ.get('CMS_USER_PERMITTED_ROLE', 'Admin')
 CMS_AUTH_SECRET = os.environ.get('CMS_AUTH_SECRET', 'FAKE_AUTH_SECRET')
@@ -83,7 +85,7 @@ def api(request):
 
 @static_assets('cms-static')
 def hello_world():
-    return directory_assets('files')
+    return directory_assets(CMS_STATIC_ASSETS_PATH)
 
 
 class SkygearRequest:
