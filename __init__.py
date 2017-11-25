@@ -12,20 +12,23 @@ CMS_SKYGEAR_ENDPOINT = \
     os.environ.get('CMS_SKYGEAR_ENDPOINT', 'http://localhost:3000/')
 CMS_SKYGEAR_MASTER_KEY = \
     os.environ.get('CMS_SKYGEAR_MASTER_KEY', 'FAKE_MASTER_KEY')
-CMS_STATIC_ASSETS_PATH = \
-    os.environ.get('CMS_STATIC_ASSETS_PATH', 'files')
 
 CMS_USER_PERMITTED_ROLE = os.environ.get('CMS_USER_PERMITTED_ROLE', 'Admin')
 CMS_AUTH_SECRET = os.environ.get('CMS_AUTH_SECRET', 'FAKE_AUTH_SECRET')
 
 # cms index params
 
+CMS_STATIC_URL = \
+    os.environ.get('CMS_STATIC_URL', 'http://localhost:3001/static/')
+CMS_SITE_TITLE = \
+    os.environ.get('CMS_SITE_TITLE', 'Skygear CMS')
+
+# generated css / js bundle URLs
+
 CMS_CSS_URL = \
     os.environ.get('CMS_CSS_URL', '')
 CMS_JS_URL = \
-    os.environ.get('CMS_JS_URL', '')
-CMS_SITE_TITLE = \
-    os.environ.get('REACT_APP_PUBLIC_URL', 'Skygear CMS')
+    os.environ.get('CMS_JS_URL', 'http://localhost:3001/static/js/bundle.js')
 
 # other constants
 
@@ -47,6 +50,7 @@ def index(request):
         'CMS_CSS_URL': CMS_CSS_URL,
         'CMS_JS_URL': CMS_JS_URL,
         'CMS_SITE_TITLE': CMS_SITE_TITLE,
+        'CMS_STATIC_URL': CMS_STATIC_URL,
     }
     return skygear.Response(
         INDEX_HTML_FORMAT.format(**context),
@@ -81,11 +85,6 @@ def api(request):
 
     req.is_master = True
     return request_skygear(req).to_werkzeug()
-
-
-@static_assets('cms-static')
-def hello_world():
-    return directory_assets(CMS_STATIC_ASSETS_PATH)
 
 
 class SkygearRequest:
@@ -372,8 +371,8 @@ INDEX_HTML_FORMAT = """<!doctype html>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="theme-color" content="#000000">
-    <link rel="manifest" href="{CMS_SKYGEAR_ENDPOINT}static/manifest.json">
-    <link rel="stylesheet" href="{CMS_SKYGEAR_ENDPOINT}static/css/bootstrap.min.css">
+    <link rel="manifest" href="{CMS_STATIC_URL}manifest.json">
+    <link rel="stylesheet" href="{CMS_STATIC_URL}css/bootstrap.min.css">
     <link rel="stylesheet" href="{CMS_CSS_URL}">
     <title>{CMS_SITE_TITLE}</title>
   </head>

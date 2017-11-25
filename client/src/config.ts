@@ -11,6 +11,7 @@ export function configFromEnv(): AppConfig {
     publicUrl: process.env.PUBLIC_URL || '.',
     skygearApiKey: process.env.REACT_APP_SKYGEAR_API_KEY || 'FAKE_API_KEY',
     skygearEndpoint:
-      process.env.REACT_APP_SKYGEAR_ENDPOINT || 'http://localhost:3000',
+      process.env.REACT_APP_SKYGEAR_ENDPOINT ||
+      'http://localhost:3000/cms-api/',
   };
 }
