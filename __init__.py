@@ -80,6 +80,10 @@ def api(request):
 
     req.access_token = authdata.skygear_token
 
+    if req.body.is_dict:
+        if req.body.data.get('action') == 'me':
+            return intercept_me(req).to_werkzeug()
+
     if not authdata.is_admin:
         return request_skygear(req).to_werkzeug()
 
@@ -340,6 +344,27 @@ def intercept_asset_put(req):
 
     resp.body.data['result']['post-request']['action'] = \
         CMS_SKYGEAR_ENDPOINT + action_url[1:]
+
+    return resp
+
+
+def intercept_me(req):
+    resp = request_skygear(req)
+
+    if not (200 <= resp.status_code <= 299):
+        return resp
+
+    # unknown resp structure
+    if not resp.body.is_dict:
+        return SkygearResponse.forbidden()
+
+    if not can_access_cms(resp):
+        return SkygearResponse.forbidden()
+
+    resp.access_token = AuthData(
+        is_admin=True,
+        skygear_token=resp.access_token,
+    ).to_cms_token()
 
     return resp
 
