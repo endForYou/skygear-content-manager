@@ -76,7 +76,7 @@ def api(request):
 
     authdata = AuthData.from_cms_token(cms_access_token)
     if not authdata:
-        return request_skygear(req).to_werkzeug()
+        return SkygearResponse.forbidden().to_werkzeug()
 
     req.access_token = authdata.skygear_token
 
