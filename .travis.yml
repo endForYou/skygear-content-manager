@@ -8,7 +8,7 @@ script:
   - pushd .
   - cd client
   - npm install
-  - node_modules/.bin/prettier --list-different "src/**/*.js"
+  - node_modules/.bin/prettier --list-different "src/**/*.ts*"
   - npm run lint
   - CI=1 npm run test
   - popd
