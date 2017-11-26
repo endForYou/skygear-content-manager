@@ -2,7 +2,7 @@ set -ex
 
 cd client
 
-npm install --production
+npm install
 npm run build
 
 cd ..
