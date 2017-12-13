@@ -42,6 +42,7 @@ export interface RecordConfig {
   list?: ListPageConfig;
   show?: ShowPageConfig;
   edit?: EditPageConfig;
+  new?: EditPageConfig;
 }
 
 export interface ListPageConfig {
@@ -257,6 +258,8 @@ function parseRecordConfig(
       edit == null ? undefined : parseEditPageConfig(context, cmsRecord, edit),
     list:
       list == null ? undefined : parseListPageConfig(context, cmsRecord, list),
+    new:
+      edit == null ? undefined : parseEditPageConfig(context, cmsRecord, edit),
     show:
       show == null ? undefined : parseShowPageConfig(context, cmsRecord, show),
   };

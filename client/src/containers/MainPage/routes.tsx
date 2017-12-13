@@ -8,6 +8,7 @@ import {
   ShowPageConfig,
 } from '../../cmsConfig';
 import { EditPageContainer } from '../../pages/EditPageContainer';
+import { NewPageContainer } from '../../pages/NewPageContainer';
 import { ListPageFactory } from '../../pages/ListPage';
 import { ShowPageContainer } from '../../pages/ShowPageContainer';
 
@@ -23,6 +24,9 @@ function routesFromRecordConfig(config: RecordConfig): JSX.Element[] {
   const routes: JSX.Element[] = [];
   if (config.list) {
     routes.push(makeListRoute(config.list));
+  }
+  if (config.new) {
+    routes.push(makeNewRoute(config.new));
   }
   if (config.show) {
     routes.push(makeShowRoute(config.show));
@@ -74,6 +78,22 @@ function makeEditRoute(config: EditPageConfig): JSX.Element {
         <EditPageContainer
           config={config}
           recordId={routeProps.match.params.recordId}
+        />
+      )}
+    />
+  );
+}
+
+function makeNewRoute(config: EditPageConfig): JSX.Element {
+  const recordName = config.cmsRecord.name;
+  return (
+    <Route
+      key={`${recordName}-new`}
+      exact={true}
+      path={`/record/${recordName}/new`}
+      render={routeProps => (
+        <NewPageContainer
+          config={config}
         />
       )}
     />
