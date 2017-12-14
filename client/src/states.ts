@@ -46,7 +46,6 @@ export interface EditState {
 }
 
 export interface NewState {
-  remoteRecord: Remote<Record>;
   savingRecord?: Remote<Record>;
 }
 
@@ -68,7 +67,6 @@ export const initialEditState: EditState = {
 };
 
 export const initialNewState: NewState = {
-  remoteRecord: RemoteLoading,
   savingRecord: undefined,
 };
 

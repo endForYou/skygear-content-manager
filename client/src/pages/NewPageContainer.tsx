@@ -4,20 +4,21 @@ import { Dispatch } from 'redux';
 import { Record } from 'skygear';
 
 import { RecordActionDispatcher } from '../actions/record';
-import { NewPage } from '../components/NewPage';
+// import { NewPage } from '../components/NewPage';
+import { EditPage } from '../components/EditPage';
 import { EditPageConfig } from '../cmsConfig';
 import { RootState } from '../states';
 import { Remote } from '../types';
-// import { Remote, RemoteType } from '../types';
 
 export interface NewPageContainerProps {
   config: EditPageConfig;
 }
 
 type Props = NewPageContainerProps & StateProps & DispatchProps;
+// type Props = NewPageContainerProps & DispatchProps;
 
 interface StateProps {
-  remoteRecord: Remote<Record>;
+  // record?: Record;
   savingRecord?: Remote<Record>;
 }
 
@@ -27,6 +28,7 @@ interface DispatchProps {
 
 class NewPageContainerImpl extends React.PureComponent<Props> {
   public recordDispatcher: RecordActionDispatcher;
+  public newRecord: Record;
 
   constructor(props: Props) {
     super(props);
@@ -36,14 +38,21 @@ class NewPageContainerImpl extends React.PureComponent<Props> {
       props.config.cmsRecord,
       props.config.references
     );
+
+    this.newRecord = new (Record.extend(props.config.cmsRecord.name))();
+    console.log(this.newRecord);
+
+    console.log('constructing...');
+    console.log(props.config);
   }
 
   public render() {
     return (
-      <NewPage
+      <EditPage
         config={this.props.config}
         dispatch={this.props.dispatch}
         recordDispatcher={this.recordDispatcher}
+        record={this.newRecord}
         savingRecord={this.props.savingRecord}
       />
     );
@@ -56,7 +65,7 @@ function mapStateToProps(
 ): StateProps {
   const recordName = ownProps.config.cmsRecord.name;
   return {
-    remoteRecord: state.recordViewsByName[recordName].new.remoteRecord,
+    // record: state.recordViewsByName[recordName].new.record,
     savingRecord: state.recordViewsByName[recordName].new.savingRecord,
   };
 }
