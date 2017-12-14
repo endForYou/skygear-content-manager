@@ -15,10 +15,8 @@ export interface NewPageContainerProps {
 }
 
 type Props = NewPageContainerProps & StateProps & DispatchProps;
-// type Props = NewPageContainerProps & DispatchProps;
 
 interface StateProps {
-  // record?: Record;
   savingRecord?: Remote<Record>;
 }
 
@@ -65,7 +63,6 @@ function mapStateToProps(
 ): StateProps {
   const recordName = ownProps.config.cmsRecord.name;
   return {
-    // record: state.recordViewsByName[recordName].new.record,
     savingRecord: state.recordViewsByName[recordName].new.savingRecord,
   };
 }

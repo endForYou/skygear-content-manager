@@ -6,6 +6,8 @@ import { RecordActionTypes } from '../actions/record';
 import {
   EditState,
   initialEditState,
+  NewState,
+  initialNewState,
   initialListState,
   initialRecordViewState,
   initialShowState,
@@ -23,6 +25,7 @@ const recordViewsReducer = combineReducers<RecordViewState>({
   edit: recordEditReducer as Reducer<any>,
   list: recordListReducer as Reducer<any>,
   show: recordShowReducer as Reducer<any>,
+  new: recordNewReducer as Reducer<any>,
 });
 // tslint:enable: no-any
 
@@ -124,6 +127,31 @@ function recordEditReducer(
       return {
         ...state,
         remoteRecord: RemoteSuccess(action.payload.record),
+        savingRecord: RemoteSuccess(action.payload.record),
+      };
+    case RecordActionTypes.SaveFailure:
+      return {
+        ...state,
+        savingRecord: RemoteFailure(action.payload.error),
+      };
+    default:
+      return state;
+  }
+}
+
+function recordNewReducer(
+  state: NewState = initialNewState,
+  action: Actions
+): NewState {
+  switch (action.type) {
+    case RecordActionTypes.SaveRequest:
+      return {
+        ...state,
+        savingRecord: RemoteLoading,
+      };
+    case RecordActionTypes.SaveSuccess:
+      return {
+        ...state,
         savingRecord: RemoteSuccess(action.payload.record),
       };
     case RecordActionTypes.SaveFailure:
