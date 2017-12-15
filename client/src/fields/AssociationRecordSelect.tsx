@@ -41,7 +41,7 @@ class AssociationRecordSelectImpl extends React.PureComponent<
   // return the association records from props
   get assoRecords(): Record[] {
     const { config, context } = this.props;
-    return context.record.$transient[`${config.name}Associations`];
+    return context.record.$transient[`${config.name}Associations`] || [];
   }
 
   get targets(): Record[] {
