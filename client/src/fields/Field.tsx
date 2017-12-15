@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Record } from 'skygear';
 
 import { FieldConfig, FieldConfigTypes } from '../cmsConfig';
-import { Effect } from '../components/EditPage';
+import { Effect } from '../components/RecordFormPage';
 
 import { AssociationReferenceField } from './AssociationReferenceField';
 import { BooleanField } from './BooleanField';

@@ -4,8 +4,7 @@ import { Dispatch } from 'redux';
 import { Record } from 'skygear';
 
 import { RecordActionDispatcher } from '../actions/record';
-// import { NewPage } from '../components/NewPage';
-import { EditPage } from '../components/EditPage';
+import { RecordFormPage } from '../components/RecordFormPage';
 import { EditPageConfig } from '../cmsConfig';
 import { RootState } from '../states';
 import { Remote } from '../types';
@@ -46,7 +45,7 @@ class NewPageContainerImpl extends React.PureComponent<Props> {
 
   public render() {
     return (
-      <EditPage
+      <RecordFormPage
         config={this.props.config}
         dispatch={this.props.dispatch}
         recordDispatcher={this.recordDispatcher}

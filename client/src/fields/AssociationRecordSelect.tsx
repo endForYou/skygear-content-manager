@@ -8,7 +8,7 @@ import {
 import skygear, { Query, Record, Reference } from 'skygear';
 
 import { AssociationReferenceFieldConfig } from '../cmsConfig';
-import { Effect } from '../components/EditPage';
+import { Effect } from '../components/RecordFormPage';
 import { deleteRecordsProperly, parseReference } from '../recordUtil';
 import { debouncePromise1, makeArray, objectFrom } from '../util';
 

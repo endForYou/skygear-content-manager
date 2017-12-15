@@ -10,7 +10,7 @@ import { errorMessageFromError } from '../recordUtil';
 import { RootState } from '../states';
 import { Remote, RemoteType } from '../types';
 
-export interface EditPageProps {
+export interface RecordFormPageProps {
   config: EditPageConfig;
   dispatch: Dispatch<RootState>;
   record: Record;
@@ -44,8 +44,8 @@ interface RecordEffect {
 // tslint:disable-next-line: no-any
 type RecordChangeHandler = (name: string, value: any, effect?: Effect) => void;
 
-class EditPageImpl extends React.PureComponent<EditPageProps, State> {
-  constructor(props: EditPageProps) {
+class RecordFormPageImpl extends React.PureComponent<RecordFormPageProps, State> {
+  constructor(props: RecordFormPageProps) {
     super(props);
 
     this.state = {
@@ -189,4 +189,4 @@ function mergeRecordChange(record: Record, change: RecordChange) {
   });
 }
 
-export const EditPage: React.ComponentClass<EditPageProps> = EditPageImpl;
+export const RecordFormPage: React.ComponentClass<RecordFormPageProps> = RecordFormPageImpl;
