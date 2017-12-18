@@ -37,10 +37,6 @@ class NewPageContainerImpl extends React.PureComponent<Props> {
     );
 
     this.newRecord = new (Record.extend(props.config.cmsRecord.name))();
-    console.log(this.newRecord);
-
-    console.log('constructing...');
-    console.log(props.config);
   }
 
   public render() {
