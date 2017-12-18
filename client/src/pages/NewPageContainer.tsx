@@ -5,12 +5,12 @@ import { Record } from 'skygear';
 
 import { RecordActionDispatcher } from '../actions/record';
 import { RecordFormPage } from '../components/RecordFormPage';
-import { EditPageConfig } from '../cmsConfig';
+import { RecordFormPageConfig } from '../cmsConfig';
 import { RootState } from '../states';
 import { Remote } from '../types';
 
 export interface NewPageContainerProps {
-  config: EditPageConfig;
+  config: RecordFormPageConfig;
 }
 
 type Props = NewPageContainerProps & StateProps & DispatchProps;

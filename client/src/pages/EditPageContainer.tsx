@@ -4,13 +4,13 @@ import { Dispatch } from 'redux';
 import { Record } from 'skygear';
 
 import { RecordActionDispatcher } from '../actions/record';
-import { EditPageConfig } from '../cmsConfig';
+import { RecordFormPageConfig } from '../cmsConfig';
 import { RecordFormPage } from '../components/RecordFormPage';
 import { RootState } from '../states';
 import { Remote, RemoteType } from '../types';
 
 export interface EditPageContainerProps {
-  config: EditPageConfig;
+  config: RecordFormPageConfig;
   recordId: string;
 }
 

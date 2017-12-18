@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Route } from 'react-router';
 
 import {
-  EditPageConfig,
+  RecordFormPageConfig,
   ListPageConfig,
   RecordConfig,
   ShowPageConfig,
@@ -67,7 +67,7 @@ function makeShowRoute(config: ShowPageConfig): JSX.Element {
   );
 }
 
-function makeEditRoute(config: EditPageConfig): JSX.Element {
+function makeEditRoute(config: RecordFormPageConfig): JSX.Element {
   const recordName = config.cmsRecord.name;
   return (
     <Route
@@ -84,7 +84,7 @@ function makeEditRoute(config: EditPageConfig): JSX.Element {
   );
 }
 
-function makeNewRoute(config: EditPageConfig): JSX.Element {
+function makeNewRoute(config: RecordFormPageConfig): JSX.Element {
   const recordName = config.cmsRecord.name;
   return (
     <Route

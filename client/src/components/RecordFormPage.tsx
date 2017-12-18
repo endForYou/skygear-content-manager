@@ -4,14 +4,14 @@ import { push } from 'react-router-redux';
 import { Record } from 'skygear';
 
 import { RecordActionDispatcher } from '../actions/record';
-import { EditPageConfig, FieldConfig } from '../cmsConfig';
+import { RecordFormPageConfig, FieldConfig } from '../cmsConfig';
 import { Field, FieldContext } from '../fields';
 import { errorMessageFromError } from '../recordUtil';
 import { RootState } from '../states';
 import { Remote, RemoteType } from '../types';
 
 export interface RecordFormPageProps {
-  config: EditPageConfig;
+  config: RecordFormPageConfig;
   dispatch: Dispatch<RootState>;
   record: Record;
   savingRecord?: Remote<Record>;
