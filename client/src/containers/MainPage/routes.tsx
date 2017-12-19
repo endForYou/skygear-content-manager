@@ -2,14 +2,14 @@ import * as React from 'react';
 import { Route } from 'react-router';
 
 import {
-  RecordFormPageConfig,
   ListPageConfig,
   RecordConfig,
+  RecordFormPageConfig,
   ShowPageConfig,
 } from '../../cmsConfig';
 import { EditPageContainer } from '../../pages/EditPageContainer';
-import { NewPageContainer } from '../../pages/NewPageContainer';
 import { ListPageFactory } from '../../pages/ListPage';
+import { NewPageContainer } from '../../pages/NewPageContainer';
 import { ShowPageContainer } from '../../pages/ShowPageContainer';
 
 export function routesFromRecordConfigs(

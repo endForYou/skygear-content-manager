@@ -73,8 +73,8 @@ export const initialNewState: NewState = {
 export const initialRecordViewState: RecordViewState = {
   edit: initialEditState,
   list: initialListState,
-  show: initialShowState,
   new: initialNewState,
+  show: initialShowState,
 };
 
 export function initialRootState(

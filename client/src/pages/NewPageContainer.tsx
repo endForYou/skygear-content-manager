@@ -4,8 +4,8 @@ import { Dispatch } from 'redux';
 import { Record } from 'skygear';
 
 import { RecordActionDispatcher } from '../actions/record';
-import { RecordFormPage } from '../components/RecordFormPage';
 import { RecordFormPageConfig } from '../cmsConfig';
+import { RecordFormPage } from '../components/RecordFormPage';
 import { RootState } from '../states';
 import { Remote } from '../types';
 

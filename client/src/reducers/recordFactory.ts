@@ -6,12 +6,12 @@ import { RecordActionTypes } from '../actions/record';
 import {
   EditState,
   initialEditState,
-  NewState,
-  initialNewState,
   initialListState,
+  initialNewState,
   initialRecordViewState,
   initialShowState,
   ListState,
+  NewState,
   RecordViewsByName,
   RecordViewState,
   ShowState,
@@ -24,8 +24,8 @@ import { RemoteFailure, RemoteLoading, RemoteSuccess } from '../types';
 const recordViewsReducer = combineReducers<RecordViewState>({
   edit: recordEditReducer as Reducer<any>,
   list: recordListReducer as Reducer<any>,
-  show: recordShowReducer as Reducer<any>,
   new: recordNewReducer as Reducer<any>,
+  show: recordShowReducer as Reducer<any>,
 });
 // tslint:enable: no-any
 

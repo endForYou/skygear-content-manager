@@ -4,7 +4,7 @@ import { push } from 'react-router-redux';
 import { Record } from 'skygear';
 
 import { RecordActionDispatcher } from '../actions/record';
-import { RecordFormPageConfig, FieldConfig } from '../cmsConfig';
+import { FieldConfig, RecordFormPageConfig } from '../cmsConfig';
 import { Field, FieldContext } from '../fields';
 import { errorMessageFromError } from '../recordUtil';
 import { RootState } from '../states';

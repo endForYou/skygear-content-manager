@@ -326,7 +326,7 @@ function parseShowPageConfig(
 function parseRecordFormPageConfig(
   context: ConfigContext,
   cmsRecord: CmsRecord,
-  configType: String,
+  configType: string,
   // tslint:disable-next-line: no-any
   input: any
 ): RecordFormPageConfig {
