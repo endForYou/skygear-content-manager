@@ -257,13 +257,15 @@ function parseRecordConfig(
   return {
     cmsRecord,
     edit:
-      edit == null ? undefined : parseEditPageConfig(context, cmsRecord, edit),
+      edit == null
+        ? undefined
+        : parseRecordFormPageConfig(context, cmsRecord, 'Edit', edit),
     list:
       list == null ? undefined : parseListPageConfig(context, cmsRecord, list),
     new:
       newConfig == null
         ? undefined
-        : parseNewPageConfig(context, cmsRecord, newConfig),
+        : parseRecordFormPageConfig(context, cmsRecord, 'New', newConfig),
     show:
       show == null ? undefined : parseShowPageConfig(context, cmsRecord, show),
   };
@@ -333,14 +335,14 @@ function parseRecordFormPageConfig(
   input: any
 ): RecordFormPageConfig {
   if (!Array.isArray(input.fields)) {
-    throw new Error(`${configType}.fields must be an Array`);
+    throw new Error(`RecordFormPageConfig.fields must be an Array`);
   }
 
   const label =
-    parseOptionalString(input, 'label', 'Edit') || humanize(cmsRecord.name);
+    parseOptionalString(input, 'label', configType) || humanize(cmsRecord.name);
 
   if (typeof input.label !== 'string' && typeof input.label !== 'undefined') {
-    throw new Error(`${configType}.label must be a string`);
+    throw new Error(`RecordFormPageConfig.label must be a string`);
   }
 
   // tslint:disable-next-line: no-any
@@ -355,24 +357,6 @@ function parseRecordFormPageConfig(
     label,
     references: filterReferences(fields),
   };
-}
-
-function parseEditPageConfig(
-  context: ConfigContext,
-  cmsRecord: CmsRecord,
-  // tslint:disable-next-line: no-any
-  input: any
-): RecordFormPageConfig {
-  return parseRecordFormPageConfig(context, cmsRecord, 'EditPageConfig', input);
-}
-
-function parseNewPageConfig(
-  context: ConfigContext,
-  cmsRecord: CmsRecord,
-  // tslint:disable-next-line: no-any
-  input: any
-): RecordFormPageConfig {
-  return parseRecordFormPageConfig(context, cmsRecord, 'NewPageConfig', input);
 }
 
 // tslint:disable-next-line: no-any
