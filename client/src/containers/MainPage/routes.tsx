@@ -10,6 +10,7 @@ import {
 import { EditPageContainer } from '../../pages/EditPageContainer';
 import { ListPageFactory } from '../../pages/ListPage';
 import { NewPageContainer } from '../../pages/NewPageContainer';
+import { NotificationPage } from '../../notifications/NotificationPage';
 import { ShowPageContainer } from '../../pages/ShowPageContainer';
 
 export function routesFromRecordConfigs(
@@ -34,6 +35,7 @@ function routesFromRecordConfig(config: RecordConfig): JSX.Element[] {
   if (config.edit) {
     routes.push(makeEditRoute(config.edit));
   }
+  routes.push(makeNotificationRoute());
 
   return routes;
 }
@@ -92,6 +94,19 @@ function makeNewRoute(config: RecordFormPageConfig): JSX.Element {
       exact={true}
       path={`/records/${recordName}/new`}
       render={routeProps => <NewPageContainer config={config} />}
+    />
+  );
+}
+
+function makeNotificationRoute(): JSX.Element {
+  return (
+    <Route
+      key={`notification`}
+      exact={true}
+      path={`/notification`}
+      render={routeProps => (
+        <NotificationPage config={''}/>
+      )}
     />
   );
 }
