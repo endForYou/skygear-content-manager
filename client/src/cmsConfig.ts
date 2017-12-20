@@ -261,7 +261,9 @@ function parseRecordConfig(
     list:
       list == null ? undefined : parseListPageConfig(context, cmsRecord, list),
     new:
-      newConfig == null ? undefined : parseNewPageConfig(context, cmsRecord, newConfig),
+      newConfig == null
+        ? undefined
+        : parseNewPageConfig(context, cmsRecord, newConfig),
     show:
       show == null ? undefined : parseShowPageConfig(context, cmsRecord, show),
   };

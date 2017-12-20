@@ -138,7 +138,10 @@ class ListPageImpl extends React.PureComponent<ListPageProps> {
       <div>
         <div>
           <h1 className="display-4 d-inline-block">{pageConfig.label}</h1>
-          <Link className="btn btn-light float-right" to={`/record/${recordName}/new`}>
+          <Link
+            className="btn btn-light float-right"
+            to={`/record/${recordName}/new`}
+          >
             New
           </Link>
         </div>

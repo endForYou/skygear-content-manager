@@ -44,7 +44,10 @@ interface RecordEffect {
 // tslint:disable-next-line: no-any
 type RecordChangeHandler = (name: string, value: any, effect?: Effect) => void;
 
-class RecordFormPageImpl extends React.PureComponent<RecordFormPageProps, State> {
+class RecordFormPageImpl extends React.PureComponent<
+  RecordFormPageProps,
+  State
+> {
   constructor(props: RecordFormPageProps) {
     super(props);
 
@@ -189,4 +192,6 @@ function mergeRecordChange(record: Record, change: RecordChange) {
   });
 }
 
-export const RecordFormPage: React.ComponentClass<RecordFormPageProps> = RecordFormPageImpl;
+export const RecordFormPage: React.ComponentClass<
+  RecordFormPageProps
+> = RecordFormPageImpl;

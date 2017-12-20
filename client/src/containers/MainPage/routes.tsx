@@ -91,11 +91,7 @@ function makeNewRoute(config: RecordFormPageConfig): JSX.Element {
       key={`${recordName}-new`}
       exact={true}
       path={`/record/${recordName}/new`}
-      render={routeProps => (
-        <NewPageContainer
-          config={config}
-        />
-      )}
+      render={routeProps => <NewPageContainer config={config} />}
     />
   );
 }
