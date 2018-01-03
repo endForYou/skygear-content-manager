@@ -1,5 +1,6 @@
 import skygear
 from skygear.utils import db
+from . import lambdas
 
 
 @skygear.event("before-plugins-ready")
