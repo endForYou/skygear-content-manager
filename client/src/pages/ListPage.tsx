@@ -1,3 +1,4 @@
+import classNames from 'classnames';
 import * as qs from 'query-string';
 import * as React from 'react';
 import { connect } from 'react-redux';
@@ -99,11 +100,15 @@ export interface StateProps {
   records: Record[];
 }
 
+interface State {
+  showfilterMenu: boolean;
+}
+
 export interface DispatchProps {
   dispatch: Dispatch<RootState>;
 }
 
-class ListPageImpl extends React.PureComponent<ListPageProps> {
+class ListPageImpl extends React.PureComponent<ListPageProps, State> {
   public recordActionCreator: RecordActionDispatcher;
 
   constructor(props: ListPageProps) {
@@ -116,12 +121,22 @@ class ListPageImpl extends React.PureComponent<ListPageProps> {
       cmsRecord,
       references
     );
+
+    this.state = {
+      showfilterMenu: false,
+    };
+
+    this.onFilterButtonClicked = this.onFilterButtonClicked.bind(this); 
   }
 
   public componentDidMount() {
     const { page, pageConfig } = this.props;
 
     this.recordActionCreator.fetchList(page, pageConfig.perPage);
+  }
+
+  public onFilterButtonClicked() {
+    this.setState({showfilterMenu: !this.state.showfilterMenu});
   }
 
   public render() {
@@ -134,15 +149,41 @@ class ListPageImpl extends React.PureComponent<ListPageProps> {
       records,
     } = this.props;
 
+    const {
+      showfilterMenu,
+    } = this.state;
+
     return (
       <div>
-        <h1 className="display-4 d-inline-block">{pageConfig.label}</h1>
-        <Link
-          className="btn btn-light float-right"
-          to={`/records/${recordName}/new`}
-        >
-          New
-        </Link>
+        <div className="navbar">
+          <h1 className="display-4 d-inline-block">{pageConfig.label}</h1>
+          <Link
+            className="btn btn-light float-right"
+            to={`/records/${recordName}/new`}
+          >
+            New
+          </Link>
+          { pageConfig.filters &&
+            <div className="dropdown float-right">
+              <button
+                type="button"
+                className="btn btn-primary dropdown-toggle"
+                onClick={this.onFilterButtonClicked}
+              >
+                Add Filter <span className="caret" />
+              </button>
+
+              <div
+                style={{right: 0, left: 'unset'}} 
+                className={classNames('dropdown-menu-right', 'dropdown-menu', showfilterMenu ? 'show' : '')}
+              >
+                { pageConfig.filters.map(filter => 
+                  <a key={filter.name} className="dropdown-item" href="#">{filter.label}</a>
+                )}
+              </div>
+            </div>
+          }
+        </div>
         <div className="table-responsive">
           {(() => {
             if (isLoading) {
