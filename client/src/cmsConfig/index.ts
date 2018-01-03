@@ -1,4 +1,6 @@
-import { humanize, isObject, objectFrom } from './util';
+import { humanize, isObject, objectFrom } from './../util';
+import { FilterConfig, parseFilterConfig } from './filterConfig';
+import { parseOptionalString, parseString } from './util';
 
 export interface CmsConfig {
   site: SiteConfig;
@@ -50,6 +52,7 @@ export interface ListPageConfig {
   label: string;
   perPage: number;
   fields: FieldConfig[];
+  filters: FilterConfig[];
   references: ReferenceConfig[];
 }
 
@@ -302,9 +305,15 @@ function parseListPageConfig(
   ) as FieldConfig[];
   const compactFields = fields.map(config => ({ ...config, compact: true }));
 
+  // tslint:disable-next-line: no-any
+  const filters = input.filters && input.filters.map((f: any) =>
+    parseFilterConfig(f)
+  ) as FilterConfig[];
+
   return {
     cmsRecord,
     fields: compactFields,
+    filters,
     label,
     perPage,
     references: filterReferences(compactFields),
@@ -661,33 +670,4 @@ function filterReferences(fieldConfigs: FieldConfig[]): ReferenceConfig[] {
     },
     [] as ReferenceConfig[]
   );
-}
-
-// tslint:disable-next-line: no-any
-function parseString(a: any, fieldName: string, context: string): string {
-  const optionalString = parseOptionalString(a, fieldName, context);
-  if (optionalString === undefined) {
-    throw new Error(`${context}.${fieldName} want a string, got undefined`);
-  }
-
-  return optionalString;
-}
-
-function parseOptionalString(
-  // tslint:disable-next-line: no-any
-  a: any,
-  fieldName: string,
-  context: string
-): string | undefined {
-  const value = a[fieldName];
-
-  if (value == null) {
-    return undefined;
-  }
-
-  if (typeof value === 'string') {
-    return value;
-  }
-
-  throw new Error(`${context}.${fieldName} want a string, got ${typeof a}`);
 }
