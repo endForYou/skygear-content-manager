@@ -67,6 +67,11 @@ export interface RecordFormPageConfig {
   references: ReferenceConfig[];
 }
 
+enum RecordFormPagConfigType {
+  New = 'New',
+  Edit = 'Edit',
+}
+
 export type ReferenceConfig =
   | ReferenceFieldConfig
   | AssociationReferenceFieldConfig;
@@ -198,7 +203,6 @@ export function parseCmsConfig(input: any): CmsConfig {
       records
       // tslint:disable-next-line: no-any
     ).reduce((obj: object, [name, recordConfig]: [string, any]) => {
-      console.log(recordConfig);
       return { ...obj, [name]: parseRecordConfig(context, name, recordConfig) };
     }, {}),
     site: parseSiteConfigs(site),
@@ -259,13 +263,13 @@ function parseRecordConfig(
     edit:
       edit == null
         ? undefined
-        : parseRecordFormPageConfig(context, cmsRecord, 'Edit', edit),
+        : parseRecordFormPageConfig(context, cmsRecord, RecordFormPagConfigType.New, edit),
     list:
       list == null ? undefined : parseListPageConfig(context, cmsRecord, list),
     new:
       newConfig == null
         ? undefined
-        : parseRecordFormPageConfig(context, cmsRecord, 'New', newConfig),
+        : parseRecordFormPageConfig(context, cmsRecord, RecordFormPagConfigType.New, newConfig),
     show:
       show == null ? undefined : parseShowPageConfig(context, cmsRecord, show),
   };
@@ -330,7 +334,7 @@ function parseShowPageConfig(
 function parseRecordFormPageConfig(
   context: ConfigContext,
   cmsRecord: CmsRecord,
-  configType: string,
+  configType: RecordFormPagConfigType,
   // tslint:disable-next-line: no-any
   input: any
 ): RecordFormPageConfig {
