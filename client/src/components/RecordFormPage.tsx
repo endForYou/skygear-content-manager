@@ -10,6 +10,10 @@ import { errorMessageFromError } from '../recordUtil';
 import { RootState } from '../states';
 import { Remote, RemoteType } from '../types';
 
+// TODO: Reduce reused components between edit and new page
+// in order to support future requirements such as custom input validation during
+// record submission.
+// e.g. Reduce reused part into RecordForm only instead of RecordFormPage.
 export interface RecordFormPageProps {
   config: RecordFormPageConfig;
   dispatch: Dispatch<RootState>;
