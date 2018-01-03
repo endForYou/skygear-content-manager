@@ -263,13 +263,23 @@ function parseRecordConfig(
     edit:
       edit == null
         ? undefined
-        : parseRecordFormPageConfig(context, cmsRecord, RecordFormPagConfigType.New, edit),
+        : parseRecordFormPageConfig(
+            context,
+            cmsRecord,
+            RecordFormPagConfigType.New,
+            edit
+          ),
     list:
       list == null ? undefined : parseListPageConfig(context, cmsRecord, list),
     new:
       newConfig == null
         ? undefined
-        : parseRecordFormPageConfig(context, cmsRecord, RecordFormPagConfigType.New, newConfig),
+        : parseRecordFormPageConfig(
+            context,
+            cmsRecord,
+            RecordFormPagConfigType.New,
+            newConfig
+          ),
     show:
       show == null ? undefined : parseShowPageConfig(context, cmsRecord, show),
   };
