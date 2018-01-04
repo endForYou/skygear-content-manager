@@ -10,7 +10,7 @@ import {
 import { EditPageContainer } from '../../pages/EditPageContainer';
 import { ListPageFactory } from '../../pages/ListPage';
 import { NewPageContainer } from '../../pages/NewPageContainer';
-import { NotificationPage } from '../../notifications/NotificationPage';
+import { PushNotificationListPageFactory } from '../../push_notifications/PushNotificationListPage';
 import { ShowPageContainer } from '../../pages/ShowPageContainer';
 
 export function routesFromRecordConfigs(
@@ -104,9 +104,7 @@ function makeNotificationRoute(): JSX.Element {
       key={`notification`}
       exact={true}
       path={`/notification`}
-      render={routeProps => (
-        <NotificationPage config={''}/>
-      )}
+      component={PushNotificationListPageFactory()}
     />
   );
 }
