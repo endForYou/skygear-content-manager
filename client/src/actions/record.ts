@@ -7,8 +7,10 @@ import {
   CmsRecord,
   FieldConfigTypes,
   Filter,
+  FilterType,
   ReferenceConfig,
   ReferenceFieldConfig,
+  StringFilterQueryType,
 } from '../cmsConfig';
 import { parseReference } from '../recordUtil';
 import { RootState } from '../states';
@@ -302,12 +304,16 @@ function fetchRecordList(
   return dispatch => {
     const RecordCls = Record.extend(cmsRecord.recordType);
 
-    const query = new Query(RecordCls);
+    let query = new Query(RecordCls);
     query.overallCount = true;
     query.limit = perPage;
     query.offset = (page - 1) * perPage;
 
     query.addDescending('_created_at');
+    
+    filters.forEach(filter => {
+      query = addFilterToQuery(query, filter);
+    });
 
     dispatch(fetchRecordListRequest(cmsRecord, page));
     return queryWithTarget(query, references).then(
@@ -319,6 +325,28 @@ function fetchRecordList(
       }
     );
   };
+}
+
+function addFilterToQuery(query: Query, filter: Filter): Query {
+    switch (filter.type) {
+      case FilterType.StringFilterType:
+        switch (filter.query) {
+          case StringFilterQueryType.EqualTo:
+            query.equalTo(filter.name, filter.value);
+            break;
+          case StringFilterQueryType.NotEqualTo:
+            query.notEqualTo(filter.name, filter.value);
+            break;
+          case StringFilterQueryType.Like:
+            query.like(filter.name, filter.value);
+            break;
+          case StringFilterQueryType.NotLike:
+            query.notLike(filter.name, filter.value);
+            break;
+        }
+        break;
+    }
+    return query;
 }
 
 function queryWithTarget(

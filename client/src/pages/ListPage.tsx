@@ -200,8 +200,10 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
   }
 
   public onCloseFilterClicked(filter: Filter) {
-    this.setState(
-      {filters: this.state.filters.filter(f => f.id !== filter.id)});
+    const { page, pageConfig } = this.props;
+    const filters = this.state.filters.filter(f => f.id !== filter.id);
+    this.setState({ filters });
+    this.fetchList(page, pageConfig.perPage, filters);
   }
 
   public renderFilter(filter: Filter) {
