@@ -190,6 +190,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
       case FilterConfigTypes.String:
         this.setState({filters: [...this.state.filters, {
           id: uuid(),
+          label: filterConfig.label,
           name: filterConfig.name, 
           query: StringFilterQueryType.EqualTo,
           type: FilterType.StringFilterType,
@@ -210,27 +211,36 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
     switch (filter.type) {
       case FilterType.StringFilterType:
         return (
-          <div key={filter.id} className="form-inline form-group">
-            <button onClick={() => this.onCloseFilterClicked(filter)} type="button" className="close">
-              <span>&times;</span>
-            </button>
-            <select 
-              className="form-control"
-              value={filter.query}
-              onChange={event => this.handleQueryTypeChange(filter, event)} 
-            >
-              <option value={StringFilterQueryType.EqualTo}>Equal to</option>
-              <option value={StringFilterQueryType.NotEqualTo}>Not equal to</option>
-              <option value={StringFilterQueryType.Like}>Like</option>
-              <option value={StringFilterQueryType.NotLike}>Not like</option>
-            </select>
-            <input 
-              type="text"
-              className="form-control"
-              autoFocus={true}
-              onChange={event => this.handleFilterValueChange(filter, event)}
-              value={filter.value}
-            />
+          <div key={filter.id} className="form-inline mb-2">
+            <div className="form-group mr-2">
+              <label>{filter.label}</label>
+            </div>
+            <div className="form-group mr-2">
+              <select 
+                className="form-control"
+                value={filter.query}
+                onChange={event => this.handleQueryTypeChange(filter, event)} 
+              >
+                <option value={StringFilterQueryType.EqualTo}>Equal to</option>
+                <option value={StringFilterQueryType.NotEqualTo}>Not equal to</option>
+                <option value={StringFilterQueryType.Like}>Like</option>
+                <option value={StringFilterQueryType.NotLike}>Not like</option>
+              </select>
+            </div>
+            <div className="form-group mr-4">
+              <input 
+                type="text"
+                className="form-control"
+                autoFocus={true}
+                onChange={event => this.handleFilterValueChange(filter, event)}
+                value={filter.value}
+              />
+            </div>
+            <div className="form-group">
+              <button onClick={() => this.onCloseFilterClicked(filter)} type="button" className="close">
+                <span>&times;</span>
+              </button>
+            </div>
           </div>
         );
     }

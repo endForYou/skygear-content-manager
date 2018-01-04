@@ -18,8 +18,8 @@ export interface FilterConfigAttrs {
 
 interface FilterConfigInput {
   type: string;
-  // tslint:disable-next-line: no-any
-  [key: string]: any;
+  name: string;
+  label: string;
 }
 
 export interface StringFilterConfig extends FilterConfigInput {
@@ -74,6 +74,7 @@ export interface StringFilterAttrs {
   name: string;
   type: FilterType;
   query: FilterQueryType;
+  label: string;
 }
 
 export interface StringFilter extends StringFilterAttrs {
