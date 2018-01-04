@@ -54,3 +54,32 @@ function parseStringFilterConfig(input: FilterConfigInput): StringFilterConfig {
     type: FilterConfigTypes.String,
   };
 }
+
+export enum StringFilterQueryType {
+  EqualTo = 'EqualTo',
+  NotEqualTo = 'NotEqualTo',
+  Like = 'Like', 
+  NotLike = 'NotLike',
+}
+
+export type Filter =
+  | StringFilter;
+
+export enum FilterType {
+  StringFilterType = 'StringFilterType',
+}
+
+export interface StringFilterAttrs {
+  id: string;
+  type: FilterType;
+  query: FilterQueryType;
+}
+
+export interface StringFilter extends StringFilterAttrs {
+  type: FilterType.StringFilterType;
+  query: StringFilterQueryType;
+  value: string;
+}
+
+export type FilterQueryType =
+  | StringFilterQueryType;

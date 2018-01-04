@@ -6,6 +6,7 @@ import {
   AssociationReferenceFieldConfig,
   CmsRecord,
   FieldConfigTypes,
+  Filter,
   ReferenceConfig,
   ReferenceFieldConfig,
 } from '../cmsConfig';
@@ -294,6 +295,7 @@ function saveRecord(
 function fetchRecordList(
   cmsRecord: CmsRecord,
   references: ReferenceConfig[],
+  filters: Filter[],
   page: number = 1,
   perPage: number = 25
 ): ThunkAction<Promise<void>, {}, {}> {
@@ -445,15 +447,18 @@ export class RecordActionDispatcher {
   private dispatch: Dispatch<RootState>;
   private cmsRecord: CmsRecord;
   private references: ReferenceConfig[];
+  private filters: Filter[];
 
   constructor(
     dispatch: Dispatch<RootState>,
     cmsRecord: CmsRecord,
-    references: ReferenceConfig[]
+    references: ReferenceConfig[],
+    filters: Filter[] = [],
   ) {
     this.dispatch = dispatch;
     this.cmsRecord = cmsRecord;
     this.references = references;
+    this.filters = filters;
   }
 
   public fetch(id: string): Promise<void> {
@@ -462,7 +467,7 @@ export class RecordActionDispatcher {
 
   public fetchList(page: number, perPage: number): Promise<void> {
     return this.dispatch(
-      fetchRecordList(this.cmsRecord, this.references, page, perPage)
+      fetchRecordList(this.cmsRecord, this.references, this.filters, page, perPage)
     );
   }
 

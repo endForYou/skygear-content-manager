@@ -1,4 +1,5 @@
 import classNames from 'classnames';
+import uuid from 'uuid';
 import * as qs from 'query-string';
 import * as React from 'react';
 import { connect } from 'react-redux';
@@ -7,7 +8,8 @@ import { Dispatch } from 'redux';
 import { Record } from 'skygear';
 
 import { RecordActionDispatcher } from '../actions/record';
-import { FieldConfig, ListPageConfig } from '../cmsConfig';
+import { FieldConfig, Filter, FilterConfig, FilterConfigTypes, FilterType,
+  ListPageConfig, StringFilterQueryType } from '../cmsConfig';
 import Pagination from '../components/Pagination';
 import { Field, FieldContext } from '../fields';
 import { RootState } from '../states';
@@ -102,6 +104,7 @@ export interface StateProps {
 
 interface State {
   showfilterMenu: boolean;
+  filters: Filter[];
 }
 
 export interface DispatchProps {
@@ -115,18 +118,22 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
     super(props);
 
     const { dispatch, pageConfig: { cmsRecord, references } } = this.props;
+    const filters: Filter[] = [];
+
+    this.state = {
+      filters,
+      showfilterMenu: false,
+    };
 
     this.recordActionCreator = new RecordActionDispatcher(
       dispatch,
       cmsRecord,
-      references
+      references,
     );
 
-    this.state = {
-      showfilterMenu: false,
-    };
-
-    this.onFilterButtonClicked = this.onFilterButtonClicked.bind(this); 
+    this.toggleFilterMenu = this.toggleFilterMenu.bind(this); 
+    this.onFilterItemClicked = this.onFilterItemClicked.bind(this);
+    this.handleQueryTypeChange = this.handleQueryTypeChange.bind(this);
   }
 
   public componentDidMount() {
@@ -135,8 +142,76 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
     this.recordActionCreator.fetchList(page, pageConfig.perPage);
   }
 
-  public onFilterButtonClicked() {
+  public toggleFilterMenu() {
     this.setState({showfilterMenu: !this.state.showfilterMenu});
+  }
+
+  public handleQueryTypeChange(filter: Filter, event: React.ChangeEvent<HTMLSelectElement>) {
+    switch (filter.type) {
+      case FilterType.StringFilterType:
+        this.setState({filters: this.state.filters.map(f => {
+          if (f.id === filter.id) {
+            return {...f,
+              query: StringFilterQueryType[event.target.value],
+            };
+          }
+          return f;
+        })});
+    }
+  }
+
+  public handleFilterValueChange(filter: Filter, event: React.ChangeEvent<HTMLInputElement>) {
+    switch (filter.type) {
+      case FilterType.StringFilterType:
+        this.setState({filters: this.state.filters.map(f => {
+          if (f.id === filter.id) {
+            return {...f,
+              value: event.target.value,
+            };
+          }
+          return f;
+        })});
+    }
+  }
+
+  public onFilterItemClicked(filterConfig: FilterConfig) {
+    switch (filterConfig.type) {
+      case FilterConfigTypes.String:
+        this.setState({filters: [...this.state.filters, {
+          id: uuid(),
+          query: StringFilterQueryType.EqualTo,
+          type: FilterType.StringFilterType,
+          value: '',
+        }]});
+    }
+    this.toggleFilterMenu();
+  }
+
+  public renderFilter(filter: Filter) {
+    switch (filter.type) {
+      case FilterType.StringFilterType:
+        return (
+          <div key={filter.id} className="form-inline form-group">
+            <select 
+              className="form-control"
+              value={filter.query}
+              onChange={event => this.handleQueryTypeChange(filter, event)} 
+            >
+              <option value={StringFilterQueryType.EqualTo}>Equal to</option>
+              <option value={StringFilterQueryType.NotEqualTo}>Not equal to</option>
+              <option value={StringFilterQueryType.Like}>Like</option>
+              <option value={StringFilterQueryType.NotLike}>Not like</option>
+            </select>
+            <input 
+              type="text"
+              className="form-control"
+              autoFocus={true}
+              onChange={event => this.handleFilterValueChange(filter, event)}
+              value={filter.value}
+            />
+          </div>
+        );
+    }
   }
 
   public render() {
@@ -151,6 +226,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
 
     const {
       showfilterMenu,
+      filters,
     } = this.state;
 
     return (
@@ -168,7 +244,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
               <button
                 type="button"
                 className="btn btn-primary dropdown-toggle"
-                onClick={this.onFilterButtonClicked}
+                onClick={this.toggleFilterMenu}
               >
                 Add Filter <span className="caret" />
               </button>
@@ -177,13 +253,26 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
                 style={{right: 0, left: 'unset'}} 
                 className={classNames('dropdown-menu-right', 'dropdown-menu', showfilterMenu ? 'show' : '')}
               >
-                { pageConfig.filters.map(filter => 
-                  <a key={filter.name} className="dropdown-item" href="#">{filter.label}</a>
+                { pageConfig.filters.map(filterConfig => 
+                  <a
+                    key={filterConfig.name} 
+                    className="dropdown-item" 
+                    onClick={() => this.onFilterItemClicked(filterConfig)}
+                  >
+                    {filterConfig.label}
+                  </a>
                 )}
               </div>
             </div>
           }
         </div>
+      
+        <div className="float-right">
+          { filters.map(filter =>
+            this.renderFilter(filter)
+          )}
+        </div>
+          
         <div className="table-responsive">
           {(() => {
             if (isLoading) {
@@ -217,7 +306,6 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
 
   public onPageItemClicked = (page: number) => {
     const { pageConfig } = this.props;
-
     this.recordActionCreator.fetchList(page, pageConfig.perPage);
   };
 }
