@@ -71,6 +71,7 @@ export enum FilterType {
 
 export interface StringFilterAttrs {
   id: string;
+  name: string;
   type: FilterType;
   query: FilterQueryType;
 }

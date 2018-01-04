@@ -134,6 +134,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
     this.toggleFilterMenu = this.toggleFilterMenu.bind(this); 
     this.onFilterItemClicked = this.onFilterItemClicked.bind(this);
     this.handleQueryTypeChange = this.handleQueryTypeChange.bind(this);
+    this.onCloseFilterClicked = this.onCloseFilterClicked.bind(this);
   }
 
   public componentDidMount() {
@@ -179,6 +180,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
       case FilterConfigTypes.String:
         this.setState({filters: [...this.state.filters, {
           id: uuid(),
+          name: filterConfig.name, 
           query: StringFilterQueryType.EqualTo,
           type: FilterType.StringFilterType,
           value: '',
@@ -187,11 +189,19 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
     this.toggleFilterMenu();
   }
 
+  public onCloseFilterClicked(filter: Filter) {
+    this.setState(
+      {filters: this.state.filters.filter(f => f.id !== filter.id)});
+  }
+
   public renderFilter(filter: Filter) {
     switch (filter.type) {
       case FilterType.StringFilterType:
         return (
           <div key={filter.id} className="form-inline form-group">
+            <button onClick={() => this.onCloseFilterClicked(filter)} type="button" className="close">
+              <span>&times;</span>
+            </button>
             <select 
               className="form-control"
               value={filter.query}
