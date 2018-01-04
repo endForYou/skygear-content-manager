@@ -99,3 +99,19 @@ export function debouncePromise1<T1, R>(
     return p;
   };
 }
+
+// tslint:disable:ban-types no-any
+export function debounce(this: any, func: Function, delay: number) {
+  let timeout: any;
+
+  return (...args: any[]) => {
+    if (timeout) {
+      clearTimeout(timeout);
+    }
+    timeout = setTimeout(() => {
+      func.call(this, ...args);
+      timeout = null;
+    }, delay);
+  };
+}
+// tslint:enable:ban-types no-any

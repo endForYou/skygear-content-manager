@@ -1,11 +1,11 @@
 import classNames from 'classnames';
-import uuid from 'uuid';
 import * as qs from 'query-string';
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { Dispatch } from 'redux';
 import { Record } from 'skygear';
+import uuid from 'uuid';
 
 import { RecordActionDispatcher } from '../actions/record';
 import { FieldConfig, Filter, FilterConfig, FilterConfigTypes, FilterType,
@@ -13,6 +13,7 @@ import { FieldConfig, Filter, FilterConfig, FilterConfigTypes, FilterType,
 import Pagination from '../components/Pagination';
 import { Field, FieldContext } from '../fields';
 import { RootState } from '../states';
+import { debounce } from '../util';
 
 interface TableHeaderProps {
   fieldConfigs: FieldConfig[];
@@ -131,16 +132,13 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
       references,
     );
 
-    this.toggleFilterMenu = this.toggleFilterMenu.bind(this); 
-    this.onFilterItemClicked = this.onFilterItemClicked.bind(this);
-    this.handleQueryTypeChange = this.handleQueryTypeChange.bind(this);
-    this.onCloseFilterClicked = this.onCloseFilterClicked.bind(this);
+    this.fetchList = debounce(this.fetchList.bind(this), 200);
   }
 
   public componentDidMount() {
     const { page, pageConfig } = this.props;
-
-    this.recordActionCreator.fetchList(page, pageConfig.perPage);
+    const { filters } = this.state;
+    this.fetchList(page, pageConfig.perPage, filters);
   }
 
   public toggleFilterMenu() {
@@ -148,31 +146,43 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
   }
 
   public handleQueryTypeChange(filter: Filter, event: React.ChangeEvent<HTMLSelectElement>) {
+    const { page, pageConfig } = this.props;
+    let { filters } = this.state; 
+
     switch (filter.type) {
       case FilterType.StringFilterType:
-        this.setState({filters: this.state.filters.map(f => {
+        filters = filters.map(f => {
           if (f.id === filter.id) {
             return {...f,
               query: StringFilterQueryType[event.target.value],
             };
           }
           return f;
-        })});
+        });
     }
+
+    this.setState({ filters });
+    this.fetchList(page, pageConfig.perPage, filters);
   }
 
   public handleFilterValueChange(filter: Filter, event: React.ChangeEvent<HTMLInputElement>) {
+    const { page, pageConfig } = this.props;
+    let { filters } = this.state; 
+
     switch (filter.type) {
       case FilterType.StringFilterType:
-        this.setState({filters: this.state.filters.map(f => {
+        filters = filters.map(f => {
           if (f.id === filter.id) {
             return {...f,
               value: event.target.value,
             };
           }
           return f;
-        })});
+        });
     }
+
+    this.setState({ filters });
+    this.fetchList(page, pageConfig.perPage, filters);
   }
 
   public onFilterItemClicked(filterConfig: FilterConfig) {
@@ -254,7 +264,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
               <button
                 type="button"
                 className="btn btn-primary dropdown-toggle"
-                onClick={this.toggleFilterMenu}
+                onClick={() => this.toggleFilterMenu()}
               >
                 Add Filter <span className="caret" />
               </button>
@@ -316,8 +326,14 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
 
   public onPageItemClicked = (page: number) => {
     const { pageConfig } = this.props;
-    this.recordActionCreator.fetchList(page, pageConfig.perPage);
+    const { filters } = this.state;
+    this.fetchList(page, pageConfig.perPage, filters);
   };
+
+  public fetchList(page: number, perPage: number, filters: Filter[]) {
+    this.recordActionCreator.fetchList(page, perPage, filters);
+  }
+
 }
 
 function ListPageFactory(recordName: string) {
