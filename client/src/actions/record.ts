@@ -7,6 +7,8 @@ import {
   BooleanFilter,
   BooleanFilterQueryType,
   CmsRecord,
+  DateTimeFilter,
+  DateTimeFilterQueryType,
   FieldConfigTypes,
   Filter,
   FilterType,
@@ -343,6 +345,9 @@ function addFilterToQuery(query: Query, filter: Filter): Query {
       case FilterType.BooleanFilterType:
         addBooleanFilterToQuery(query, filter as BooleanFilter);
         break;
+      case FilterType.DateTimeFilterType:
+        addDatetimeFilterToQuery(query, filter as DateTimeFilter);
+        break;
     }
     return query;
 }
@@ -394,6 +399,17 @@ function addBooleanFilterToQuery(query: Query, filter: BooleanFilter) {
       break;
     case BooleanFilterQueryType.False:
       query.equalTo(filter.name, false);
+      break;
+  }
+}
+
+function addDatetimeFilterToQuery(query: Query, filter: DateTimeFilter) {
+  switch (filter.query) {
+    case DateTimeFilterQueryType.Before:
+      query.lessThan(filter.name, filter.value);
+      break;
+    case DateTimeFilterQueryType.After:
+      query.greaterThan(filter.name, filter.value);
       break;
   }
 }

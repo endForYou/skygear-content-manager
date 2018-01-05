@@ -8,7 +8,7 @@ import { Record } from 'skygear';
 import uuid from 'uuid';
 
 import { RecordActionDispatcher } from '../actions/record';
-import { BooleanFilterQueryType, FieldConfig, Filter, 
+import { BooleanFilterQueryType, DateTimeFilter, DateTimeFilterQueryType, FieldConfig, Filter, 
   FilterConfig, FilterConfigTypes, FilterType,
   IntegerFilter, IntegerFilterQueryType, ListPageConfig, 
   StringFilter, StringFilterQueryType } from '../cmsConfig';
@@ -138,6 +138,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
     this.toggleFilterMenu = this.toggleFilterMenu.bind(this);
     this.handleQueryTypeChange = this.handleQueryTypeChange.bind(this);
     this.handleFilterValueChange = this.handleFilterValueChange.bind(this);
+    this.handleDateTimeValueChange = this.handleDateTimeValueChange.bind(this); 
     this.onCloseFilterClicked = this.onCloseFilterClicked.bind(this);
     this.fetchList = debounce(this.fetchList.bind(this), 200);
   }
@@ -170,8 +171,10 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
             return {...f,
               query: BooleanFilterQueryType[event.target.value],
             };
-          default:
-            return f;
+          case FilterType.DateTimeFilterType:
+            return {...f,
+              query: DateTimeFilterQueryType[event.target.value],
+            };
         }
       }
       return f;
@@ -190,13 +193,27 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
             return  {...(f as StringFilter), value: event.target.value};
           case FilterType.IntegerFilterType:
             return  {...(f as IntegerFilter), value: Number(event.target.value)};
-          default:
+          case FilterType.BooleanFilterType:
+          case FilterType.DateTimeFilterType:
             return f;
           }
       }
       return f;
     });
 
+    this.setState({ filters });
+    this.fetchList(page, pageConfig.perPage, filters);
+  }
+
+  public handleDateTimeValueChange(filter: Filter, datetime: Date) {
+    const { page, pageConfig } = this.props;
+    const filters = this.state.filters.map(f => {
+      if (f.id === filter.id) {
+        return  {...(f as DateTimeFilter), value: datetime};
+      } else {
+        return f;
+      }
+    });
     this.setState({ filters });
     this.fetchList(page, pageConfig.perPage, filters);
   }
@@ -232,6 +249,16 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
           name: filterConfig.name, 
           query: BooleanFilterQueryType.True,
           type: FilterType.BooleanFilterType,
+        }];
+        break;
+      case FilterConfigTypes.DateTime:
+        filters = [...this.state.filters, {
+          id: uuid(),
+          label: filterConfig.label,
+          name: filterConfig.name, 
+          query: DateTimeFilterQueryType.Before,
+          type: FilterType.DateTimeFilterType,
+          value: new Date(),
         }];
         break;
     }
@@ -306,6 +333,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
             handleQueryTypeChange={this.handleQueryTypeChange}
             handleFilterValueChange={this.handleFilterValueChange}
             onCloseFilterClicked={this.onCloseFilterClicked}
+            handleDateTimeValueChange={this.handleDateTimeValueChange}
           />
         </div>
           

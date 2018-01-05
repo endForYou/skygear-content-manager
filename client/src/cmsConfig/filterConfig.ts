@@ -4,7 +4,8 @@ import { parseOptionalString, parseString } from './util';
 export type FilterConfig =
   | StringFilterConfig
   | IntegerFilterConfig
-  | BooleanFilterConfig;
+  | BooleanFilterConfig
+  | DateTimeFilterConfig;
 
 export enum FilterConfigTypes {
   String = 'String',
@@ -36,6 +37,10 @@ export interface BooleanFilterConfig extends FilterConfigInput {
   type: FilterConfigTypes.Boolean; 
 }
 
+export interface DateTimeFilterConfig extends FilterConfigInput {
+  type: FilterConfigTypes.DateTime; 
+}
+
 // tslint:disable-next-line: no-any
 export function parseFilterConfig(a: any): FilterConfig {
   switch (a.type) {
@@ -45,6 +50,8 @@ export function parseFilterConfig(a: any): FilterConfig {
       return parseIntegerFilterConfig(a);
     case 'Boolean':
       return parseBooleanFilterConfig(a);
+    case 'DateTime':
+      return parseDateTimeFilterConfig(a);
     default:
       throw new Error(`Received unknown filter config type: ${a.type}`);
   }
@@ -83,6 +90,12 @@ function parseBooleanFilterConfig(input: FilterConfigInput): BooleanFilterConfig
   };
 }
 
+function parseDateTimeFilterConfig(input: FilterConfigInput): DateTimeFilterConfig {
+  return {
+    ...parseFilterConfigAttrs(input, 'DateTime'),
+    type: FilterConfigTypes.DateTime,
+  };
+}
 
 export enum StringFilterQueryType {
   EqualTo = 'EqualTo',
@@ -105,15 +118,22 @@ export enum BooleanFilterQueryType {
   False = 'False',
 }
 
+export enum DateTimeFilterQueryType {
+  Before = 'Before',
+  After = 'After',
+}
+
 export type Filter =
   | StringFilter
   | IntegerFilter
-  | BooleanFilter;
+  | BooleanFilter
+  | DateTimeFilter;
 
 export enum FilterType {
   StringFilterType = 'StringFilterType',
   IntegerFilterType = 'IntegerFilterType',
   BooleanFilterType = 'BooleanFilterType',
+  DateTimeFilterType = 'DateTimeFilterType',
 }
 
 export interface FilterAttrs {
@@ -140,7 +160,13 @@ export interface BooleanFilter extends FilterAttrs {
   query: BooleanFilterQueryType;
 }
 
+export interface DateTimeFilter extends FilterAttrs {
+  type: FilterType.DateTimeFilterType;
+  query: DateTimeFilterQueryType;
+  value: Date;
+}
 export type FilterQueryType =
   | StringFilterQueryType
   | IntegerFilterQueryType
-  | BooleanFilterQueryType;
+  | BooleanFilterQueryType
+  | DateTimeFilterQueryType;

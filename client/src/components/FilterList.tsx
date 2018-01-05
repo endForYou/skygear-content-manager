@@ -1,7 +1,11 @@
+import moment from 'moment';
 import * as React from 'react';
+import * as Datetime from 'react-datetime';
+// tslint:disable-next-line: no-submodule-imports
+import 'react-datetime/css/react-datetime.css';
 
-import { BooleanFilterQueryType, 
-  Filter, FilterType, IntegerFilter,
+import { BooleanFilterQueryType, DateTimeFilter, DateTimeFilterQueryType,
+  Filter, FilterType, IntegerFilter, 
   IntegerFilterQueryType, StringFilter, StringFilterQueryType, } from '../cmsConfig';
 
 interface FilterListProps {
@@ -9,7 +13,11 @@ interface FilterListProps {
   handleQueryTypeChange: (filter: Filter, event: React.ChangeEvent<HTMLSelectElement>) => void;
   handleFilterValueChange: (filter: Filter, event: React.ChangeEvent<HTMLInputElement>) => void; 
   onCloseFilterClicked: (filter: Filter) => void;
+  handleDateTimeValueChange: (filter: Filter, datetime: Date) => void;
 }
+
+const DATE_FORMAT = 'YYYY-MM-DD';
+const TIME_FORMAT = 'HH:mm:ss[Z]';
 
 export class FilterList extends React.PureComponent<FilterListProps> {
 
@@ -43,6 +51,8 @@ export class FilterList extends React.PureComponent<FilterListProps> {
         return this.renderIntegerFilterSelect(filter);
       case FilterType.BooleanFilterType:
         return this.renderBooleanFilterSelect(filter);
+      case FilterType.DateTimeFilterType:
+        return this.renderDateTimeFilterSelect(filter);
     }
   }
 
@@ -92,14 +102,30 @@ export class FilterList extends React.PureComponent<FilterListProps> {
       </select>);
   }
 
+  public renderDateTimeFilterSelect(filter: Filter) {
+    const { handleQueryTypeChange } = this.props;
+
+    return (
+      <select 
+        className="form-control"
+        value={filter.query}
+        onChange={event => handleQueryTypeChange(filter, event)} 
+      >
+        <option value={DateTimeFilterQueryType.Before}>Before</option>
+        <option value={DateTimeFilterQueryType.After}>After</option>
+      </select>);
+  }
+
   public renderInput(filter: Filter) {
     switch (filter.type) {
       case FilterType.StringFilterType:
         return this.renderStringInput(filter as StringFilter);
       case FilterType.IntegerFilterType:
         return this.renderIntegerInput(filter as IntegerFilter);
-      default:
+      case FilterType.BooleanFilterType:
         return (<div />);
+      case FilterType.DateTimeFilterType:
+        return this.renderDateTimeInput(filter as DateTimeFilter);
     }
   }
 
@@ -130,12 +156,31 @@ export class FilterList extends React.PureComponent<FilterListProps> {
       />
     );
   }
+  public renderDateTimeInput(filter: DateTimeFilter) {
+    return (
+      <Datetime
+        dateFormat={DATE_FORMAT}
+        timeFormat={TIME_FORMAT}
+        value={filter.value}
+        onChange={event => this.handleDateTimeChange(filter, event)}
+        utc={true}
+      />
+    );
+  }
 
   public render() {
     const { filters } = this.props;
     return filters.map(filter =>
       this.renderFilter(filter)
     );
+  }
+
+  // tslint:disable-next-line: no-any
+  public handleDateTimeChange(filter: Filter, event: string | moment.Moment | React.ChangeEvent<any>) {
+    if (!moment.isMoment(event)) {
+      return;
+    }
+    this.props.handleDateTimeValueChange(filter, event.toDate());
   }
 
 }
