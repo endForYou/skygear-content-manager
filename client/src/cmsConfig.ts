@@ -67,7 +67,7 @@ export interface RecordFormPageConfig {
   references: ReferenceConfig[];
 }
 
-enum RecordFormPagConfigType {
+enum RecordFormPageConfigType {
   New = 'New',
   Edit = 'Edit',
 }
@@ -266,7 +266,7 @@ function parseRecordConfig(
         : parseRecordFormPageConfig(
             context,
             cmsRecord,
-            RecordFormPagConfigType.New,
+            RecordFormPageConfigType.New,
             edit
           ),
     list:
@@ -277,7 +277,7 @@ function parseRecordConfig(
         : parseRecordFormPageConfig(
             context,
             cmsRecord,
-            RecordFormPagConfigType.New,
+            RecordFormPageConfigType.New,
             newConfig
           ),
     show:
@@ -344,7 +344,7 @@ function parseShowPageConfig(
 function parseRecordFormPageConfig(
   context: ConfigContext,
   cmsRecord: CmsRecord,
-  configType: RecordFormPagConfigType,
+  configType: RecordFormPageConfigType,
   // tslint:disable-next-line: no-any
   input: any
 ): RecordFormPageConfig {
