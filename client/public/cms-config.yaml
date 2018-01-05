@@ -43,6 +43,14 @@ records:
           type: ImageAsset
         - type: _created_at
         - type: _updated_at
+    new:
+      fields:
+        - type: _id
+        - name: name
+          type: String
+        - name: image_id
+          label: Image
+          type: ImageAsset
   poll:
     list:
       label: Polls
@@ -157,6 +165,42 @@ records:
           type: Boolean
         - type: _created_at
         - type: _updated_at
+    new:
+      label: New Poll
+      fields:
+        - type: _id
+        - name: name
+          type: String
+        - name: description
+          type: String
+        # - name: user_id
+        #   type: Reference
+        - name: topics
+          type: Reference
+          target: topic
+          displayFieldName: name
+          via_association_record: poll_topic
+        - name: start_time
+          type: DateTime
+        - name: end_time
+          type: DateTime
+        - name: image_id
+          label: Image
+          type: ImageAsset
+        - name: is_active
+          type: Boolean
+        - name: is_live
+          type: Boolean
+        - name: likes
+          type: Integer
+        - name: answers
+          type: Integer
+        - name: views
+          type: Integer
+        # - name: country_id
+        #   type: Reference
+        - name: promoted
+          type: Boolean
   question:
     list:
       fields:
@@ -188,6 +232,21 @@ records:
           type: Boolean
     edit:
       fields:
+        - name: title
+          type: String
+        - name: type
+          type: String
+        - name: poll_id
+          type: Reference
+          target: poll
+          displayFieldName: name
+        - name: ordering
+          type: Integer
+        - name: deleted
+          type: Boolean
+    new:
+      fields:
+        - type: _id
         - name: title
           type: String
         - name: type

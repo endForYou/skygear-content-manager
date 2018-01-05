@@ -41,7 +41,8 @@ export interface RecordConfig {
   cmsRecord: CmsRecord;
   list?: ListPageConfig;
   show?: ShowPageConfig;
-  edit?: EditPageConfig;
+  edit?: RecordFormPageConfig;
+  new?: RecordFormPageConfig;
 }
 
 export interface ListPageConfig {
@@ -59,11 +60,16 @@ export interface ShowPageConfig {
   references: ReferenceConfig[];
 }
 
-export interface EditPageConfig {
+export interface RecordFormPageConfig {
   cmsRecord: CmsRecord;
   label: string;
   fields: FieldConfig[];
   references: ReferenceConfig[];
+}
+
+enum RecordFormPageConfigType {
+  New = 'New',
+  Edit = 'Edit',
 }
 
 export type ReferenceConfig =
@@ -246,6 +252,7 @@ function parseRecordConfig(
   input: any
 ): RecordConfig {
   const { list, show, edit } = input;
+  const newConfig = input.new;
 
   const recordType =
     parseOptionalString(input, 'recordType', recordName) || recordName;
@@ -254,9 +261,25 @@ function parseRecordConfig(
   return {
     cmsRecord,
     edit:
-      edit == null ? undefined : parseEditPageConfig(context, cmsRecord, edit),
+      edit == null
+        ? undefined
+        : parseRecordFormPageConfig(
+            context,
+            cmsRecord,
+            RecordFormPageConfigType.New,
+            edit
+          ),
     list:
       list == null ? undefined : parseListPageConfig(context, cmsRecord, list),
+    new:
+      newConfig == null
+        ? undefined
+        : parseRecordFormPageConfig(
+            context,
+            cmsRecord,
+            RecordFormPageConfigType.New,
+            newConfig
+          ),
     show:
       show == null ? undefined : parseShowPageConfig(context, cmsRecord, show),
   };
@@ -318,21 +341,22 @@ function parseShowPageConfig(
   };
 }
 
-function parseEditPageConfig(
+function parseRecordFormPageConfig(
   context: ConfigContext,
   cmsRecord: CmsRecord,
+  configType: RecordFormPageConfigType,
   // tslint:disable-next-line: no-any
   input: any
-): EditPageConfig {
+): RecordFormPageConfig {
   if (!Array.isArray(input.fields)) {
-    throw new Error(`EditPageConfig.fields must be an Array`);
+    throw new Error(`RecordFormPageConfig.fields must be an Array`);
   }
 
   const label =
-    parseOptionalString(input, 'label', 'Edit') || humanize(cmsRecord.name);
+    parseOptionalString(input, 'label', configType) || humanize(cmsRecord.name);
 
   if (typeof input.label !== 'string' && typeof input.label !== 'undefined') {
-    throw new Error(`EditPageConfig.label must be a string`);
+    throw new Error(`RecordFormPageConfig.label must be a string`);
   }
 
   // tslint:disable-next-line: no-any

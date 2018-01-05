@@ -4,13 +4,13 @@ import { Dispatch } from 'redux';
 import { Record } from 'skygear';
 
 import { RecordActionDispatcher } from '../actions/record';
-import { EditPageConfig } from '../cmsConfig';
-import { EditPage } from '../components/EditPage';
+import { RecordFormPageConfig } from '../cmsConfig';
+import { RecordFormPage } from '../components/RecordFormPage';
 import { RootState } from '../states';
 import { Remote, RemoteType } from '../types';
 
 export interface EditPageContainerProps {
-  config: EditPageConfig;
+  config: RecordFormPageConfig;
   recordId: string;
 }
 
@@ -49,7 +49,7 @@ class EditPageContainerImpl extends React.PureComponent<Props> {
         return <div>Loading record...</div>;
       case RemoteType.Success:
         return (
-          <EditPage
+          <RecordFormPage
             config={this.props.config}
             dispatch={this.props.dispatch}
             record={remoteRecord.value}

@@ -25,6 +25,7 @@ export interface RecordViewState {
   list: ListState;
   show: ShowState;
   edit: EditState;
+  new: NewState;
 }
 
 export interface ListState {
@@ -41,6 +42,10 @@ export interface ShowState {
 
 export interface EditState {
   remoteRecord: Remote<Record>;
+  savingRecord?: Remote<Record>;
+}
+
+export interface NewState {
   savingRecord?: Remote<Record>;
 }
 
@@ -61,9 +66,14 @@ export const initialEditState: EditState = {
   savingRecord: undefined,
 };
 
+export const initialNewState: NewState = {
+  savingRecord: undefined,
+};
+
 export const initialRecordViewState: RecordViewState = {
   edit: initialEditState,
   list: initialListState,
+  new: initialNewState,
   show: initialShowState,
 };
 

@@ -4,14 +4,18 @@ import { push } from 'react-router-redux';
 import { Record } from 'skygear';
 
 import { RecordActionDispatcher } from '../actions/record';
-import { EditPageConfig, FieldConfig } from '../cmsConfig';
+import { FieldConfig, RecordFormPageConfig } from '../cmsConfig';
 import { Field, FieldContext } from '../fields';
 import { errorMessageFromError } from '../recordUtil';
 import { RootState } from '../states';
 import { Remote, RemoteType } from '../types';
 
-export interface EditPageProps {
-  config: EditPageConfig;
+// TODO: Reduce reused components between edit and new page
+// in order to support future requirements such as custom input validation during
+// record submission.
+// e.g. Reduce reused part into RecordForm only instead of RecordFormPage.
+export interface RecordFormPageProps {
+  config: RecordFormPageConfig;
   dispatch: Dispatch<RootState>;
   record: Record;
   savingRecord?: Remote<Record>;
@@ -44,8 +48,11 @@ interface RecordEffect {
 // tslint:disable-next-line: no-any
 type RecordChangeHandler = (name: string, value: any, effect?: Effect) => void;
 
-class EditPageImpl extends React.PureComponent<EditPageProps, State> {
-  constructor(props: EditPageProps) {
+class RecordFormPageImpl extends React.PureComponent<
+  RecordFormPageProps,
+  State
+> {
+  constructor(props: RecordFormPageProps) {
     super(props);
 
     this.state = {
@@ -189,4 +196,6 @@ function mergeRecordChange(record: Record, change: RecordChange) {
   });
 }
 
-export const EditPage: React.ComponentClass<EditPageProps> = EditPageImpl;
+export const RecordFormPage: React.ComponentClass<
+  RecordFormPageProps
+> = RecordFormPageImpl;

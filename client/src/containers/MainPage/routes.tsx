@@ -2,13 +2,14 @@ import * as React from 'react';
 import { Route } from 'react-router';
 
 import {
-  EditPageConfig,
   ListPageConfig,
   RecordConfig,
+  RecordFormPageConfig,
   ShowPageConfig,
 } from '../../cmsConfig';
 import { EditPageContainer } from '../../pages/EditPageContainer';
 import { ListPageFactory } from '../../pages/ListPage';
+import { NewPageContainer } from '../../pages/NewPageContainer';
 import { ShowPageContainer } from '../../pages/ShowPageContainer';
 
 export function routesFromRecordConfigs(
@@ -23,6 +24,9 @@ function routesFromRecordConfig(config: RecordConfig): JSX.Element[] {
   const routes: JSX.Element[] = [];
   if (config.list) {
     routes.push(makeListRoute(config.list));
+  }
+  if (config.new) {
+    routes.push(makeNewRoute(config.new));
   }
   if (config.show) {
     routes.push(makeShowRoute(config.show));
@@ -63,7 +67,7 @@ function makeShowRoute(config: ShowPageConfig): JSX.Element {
   );
 }
 
-function makeEditRoute(config: EditPageConfig): JSX.Element {
+function makeEditRoute(config: RecordFormPageConfig): JSX.Element {
   const recordName = config.cmsRecord.name;
   return (
     <Route
@@ -76,6 +80,18 @@ function makeEditRoute(config: EditPageConfig): JSX.Element {
           recordId={routeProps.match.params.recordId}
         />
       )}
+    />
+  );
+}
+
+function makeNewRoute(config: RecordFormPageConfig): JSX.Element {
+  const recordName = config.cmsRecord.name;
+  return (
+    <Route
+      key={`${recordName}-new`}
+      exact={true}
+      path={`/record/${recordName}/new`}
+      render={routeProps => <NewPageContainer config={config} />}
     />
   );
 }

@@ -8,7 +8,7 @@ import {
 import skygear, { Query, Record, Reference } from 'skygear';
 
 import { AssociationReferenceFieldConfig } from '../cmsConfig';
-import { Effect } from '../components/EditPage';
+import { Effect } from '../components/RecordFormPage';
 import { deleteRecordsProperly, parseReference } from '../recordUtil';
 import { debouncePromise1, makeArray, objectFrom } from '../util';
 
@@ -41,7 +41,7 @@ class AssociationRecordSelectImpl extends React.PureComponent<
   // return the association records from props
   get assoRecords(): Record[] {
     const { config, context } = this.props;
-    return context.record.$transient[`${config.name}Associations`];
+    return context.record.$transient[`${config.name}Associations`] || [];
   }
 
   get targets(): Record[] {
