@@ -8,8 +8,10 @@ import { Record } from 'skygear';
 import uuid from 'uuid';
 
 import { RecordActionDispatcher } from '../actions/record';
-import { FieldConfig, Filter, FilterConfig, FilterConfigTypes, FilterType,
-  IntegerFilter, IntegerFilterQueryType, ListPageConfig, StringFilter, StringFilterQueryType } from '../cmsConfig';
+import { BooleanFilterQueryType, FieldConfig, Filter, 
+  FilterConfig, FilterConfigTypes, FilterType,
+  IntegerFilter, IntegerFilterQueryType, ListPageConfig, 
+  StringFilter, StringFilterQueryType } from '../cmsConfig';
 import { FilterList } from '../components/FilterList';
 import Pagination from '../components/Pagination';
 import { Field, FieldContext } from '../fields';
@@ -164,6 +166,10 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
             return {...f,
               query: IntegerFilterQueryType[event.target.value],
             };
+          case FilterType.BooleanFilterType:
+            return {...f,
+              query: BooleanFilterQueryType[event.target.value],
+            };
           default:
             return f;
         }
@@ -219,7 +225,15 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
           value: 0,
         }];
         break;
-
+      case FilterConfigTypes.Boolean:
+        filters = [...this.state.filters, {
+          id: uuid(),
+          label: filterConfig.label,
+          name: filterConfig.name, 
+          query: BooleanFilterQueryType.True,
+          type: FilterType.BooleanFilterType,
+        }];
+        break;
     }
     this.setState({ filters });
     this.fetchList(page, pageConfig.perPage, filters);

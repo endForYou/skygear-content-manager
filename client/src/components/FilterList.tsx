@@ -1,6 +1,8 @@
 import * as React from 'react';
 
-import { Filter, FilterType, IntegerFilterQueryType, StringFilterQueryType, } from '../cmsConfig';
+import { BooleanFilterQueryType, 
+  Filter, FilterType, IntegerFilter,
+  IntegerFilterQueryType, StringFilter, StringFilterQueryType, } from '../cmsConfig';
 
 interface FilterListProps {
   filters: Filter[];
@@ -39,6 +41,8 @@ export class FilterList extends React.PureComponent<FilterListProps> {
         return this.renderStringFilterSelect(filter);
       case FilterType.IntegerFilterType:
         return this.renderIntegerFilterSelect(filter);
+      case FilterType.BooleanFilterType:
+        return this.renderBooleanFilterSelect(filter);
     }
   }
 
@@ -74,16 +78,32 @@ export class FilterList extends React.PureComponent<FilterListProps> {
       </select>);
   }
 
+  public renderBooleanFilterSelect(filter: Filter) {
+    const { handleQueryTypeChange } = this.props;
+
+    return (
+      <select 
+        className="form-control"
+        value={filter.query}
+        onChange={event => handleQueryTypeChange(filter, event)} 
+      >
+        <option value={BooleanFilterQueryType.True}>True</option>
+        <option value={BooleanFilterQueryType.False}>False</option>
+      </select>);
+  }
+
   public renderInput(filter: Filter) {
     switch (filter.type) {
       case FilterType.StringFilterType:
-        return this.renderStringInput(filter);
+        return this.renderStringInput(filter as StringFilter);
       case FilterType.IntegerFilterType:
-        return this.renderIntegerInput(filter);
+        return this.renderIntegerInput(filter as IntegerFilter);
+      default:
+        return (<div />);
     }
   }
 
-  public renderStringInput(filter: Filter) {
+  public renderStringInput(filter: StringFilter) {
     const { handleFilterValueChange } = this.props;
 
     return (
@@ -97,7 +117,7 @@ export class FilterList extends React.PureComponent<FilterListProps> {
     );
   }
 
-  public renderIntegerInput(filter: Filter) {
+  public renderIntegerInput(filter: IntegerFilter) {
     const { handleFilterValueChange } = this.props;
 
     return (

@@ -4,13 +4,17 @@ import skygear, { Query, QueryResult, Record, Reference } from 'skygear';
 
 import {
   AssociationReferenceFieldConfig,
+  BooleanFilter,
+  BooleanFilterQueryType,
   CmsRecord,
   FieldConfigTypes,
   Filter,
   FilterType,
+  IntegerFilter,
   IntegerFilterQueryType,
   ReferenceConfig,
   ReferenceFieldConfig,
+  StringFilter,
   StringFilterQueryType,
 } from '../cmsConfig';
 import { parseReference } from '../recordUtil';
@@ -331,45 +335,67 @@ function fetchRecordList(
 function addFilterToQuery(query: Query, filter: Filter): Query {
     switch (filter.type) {
       case FilterType.StringFilterType:
-        switch (filter.query) {
-          case StringFilterQueryType.EqualTo:
-            query.equalTo(filter.name, filter.value);
-            break;
-          case StringFilterQueryType.NotEqualTo:
-            query.notEqualTo(filter.name, filter.value);
-            break;
-          case StringFilterQueryType.Like:
-            query.like(filter.name, filter.value);
-            break;
-          case StringFilterQueryType.NotLike:
-            query.notLike(filter.name, filter.value);
-            break;
-        }
+        addStringFitlerToQuery(query, filter as StringFilter);
         break;
       case FilterType.IntegerFilterType:
-        switch (filter.query) {
-          case IntegerFilterQueryType.EqualTo:
-            query.equalTo(filter.name, filter.value);
-            break;
-          case IntegerFilterQueryType.NotEqualTo:
-            query.notEqualTo(filter.name, filter.value);
-            break;
-          case IntegerFilterQueryType.LessThan:
-            query.lessThan(filter.name, filter.value);
-            break;
-          case IntegerFilterQueryType.GreaterThan:
-            query.greaterThan(filter.name, filter.value);
-            break;
-          case IntegerFilterQueryType.LessThanOrEqualTo:
-            query.lessThanOrEqualTo(filter.name, filter.value);
-            break;
-          case IntegerFilterQueryType.GreaterThanOrEqualTo:
-            query.greaterThanOrEqualTo(filter.name, filter.value);
-            break;
-        }
+        addIntegerFilterToQuery(query, filter as IntegerFilter);
+        break;
+      case FilterType.BooleanFilterType:
+        addBooleanFilterToQuery(query, filter as BooleanFilter);
         break;
     }
     return query;
+}
+
+function addStringFitlerToQuery(query: Query, filter: StringFilter) {
+  switch (filter.query) {
+    case StringFilterQueryType.EqualTo:
+      query.equalTo(filter.name, filter.value);
+      break;
+    case StringFilterQueryType.NotEqualTo:
+      query.notEqualTo(filter.name, filter.value);
+      break;
+    case StringFilterQueryType.Like:
+      query.like(filter.name, filter.value);
+      break;
+    case StringFilterQueryType.NotLike:
+      query.notLike(filter.name, filter.value);
+      break;
+  }
+}
+
+function addIntegerFilterToQuery(query: Query, filter: IntegerFilter) {
+  switch (filter.query) {
+    case IntegerFilterQueryType.EqualTo:
+      query.equalTo(filter.name, filter.value);
+      break;
+    case IntegerFilterQueryType.NotEqualTo:
+      query.notEqualTo(filter.name, filter.value);
+      break;
+    case IntegerFilterQueryType.LessThan:
+      query.lessThan(filter.name, filter.value);
+      break;
+    case IntegerFilterQueryType.GreaterThan:
+      query.greaterThan(filter.name, filter.value);
+      break;
+    case IntegerFilterQueryType.LessThanOrEqualTo:
+      query.lessThanOrEqualTo(filter.name, filter.value);
+      break;
+    case IntegerFilterQueryType.GreaterThanOrEqualTo:
+      query.greaterThanOrEqualTo(filter.name, filter.value);
+      break;
+  }
+}
+
+function addBooleanFilterToQuery(query: Query, filter: BooleanFilter) {
+  switch (filter.query) {
+    case BooleanFilterQueryType.True:
+      query.equalTo(filter.name, true);
+      break;
+    case BooleanFilterQueryType.False:
+      query.equalTo(filter.name, false);
+      break;
+  }
 }
 
 function queryWithTarget(
