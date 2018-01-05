@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 // import { Record } from 'skygear';
 
+import Pagination from '../components/Pagination';
 import { PushCampaignActionDispatcher } from '../actions/push_campaign';
 import { RootState } from '../states';
 // import { Remote } from '../types';
@@ -84,6 +85,7 @@ export type PushNotificationListPageProps = StateProps & DispatchProps;
 
 export interface StateProps {
   page: number;
+  maxPage: number;
   isLoading: boolean;
 }
 
@@ -108,13 +110,40 @@ class PushNotificationListPageImpl extends React.PureComponent<PushNotificationL
   }
 
   public render() {
+    const {
+      page,
+      maxPage,
+      isLoading,
+    } = this.props;
+
     return (
       <div>
         <h1 className="display-4">Push Notifications</h1>
-        <div>Loading list...</div>
+        <div className="table-responsive">
+          {(() => {
+            if (isLoading) {
+              return <div>Loading...</div>;
+            } else {
+              return <div>No campaigns found.</div>;
+            }
+          })()}
+          {maxPage > 0 ? (
+            <Pagination
+              key="pagination"
+              recordName="Push Campaign"
+              currentPage={page}
+              maxPage={maxPage}
+              onItemClicked={this.onPageItemClicked}
+            />
+          ) : null}
+        </div>
       </div>
     );
   }
+
+  public onPageItemClicked = (page: number) => {
+    this.notificationActionDispatcher.fetchList(page, 25);
+  };
 }
 
 function PushNotificationListPageFactory() {
@@ -122,9 +151,11 @@ function PushNotificationListPageFactory() {
     const { location } = state.router;
     const { page: pageStr = '1' } = qs.parse(location ? location.search : '');
     const page = parseInt(pageStr, 10);
+    const maxPage: number = 1;
 
     return {
       page,
+      maxPage,
       isLoading: false
     };
   }
