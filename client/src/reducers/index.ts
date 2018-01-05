@@ -6,6 +6,7 @@ import { RootState } from '../states';
 import auth from './auth';
 import importReducer from './import';
 import { recordViewsByNameReducerFactory } from './recordFactory';
+import { pushCampaignViewsReducer } from './pushCampaign';
 
 const constReducer = (state = {}) => {
   return state;
@@ -23,6 +24,7 @@ function rootReducerFactory(recordNames: string[]) {
       any
     >,
     router: routerReducer as Reducer<any>,
+    pushCampaign: pushCampaignViewsReducer as Reducer<any>,
   });
   // tslint:enable: no-any
 }

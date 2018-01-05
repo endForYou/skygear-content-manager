@@ -2,17 +2,11 @@ import { Dispatch } from 'redux';
 import { ThunkAction } from 'redux-thunk';
 import skygear from 'skygear';
 
+import { PushCampaign } from '../types';
 import { RootState } from '../states';
 
-export interface PushCampaignHistory {
-  id: string;
-  content: string;
-  device: string;
-  send_time: Date;
-  user_id: string;
-}
 
-export type RecordActions =
+export type PushCampaignListActions =
   | FetchPushCampaignListRequest
   | FetchPushCampaignListSuccess
   | FetchPushCampaignListFailure;
@@ -32,7 +26,7 @@ export interface FetchPushCampaignListRequest {
 
 export interface FetchPushCampaignListSuccess {
   payload: {
-    fetchResult: PushCampaignHistory[];
+    fetchResult: PushCampaign[];
     page: number;
     perPage: number;
   };
@@ -58,7 +52,7 @@ function fetchPushCampaignListRequest(
 }
 
 function fetchPushCampaignListSuccess(
-  fetchResult: PushCampaignHistory[],
+  fetchResult: PushCampaign[],
   page: number,
   perPage: number,
 ): FetchPushCampaignListSuccess {
@@ -86,7 +80,7 @@ function fetchPushCampaignListFailure(
 function fetchListOperation(
   page: number,
   perPage: number
-): Promise<PushCampaignHistory[]> {
+): Promise<PushCampaign[]> {
   // WTF: To avoid compilation error: 
   // "Property 'lambda' does not exist on type 'Container'."
   // tslint:disable-next-line: no-any

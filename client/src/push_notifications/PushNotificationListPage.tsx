@@ -5,8 +5,9 @@ import { Dispatch } from 'redux';
 // import { Record } from 'skygear';
 
 import Pagination from '../components/Pagination';
-import { PushCampaignActionDispatcher } from '../actions/push_campaign';
+import { PushCampaignActionDispatcher } from '../actions/pushCampaign';
 import { RootState } from '../states';
+import { PushCampaign } from '../types';
 // import { Remote } from '../types';
 // import { Field, FieldContext } from '../fields';
 // import { FieldConfig } from '../cmsConfig';
@@ -87,6 +88,7 @@ export interface StateProps {
   page: number;
   maxPage: number;
   isLoading: boolean;
+  pushCampaigns: PushCampaign[];
 }
 
 export interface DispatchProps {
@@ -153,10 +155,16 @@ function PushNotificationListPageFactory() {
     const page = parseInt(pageStr, 10);
     const maxPage: number = 1;
 
+    const { isLoading, pushCampaigns } = state.pushCampaign.list;
+
+    console.log('pushCampaigns:');
+    console.log(pushCampaigns);
+
     return {
       page,
       maxPage,
-      isLoading: false
+      isLoading,
+      pushCampaigns
     };
   }
 
