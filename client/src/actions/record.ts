@@ -8,6 +8,7 @@ import {
   FieldConfigTypes,
   Filter,
   FilterType,
+  IntegerFilterQueryType,
   ReferenceConfig,
   ReferenceFieldConfig,
   StringFilterQueryType,
@@ -342,6 +343,28 @@ function addFilterToQuery(query: Query, filter: Filter): Query {
             break;
           case StringFilterQueryType.NotLike:
             query.notLike(filter.name, filter.value);
+            break;
+        }
+        break;
+      case FilterType.IntegerFilterType:
+        switch (filter.query) {
+          case IntegerFilterQueryType.EqualTo:
+            query.equalTo(filter.name, filter.value);
+            break;
+          case IntegerFilterQueryType.NotEqualTo:
+            query.notEqualTo(filter.name, filter.value);
+            break;
+          case IntegerFilterQueryType.LessThan:
+            query.lessThan(filter.name, filter.value);
+            break;
+          case IntegerFilterQueryType.GreaterThan:
+            query.greaterThan(filter.name, filter.value);
+            break;
+          case IntegerFilterQueryType.LessThanOrEqualTo:
+            query.lessThanOrEqualTo(filter.name, filter.value);
+            break;
+          case IntegerFilterQueryType.GreaterThanOrEqualTo:
+            query.greaterThanOrEqualTo(filter.name, filter.value);
             break;
         }
         break;

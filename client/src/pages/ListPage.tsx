@@ -9,7 +9,7 @@ import uuid from 'uuid';
 
 import { RecordActionDispatcher } from '../actions/record';
 import { FieldConfig, Filter, FilterConfig, FilterConfigTypes, FilterType,
-  ListPageConfig, StringFilterQueryType } from '../cmsConfig';
+  IntegerFilter, IntegerFilterQueryType, ListPageConfig, StringFilter, StringFilterQueryType } from '../cmsConfig';
 import { FilterList } from '../components/FilterList';
 import Pagination from '../components/Pagination';
 import { Field, FieldContext } from '../fields';
@@ -133,6 +133,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
       references,
     );
 
+    this.toggleFilterMenu = this.toggleFilterMenu.bind(this);
     this.handleQueryTypeChange = this.handleQueryTypeChange.bind(this);
     this.handleFilterValueChange = this.handleFilterValueChange.bind(this);
     this.onCloseFilterClicked = this.onCloseFilterClicked.bind(this);
@@ -151,19 +152,24 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
 
   public handleQueryTypeChange(filter: Filter, event: React.ChangeEvent<HTMLSelectElement>) {
     const { page, pageConfig } = this.props;
-    let { filters } = this.state; 
 
-    switch (filter.type) {
-      case FilterType.StringFilterType:
-        filters = filters.map(f => {
-          if (f.id === filter.id) {
+    const filters = this.state.filters.map(f => {
+      if (f.id === filter.id) {
+        switch (filter.type) {
+          case FilterType.StringFilterType:
             return {...f,
               query: StringFilterQueryType[event.target.value],
             };
-          }
-          return f;
-        });
-    }
+          case FilterType.IntegerFilterType:
+            return {...f,
+              query: IntegerFilterQueryType[event.target.value],
+            };
+          default:
+            return f;
+        }
+      }
+      return f;
+    });
 
     this.setState({ filters });
     this.fetchList(page, pageConfig.perPage, filters);
@@ -171,36 +177,52 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
 
   public handleFilterValueChange(filter: Filter, event: React.ChangeEvent<HTMLInputElement>) {
     const { page, pageConfig } = this.props;
-    let { filters } = this.state; 
-
-    switch (filter.type) {
-      case FilterType.StringFilterType:
-        filters = filters.map(f => {
-          if (f.id === filter.id) {
-            return {...f,
-              value: event.target.value,
-            };
+    const filters = this.state.filters.map(f => {
+      if (f.id === filter.id) {
+        switch (filter.type) {
+          case FilterType.StringFilterType:
+            return  {...(f as StringFilter), value: event.target.value};
+          case FilterType.IntegerFilterType:
+            return  {...(f as IntegerFilter), value: Number(event.target.value)};
+          default:
+            return f;
           }
-          return f;
-        });
-    }
+      }
+      return f;
+    });
 
     this.setState({ filters });
     this.fetchList(page, pageConfig.perPage, filters);
   }
 
   public onFilterItemClicked(filterConfig: FilterConfig) {
+    const { page, pageConfig } = this.props;
+    let filters = this.state.filters; 
     switch (filterConfig.type) {
       case FilterConfigTypes.String:
-        this.setState({filters: [...this.state.filters, {
+        filters = [...this.state.filters, {
           id: uuid(),
           label: filterConfig.label,
           name: filterConfig.name, 
           query: StringFilterQueryType.EqualTo,
           type: FilterType.StringFilterType,
           value: '',
-        }]});
+        }];
+        break;
+      case FilterConfigTypes.Integer:
+        filters = [...this.state.filters, {
+          id: uuid(),
+          label: filterConfig.label,
+          name: filterConfig.name, 
+          query: IntegerFilterQueryType.EqualTo,
+          type: FilterType.IntegerFilterType,
+          value: 0,
+        }];
+        break;
+
     }
+    this.setState({ filters });
+    this.fetchList(page, pageConfig.perPage, filters);
     this.toggleFilterMenu();
   }
 
@@ -241,7 +263,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
               <button
                 type="button"
                 className="btn btn-primary dropdown-toggle"
-                onClick={() => this.toggleFilterMenu()}
+                onClick={this.toggleFilterMenu}
               >
                 Add Filter <span className="caret" />
               </button>
