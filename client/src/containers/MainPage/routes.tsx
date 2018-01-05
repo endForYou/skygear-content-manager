@@ -44,7 +44,7 @@ function makeListRoute(config: ListPageConfig): JSX.Element {
     <Route
       key={`${recordName}-list`}
       exact={true}
-      path={`/record/${recordName}`}
+      path={`/records/${recordName}`}
       component={ListPageFactory(recordName)}
     />
   );
@@ -90,7 +90,7 @@ function makeNewRoute(config: RecordFormPageConfig): JSX.Element {
     <Route
       key={`${recordName}-new`}
       exact={true}
-      path={`/record/${recordName}/new`}
+      path={`/records/${recordName}/new`}
       render={routeProps => <NewPageContainer config={config} />}
     />
   );

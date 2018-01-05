@@ -140,7 +140,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps> {
           <h1 className="display-4 d-inline-block">{pageConfig.label}</h1>
           <Link
             className="btn btn-light float-right"
-            to={`/record/${recordName}/new`}
+            to={`/records/${recordName}/new`}
           >
             New
           </Link>

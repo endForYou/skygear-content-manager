@@ -47,7 +47,7 @@ function Item({ item }: ItemProps): JSX.Element {
   switch (item.type) {
     case RecordSiteItemConfigType.Record:
       return (
-        <NavLink className="nav-link" to={`/record/${item.name}`}>
+        <NavLink className="nav-link" to={`/records/${item.name}`}>
           {item.label}
         </NavLink>
       );
