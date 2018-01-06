@@ -1,6 +1,6 @@
 import { Dispatch } from 'redux';
 import { ThunkAction } from 'redux-thunk';
-import skygear, { Query, QueryResult, Record, Reference } from 'skygear';
+import skygear, { Query, QueryResult, Record, RecordCls, Reference } from 'skygear';
 
 import {
   AssociationReferenceFieldConfig,
@@ -12,6 +12,8 @@ import {
   FieldConfigTypes,
   Filter,
   FilterType,
+  GeneralFilter,
+  GeneralFilterQueryType,
   IntegerFilter,
   IntegerFilterQueryType,
   ReferenceConfig,
@@ -256,9 +258,9 @@ export function fetchRecord(
   id: string
 ): ThunkAction<Promise<void>, {}, {}> {
   return dispatch => {
-    const RecordCls = Record.extend(cmsRecord.recordType);
+    const recordCls = Record.extend(cmsRecord.recordType);
 
-    const query = new Query(RecordCls);
+    const query = new Query(recordCls);
     query.equalTo('_id', id);
     query.limit = 1;
 
@@ -309,18 +311,22 @@ function fetchRecordList(
   perPage: number = 25
 ): ThunkAction<Promise<void>, {}, {}> {
   return dispatch => {
-    const RecordCls = Record.extend(cmsRecord.recordType);
+    const recordCls = Record.extend(cmsRecord.recordType);
 
-    let query = new Query(RecordCls);
+    let query: Query;
+    if (filters.length === 1 && filters[0].type === FilterType.GeneralFilterType) {
+      query = createGeneralFilterQuery(filters[0] as GeneralFilter, recordCls);
+    } else {
+      query = new Query(recordCls);
+      filters.forEach(filter => {
+        query = addFilterToQuery(query, filter, recordCls);
+      });
+    }
+
     query.overallCount = true;
     query.limit = perPage;
     query.offset = (page - 1) * perPage;
-
     query.addDescending('_created_at');
-    
-    filters.forEach(filter => {
-      query = addFilterToQuery(query, filter);
-    });
 
     dispatch(fetchRecordListRequest(cmsRecord, page));
     return queryWithTarget(query, references).then(
@@ -334,25 +340,21 @@ function fetchRecordList(
   };
 }
 
-function addFilterToQuery(query: Query, filter: Filter): Query {
+function addFilterToQuery(query: Query, filter: Filter, recordCls: RecordCls): Query {
     switch (filter.type) {
       case FilterType.StringFilterType:
-        addStringFitlerToQuery(query, filter as StringFilter);
-        break;
+        return addStringFitlerToQuery(query, filter as StringFilter);
       case FilterType.IntegerFilterType:
-        addIntegerFilterToQuery(query, filter as IntegerFilter);
-        break;
+        return addIntegerFilterToQuery(query, filter as IntegerFilter);
       case FilterType.BooleanFilterType:
-        addBooleanFilterToQuery(query, filter as BooleanFilter);
-        break;
+        return addBooleanFilterToQuery(query, filter as BooleanFilter);
       case FilterType.DateTimeFilterType:
-        addDatetimeFilterToQuery(query, filter as DateTimeFilter);
-        break;
+        return addDatetimeFilterToQuery(query, filter as DateTimeFilter);
     }
     return query;
 }
 
-function addStringFitlerToQuery(query: Query, filter: StringFilter) {
+function addStringFitlerToQuery(query: Query, filter: StringFilter): Query {
   switch (filter.query) {
     case StringFilterQueryType.EqualTo:
       query.equalTo(filter.name, filter.value);
@@ -367,9 +369,10 @@ function addStringFitlerToQuery(query: Query, filter: StringFilter) {
       query.notLike(filter.name, filter.value);
       break;
   }
+  return query;
 }
 
-function addIntegerFilterToQuery(query: Query, filter: IntegerFilter) {
+function addIntegerFilterToQuery(query: Query, filter: IntegerFilter): Query {
   switch (filter.query) {
     case IntegerFilterQueryType.EqualTo:
       query.equalTo(filter.name, filter.value);
@@ -390,9 +393,10 @@ function addIntegerFilterToQuery(query: Query, filter: IntegerFilter) {
       query.greaterThanOrEqualTo(filter.name, filter.value);
       break;
   }
+  return query;
 }
 
-function addBooleanFilterToQuery(query: Query, filter: BooleanFilter) {
+function addBooleanFilterToQuery(query: Query, filter: BooleanFilter): Query {
   switch (filter.query) {
     case BooleanFilterQueryType.True:
       query.equalTo(filter.name, true);
@@ -401,9 +405,10 @@ function addBooleanFilterToQuery(query: Query, filter: BooleanFilter) {
       query.equalTo(filter.name, false);
       break;
   }
+  return query;
 }
 
-function addDatetimeFilterToQuery(query: Query, filter: DateTimeFilter) {
+function addDatetimeFilterToQuery(query: Query, filter: DateTimeFilter): Query {
   switch (filter.query) {
     case DateTimeFilterQueryType.Before:
       query.lessThan(filter.name, filter.value);
@@ -411,6 +416,20 @@ function addDatetimeFilterToQuery(query: Query, filter: DateTimeFilter) {
     case DateTimeFilterQueryType.After:
       query.greaterThan(filter.name, filter.value);
       break;
+  }
+  return query;
+}
+
+function createGeneralFilterQuery(filter: GeneralFilter, recordCls: RecordCls) {
+  switch (filter.query) {
+    case GeneralFilterQueryType.Contains:
+      const generalQuery = filter.names.map(name => {
+        const q = new Query(recordCls);
+        q.like(name, `%${filter.value}%`);
+        return q;
+      }).reduce((accumulator, currentValue) => Query.or(accumulator, currentValue));
+
+      return generalQuery;
   }
 }
 

@@ -4,9 +4,17 @@ import * as Datetime from 'react-datetime';
 // tslint:disable-next-line: no-submodule-imports
 import 'react-datetime/css/react-datetime.css';
 
-import { BooleanFilterQueryType, DateTimeFilter, DateTimeFilterQueryType,
-  Filter, FilterType, IntegerFilter, 
-  IntegerFilterQueryType, StringFilter, StringFilterQueryType, } from '../cmsConfig';
+import { 
+  BooleanFilterQueryType, 
+  DateTimeFilter, 
+  DateTimeFilterQueryType,
+  Filter, 
+  FilterType, 
+  GeneralFilter, 
+  IntegerFilter, 
+  IntegerFilterQueryType,
+  StringFilter, 
+  StringFilterQueryType, } from '../cmsConfig';
 
 interface FilterListProps {
   filters: Filter[];
@@ -53,6 +61,8 @@ export class FilterList extends React.PureComponent<FilterListProps> {
         return this.renderBooleanFilterSelect(filter);
       case FilterType.DateTimeFilterType:
         return this.renderDateTimeFilterSelect(filter);
+      case FilterType.GeneralFilterType:
+        return (<div />);
     }
   }
 
@@ -126,6 +136,8 @@ export class FilterList extends React.PureComponent<FilterListProps> {
         return (<div />);
       case FilterType.DateTimeFilterType:
         return this.renderDateTimeInput(filter as DateTimeFilter);
+      case FilterType.GeneralFilterType:
+        return this.renderGeneralInput(filter as GeneralFilter);
     }
   }
 
@@ -164,6 +176,20 @@ export class FilterList extends React.PureComponent<FilterListProps> {
         value={filter.value}
         onChange={event => this.handleDateTimeChange(filter, event)}
         utc={true}
+      />
+    );
+  }
+
+  public renderGeneralInput(filter: GeneralFilter) {
+    const { handleFilterValueChange } = this.props;
+
+    return (
+      <input 
+        type="text"
+        className="form-control"
+        autoFocus={true}
+        onChange={event => handleFilterValueChange(filter, event)}
+        value={filter.value}
       />
     );
   }

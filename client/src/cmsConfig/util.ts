@@ -26,3 +26,19 @@ export function parseOptionalString(
 
   throw new Error(`${context}.${fieldName} want a string, got ${typeof a}`);
 }
+
+// tslint:disable-next-line: no-any
+export function parseStringArray(a: any, fieldName: string, context: string): string[] {
+  const value = a[fieldName];
+  if (value instanceof Array) {
+    return value.map(name => {
+        if (typeof name === 'string') {
+          return name;
+        }
+
+        throw new Error(`${context}.${fieldName} want a string, got ${typeof a}`);
+    });
+  }
+  
+  throw new Error(`${context}.${fieldName} want an array, got ${typeof value}`);
+}
