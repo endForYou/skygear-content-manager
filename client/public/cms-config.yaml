@@ -23,6 +23,13 @@ records:
           type: ImageAsset
         - type: _created_at
         - type: _updated_at
+      filters:
+        - name: name
+          type: String
+          label: Name
+        - name: _created_at
+          type: DateTime
+          label: Created at
     show:
       fields:
         - type: _id
@@ -89,6 +96,13 @@ records:
           type: Boolean
         - type: _created_at
         - type: _updated_at
+      filters:
+        - name: views
+          type: Integer
+          label: Views
+        - name: is_active
+          type: Boolean
+          label: Is active
     show:
       label: View Poll
       fields:
@@ -216,6 +230,12 @@ records:
           type: Integer
         - name: deleted
           type: Boolean
+      filters:
+        - type: General
+          label: General
+          name:
+            - title
+            - type
     show:
       fields:
         - name: title
