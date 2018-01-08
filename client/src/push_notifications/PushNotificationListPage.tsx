@@ -7,17 +7,27 @@ import { Link } from 'react-router-dom';
 import Pagination from '../components/Pagination';
 import { PushCampaignActionDispatcher } from '../actions/pushCampaign';
 import { RootState } from '../states';
-import { PushCampaign, pushCampaignConfig } from '../types';
-// import { Remote } from '../types';
+import { PushCampaign } from '../types';
 // import { Field, FieldContext } from '../fields';
 // import { FieldConfig } from '../cmsConfig';
 
+const pageSize: number = 25;
 
+interface FieldConfig {
+  field: string;
+  fieldTitle: string;
+}
 
+const pushCampaignConfig: FieldConfig[] = [
+  {'field': 'type', 'fieldTitle': 'Type'},
+  {'field': 'number_of_audiences', 'fieldTitle': 'No. of audiences'},
+  {'field': 'content', 'fieldTitle': 'Content'},
+  {'field': 'send_time', 'fieldTitle': 'Time'},
+];
 
 const TableHeader: React.SFC = () => {
   const columns = pushCampaignConfig.map((fieldName, index) => {
-    return <th key={index}>{fieldName}</th>;
+    return <th key={index}>{fieldName.fieldTitle}</th>;
   });
   return (
     <thead className="thead-light">
@@ -35,7 +45,7 @@ interface TableRowProps {
 
 const TableRow: React.SFC<TableRowProps> = ({ pushCampaign }) => {
   const columns = pushCampaignConfig.map((fieldName, index) => {
-    return <th key={index}>{pushCampaign[fieldName]}</th>;
+    return <th key={index}><span>{pushCampaign[fieldName.field]}</span></th>;
   });
   return (
     <tr>
@@ -103,7 +113,7 @@ class PushNotificationListPageImpl extends React.PureComponent<PushNotificationL
 
   public componentDidMount() {
     const { page } = this.props;
-    this.notificationActionDispatcher.fetchList(page, 25);
+    this.notificationActionDispatcher.fetchList(page, pageSize);
   }
 
   public render() {
@@ -148,7 +158,7 @@ class PushNotificationListPageImpl extends React.PureComponent<PushNotificationL
   }
 
   public onPageItemClicked = (page: number) => {
-    this.notificationActionDispatcher.fetchList(page, 25);
+    this.notificationActionDispatcher.fetchList(page, pageSize);
   };
 }
 

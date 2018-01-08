@@ -9,10 +9,11 @@ PAGE = 1
 
 class CmsPushCampaignSchema(Schema):
     id = fields.String()
-    user_id = fields.String()
-    device = fields.String()
     content = fields.String()
     send_time = fields.DateTime()
+    type = fields.String()
+    sent = fields.Boolean()
+    number_of_audiences = fields.Integer()
 
 
 @skygear.op("push_campaign:get_all", user_required=True)
@@ -24,7 +25,7 @@ def get_all_push_campaigns(**kwargs):
             SELECT * FROM _cms_push_campaign
             LIMIT %d
             OFFSET %d
-        ''' % (page_size, page))
+        ''' % (page_size, page_size * (page - 1)))
         push_campaigns_dict_list = CmsPushCampaignSchema(
             many=True).dump(query_result).data
     return {'result': push_campaigns_dict_list}

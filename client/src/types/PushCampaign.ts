@@ -1,9 +1,8 @@
 export interface PushCampaign {
   id: string;
   content: string;
-  device: string;
+  type: string;
   send_time: Date;
-  user_id: string;
+  sent: boolean;
+  number_of_audiences: number;
 }
-
-export const pushCampaignConfig = ['id', 'content', 'device', 'send_time', 'user_id'];
