@@ -321,12 +321,6 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
       <div>
         <div className="navbar">
           <h1 className="display-4 d-inline-block">{pageConfig.label}</h1>
-          <Link
-            className="btn btn-light float-right"
-            to={`/records/${recordName}/new`}
-          >
-            New
-          </Link>
           { pageConfig.filters &&
             <div className="dropdown float-right">
               <button
@@ -353,6 +347,12 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
               </div>
             </div>
           }
+          <Link
+            className="btn btn-light float-right"
+            to={`/records/${recordName}/new`}
+          >
+            New
+          </Link>
         </div>
       
         <div className="float-right">
