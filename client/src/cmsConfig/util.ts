@@ -1,5 +1,9 @@
 // tslint:disable-next-line: no-any
-export function parseString(a: any, fieldName: string, context: string): string {
+export function parseString(
+  a: any,
+  fieldName: string,
+  context: string
+): string {
   const optionalString = parseOptionalString(a, fieldName, context);
   if (optionalString === undefined) {
     throw new Error(`${context}.${fieldName} want a string, got undefined`);
@@ -28,17 +32,21 @@ export function parseOptionalString(
 }
 
 // tslint:disable-next-line: no-any
-export function parseStringArray(a: any, fieldName: string, context: string): string[] {
+export function parseStringArray(
+  a: any,
+  fieldName: string,
+  context: string
+): string[] {
   const value = a[fieldName];
   if (value instanceof Array) {
     return value.map(name => {
-        if (typeof name === 'string') {
-          return name;
-        }
+      if (typeof name === 'string') {
+        return name;
+      }
 
-        throw new Error(`${context}.${fieldName} want a string, got ${typeof a}`);
+      throw new Error(`${context}.${fieldName} want a string, got ${typeof a}`);
     });
   }
-  
+
   throw new Error(`${context}.${fieldName} want an array, got ${typeof value}`);
 }

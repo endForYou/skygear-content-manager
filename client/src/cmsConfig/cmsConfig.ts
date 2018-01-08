@@ -306,9 +306,9 @@ function parseListPageConfig(
   const compactFields = fields.map(config => ({ ...config, compact: true }));
 
   // tslint:disable-next-line: no-any
-  const filters = input.filters && input.filters.map((f: any) =>
-    parseFilterConfig(f)
-  ) as FilterConfig[];
+  const filters =
+    input.filters &&
+    (input.filters.map((f: any) => parseFilterConfig(f)) as FilterConfig[]);
 
   return {
     cmsRecord,

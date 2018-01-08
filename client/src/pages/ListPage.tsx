@@ -8,22 +8,23 @@ import { Record } from 'skygear';
 import uuid from 'uuid';
 
 import { RecordActionDispatcher } from '../actions/record';
-import { 
-  BooleanFilterQueryType, 
-  DateTimeFilter, 
-  DateTimeFilterQueryType, 
-  FieldConfig, 
-  Filter, 
-  FilterConfig, 
-  FilterConfigTypes, 
+import {
+  BooleanFilterQueryType,
+  DateTimeFilter,
+  DateTimeFilterQueryType,
+  FieldConfig,
+  Filter,
+  FilterConfig,
+  FilterConfigTypes,
   FilterType,
-  GeneralFilter, 
+  GeneralFilter,
   GeneralFilterQueryType,
-  IntegerFilter, 
-  IntegerFilterQueryType, 
-  ListPageConfig, 
-  StringFilter, 
-  StringFilterQueryType } from '../cmsConfig';
+  IntegerFilter,
+  IntegerFilterQueryType,
+  ListPageConfig,
+  StringFilter,
+  StringFilterQueryType,
+} from '../cmsConfig';
 import { FilterList } from '../components/FilterList';
 import Pagination from '../components/Pagination';
 import { Field, FieldContext } from '../fields';
@@ -144,13 +145,13 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
     this.recordActionCreator = new RecordActionDispatcher(
       dispatch,
       cmsRecord,
-      references,
+      references
     );
 
     this.toggleFilterMenu = this.toggleFilterMenu.bind(this);
     this.handleQueryTypeChange = this.handleQueryTypeChange.bind(this);
     this.handleFilterValueChange = this.handleFilterValueChange.bind(this);
-    this.handleDateTimeValueChange = this.handleDateTimeValueChange.bind(this); 
+    this.handleDateTimeValueChange = this.handleDateTimeValueChange.bind(this);
     this.onCloseFilterClicked = this.onCloseFilterClicked.bind(this);
     this.fetchList = debounce(this.fetchList.bind(this), 200);
   }
@@ -162,29 +163,36 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
   }
 
   public toggleFilterMenu() {
-    this.setState({showfilterMenu: !this.state.showfilterMenu});
+    this.setState({ showfilterMenu: !this.state.showfilterMenu });
   }
 
-  public handleQueryTypeChange(filter: Filter, event: React.ChangeEvent<HTMLSelectElement>) {
+  public handleQueryTypeChange(
+    filter: Filter,
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) {
     const { page, pageConfig } = this.props;
 
     const filters = this.state.filters.map(f => {
       if (f.id === filter.id) {
         switch (filter.type) {
           case FilterType.StringFilterType:
-            return {...f,
+            return {
+              ...f,
               query: StringFilterQueryType[event.target.value],
             };
           case FilterType.IntegerFilterType:
-            return {...f,
+            return {
+              ...f,
               query: IntegerFilterQueryType[event.target.value],
             };
           case FilterType.BooleanFilterType:
-            return {...f,
+            return {
+              ...f,
               query: BooleanFilterQueryType[event.target.value],
             };
           case FilterType.DateTimeFilterType:
-            return {...f,
+            return {
+              ...f,
               query: DateTimeFilterQueryType[event.target.value],
             };
         }
@@ -196,21 +204,27 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
     this.fetchList(page, pageConfig.perPage, filters);
   }
 
-  public handleFilterValueChange(filter: Filter, event: React.ChangeEvent<HTMLInputElement>) {
+  public handleFilterValueChange(
+    filter: Filter,
+    event: React.ChangeEvent<HTMLInputElement>
+  ) {
     const { page, pageConfig } = this.props;
     const filters = this.state.filters.map(f => {
       if (f.id === filter.id) {
         switch (filter.type) {
           case FilterType.StringFilterType:
-            return  {...(f as StringFilter), value: event.target.value};
+            return { ...(f as StringFilter), value: event.target.value };
           case FilterType.IntegerFilterType:
-            return  {...(f as IntegerFilter), value: Number(event.target.value)};
+            return {
+              ...(f as IntegerFilter),
+              value: Number(event.target.value),
+            };
           case FilterType.BooleanFilterType:
           case FilterType.DateTimeFilterType:
             return f;
           case FilterType.GeneralFilterType:
-            return  {...(f as GeneralFilter), value: event.target.value};
-          }
+            return { ...(f as GeneralFilter), value: event.target.value };
+        }
       }
       return f;
     });
@@ -223,7 +237,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
     const { page, pageConfig } = this.props;
     const filters = this.state.filters.map(f => {
       if (f.id === filter.id) {
-        return  {...(f as DateTimeFilter), value: datetime};
+        return { ...(f as DateTimeFilter), value: datetime };
       } else {
         return f;
       }
@@ -234,58 +248,72 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
 
   public onFilterItemClicked(filterConfig: FilterConfig) {
     const { page, pageConfig } = this.props;
-    let filters = this.state.filters; 
+    let filters = this.state.filters;
 
     if (filterConfig.type === FilterConfigTypes.General) {
-      filters = [{
-        id: uuid(),
-        label: filterConfig.label,
-        names: filterConfig.names, 
-        query: GeneralFilterQueryType.Contains,
-        type: FilterType.GeneralFilterType,
-        value: '',
-      }];
+      filters = [
+        {
+          id: uuid(),
+          label: filterConfig.label,
+          names: filterConfig.names,
+          query: GeneralFilterQueryType.Contains,
+          type: FilterType.GeneralFilterType,
+          value: '',
+        },
+      ];
     } else {
       filters = filters.filter(f => f.type !== FilterType.GeneralFilterType);
       switch (filterConfig.type) {
         case FilterConfigTypes.String:
-          filters = [...filters, {
-            id: uuid(),
-            label: filterConfig.label,
-            name: filterConfig.name, 
-            query: StringFilterQueryType.EqualTo,
-            type: FilterType.StringFilterType,
-            value: '',
-          }];
+          filters = [
+            ...filters,
+            {
+              id: uuid(),
+              label: filterConfig.label,
+              name: filterConfig.name,
+              query: StringFilterQueryType.EqualTo,
+              type: FilterType.StringFilterType,
+              value: '',
+            },
+          ];
           break;
         case FilterConfigTypes.Integer:
-          filters = [...filters, {
-            id: uuid(),
-            label: filterConfig.label,
-            name: filterConfig.name, 
-            query: IntegerFilterQueryType.EqualTo,
-            type: FilterType.IntegerFilterType,
-            value: 0,
-          }];
+          filters = [
+            ...filters,
+            {
+              id: uuid(),
+              label: filterConfig.label,
+              name: filterConfig.name,
+              query: IntegerFilterQueryType.EqualTo,
+              type: FilterType.IntegerFilterType,
+              value: 0,
+            },
+          ];
           break;
         case FilterConfigTypes.Boolean:
-          filters = [...filters, {
-            id: uuid(),
-            label: filterConfig.label,
-            name: filterConfig.name, 
-            query: BooleanFilterQueryType.True,
-            type: FilterType.BooleanFilterType,
-          }];
+          filters = [
+            ...filters,
+            {
+              id: uuid(),
+              label: filterConfig.label,
+              name: filterConfig.name,
+              query: BooleanFilterQueryType.True,
+              type: FilterType.BooleanFilterType,
+            },
+          ];
           break;
         case FilterConfigTypes.DateTime:
-          filters = [...filters, {
-            id: uuid(),
-            label: filterConfig.label,
-            name: filterConfig.name, 
-            query: DateTimeFilterQueryType.Before,
-            type: FilterType.DateTimeFilterType,
-            value: new Date(),
-          }];
+          filters = [
+            ...filters,
+            {
+              id: uuid(),
+              label: filterConfig.label,
+              name: filterConfig.name,
+              query: DateTimeFilterQueryType.Before,
+              type: FilterType.DateTimeFilterType,
+              value: new Date(),
+            },
+          ];
           break;
       }
     }
@@ -312,10 +340,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
       records,
     } = this.props;
 
-    const {
-      showfilterMenu,
-      filters,
-    } = this.state;
+    const { showfilterMenu, filters } = this.state;
 
     return (
       <div>
@@ -354,7 +379,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
             New
           </Link>
         </div>
-      
+
         <div className="float-right">
           <FilterList
             filters={filters}
@@ -364,7 +389,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
             handleDateTimeValueChange={this.handleDateTimeValueChange}
           />
         </div>
-          
+
         <div className="table-responsive">
           {(() => {
             if (isLoading) {
@@ -405,7 +430,6 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
   public fetchList(page: number, perPage: number, filters: Filter[]) {
     this.recordActionCreator.fetchList(page, perPage, filters);
   }
-
 }
 
 function ListPageFactory(recordName: string) {

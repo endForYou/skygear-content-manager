@@ -1,6 +1,12 @@
 import { Dispatch } from 'redux';
 import { ThunkAction } from 'redux-thunk';
-import skygear, { Query, QueryResult, Record, RecordCls, Reference } from 'skygear';
+import skygear, {
+  Query,
+  QueryResult,
+  Record,
+  RecordCls,
+  Reference,
+} from 'skygear';
 
 import {
   AssociationReferenceFieldConfig,
@@ -314,7 +320,10 @@ function fetchRecordList(
     const recordCls = Record.extend(cmsRecord.recordType);
 
     let query: Query;
-    if (filters.length === 1 && filters[0].type === FilterType.GeneralFilterType) {
+    if (
+      filters.length === 1 &&
+      filters[0].type === FilterType.GeneralFilterType
+    ) {
       query = createGeneralFilterQuery(filters[0] as GeneralFilter, recordCls);
     } else {
       query = new Query(recordCls);
@@ -340,18 +349,22 @@ function fetchRecordList(
   };
 }
 
-function addFilterToQuery(query: Query, filter: Filter, recordCls: RecordCls): Query {
-    switch (filter.type) {
-      case FilterType.StringFilterType:
-        return addStringFitlerToQuery(query, filter as StringFilter);
-      case FilterType.IntegerFilterType:
-        return addIntegerFilterToQuery(query, filter as IntegerFilter);
-      case FilterType.BooleanFilterType:
-        return addBooleanFilterToQuery(query, filter as BooleanFilter);
-      case FilterType.DateTimeFilterType:
-        return addDatetimeFilterToQuery(query, filter as DateTimeFilter);
-    }
-    return query;
+function addFilterToQuery(
+  query: Query,
+  filter: Filter,
+  recordCls: RecordCls
+): Query {
+  switch (filter.type) {
+    case FilterType.StringFilterType:
+      return addStringFitlerToQuery(query, filter as StringFilter);
+    case FilterType.IntegerFilterType:
+      return addIntegerFilterToQuery(query, filter as IntegerFilter);
+    case FilterType.BooleanFilterType:
+      return addBooleanFilterToQuery(query, filter as BooleanFilter);
+    case FilterType.DateTimeFilterType:
+      return addDatetimeFilterToQuery(query, filter as DateTimeFilter);
+  }
+  return query;
 }
 
 function addStringFitlerToQuery(query: Query, filter: StringFilter): Query {
@@ -423,11 +436,15 @@ function addDatetimeFilterToQuery(query: Query, filter: DateTimeFilter): Query {
 function createGeneralFilterQuery(filter: GeneralFilter, recordCls: RecordCls) {
   switch (filter.query) {
     case GeneralFilterQueryType.Contains:
-      const generalQuery = filter.names.map(name => {
-        const q = new Query(recordCls);
-        q.like(name, `%${filter.value}%`);
-        return q;
-      }).reduce((accumulator, currentValue) => Query.or(accumulator, currentValue));
+      const generalQuery = filter.names
+        .map(name => {
+          const q = new Query(recordCls);
+          q.like(name, `%${filter.value}%`);
+          return q;
+        })
+        .reduce((accumulator, currentValue) =>
+          Query.or(accumulator, currentValue)
+        );
 
       return generalQuery;
   }
@@ -563,7 +580,7 @@ export class RecordActionDispatcher {
   constructor(
     dispatch: Dispatch<RootState>,
     cmsRecord: CmsRecord,
-    references: ReferenceConfig[],
+    references: ReferenceConfig[]
   ) {
     this.dispatch = dispatch;
     this.cmsRecord = cmsRecord;
@@ -574,7 +591,11 @@ export class RecordActionDispatcher {
     return this.dispatch(fetchRecord(this.cmsRecord, this.references, id));
   }
 
-  public fetchList(page: number, perPage: number, filters: Filter[] = []): Promise<void> {
+  public fetchList(
+    page: number,
+    perPage: number,
+    filters: Filter[] = []
+  ): Promise<void> {
     return this.dispatch(
       fetchRecordList(this.cmsRecord, this.references, filters, page, perPage)
     );

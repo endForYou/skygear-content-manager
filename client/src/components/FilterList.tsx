@@ -4,22 +4,29 @@ import * as Datetime from 'react-datetime';
 // tslint:disable-next-line: no-submodule-imports
 import 'react-datetime/css/react-datetime.css';
 
-import { 
-  BooleanFilterQueryType, 
-  DateTimeFilter, 
+import {
+  BooleanFilterQueryType,
+  DateTimeFilter,
   DateTimeFilterQueryType,
-  Filter, 
-  FilterType, 
-  GeneralFilter, 
-  IntegerFilter, 
+  Filter,
+  FilterType,
+  GeneralFilter,
+  IntegerFilter,
   IntegerFilterQueryType,
-  StringFilter, 
-  StringFilterQueryType, } from '../cmsConfig';
+  StringFilter,
+  StringFilterQueryType,
+} from '../cmsConfig';
 
 interface FilterListProps {
   filters: Filter[];
-  handleQueryTypeChange: (filter: Filter, event: React.ChangeEvent<HTMLSelectElement>) => void;
-  handleFilterValueChange: (filter: Filter, event: React.ChangeEvent<HTMLInputElement>) => void; 
+  handleQueryTypeChange: (
+    filter: Filter,
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => void;
+  handleFilterValueChange: (
+    filter: Filter,
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => void;
   onCloseFilterClicked: (filter: Filter) => void;
   handleDateTimeValueChange: (filter: Filter, datetime: Date) => void;
 }
@@ -28,7 +35,6 @@ const DATE_FORMAT = 'YYYY-MM-DD';
 const TIME_FORMAT = 'HH:mm:ss[Z]';
 
 export class FilterList extends React.PureComponent<FilterListProps> {
-
   public renderFilter(filter: Filter) {
     const { onCloseFilterClicked } = this.props;
     return (
@@ -36,14 +42,14 @@ export class FilterList extends React.PureComponent<FilterListProps> {
         <div className="form-group mr-2">
           <label>{filter.label}</label>
         </div>
-        <div className="form-group mr-2">
-          {this.renderFilterSelect(filter)}
-        </div>
-        <div className="form-group mr-4">
-          {this.renderInput(filter)}
-        </div>
+        <div className="form-group mr-2">{this.renderFilterSelect(filter)}</div>
+        <div className="form-group mr-4">{this.renderInput(filter)}</div>
         <div className="form-group">
-          <button onClick={() => onCloseFilterClicked(filter)} type="button" className="close">
+          <button
+            onClick={() => onCloseFilterClicked(filter)}
+            type="button"
+            className="close"
+          >
             <span>&times;</span>
           </button>
         </div>
@@ -62,68 +68,76 @@ export class FilterList extends React.PureComponent<FilterListProps> {
       case FilterType.DateTimeFilterType:
         return this.renderDateTimeFilterSelect(filter);
       case FilterType.GeneralFilterType:
-        return (<div />);
+        return <div />;
     }
   }
 
   public renderStringFilterSelect(filter: Filter) {
     const { handleQueryTypeChange } = this.props;
     return (
-      <select 
+      <select
         className="form-control"
         value={filter.query}
-        onChange={event => handleQueryTypeChange(filter, event)} 
+        onChange={event => handleQueryTypeChange(filter, event)}
       >
         <option value={StringFilterQueryType.EqualTo}>Equal to</option>
         <option value={StringFilterQueryType.NotEqualTo}>Not equal to</option>
         <option value={StringFilterQueryType.Like}>Like</option>
         <option value={StringFilterQueryType.NotLike}>Not like</option>
-      </select>);
+      </select>
+    );
   }
 
   public renderIntegerFilterSelect(filter: Filter) {
     const { handleQueryTypeChange } = this.props;
     return (
-      <select 
+      <select
         className="form-control"
         value={filter.query}
-        onChange={event => handleQueryTypeChange(filter, event)} 
+        onChange={event => handleQueryTypeChange(filter, event)}
       >
         <option value={IntegerFilterQueryType.EqualTo}>Equal to</option>
         <option value={IntegerFilterQueryType.NotEqualTo}>Not equal to</option>
         <option value={IntegerFilterQueryType.LessThan}>Less than</option>
         <option value={IntegerFilterQueryType.GreaterThan}>Greater than</option>
-        <option value={IntegerFilterQueryType.LessThanOrEqualTo}>Less than or equal to</option>
-        <option value={IntegerFilterQueryType.GreaterThanOrEqualTo}>Greater than or equal to</option>
-      </select>);
+        <option value={IntegerFilterQueryType.LessThanOrEqualTo}>
+          Less than or equal to
+        </option>
+        <option value={IntegerFilterQueryType.GreaterThanOrEqualTo}>
+          Greater than or equal to
+        </option>
+      </select>
+    );
   }
 
   public renderBooleanFilterSelect(filter: Filter) {
     const { handleQueryTypeChange } = this.props;
 
     return (
-      <select 
+      <select
         className="form-control"
         value={filter.query}
-        onChange={event => handleQueryTypeChange(filter, event)} 
+        onChange={event => handleQueryTypeChange(filter, event)}
       >
         <option value={BooleanFilterQueryType.True}>True</option>
         <option value={BooleanFilterQueryType.False}>False</option>
-      </select>);
+      </select>
+    );
   }
 
   public renderDateTimeFilterSelect(filter: Filter) {
     const { handleQueryTypeChange } = this.props;
 
     return (
-      <select 
+      <select
         className="form-control"
         value={filter.query}
-        onChange={event => handleQueryTypeChange(filter, event)} 
+        onChange={event => handleQueryTypeChange(filter, event)}
       >
         <option value={DateTimeFilterQueryType.Before}>Before</option>
         <option value={DateTimeFilterQueryType.After}>After</option>
-      </select>);
+      </select>
+    );
   }
 
   public renderInput(filter: Filter) {
@@ -133,7 +147,7 @@ export class FilterList extends React.PureComponent<FilterListProps> {
       case FilterType.IntegerFilterType:
         return this.renderIntegerInput(filter as IntegerFilter);
       case FilterType.BooleanFilterType:
-        return (<div />);
+        return <div />;
       case FilterType.DateTimeFilterType:
         return this.renderDateTimeInput(filter as DateTimeFilter);
       case FilterType.GeneralFilterType:
@@ -145,7 +159,7 @@ export class FilterList extends React.PureComponent<FilterListProps> {
     const { handleFilterValueChange } = this.props;
 
     return (
-      <input 
+      <input
         type="text"
         className="form-control"
         autoFocus={true}
@@ -159,7 +173,7 @@ export class FilterList extends React.PureComponent<FilterListProps> {
     const { handleFilterValueChange } = this.props;
 
     return (
-      <input 
+      <input
         type="number"
         className="form-control"
         autoFocus={true}
@@ -184,7 +198,7 @@ export class FilterList extends React.PureComponent<FilterListProps> {
     const { handleFilterValueChange } = this.props;
 
     return (
-      <input 
+      <input
         type="text"
         className="form-control"
         autoFocus={true}
@@ -196,17 +210,17 @@ export class FilterList extends React.PureComponent<FilterListProps> {
 
   public render() {
     const { filters } = this.props;
-    return filters.map(filter =>
-      this.renderFilter(filter)
-    );
+    return filters.map(filter => this.renderFilter(filter));
   }
 
   // tslint:disable-next-line: no-any
-  public handleDateTimeChange(filter: Filter, event: string | moment.Moment | React.ChangeEvent<any>) {
+  public handleDateTimeChange(
+    filter: Filter,
+    event: string | moment.Moment | React.ChangeEvent<any>
+  ) {
     if (!moment.isMoment(event)) {
       return;
     }
     this.props.handleDateTimeValueChange(filter, event.toDate());
   }
-
 }

@@ -37,17 +37,17 @@ export interface IntegerFilterConfig extends FilterConfigInput {
 }
 
 export interface BooleanFilterConfig extends FilterConfigInput {
-  type: FilterConfigTypes.Boolean; 
+  type: FilterConfigTypes.Boolean;
   name: string;
 }
 
 export interface DateTimeFilterConfig extends FilterConfigInput {
-  type: FilterConfigTypes.DateTime; 
+  type: FilterConfigTypes.DateTime;
   name: string;
 }
 
 export interface GeneralFilterConfig extends FilterConfigInput {
-  type: FilterConfigTypes.General; 
+  type: FilterConfigTypes.General;
   names: string[];
 }
 
@@ -88,29 +88,38 @@ function parseStringFilterConfig(input: FilterConfigInput): StringFilterConfig {
   };
 }
 
-function parseIntegerFilterConfig(input: FilterConfigInput): IntegerFilterConfig {
+function parseIntegerFilterConfig(
+  input: FilterConfigInput
+): IntegerFilterConfig {
   return {
     ...parseFilterConfigAttrs(input, 'Integer'),
     type: FilterConfigTypes.Integer,
   };
 }
 
-function parseBooleanFilterConfig(input: FilterConfigInput): BooleanFilterConfig {
+function parseBooleanFilterConfig(
+  input: FilterConfigInput
+): BooleanFilterConfig {
   return {
     ...parseFilterConfigAttrs(input, 'Boolean'),
     type: FilterConfigTypes.Boolean,
   };
 }
 
-function parseDateTimeFilterConfig(input: FilterConfigInput): DateTimeFilterConfig {
+function parseDateTimeFilterConfig(
+  input: FilterConfigInput
+): DateTimeFilterConfig {
   return {
     ...parseFilterConfigAttrs(input, 'DateTime'),
     type: FilterConfigTypes.DateTime,
   };
 }
 
-function parseGeneralFilterConfig(input: FilterConfigInput): GeneralFilterConfig {
-  const label = parseOptionalString(input, 'label', 'General') || humanize(name);
+function parseGeneralFilterConfig(
+  input: FilterConfigInput
+): GeneralFilterConfig {
+  const label =
+    parseOptionalString(input, 'label', 'General') || humanize(name);
   const names = parseStringArray(input, 'name', 'General');
   return {
     label,
@@ -122,7 +131,7 @@ function parseGeneralFilterConfig(input: FilterConfigInput): GeneralFilterConfig
 export enum StringFilterQueryType {
   EqualTo = 'EqualTo',
   NotEqualTo = 'NotEqualTo',
-  Like = 'Like', 
+  Like = 'Like',
   NotLike = 'NotLike',
 }
 
