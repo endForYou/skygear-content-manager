@@ -213,9 +213,9 @@ export class FilterList extends React.PureComponent<FilterListProps> {
     return filters.map(filter => this.renderFilter(filter));
   }
 
-  // tslint:disable-next-line: no-any
   public handleDateTimeChange(
     filter: Filter,
+    // tslint:disable-next-line: no-any
     event: string | moment.Moment | React.ChangeEvent<any>
   ) {
     if (!moment.isMoment(event)) {

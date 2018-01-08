@@ -1,5 +1,5 @@
-// tslint:disable-next-line: no-any
 export function parseString(
+  // tslint:disable-next-line: no-any
   a: any,
   fieldName: string,
   context: string
@@ -31,8 +31,8 @@ export function parseOptionalString(
   throw new Error(`${context}.${fieldName} want a string, got ${typeof a}`);
 }
 
-// tslint:disable-next-line: no-any
 export function parseStringArray(
+  // tslint:disable-next-line: no-any
   a: any,
   fieldName: string,
   context: string
