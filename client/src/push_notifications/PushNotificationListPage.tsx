@@ -2,85 +2,80 @@ import * as qs from 'query-string';
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
-// import { Record } from 'skygear';
+import { Link } from 'react-router-dom';
 
 import Pagination from '../components/Pagination';
 import { PushCampaignActionDispatcher } from '../actions/pushCampaign';
 import { RootState } from '../states';
-import { PushCampaign } from '../types';
+import { PushCampaign, pushCampaignConfig } from '../types';
 // import { Remote } from '../types';
 // import { Field, FieldContext } from '../fields';
 // import { FieldConfig } from '../cmsConfig';
 
 
 
-// interface TableHeaderProps {
-//   fieldConfigs: FieldConfig[];
-// }
 
-// const TableHeader: React.SFC<TableHeaderProps> = ({ fieldConfigs }) => {
-//   const columns = fieldConfigs.map((fieldConfig, index) => {
-//     return <th key={index}>{fieldConfig.label}</th>;
-//   });
-//   return (
-//     <thead className="thead-light">
-//       <tr>
-//         {columns}
-//         <th />
-//       </tr>
-//     </thead>
-//   );
-// };
+const TableHeader: React.SFC = () => {
+  const columns = pushCampaignConfig.map((fieldName, index) => {
+    return <th key={index}>{fieldName}</th>;
+  });
+  return (
+    <thead className="thead-light">
+      <tr>
+        {columns}
+        <th />
+      </tr>
+    </thead>
+  );
+};
 
-// interface TableRowProps {
-//   fieldConfigs: FieldConfig[];
-//   record: Record;
-// }
+interface TableRowProps {
+  pushCampaign: PushCampaign;
+}
 
-// const TableRow: React.SFC<TableRowProps> = ({ fieldConfigs, record }) => {
-//   const columns = fieldConfigs.map((fieldConfig, index) => {
-//     return (
-//       <td key={index}>
-//         <Field
-//           config={fieldConfig}
-//           value={record[fieldConfig.name]}
-//           context={FieldContext(record)}
-//         />
-//       </td>
-//     );
-//   });
-//   return (
-//     <tr>
-//       {columns}
-//     </tr>
-//   );
-// };
+const TableRow: React.SFC<TableRowProps> = ({ pushCampaign }) => {
+  const columns = pushCampaignConfig.map((fieldName, index) => {
+    return <th key={index}>{pushCampaign[fieldName]}</th>;
+  });
+  return (
+    <tr>
+      {columns}
+      <td>
+        <Link className="btn btn-light" to={`/notification`}>
+          Show
+        </Link>
+        &nbsp;
+        <Link className="btn btn-light" to={`/notification`}>
+          Edit
+        </Link>
+      </td>
+    </tr>
+  );
+};
 
-// interface TableBodyProps {
-//   fieldConfigs: FieldConfig[];
-//   records: Record[];
-// }
+interface TableBodyProps {
+  pushCampaigns: PushCampaign[];
+}
 
-// const TableBody: React.SFC<TableBodyProps> = ({ fieldConfigs, records }) => {
-//   const rows = records.map((record, index) => {
-//     return <TableRow key={index} fieldConfigs={fieldConfigs} record={record} />;
-//   });
-//   return <tbody>{rows}</tbody>;
-// };
+const TableBody: React.SFC<TableBodyProps> = ({ pushCampaigns }) => {
+  const rows = pushCampaigns.map((pushCampaign, index) => {
+    return <TableRow key={index} pushCampaign={pushCampaign} />;
+  });
+  return <tbody>{rows}</tbody>;
+};
 
-// interface ListTableProps {
-//   fieldConfigs: FieldConfig[];
-//   records: Record[];
-// }
+interface ListTableProps {
+  pushCampaigns: PushCampaign[];
+}
 
-// const ListTable: React.SFC<ListTableProps> = ({ fieldConfigs, records }) => {
-//   return (
-//     <table key="table" className="table table-sm table-hover table-responsive">
-//       <TableHeader fieldConfigs={fieldConfigs} />
-//       <TableBody fieldConfigs={fieldConfigs} records={records} />
-//     </table>
-//   );
-// };
+const ListTable: React.SFC<ListTableProps> = ({ pushCampaigns }) => {
+    return (
+    <table key="table" className="table table-sm table-hover table-responsive">
+      <TableHeader/>
+      <TableBody pushCampaigns={pushCampaigns} />
+    </table>
+  );
+};
 
 export type PushNotificationListPageProps = StateProps & DispatchProps;
 
@@ -116,6 +111,7 @@ class PushNotificationListPageImpl extends React.PureComponent<PushNotificationL
       page,
       maxPage,
       isLoading,
+      pushCampaigns
     } = this.props;
 
     return (
@@ -126,7 +122,15 @@ class PushNotificationListPageImpl extends React.PureComponent<PushNotificationL
             if (isLoading) {
               return <div>Loading...</div>;
             } else {
-              return <div>No campaigns found.</div>;
+              if (pushCampaigns.length === 0) {
+                return <div>No campaigns found.</div>;
+              } else {
+                return (
+                  <ListTable
+                    pushCampaigns={pushCampaigns}
+                  />
+                );
+              }
             }
           })()}
           {maxPage > 0 ? (
