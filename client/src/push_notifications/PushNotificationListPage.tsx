@@ -19,10 +19,10 @@ interface FieldConfig {
 }
 
 const pushCampaignConfig: FieldConfig[] = [
-  {'field': 'type', 'fieldTitle': 'Type'},
-  {'field': 'number_of_audiences', 'fieldTitle': 'No. of audiences'},
-  {'field': 'content', 'fieldTitle': 'Content'},
-  {'field': 'send_time', 'fieldTitle': 'Time'},
+  {field: 'type', fieldTitle: 'Type'},
+  {field: 'number_of_audiences', fieldTitle: 'No. of audiences'},
+  {field: 'content', fieldTitle: 'Content'},
+  {field: 'send_time', fieldTitle: 'Time'},
 ];
 
 const TableHeader: React.SFC = () => {
@@ -126,7 +126,15 @@ class PushNotificationListPageImpl extends React.PureComponent<PushNotificationL
 
     return (
       <div>
-        <h1 className="display-4">Push Notifications</h1>
+        <div>
+          <h1 className="display-4 d-inline-block">Push Notifications</h1>
+          <Link
+            className="btn btn-light float-right"
+            to={`/notification/new`}
+          >
+            New Notification
+          </Link>
+        </div>
         <div className="table-responsive">
           {(() => {
             if (isLoading) {
@@ -167,12 +175,9 @@ function PushNotificationListPageFactory() {
     const { location } = state.router;
     const { page: pageStr = '1' } = qs.parse(location ? location.search : '');
     const page = parseInt(pageStr, 10);
-    const maxPage: number = 1;
+    const { isLoading, pushCampaigns, totalCount } = state.pushCampaign.list;
 
-    const { isLoading, pushCampaigns } = state.pushCampaign.list;
-
-    console.log('pushCampaigns:');
-    console.log(pushCampaigns);
+    const maxPage = Math.ceil(totalCount / pageSize);
 
     return {
       page,

@@ -96,6 +96,7 @@ export interface PushCampaignState {
 export interface PushCampaignListState {
   isLoading: boolean;
   page: number;
+  totalCount: number;
   pushCampaigns: PushCampaign[];
   error?: Error;
 }
@@ -103,6 +104,7 @@ export interface PushCampaignListState {
 export const initialPushCampaignListState: PushCampaignListState = {
   isLoading: true,
   page: 1,
+  totalCount: 0,
   pushCampaigns: [],
   error: undefined
 };

@@ -29,6 +29,7 @@ export interface FetchPushCampaignListSuccess {
     fetchResult: PushCampaign[];
     page: number;
     perPage: number;
+    totalCount: number;
   };
   type: PushCampaignActionTypes.FetchListSuccess;
 }
@@ -55,12 +56,14 @@ function fetchPushCampaignListSuccess(
   fetchResult: PushCampaign[],
   page: number,
   perPage: number,
+  totalCount: number,
 ): FetchPushCampaignListSuccess {
   return {
     payload: {
       fetchResult,
       page,
       perPage,
+      totalCount,
     },
     type: PushCampaignActionTypes.FetchListSuccess,
   };
@@ -77,10 +80,15 @@ function fetchPushCampaignListFailure(
   };
 }
 
+interface fetchListResult {
+  pushCampaigns: PushCampaign[];
+  totalCount: number;
+}
+
 function fetchListOperation(
   page: number,
   perPage: number
-): Promise<PushCampaign[]> {
+): Promise<fetchListResult> {
   // WTF: To avoid compilation error: 
   // "Property 'lambda' does not exist on type 'Container'."
   // tslint:disable-next-line: no-any
@@ -89,7 +97,7 @@ function fetchListOperation(
     .then(
       // tslint:disable-next-line: no-any
       (queryResult: any) => {
-        return queryResult.result;
+        return {'pushCampaigns': queryResult.pushCampaigns, 'totalCount': queryResult.totalCount};
       });
 }
 
@@ -101,7 +109,7 @@ function fetchPushCampaignList(
     dispatch(fetchPushCampaignListRequest(page));
     return fetchListOperation(page, perPage).then(
       fetchResult => {
-        dispatch(fetchPushCampaignListSuccess(fetchResult, page, perPage));
+        dispatch(fetchPushCampaignListSuccess(fetchResult.pushCampaigns, page, perPage, fetchResult.totalCount));
       },
       error => {
         dispatch(fetchPushCampaignListFailure(error));

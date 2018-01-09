@@ -21,6 +21,7 @@ def get_all_push_campaigns(**kwargs):
     page_size = kwargs.get('perPage', PAGE_SIZE)
     page = kwargs.get('page', PAGE)
     with db.conn() as conn:
+        total_count = conn.execute('SELECT COUNT(id) FROM _cms_push_campaign').scalar()
         query_result = conn.execute('''
             SELECT * FROM _cms_push_campaign
             LIMIT %d
@@ -28,4 +29,4 @@ def get_all_push_campaigns(**kwargs):
         ''' % (page_size, page_size * (page - 1)))
         push_campaigns_dict_list = CmsPushCampaignSchema(
             many=True).dump(query_result).data
-    return {'result': push_campaigns_dict_list}
+    return {'pushCampaigns': push_campaigns_dict_list, 'totalCount': total_count}

@@ -24,11 +24,12 @@ function pushCampaignListReducer(
     case PushCampaignActionTypes.FetchListRequest:
       return { ...state, page: action.payload.page };
     case PushCampaignActionTypes.FetchListSuccess:
-      const { fetchResult } = action.payload;
+      const { fetchResult, totalCount } = action.payload;
       return {
         ...state,
         isLoading: false,
         pushCampaigns: fetchResult.map((pushCampaign: PushCampaign) => pushCampaign),
+        totalCount
       };
     case PushCampaignActionTypes.FetchListFailure:
       return { ...state, isLoading: false, error: action.payload.error };
