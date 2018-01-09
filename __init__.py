@@ -34,6 +34,7 @@ CMS_JS_URL = \
 
 REQUEST_HEADER_BLACKLIST = [
     'Host',
+    'Accept-Encoding',
 ]
 RESPONSE_HEADER_BLACKLIST = [
     'Access-Control-Allow-Credentials',
