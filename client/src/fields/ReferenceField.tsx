@@ -13,9 +13,9 @@ import { ReferenceFieldConfig } from '../cmsConfig';
 import { ReferenceLink } from '../components/ReferenceLink';
 import { parseReference } from '../recordUtil';
 
+import { debouncePromise1, objectFrom } from '../util';
 import { RequiredFieldProps } from './Field';
 import { NullField } from './NullField';
-import { objectFrom } from '../util';
 
 export type ReferenceFieldProps = RequiredFieldProps<ReferenceFieldConfig>;
 
@@ -77,9 +77,8 @@ class ReferenceFieldImpl extends React.PureComponent<
       return (
         <StringSelectAsync
           {...rest}
-          loadOptions={this.loadOptions}
+          loadOptions={this.debouncedLoadOptions}
           onChange={this.onChange}
-          searchable={false}
           value={value || undefined}
         />
       );
@@ -108,6 +107,12 @@ class ReferenceFieldImpl extends React.PureComponent<
 
     const RecordCls = Record.extend(targetCmsRecord.recordType);
     const query = new Query(RecordCls);
+    if (input !== '') {
+      query.caseInsensitiveLike(
+        this.props.config.displayFieldName,
+        `%${input}%`
+      );
+    }
     query.limit = 500;
     return skygear.publicDB.query(query).then(records => {
       this.setState({
@@ -125,6 +130,11 @@ class ReferenceFieldImpl extends React.PureComponent<
       };
     });
   };
+
+  // tslint:disable-next-line: member-ordering
+  public debouncedLoadOptions: LoadOptionsAsyncHandler<
+    string
+  > = debouncePromise1(this.loadOptions, 300);
 
   public onChange: OnChangeHandler<string> = value => {
     if (value === null) {
