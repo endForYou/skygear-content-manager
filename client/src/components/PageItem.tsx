@@ -37,7 +37,7 @@ export class PageItem extends React.PureComponent<PageItemProps> {
         <li className={itemClassName}>
           <Link
             className="page-link"
-            to={`/record/${recordName}?page=${page}`}
+            to={`/records/${recordName}?page=${page}`}
             onClick={() => onClick(page)}
           >
             {children}
