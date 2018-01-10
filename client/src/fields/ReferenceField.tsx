@@ -15,11 +15,17 @@ import { parseReference } from '../recordUtil';
 
 import { RequiredFieldProps } from './Field';
 import { NullField } from './NullField';
+import { objectFrom } from '../util';
 
 export type ReferenceFieldProps = RequiredFieldProps<ReferenceFieldConfig>;
 
+interface RecordsById {
+  [recordId: string]: Record;
+}
+
 interface State {
   value: RefOption | null;
+  recordsById: RecordsById;
 }
 
 interface RefOption {
@@ -37,13 +43,20 @@ class ReferenceFieldImpl extends React.PureComponent<
   constructor(props: ReferenceFieldProps) {
     super(props);
 
+    const selectedRecord = props.context.record.$transient[props.config.name] || null;
+    const recordsById: RecordsById = {};
+    if (selectedRecord !== null) {
+      recordsById[selectedRecord._id] = selectedRecord;
+    }
+
     this.state = {
-      value: propsToRefOption(this.props),
+      recordsById,
+      value: propsToRefOption(props, recordsById),
     };
   }
 
   public componentWillReceiveProps(nextProps: ReferenceFieldProps) {
-    this.setState({ value: propsToRefOption(nextProps) });
+    this.setState({ value: propsToRefOption(nextProps, this.state.recordsById) });
   }
 
   public render() {
@@ -95,7 +108,14 @@ class ReferenceFieldImpl extends React.PureComponent<
 
     const RecordCls = Record.extend(targetCmsRecord.recordType);
     const query = new Query(RecordCls);
+    query.limit = 500;
     return skygear.publicDB.query(query).then(records => {
+      this.setState({
+        recordsById: {
+          ...this.state.recordsById,
+          ...recordsToRecordsById(records),
+        },
+      });
       const options = records.map(record => {
         return recordToOption(record, displayFieldName);
       });
@@ -141,16 +161,22 @@ class ReferenceFieldImpl extends React.PureComponent<
   };
 }
 
-function propsToRefOption(props: ReferenceFieldProps): RefOption | null {
-  const { config, context, value } = props;
-
+function propsToRefOption(props: ReferenceFieldProps, recordsById: RecordsById): RefOption | null {
+  const { config, value } = props;
   if (value == null) {
     return null;
   }
 
+  const recordId: string = parseReference(value).recordId;
+  const recordOption: Record | null = recordsById[recordId];
+
+  if (recordOption == null) {
+    return null;
+  }
+
   return {
-    label: context.record.$transient[config.name][config.displayFieldName],
-    value: parseReference(value).recordId,
+    label: recordOption[config.displayFieldName],
+    value: recordId,
   };
 }
 
@@ -161,6 +187,14 @@ function recordToOption(r: Record, fieldName: string): Option<string> {
     label: r[fieldName],
     value: r._id,
   };
+}
+
+function recordsToRecordsById(records: Record[]): RecordsById {
+  return objectFrom(
+    records.map(record => {
+      return [record._id, record] as [string, Record];
+    })
+  );
 }
 
 export const ReferenceField: React.ComponentClass<
