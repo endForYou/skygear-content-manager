@@ -43,7 +43,8 @@ class ReferenceFieldImpl extends React.PureComponent<
   constructor(props: ReferenceFieldProps) {
     super(props);
 
-    const selectedRecord = props.context.record.$transient[props.config.name] || null;
+    const selectedRecord =
+      props.context.record.$transient[props.config.name] || null;
     const recordsById: RecordsById = {};
     if (selectedRecord !== null) {
       recordsById[selectedRecord._id] = selectedRecord;
@@ -56,7 +57,9 @@ class ReferenceFieldImpl extends React.PureComponent<
   }
 
   public componentWillReceiveProps(nextProps: ReferenceFieldProps) {
-    this.setState({ value: propsToRefOption(nextProps, this.state.recordsById) });
+    this.setState({
+      value: propsToRefOption(nextProps, this.state.recordsById),
+    });
   }
 
   public render() {
@@ -171,7 +174,10 @@ class ReferenceFieldImpl extends React.PureComponent<
   };
 }
 
-function propsToRefOption(props: ReferenceFieldProps, recordsById: RecordsById): RefOption | null {
+function propsToRefOption(
+  props: ReferenceFieldProps,
+  recordsById: RecordsById
+): RefOption | null {
   const { config, value } = props;
   if (value == null) {
     return null;
