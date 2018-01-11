@@ -11,6 +11,7 @@ import { EditPageContainer } from '../../pages/EditPageContainer';
 import { ListPageFactory } from '../../pages/ListPage';
 import { NewPageContainer } from '../../pages/NewPageContainer';
 import { PushNotificationListPageFactory } from '../../push_notifications/PushNotificationListPage';
+import { NewPushNotificationPage } from '../../push_notifications/NewPushNotificationPage';
 import { ShowPageContainer } from '../../pages/ShowPageContainer';
 
 export function routesFromRecordConfigs(
@@ -35,7 +36,8 @@ function routesFromRecordConfig(config: RecordConfig): JSX.Element[] {
   if (config.edit) {
     routes.push(makeEditRoute(config.edit));
   }
-  routes.push(makeNotificationRoute());
+  routes.push(makeNewPushNotificationRoute());
+  routes.push(makeNotificationListRoute());
 
   return routes;
 }
@@ -98,13 +100,24 @@ function makeNewRoute(config: RecordFormPageConfig): JSX.Element {
   );
 }
 
-function makeNotificationRoute(): JSX.Element {
+function makeNotificationListRoute(): JSX.Element {
   return (
     <Route
       key={`notification`}
       exact={true}
       path={`/notification`}
       component={PushNotificationListPageFactory()}
+    />
+  );
+}
+
+function makeNewPushNotificationRoute(): JSX.Element {
+  return (
+    <Route
+      key={`notification-new`}
+      exact={true}
+      path={`/notification/new`}
+      render={routeProps => <NewPushNotificationPage/>}
     />
   );
 }

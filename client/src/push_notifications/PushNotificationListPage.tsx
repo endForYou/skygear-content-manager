@@ -33,7 +33,6 @@ const TableHeader: React.SFC = () => {
     <thead className="thead-light">
       <tr>
         {columns}
-        <th />
       </tr>
     </thead>
   );
@@ -45,7 +44,7 @@ interface TableRowProps {
 
 const TableRow: React.SFC<TableRowProps> = ({ pushCampaign }) => {
   const columns = pushCampaignConfig.map((fieldName, index) => {
-    return <th key={index}><span>{pushCampaign[fieldName.field]}</span></th>;
+    return <td key={index}><span>{pushCampaign[fieldName.field]}</span></td>;
   });
   return (
     <tr>
