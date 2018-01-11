@@ -55,6 +55,7 @@ services:
       TOKEN_STORE_SECRET: my_skygear_jwt_secret
       ASSET_STORE_URL_PREFIX: http://localhost:3000/
       CMS_SKYGEAR_ENDPOINT: http://localhost:3001
+      CMS_SKYGEAR_API_KEY: my_skygear_key
       CMS_SKYGEAR_MASTER_KEY: my_master_key
       CMS_STATIC_URL: http://localhost:3002/
       # TODO: remove the random number

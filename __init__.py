@@ -10,6 +10,8 @@ from skygear.utils.assets import directory_assets
 
 CMS_SKYGEAR_ENDPOINT = \
     os.environ.get('CMS_SKYGEAR_ENDPOINT', 'http://localhost:3000/')
+CMS_SKYGEAR_API_KEY = \
+    os.environ.get('CMS_SKYGEAR_API_KEY', 'FAKE_API_KEY')
 CMS_SKYGEAR_MASTER_KEY = \
     os.environ.get('CMS_SKYGEAR_MASTER_KEY', 'FAKE_MASTER_KEY')
 
@@ -48,6 +50,7 @@ RESPONSE_HEADER_BLACKLIST = [
 def index(request):
     context = {
         'CMS_SKYGEAR_ENDPOINT': CMS_SKYGEAR_ENDPOINT,
+        'CMS_SKYGEAR_API_KEY': CMS_SKYGEAR_API_KEY,
         'CMS_CSS_URL': CMS_CSS_URL,
         'CMS_JS_URL': CMS_JS_URL,
         'CMS_SITE_TITLE': CMS_SITE_TITLE,
@@ -407,6 +410,11 @@ INDEX_HTML_FORMAT = """<!doctype html>
       You need to enable JavaScript to run this app.
     </noscript>
     <div id="root"></div>
+    <script type="text/javascript">
+      window.skygearEndpoint = "{CMS_SKYGEAR_ENDPOINT}";
+      window.skygearApiKey = "{CMS_SKYGEAR_API_KEY}";
+      window.cmsConfigUri = "{CMS_STATIC_URL}cms-config.yaml";
+    </script>
     <script type="text/javascript" src="{CMS_JS_URL}"></script>
   </body>
 </html>
