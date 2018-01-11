@@ -1,0 +1,46 @@
+# docker-compose.yml for Skygear
+# This docker-compose.yml requries Docker Compose 1.6. Do not modify this
+# file for local development--create `docker-compose.override.yml` to
+# override settings here.
+
+version: '2'
+
+services:
+  db:
+    extends:
+      file: docker-compose.yml
+      service: db
+
+  app:
+    extends:
+      file: docker-compose.yml
+      service: app
+
+  plugin:
+    extends:
+      file: docker-compose.yml
+      service: plugin
+
+  client:
+    build:
+      context: client
+      dockerfile: Dockerfile-dev
+    ports:
+      - "3002:80"
+    volumes:
+      - ./client:/usr/src/app
+    command: npm start
+    environment:
+      BROWSER: none
+      PORT: 80
+      PUBLIC_URL: .
+      REACT_APP_CMS_CONFIG_URI: /cms-config.yaml
+      REACT_APP_SKYGEAR_API_KEY: my_skygear_key
+      REACT_APP_SKYGEAR_ENDPOINT: http://localhost:3001/cms-api/
+
+# The volume container for skygear
+volumes:
+  db_data:
+    driver: local
+  app_data:
+    driver: local
