@@ -154,7 +154,7 @@ class PushNotificationListPageImpl extends React.PureComponent<PushNotificationL
           {maxPage > 0 ? (
             <Pagination
               key="pagination"
-              recordName="Push Campaign"
+              pathname="/notification"
               currentPage={page}
               maxPage={maxPage}
               onItemClicked={this.onPageItemClicked}

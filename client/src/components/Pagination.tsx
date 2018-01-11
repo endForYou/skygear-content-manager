@@ -3,7 +3,7 @@ import * as React from 'react';
 import { OnPageItemClickedType, PageItem } from './PageItem';
 
 export interface PaginationProps {
-  recordName: string;
+  pathname: string;
   currentPage: number;
   maxPage: number;
   onItemClicked: OnPageItemClickedType;
@@ -21,13 +21,13 @@ export default class Pagination extends React.PureComponent<PaginationProps> {
   }
 
   protected renderPaginationItems() {
-    const { recordName, currentPage, maxPage, onItemClicked } = this.props;
+    const { pathname, currentPage, maxPage, onItemClicked } = this.props;
 
     const middleItems = getPages(currentPage, maxPage).map(page => {
       return (
         <PageItem
           key={page}
-          recordName={recordName}
+          pathname={pathname}
           page={page}
           onClick={onItemClicked}
           isActive={currentPage === page}
@@ -40,7 +40,7 @@ export default class Pagination extends React.PureComponent<PaginationProps> {
     const prevItem = (
       <PageItem
         key="prev"
-        recordName={recordName}
+        pathname={pathname}
         page={currentPage - 1}
         onClick={onItemClicked}
         isDisabled={currentPage <= 1}
@@ -52,7 +52,7 @@ export default class Pagination extends React.PureComponent<PaginationProps> {
     const nextItem = (
       <PageItem
         key="next"
-        recordName={recordName}
+        pathname={pathname}
         page={currentPage + 1}
         onClick={onItemClicked}
         isDisabled={currentPage >= maxPage}
