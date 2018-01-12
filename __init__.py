@@ -28,13 +28,6 @@ CMS_STATIC_URL = \
 CMS_SITE_TITLE = \
     os.environ.get('CMS_SITE_TITLE', 'Skygear CMS')
 
-# generated css / js bundle URLs
-
-CMS_CSS_URL = \
-    os.environ.get('CMS_CSS_URL', '')
-CMS_JS_URL = \
-    os.environ.get('CMS_JS_URL', 'http://localhost:3001/static/js/bundle.js')
-
 # other constants
 
 REQUEST_HEADER_BLACKLIST = [
@@ -54,8 +47,6 @@ def index(request):
     context = {
         'CMS_SKYGEAR_ENDPOINT': CMS_SKYGEAR_ENDPOINT,
         'CMS_SKYGEAR_API_KEY': CMS_SKYGEAR_API_KEY,
-        'CMS_CSS_URL': CMS_CSS_URL,
-        'CMS_JS_URL': CMS_JS_URL,
         'CMS_SITE_TITLE': CMS_SITE_TITLE,
         'CMS_STATIC_URL': CMS_STATIC_URL,
         'CMS_PUBLIC_URL': CMS_PUBLIC_URL,
@@ -406,7 +397,7 @@ INDEX_HTML_FORMAT = """<!doctype html>
     <meta name="theme-color" content="#000000">
     <link rel="manifest" href="{CMS_STATIC_URL}manifest.json">
     <link rel="stylesheet" href="{CMS_STATIC_URL}css/bootstrap.min.css">
-    <link rel="stylesheet" href="{CMS_CSS_URL}">
+    <link rel="stylesheet" href="{CMS_STATIC_URL}static/css/main.css">
     <title>{CMS_SITE_TITLE}</title>
   </head>
   <body>
@@ -414,7 +405,7 @@ INDEX_HTML_FORMAT = """<!doctype html>
       You need to enable JavaScript to run this app.
     </noscript>
     <div id="root"></div>
-    <script type="text/javascript" src="{CMS_JS_URL}"></script>
+    <script type="text/javascript" src="{CMS_STATIC_URL}static/js/main.js"></script>
     <script type="text/javascript">
       skygearCMS.start({{
         skygearEndpoint: "{CMS_SKYGEAR_ENDPOINT}",

@@ -59,9 +59,6 @@ services:
       CMS_SKYGEAR_MASTER_KEY: my_master_key
       CMS_STATIC_URL: http://localhost:3002/
       CMS_PUBLIC_URL: http://localhost:3001/cms
-      # TODO: remove the random number
-      CMS_JS_URL: http://localhost:3002/static/js/main.d59ea0f7.js
-      CMS_CSS_URL: http://localhost:3002/static/css/main.48da202c.css
 
   client:
     build:
