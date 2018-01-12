@@ -136,15 +136,13 @@ class ListPageImpl extends React.PureComponent<ListPageProps> {
 
     return (
       <div>
-        <div>
-          <h1 className="display-4 d-inline-block">{pageConfig.label}</h1>
-          <Link
-            className="btn btn-light float-right"
-            to={`/records/${recordName}/new`}
-          >
-            New
-          </Link>
-        </div>
+        <h1 className="display-4 d-inline-block">{pageConfig.label}</h1>
+        <Link
+          className="btn btn-light float-right"
+          to={`/records/${recordName}/new`}
+        >
+          New
+        </Link>
         <div className="table-responsive">
           {(() => {
             if (isLoading) {

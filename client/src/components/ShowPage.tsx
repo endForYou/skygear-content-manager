@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { Link } from 'react-router-dom';
 import { Record } from 'skygear';
 
 import { CmsRecord, FieldConfig, ShowPageConfig } from '../cmsConfig';
@@ -45,7 +46,13 @@ function RecordView({ config, record }: RecordViewProps): JSX.Element {
   });
   return (
     <form>
-      <h1 className="display-4">{config.label}</h1>
+      <h1 className="display-4 d-inline-block">{config.label}</h1>
+      <Link
+        className="btn btn-light float-right"
+        to={`/record/${record.id}/edit`}
+      >
+        Edit
+      </Link>
       {formGroups}
     </form>
   );
