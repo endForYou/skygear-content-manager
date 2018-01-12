@@ -46,15 +46,13 @@ function RecordView({ config, record }: RecordViewProps): JSX.Element {
   });
   return (
     <form>
-      <div>
-        <h1 className="display-4 d-inline-block">{config.label}</h1>
-        <Link
-          className="btn btn-light float-right"
-          to={`/record/${record.id}/edit`}
-        >
-          Edit
-        </Link>
-      </div>
+      <h1 className="display-4 d-inline-block">{config.label}</h1>
+      <Link
+        className="btn btn-light float-right"
+        to={`/record/${record.id}/edit`}
+      >
+        Edit
+      </Link>
       {formGroups}
     </form>
   );
