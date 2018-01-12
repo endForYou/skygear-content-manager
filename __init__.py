@@ -5,6 +5,7 @@ from jose import JWTError, jwt
 import requests
 import skygear
 from skygear import static_assets
+from skygear.options import options
 from skygear.utils.assets import directory_assets
 
 
@@ -20,6 +21,8 @@ CMS_AUTH_SECRET = os.environ.get('CMS_AUTH_SECRET', 'FAKE_AUTH_SECRET')
 
 # cms index params
 
+CMS_PUBLIC_URL = \
+    os.environ.get('CMS_PUBLIC_URL', 'http://localhost:3000/cms')
 CMS_STATIC_URL = \
     os.environ.get('CMS_STATIC_URL', 'http://localhost:3001/static/')
 CMS_SITE_TITLE = \
@@ -55,6 +58,7 @@ def index(request):
         'CMS_JS_URL': CMS_JS_URL,
         'CMS_SITE_TITLE': CMS_SITE_TITLE,
         'CMS_STATIC_URL': CMS_STATIC_URL,
+        'CMS_PUBLIC_URL': CMS_PUBLIC_URL,
     }
     return skygear.Response(
         INDEX_HTML_FORMAT.format(**context),
@@ -150,7 +154,7 @@ class SkygearRequest:
 
         return requests.Request(
             method=method,
-            url=CMS_SKYGEAR_ENDPOINT,
+            url=options.skygear_endpoint,
             data=body.to_data(),
             headers=headers,
         )
@@ -410,12 +414,15 @@ INDEX_HTML_FORMAT = """<!doctype html>
       You need to enable JavaScript to run this app.
     </noscript>
     <div id="root"></div>
-    <script type="text/javascript">
-      window.skygearEndpoint = "{CMS_SKYGEAR_ENDPOINT}";
-      window.skygearApiKey = "{CMS_SKYGEAR_API_KEY}";
-      window.cmsConfigUri = "{CMS_STATIC_URL}cms-config.yaml";
-    </script>
     <script type="text/javascript" src="{CMS_JS_URL}"></script>
+    <script type="text/javascript">
+      skygearCMS.start({{
+        skygearEndpoint: "{CMS_SKYGEAR_ENDPOINT}",
+        skygearApiKey: "{CMS_SKYGEAR_API_KEY}",
+        cmsConfigUri: "{CMS_STATIC_URL}cms-config.yaml",
+        publicUrl: "{CMS_PUBLIC_URL}",
+      }});
+    </script>
   </body>
 </html>
 """

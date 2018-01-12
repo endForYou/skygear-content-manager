@@ -71,6 +71,8 @@ module.exports = {
       path
         .relative(paths.appSrc, info.absoluteResourcePath)
         .replace(/\\/g, '/'),
+    // Export to window
+    library: 'skygearCMS',
   },
   resolve: {
     // This allows you to set a fallback for where Webpack should look for modules.

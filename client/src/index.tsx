@@ -12,7 +12,7 @@ import thunk from 'redux-thunk';
 import skygear from 'skygear';
 
 import { CmsConfig, parseCmsConfig } from './cmsConfig';
-import { AppConfig, configFromEnv } from './config';
+import defaultAppConfig, { AppConfig } from './config';
 import { App } from './containers/App';
 import rootReducerFactory from './reducers';
 import { initialRootState, RootState } from './states';
@@ -39,8 +39,7 @@ const Root = ({ config, history, store }: RootProps) => {
   );
 };
 
-function main(): void {
-  const appConfig: AppConfig = configFromEnv();
+function main(appConfig: AppConfig = defaultAppConfig): void {
   const history: History = createHistoryFromPublicUrl(appConfig.publicUrl);
 
   Promise.all([fetchUser(appConfig), fetchCmsConfig(appConfig)]).then(
@@ -114,4 +113,7 @@ function fetchCmsConfig(config: AppConfig) {
     });
 }
 
-main();
+/**
+ * Export functions
+ */
+export const start = main;
