@@ -184,7 +184,7 @@ function propsToRefOption(
   }
 
   const recordId: string = parseReference(value).recordId;
-  const recordOption: Record | null = recordsById[recordId];
+  const recordOption: Record | undefined = recordsById[recordId];
 
   if (recordOption == null) {
     return null;
