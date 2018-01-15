@@ -69,6 +69,8 @@ export class FilterList extends React.PureComponent<FilterListProps> {
         return this.renderDateTimeFilterSelect(filter);
       case FilterType.GeneralFilterType:
         return <div />;
+      default:
+        throw new Error('unsupported FilterType in renderFilterSelect');
     }
   }
 
@@ -152,6 +154,8 @@ export class FilterList extends React.PureComponent<FilterListProps> {
         return this.renderDateTimeInput(filter);
       case FilterType.GeneralFilterType:
         return this.renderGeneralInput(filter);
+      default:
+        throw new Error('unsupported FilterType in renderInput');
     }
   }
 

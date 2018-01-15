@@ -189,6 +189,8 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
               ...f,
               query: DateTimeFilterQueryType[event.target.value],
             };
+          default:
+            throw new Error(`handleQueryTypeChange does not support FilterType ${f.type}`);
         }
       }
       return f;
@@ -218,6 +220,8 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
             return f;
           case FilterType.GeneralFilterType:
             return { ...(f as GeneralFilter), value: event.target.value };
+          default:
+            throw new Error(`handleFilterValueChange does not support FilterType ${f.type}`);
         }
       }
       return f;

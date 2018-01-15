@@ -369,6 +369,8 @@ function addFilterToQuery(
     case FilterType.DateTimeFilterType:
       addDatetimeFilterToQuery(query, filter);
       break;
+    default:
+      throw new Error(`addFilterToQuery does not support FilterType ${filter.type}`);
   }
 }
 
@@ -386,6 +388,8 @@ function addStringFilterToQuery(query: Query, filter: StringFilter) {
     case StringFilterQueryType.NotLike:
       query.notLike(filter.name, filter.value);
       break;
+    default:
+      throw new Error(`addStringFilterToQuery does not support StringFilterQueryType ${filter.type}`);
   }
 }
 
@@ -409,6 +413,8 @@ function addIntegerFilterToQuery(query: Query, filter: IntegerFilter) {
     case IntegerFilterQueryType.GreaterThanOrEqualTo:
       query.greaterThanOrEqualTo(filter.name, filter.value);
       break;
+    default:
+      throw new Error(`addIntegerFilterToQuery does not support IntegerFilterQueryType ${filter.type}`);
   }
 }
 
@@ -420,6 +426,8 @@ function addBooleanFilterToQuery(query: Query, filter: BooleanFilter) {
     case BooleanFilterQueryType.False:
       query.equalTo(filter.name, false);
       break;
+    default:
+      throw new Error(`addBooleanFilterToQuery does not support BooleanFilterQueryType ${filter.type}`);
   }
 }
 
@@ -431,6 +439,8 @@ function addDatetimeFilterToQuery(query: Query, filter: DateTimeFilter) {
     case DateTimeFilterQueryType.After:
       query.greaterThan(filter.name, filter.value);
       break;
+    default:
+      throw new Error(`addDatetimeFilterToQuery does not support DateTimeFilterQueryType ${filter.type}`);
   }
 }
 
@@ -448,6 +458,8 @@ function createGeneralFilterQuery(filter: GeneralFilter, recordCls: RecordCls) {
         );
 
       return generalQuery;
+    default:
+      throw new Error(`createGeneralFilterQuery does not support GeneralFilterQueryType ${filter.query}`);
   }
 }
 
