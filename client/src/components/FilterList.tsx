@@ -143,15 +143,15 @@ export class FilterList extends React.PureComponent<FilterListProps> {
   public renderInput(filter: Filter) {
     switch (filter.type) {
       case FilterType.StringFilterType:
-        return this.renderStringInput(filter as StringFilter);
+        return this.renderStringInput(filter);
       case FilterType.IntegerFilterType:
-        return this.renderIntegerInput(filter as IntegerFilter);
+        return this.renderIntegerInput(filter);
       case FilterType.BooleanFilterType:
         return <div />;
       case FilterType.DateTimeFilterType:
-        return this.renderDateTimeInput(filter as DateTimeFilter);
+        return this.renderDateTimeInput(filter);
       case FilterType.GeneralFilterType:
-        return this.renderGeneralInput(filter as GeneralFilter);
+        return this.renderGeneralInput(filter);
     }
   }
 

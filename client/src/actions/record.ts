@@ -320,11 +320,13 @@ function fetchRecordList(
     const recordCls = Record.extend(cmsRecord.recordType);
 
     let query: Query;
+    const firstFilter = filters[0];
+
     if (
       filters.length === 1 &&
-      filters[0].type === FilterType.GeneralFilterType
+      firstFilter.type === FilterType.GeneralFilterType
     ) {
-      query = createGeneralFilterQuery(filters[0] as GeneralFilter, recordCls);
+      query = createGeneralFilterQuery(firstFilter, recordCls);
     } else {
       query = new Query(recordCls);
       filters.forEach(filter => {
@@ -356,16 +358,16 @@ function addFilterToQuery(
 ) {
   switch (filter.type) {
     case FilterType.StringFilterType:
-      addStringFilterToQuery(query, filter as StringFilter);
+      addStringFilterToQuery(query, filter);
       break;
     case FilterType.IntegerFilterType:
-      addIntegerFilterToQuery(query, filter as IntegerFilter);
+      addIntegerFilterToQuery(query, filter);
       break;
     case FilterType.BooleanFilterType:
-      addBooleanFilterToQuery(query, filter as BooleanFilter);
+      addBooleanFilterToQuery(query, filter);
       break;
     case FilterType.DateTimeFilterType:
-      addDatetimeFilterToQuery(query, filter as DateTimeFilter);
+      addDatetimeFilterToQuery(query, filter);
       break;
   }
 }
