@@ -21,11 +21,11 @@ deploy:
   - provider: script
     script: ./scripts/deploy.sh
     on:
-      branch: improve-deployment
+      branch: master
   - provider: s3
     bucket: "code.skygear.io"
     skip_cleanup: true
     on:
-      branch: improve-deployment
+      branch: master
     local_dir: client/build
     upload_dir: js/content-manager/${TRAVIS_COMMIT:0:7}
