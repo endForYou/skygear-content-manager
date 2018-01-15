@@ -310,13 +310,13 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
                 </div>
               </div>
             )}
+            <Link
+              className="btn btn-light float-right"
+              to={`/records/${recordName}/new`}
+            >
+              New
+            </Link>
           </div>
-          <Link
-            className="btn btn-light float-right"
-            to={`/records/${recordName}/new`}
-          >
-            New
-          </Link>
         </div>
 
         <div className="float-right">
