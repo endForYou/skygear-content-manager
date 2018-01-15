@@ -1,3 +1,4 @@
+import uuid from 'uuid';
 import { humanize } from '.././util';
 import { parseOptionalString, parseString, parseStringArray } from './util';
 
@@ -219,3 +220,55 @@ export type FilterQueryType =
   | BooleanFilterQueryType
   | DateTimeFilterQueryType
   | GeneralFilterQueryType;
+
+export function filterFactory(filterConfig: FilterConfig): Filter {
+  switch (filterConfig.type) {
+    case FilterConfigTypes.String:
+      return {
+        id: uuid(),
+        label: filterConfig.label,
+        name: filterConfig.name,
+        query: StringFilterQueryType.EqualTo,
+        type: FilterType.StringFilterType,
+        value: '',
+      };
+    case FilterConfigTypes.Integer:
+      return {
+        id: uuid(),
+        label: filterConfig.label,
+        name: filterConfig.name,
+        query: IntegerFilterQueryType.EqualTo,
+        type: FilterType.IntegerFilterType,
+        value: 0,
+      };
+    case FilterConfigTypes.Boolean:
+      return {
+        id: uuid(),
+        label: filterConfig.label,
+        name: filterConfig.name,
+        query: BooleanFilterQueryType.True,
+        type: FilterType.BooleanFilterType,
+      };
+    case FilterConfigTypes.DateTime:
+      return {
+        id: uuid(),
+        label: filterConfig.label,
+        name: filterConfig.name,
+        query: DateTimeFilterQueryType.Before,
+        type: FilterType.DateTimeFilterType,
+        value: new Date(),
+      };
+    case FilterConfigTypes.General:
+      return {
+        id: uuid(),
+        label: filterConfig.label,
+        names: filterConfig.names,
+        query: GeneralFilterQueryType.Contains,
+        type: FilterType.GeneralFilterType,
+        value: '',
+      };
+    default:
+      throw new Error(`unsupported FilterConfigTypes in filterFactory`);
+  }
+
+}

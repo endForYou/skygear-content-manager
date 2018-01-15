@@ -5,7 +5,6 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { Dispatch } from 'redux';
 import { Record } from 'skygear';
-import uuid from 'uuid';
 
 import { RecordActionDispatcher } from '../actions/record';
 import {
@@ -16,9 +15,9 @@ import {
   Filter,
   FilterConfig,
   FilterConfigTypes,
+  filterFactory,
   FilterType,
   GeneralFilter,
-  GeneralFilterQueryType,
   IntegerFilter,
   IntegerFilterQueryType,
   ListPageConfig,
@@ -243,75 +242,10 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
 
   public onFilterItemClicked(filterConfig: FilterConfig) {
     const { page, pageConfig } = this.props;
-    let filters = this.state.filters;
+    const newFilter = filterFactory(filterConfig);
 
-    if (filterConfig.type === FilterConfigTypes.General) {
-      filters = [
-        {
-          id: uuid(),
-          label: filterConfig.label,
-          names: filterConfig.names,
-          query: GeneralFilterQueryType.Contains,
-          type: FilterType.GeneralFilterType,
-          value: '',
-        },
-      ];
-    } else {
-      filters = filters.filter(f => f.type !== FilterType.GeneralFilterType);
-      switch (filterConfig.type) {
-        case FilterConfigTypes.String:
-          filters = [
-            ...filters,
-            {
-              id: uuid(),
-              label: filterConfig.label,
-              name: filterConfig.name,
-              query: StringFilterQueryType.EqualTo,
-              type: FilterType.StringFilterType,
-              value: '',
-            },
-          ];
-          break;
-        case FilterConfigTypes.Integer:
-          filters = [
-            ...filters,
-            {
-              id: uuid(),
-              label: filterConfig.label,
-              name: filterConfig.name,
-              query: IntegerFilterQueryType.EqualTo,
-              type: FilterType.IntegerFilterType,
-              value: 0,
-            },
-          ];
-          break;
-        case FilterConfigTypes.Boolean:
-          filters = [
-            ...filters,
-            {
-              id: uuid(),
-              label: filterConfig.label,
-              name: filterConfig.name,
-              query: BooleanFilterQueryType.True,
-              type: FilterType.BooleanFilterType,
-            },
-          ];
-          break;
-        case FilterConfigTypes.DateTime:
-          filters = [
-            ...filters,
-            {
-              id: uuid(),
-              label: filterConfig.label,
-              name: filterConfig.name,
-              query: DateTimeFilterQueryType.Before,
-              type: FilterType.DateTimeFilterType,
-              value: new Date(),
-            },
-          ];
-          break;
-      }
-    }
+    const filters = filterConfig.type === FilterConfigTypes.General ?
+      [newFilter] : [...this.state.filters.filter(f => f.type !== FilterType.GeneralFilterType), newFilter];
 
     this.setState({ filters });
     this.fetchList(page, pageConfig.perPage, filters);
