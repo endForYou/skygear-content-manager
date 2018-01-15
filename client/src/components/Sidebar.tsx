@@ -36,7 +36,16 @@ function ListItems({ items }: SidebarProps): JSX.Element {
     );
   });
 
-  return <ul className="nav flex-column">{listItems}</ul>;
+  return (
+    <ul className="nav flex-column">
+      {listItems}
+      <li key="notification" className="nav-item">
+        <NavLink className="nav-link" to={`/notification`}>
+          Push Notifications
+        </NavLink>
+      </li>
+    </ul>
+  );
 }
 
 interface ItemProps {
