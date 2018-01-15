@@ -22,12 +22,18 @@ import { getPath, isObject } from './util';
 type User = any;
 
 interface RootProps {
-  config: AppConfig;
   history: History;
   store: Store<RootState>;
 }
 
-const Root = ({ config, history, store }: RootProps) => {
+export interface CmsRenderConfig {
+  cmsConfig: CmsConfig;
+  publicUrl: string;
+  skygearApiKey: string;
+  skygearEndpoint: string;
+}
+
+const Root = ({ history, store }: RootProps) => {
   return (
     <Provider store={store}>
       <ConnectedRouter history={history}>
@@ -40,10 +46,33 @@ const Root = ({ config, history, store }: RootProps) => {
 };
 
 function main(appConfig: AppConfig = defaultAppConfig): void {
-  const history: History = createHistoryFromPublicUrl(appConfig.publicUrl);
+  fetchCmsConfig(appConfig).then(
+    (cmsConfig: CmsConfig) => {
+      const cmsRenderConfig: CmsRenderConfig = {
+        cmsConfig,
+        publicUrl: appConfig.publicUrl,
+        skygearApiKey: appConfig.skygearApiKey,
+        skygearEndpoint: appConfig.skygearEndpoint,
+      };
 
-  Promise.all([fetchUser(appConfig), fetchCmsConfig(appConfig)]).then(
-    ([user, cmsConfig]: [User, CmsConfig]) => {
+      renderCms(cmsRenderConfig);
+    },
+    error => {
+      console.log('Failed to initialize CMS:', error);
+    }
+  );
+}
+
+export function renderCms(cmsRenderConfig: CmsRenderConfig): void {
+  const cmsConfig: CmsConfig = cmsRenderConfig.cmsConfig;
+  const publicUrl: string = cmsRenderConfig.publicUrl;
+  const history: History = createHistoryFromPublicUrl(publicUrl);
+
+  fetchUser(
+    cmsRenderConfig.skygearEndpoint,
+    cmsRenderConfig.skygearApiKey
+  ).then(
+    (user: User) => {
       const recordNames = Object.keys(cmsConfig.records);
 
       const rootReducer = rootReducerFactory(recordNames);
@@ -55,12 +84,12 @@ function main(appConfig: AppConfig = defaultAppConfig): void {
         applyMiddleware(thunk, routerMiddleware(history))
       );
       ReactDOM.render(
-        <Root config={appConfig} history={history} store={store} />,
+        <Root history={history} store={store} />,
         document.getElementById('root')
       );
     },
     error => {
-      console.log('Failed to initialize CMS:', error);
+      console.log('Failed to render CMS:', error);
     }
   );
 }
@@ -75,11 +104,11 @@ function createHistoryFromPublicUrl(publicUrl: string): History {
   }
 }
 
-function fetchUser(config: AppConfig) {
+function fetchUser(endPoint: string, apiKey: string) {
   return skygear
     .config({
-      apiKey: config.skygearApiKey,
-      endPoint: config.skygearEndpoint,
+      apiKey,
+      endPoint,
     })
     .then(() => {
       return fetchCurrentUserIfNeeded();
