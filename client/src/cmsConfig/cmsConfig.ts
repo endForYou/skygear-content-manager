@@ -308,7 +308,7 @@ function parseListPageConfig(
   const filters =
     input.filters &&
     // tslint:disable-next-line: no-any
-    (input.filters.map((f: any) => parseFilterConfig(f)) as FilterConfig[]);
+    (input.filters as any[]).map(f => parseFilterConfig(f));
 
   return {
     cmsRecord,
