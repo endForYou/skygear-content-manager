@@ -148,11 +148,6 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
       references
     );
 
-    this.toggleFilterMenu = this.toggleFilterMenu.bind(this);
-    this.handleQueryTypeChange = this.handleQueryTypeChange.bind(this);
-    this.handleFilterValueChange = this.handleFilterValueChange.bind(this);
-    this.handleDateTimeValueChange = this.handleDateTimeValueChange.bind(this);
-    this.onCloseFilterClicked = this.onCloseFilterClicked.bind(this);
     this.fetchList = debounce(this.fetchList.bind(this), 200);
   }
 
@@ -345,33 +340,39 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
     return (
       <div>
         <div className="navbar">
-          <h1 className="display-4 d-inline-block">{pageConfig.label}</h1>
-          { pageConfig.filters &&
-            <div className="dropdown float-right">
-              <button
-                type="button"
-                className="btn btn-primary dropdown-toggle"
-                onClick={this.toggleFilterMenu}
-              >
-                Add Filter <span className="caret" />
-              </button>
+          <h1 className="display-4">{pageConfig.label}</h1>
+          <div className="float-right">
+            {pageConfig.filters && (
+              <div className="dropdown float-right ml-2">
+                <button
+                  type="button"
+                  className="btn btn-primary dropdown-toggle"
+                  onClick={() => this.toggleFilterMenu()}
+                >
+                  Add Filter <span className="caret" />
+                </button>
 
-              <div
-                style={{right: 0, left: 'unset'}} 
-                className={classNames('dropdown-menu-right', 'dropdown-menu', showfilterMenu ? 'show' : '')}
-              >
-                { pageConfig.filters.map(filterConfig => 
-                  <a
-                    key={filterConfig.label} 
-                    className="dropdown-item" 
-                    onClick={() => this.onFilterItemClicked(filterConfig)}
-                  >
-                    {filterConfig.label}
-                  </a>
-                )}
+                <div
+                  style={{ right: 0, left: 'unset' }}
+                  className={classNames(
+                    'dropdown-menu-right',
+                    'dropdown-menu',
+                    showfilterMenu ? 'show' : ''
+                  )}
+                >
+                  {pageConfig.filters.map(filterConfig => (
+                    <a
+                      key={filterConfig.label}
+                      className="dropdown-item"
+                      onClick={() => this.onFilterItemClicked(filterConfig)}
+                    >
+                      {filterConfig.label}
+                    </a>
+                  ))}
+                </div>
               </div>
-            </div>
-          }
+            )}
+          </div>
           <Link
             className="btn btn-light float-right"
             to={`/records/${recordName}/new`}
@@ -383,10 +384,10 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
         <div className="float-right">
           <FilterList
             filters={filters}
-            handleQueryTypeChange={this.handleQueryTypeChange}
-            handleFilterValueChange={this.handleFilterValueChange}
-            onCloseFilterClicked={this.onCloseFilterClicked}
-            handleDateTimeValueChange={this.handleDateTimeValueChange}
+            handleQueryTypeChange={(filter, evt) => this.handleQueryTypeChange(filter, evt)}
+            handleFilterValueChange={(filter, evt) => this.handleFilterValueChange(filter, evt)}
+            onCloseFilterClicked={filter => this.onCloseFilterClicked(filter)}
+            handleDateTimeValueChange={(filter, datetime) => this.handleDateTimeValueChange(filter, datetime)}
           />
         </div>
 
