@@ -317,22 +317,8 @@ function fetchRecordList(
   perPage: number = 25
 ): ThunkAction<Promise<void>, {}, {}> {
   return dispatch => {
-    const recordCls = Record.extend(cmsRecord.recordType);
-
-    let query: Query;
-    const firstFilter = filters[0];
-
-    if (
-      filters.length === 1 &&
-      firstFilter.type === FilterType.GeneralFilterType
-    ) {
-      query = createGeneralFilterQuery(firstFilter, recordCls);
-    } else {
-      query = new Query(recordCls);
-      filters.forEach(filter => {
-        addFilterToQuery(query, filter, recordCls);
-      });
-    }
+    const recordCls = Record.extend(cmsRecord.recordType); 
+    const query = queryWithFilters(filters, recordCls);
 
     query.overallCount = true;
     query.limit = perPage;
@@ -349,6 +335,23 @@ function fetchRecordList(
       }
     );
   };
+}
+
+function queryWithFilters(filters: Filter[], recordCls: RecordCls): Query {
+    const firstFilter = filters[0];
+
+    if (
+      filters.length === 1 &&
+      firstFilter.type === FilterType.GeneralFilterType
+    ) {
+      return createGeneralFilterQuery(firstFilter, recordCls);
+    } else {
+      const query = new Query(recordCls);
+      filters.forEach(filter => {
+        addFilterToQuery(query, filter, recordCls);
+      });
+      return query;
+    }
 }
 
 function addFilterToQuery(
