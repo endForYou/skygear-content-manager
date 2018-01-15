@@ -59,12 +59,22 @@ services:
       CMS_SKYGEAR_MASTER_KEY: my_master_key
       CMS_STATIC_URL: http://localhost:3002/
       CMS_PUBLIC_URL: http://localhost:3001/cms
+      CMS_CONFIG_FILE_URL: http://localhost:3003/cms-config.yaml
 
-  client:
+  cms-client-lib:
     build:
       context: client
     ports:
       - "3002:80"
+
+  cms-client:
+    image: halverneus/static-file-server:latest
+    ports:
+      - "3003:8080"
+    volumes:
+      - ./client/example:/content
+    environment:
+      FOLDER: /content
 
 # The volume container for skygear
 volumes:

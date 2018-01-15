@@ -99,7 +99,7 @@ function fetchCurrentUserIfNeeded() {
 }
 
 function fetchCmsConfig(config: AppConfig) {
-  return fetch(config.cmsConfigUri)
+  return fetch(config.cmsConfigUrl)
     .then((resp: Response) => {
       return resp.text();
     })

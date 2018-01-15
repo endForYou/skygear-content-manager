@@ -9,24 +9,24 @@ from skygear.options import options
 from skygear.utils.assets import directory_assets
 
 
-CMS_SKYGEAR_ENDPOINT = \
-    os.environ.get('CMS_SKYGEAR_ENDPOINT', 'http://localhost:3000/')
-CMS_SKYGEAR_API_KEY = \
-    os.environ.get('CMS_SKYGEAR_API_KEY', 'FAKE_API_KEY')
-CMS_SKYGEAR_MASTER_KEY = \
-    os.environ.get('CMS_SKYGEAR_MASTER_KEY', 'FAKE_MASTER_KEY')
-
 CMS_USER_PERMITTED_ROLE = os.environ.get('CMS_USER_PERMITTED_ROLE', 'Admin')
 CMS_AUTH_SECRET = os.environ.get('CMS_AUTH_SECRET', 'FAKE_AUTH_SECRET')
 
 # cms index params
 
+CMS_SKYGEAR_ENDPOINT = \
+    os.environ.get('CMS_SKYGEAR_ENDPOINT', 'http://localhost:3000/')
+CMS_SKYGEAR_API_KEY = \
+    os.environ.get('CMS_SKYGEAR_API_KEY', 'FAKE_API_KEY')
 CMS_PUBLIC_URL = \
     os.environ.get('CMS_PUBLIC_URL', 'http://localhost:3000/cms')
 CMS_STATIC_URL = \
     os.environ.get('CMS_STATIC_URL', 'http://localhost:3001/static/')
 CMS_SITE_TITLE = \
     os.environ.get('CMS_SITE_TITLE', 'Skygear CMS')
+CMS_CONFIG_FILE_URL = \
+    os.environ.get('CMS_CONFIG_FILE_URL',
+                   'http://localhost:3002/cms-config.yaml')
 
 # other constants
 
@@ -50,6 +50,7 @@ def index(request):
         'CMS_SITE_TITLE': CMS_SITE_TITLE,
         'CMS_STATIC_URL': CMS_STATIC_URL,
         'CMS_PUBLIC_URL': CMS_PUBLIC_URL,
+        'CMS_CONFIG_FILE_URL': CMS_CONFIG_FILE_URL,
     }
     return skygear.Response(
         INDEX_HTML_FORMAT.format(**context),
@@ -140,8 +141,8 @@ class SkygearRequest:
 
         if self.is_master:
             if body.is_dict:
-                body.data['api_key'] = CMS_SKYGEAR_MASTER_KEY
-            headers['X-Skygear-Api-Key'] = CMS_SKYGEAR_MASTER_KEY
+                body.data['api_key'] = options.masterkey
+            headers['X-Skygear-Api-Key'] = options.masterkey
 
         return requests.Request(
             method=method,
@@ -410,7 +411,7 @@ INDEX_HTML_FORMAT = """<!doctype html>
       skygearCMS.start({{
         skygearEndpoint: "{CMS_SKYGEAR_ENDPOINT}",
         skygearApiKey: "{CMS_SKYGEAR_API_KEY}",
-        cmsConfigUri: "{CMS_STATIC_URL}cms-config.yaml",
+        cmsConfigUrl: "{CMS_CONFIG_FILE_URL}",
         publicUrl: "{CMS_PUBLIC_URL}",
       }});
     </script>

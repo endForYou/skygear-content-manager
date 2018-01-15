@@ -1,5 +1,5 @@
 export interface AppConfig {
-  cmsConfigUri: string;
+  cmsConfigUrl: string;
   publicUrl: string;
   skygearApiKey: string;
   skygearEndpoint: string;
@@ -9,8 +9,8 @@ export interface AppConfig {
  * Default App Config
  */
 export default {
-  cmsConfigUri:
-    process.env.REACT_APP_CMS_CONFIG_URI ||
+  cmsConfigUrl:
+    process.env.REACT_APP_CMS_CONFIG_URL ||
     '/cms-config.yaml',
   publicUrl:
     process.env.PUBLIC_URL ||
