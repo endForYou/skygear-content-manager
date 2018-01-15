@@ -270,5 +270,4 @@ export function filterFactory(filterConfig: FilterConfig): Filter {
     default:
       throw new Error(`unsupported FilterConfigTypes in filterFactory`);
   }
-
 }

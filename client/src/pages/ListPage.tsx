@@ -190,7 +190,9 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
               query: DateTimeFilterQueryType[event.target.value],
             };
           default:
-            throw new Error(`handleQueryTypeChange does not support FilterType ${f.type}`);
+            throw new Error(
+              `handleQueryTypeChange does not support FilterType ${f.type}`
+            );
         }
       }
       return f;
@@ -221,7 +223,9 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
           case FilterType.GeneralFilterType:
             return { ...(f as GeneralFilter), value: event.target.value };
           default:
-            throw new Error(`handleFilterValueChange does not support FilterType ${f.type}`);
+            throw new Error(
+              `handleFilterValueChange does not support FilterType ${f.type}`
+            );
         }
       }
       return f;
@@ -248,8 +252,15 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
     const { page, pageConfig } = this.props;
     const newFilter = filterFactory(filterConfig);
 
-    const filters = filterConfig.type === FilterConfigTypes.General ?
-      [newFilter] : [...this.state.filters.filter(f => f.type !== FilterType.GeneralFilterType), newFilter];
+    const filters =
+      filterConfig.type === FilterConfigTypes.General
+        ? [newFilter]
+        : [
+            ...this.state.filters.filter(
+              f => f.type !== FilterType.GeneralFilterType
+            ),
+            newFilter,
+          ];
 
     this.setState({ filters });
     this.fetchList(page, pageConfig.perPage, filters);
@@ -322,10 +333,13 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
         <div className="float-right">
           <FilterList
             filters={filters}
-            handleQueryTypeChange={(filter, evt) => this.handleQueryTypeChange(filter, evt)}
-            handleFilterValueChange={(filter, evt) => this.handleFilterValueChange(filter, evt)}
+            handleQueryTypeChange={(filter, evt) =>
+              this.handleQueryTypeChange(filter, evt)}
+            handleFilterValueChange={(filter, evt) =>
+              this.handleFilterValueChange(filter, evt)}
             onCloseFilterClicked={filter => this.onCloseFilterClicked(filter)}
-            handleDateTimeValueChange={(filter, datetime) => this.handleDateTimeValueChange(filter, datetime)}
+            handleDateTimeValueChange={(filter, datetime) =>
+              this.handleDateTimeValueChange(filter, datetime)}
           />
         </div>
 
