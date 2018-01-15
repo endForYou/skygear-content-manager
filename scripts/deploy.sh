@@ -1,9 +1,8 @@
 set -ex
 
-cp -r client/build public_html
+cp -r client/example public_html
 
 npm install -g skycli
-mkdir -p /home/travis/.skycli
-echo $SKYCLI_RC > $HOME/.skycli/skyclirc
+skycli login --email $SKYCLI_EMAIL --password $SKYCLI_PASSWORD
 
 skycli deploy
