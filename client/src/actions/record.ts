@@ -328,7 +328,7 @@ function fetchRecordList(
     } else {
       query = new Query(recordCls);
       filters.forEach(filter => {
-        query = addFilterToQuery(query, filter, recordCls);
+        addFilterToQuery(query, filter, recordCls);
       });
     }
 
@@ -353,21 +353,24 @@ function addFilterToQuery(
   query: Query,
   filter: Filter,
   recordCls: RecordCls
-): Query {
+) {
   switch (filter.type) {
     case FilterType.StringFilterType:
-      return addStringFitlerToQuery(query, filter as StringFilter);
+      addStringFilterToQuery(query, filter as StringFilter);
+      break;
     case FilterType.IntegerFilterType:
-      return addIntegerFilterToQuery(query, filter as IntegerFilter);
+      addIntegerFilterToQuery(query, filter as IntegerFilter);
+      break;
     case FilterType.BooleanFilterType:
-      return addBooleanFilterToQuery(query, filter as BooleanFilter);
+      addBooleanFilterToQuery(query, filter as BooleanFilter);
+      break;
     case FilterType.DateTimeFilterType:
-      return addDatetimeFilterToQuery(query, filter as DateTimeFilter);
+      addDatetimeFilterToQuery(query, filter as DateTimeFilter);
+      break;
   }
-  return query;
 }
 
-function addStringFitlerToQuery(query: Query, filter: StringFilter): Query {
+function addStringFilterToQuery(query: Query, filter: StringFilter) {
   switch (filter.query) {
     case StringFilterQueryType.EqualTo:
       query.equalTo(filter.name, filter.value);
@@ -382,10 +385,9 @@ function addStringFitlerToQuery(query: Query, filter: StringFilter): Query {
       query.notLike(filter.name, filter.value);
       break;
   }
-  return query;
 }
 
-function addIntegerFilterToQuery(query: Query, filter: IntegerFilter): Query {
+function addIntegerFilterToQuery(query: Query, filter: IntegerFilter) {
   switch (filter.query) {
     case IntegerFilterQueryType.EqualTo:
       query.equalTo(filter.name, filter.value);
@@ -406,10 +408,9 @@ function addIntegerFilterToQuery(query: Query, filter: IntegerFilter): Query {
       query.greaterThanOrEqualTo(filter.name, filter.value);
       break;
   }
-  return query;
 }
 
-function addBooleanFilterToQuery(query: Query, filter: BooleanFilter): Query {
+function addBooleanFilterToQuery(query: Query, filter: BooleanFilter) {
   switch (filter.query) {
     case BooleanFilterQueryType.True:
       query.equalTo(filter.name, true);
@@ -418,10 +419,9 @@ function addBooleanFilterToQuery(query: Query, filter: BooleanFilter): Query {
       query.equalTo(filter.name, false);
       break;
   }
-  return query;
 }
 
-function addDatetimeFilterToQuery(query: Query, filter: DateTimeFilter): Query {
+function addDatetimeFilterToQuery(query: Query, filter: DateTimeFilter) {
   switch (filter.query) {
     case DateTimeFilterQueryType.Before:
       query.lessThan(filter.name, filter.value);
@@ -430,7 +430,6 @@ function addDatetimeFilterToQuery(query: Query, filter: DateTimeFilter): Query {
       query.greaterThan(filter.name, filter.value);
       break;
   }
-  return query;
 }
 
 function createGeneralFilterQuery(filter: GeneralFilter, recordCls: RecordCls) {
