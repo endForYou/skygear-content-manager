@@ -42,53 +42,54 @@ RESPONSE_HEADER_BLACKLIST = [
 ]
 
 
-@skygear.handler('cms/')
-def index(request):
-    context = {
-        'CMS_SKYGEAR_ENDPOINT': CMS_SKYGEAR_ENDPOINT,
-        'CMS_SKYGEAR_API_KEY': CMS_SKYGEAR_API_KEY,
-        'CMS_SITE_TITLE': CMS_SITE_TITLE,
-        'CMS_STATIC_URL': CMS_STATIC_URL,
-        'CMS_PUBLIC_URL': CMS_PUBLIC_URL,
-        'CMS_CONFIG_FILE_URL': CMS_CONFIG_FILE_URL,
-    }
-    return skygear.Response(
-        INDEX_HTML_FORMAT.format(**context),
-        content_type='text/html',
-    )
+def includeme(settings):
+    @skygear.handler('cms/')
+    def index(request):
+        context = {
+            'CMS_SKYGEAR_ENDPOINT': CMS_SKYGEAR_ENDPOINT,
+            'CMS_SKYGEAR_API_KEY': CMS_SKYGEAR_API_KEY,
+            'CMS_SITE_TITLE': CMS_SITE_TITLE,
+            'CMS_STATIC_URL': CMS_STATIC_URL,
+            'CMS_PUBLIC_URL': CMS_PUBLIC_URL,
+            'CMS_CONFIG_FILE_URL': CMS_CONFIG_FILE_URL,
+        }
+        return skygear.Response(
+            INDEX_HTML_FORMAT.format(**context),
+            content_type='text/html',
+        )
 
 
-@skygear.handler('cms-api/')
-def api(request):
-    # log_request(request)
+    @skygear.handler('cms-api/')
+    def api(request):
+        # log_request(request)
 
-    req = SkygearRequest.from_werkzeug(request)
+        req = SkygearRequest.from_werkzeug(request)
 
-    if req.body.is_dict:
-        if req.body.data.get('action') == 'auth:login':
-            return intercept_login(req).to_werkzeug()
-        elif req.body.data.get('action') == 'asset:put':
-            return intercept_asset_put(req).to_werkzeug()
+        if req.body.is_dict:
+            if req.body.data.get('action') == 'auth:login':
+                return intercept_login(req).to_werkzeug()
+            elif req.body.data.get('action') == 'asset:put':
+                return intercept_asset_put(req).to_werkzeug()
 
-    cms_access_token = req.access_token
-    if not cms_access_token:
+        cms_access_token = req.access_token
+        if not cms_access_token:
+            return request_skygear(req).to_werkzeug()
+
+        authdata = AuthData.from_cms_token(cms_access_token)
+        if not authdata:
+            return SkygearResponse.forbidden().to_werkzeug()
+
+        req.access_token = authdata.skygear_token
+
+        if req.body.is_dict:
+            if req.body.data.get('action') == 'me':
+                return intercept_me(req).to_werkzeug()
+
+        if not authdata.is_admin:
+            return request_skygear(req).to_werkzeug()
+
+        req.is_master = True
         return request_skygear(req).to_werkzeug()
-
-    authdata = AuthData.from_cms_token(cms_access_token)
-    if not authdata:
-        return SkygearResponse.forbidden().to_werkzeug()
-
-    req.access_token = authdata.skygear_token
-
-    if req.body.is_dict:
-        if req.body.data.get('action') == 'me':
-            return intercept_me(req).to_werkzeug()
-
-    if not authdata.is_admin:
-        return request_skygear(req).to_werkzeug()
-
-    req.is_master = True
-    return request_skygear(req).to_werkzeug()
 
 
 class SkygearRequest:
