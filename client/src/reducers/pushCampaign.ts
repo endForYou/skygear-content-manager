@@ -5,6 +5,8 @@ import {
   PushCampaignState,
   initialPushCampaignListState,
   PushCampaignListState,
+  NewPushCampaignState,
+  initialNewPushCampaignState,
 } from '../states';
 import { PushCampaign } from '../types';
 
@@ -13,6 +15,7 @@ import { PushCampaign } from '../types';
 // tslint:disable: no-any
 export const pushCampaignViewsReducer = combineReducers<PushCampaignState>({
   list: pushCampaignListReducer as Reducer<any>,
+  new: newPushCampaignReducer as Reducer<any>,
 });
 // tslint:enable: no-any
 
@@ -33,6 +36,29 @@ function pushCampaignListReducer(
       };
     case PushCampaignActionTypes.FetchListFailure:
       return { ...state, isLoading: false, error: action.payload.error };
+    default:
+      return state;
+  }
+}
+
+function newPushCampaignReducer(
+  state: NewPushCampaignState = initialNewPushCampaignState,
+  action: Actions
+): NewPushCampaignState {
+  switch (action.type) {
+    case PushCampaignActionTypes.FetchUserListRequest:
+      return { ...state };
+    case PushCampaignActionTypes.FetchUserListSuccess:
+      const { queryResult } = action.payload;
+      console.log('queryResult.overallCount:');
+      console.log(queryResult.overallCount);
+      return {
+        ...state,
+        userList: queryResult.map((record) => record),
+        userListTotalCount: queryResult.overallCount,
+      };
+    case PushCampaignActionTypes.FetchUserListFailure:
+      return { ...state, error: action.payload.error };
     default:
       return state;
   }

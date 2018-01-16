@@ -1,6 +1,6 @@
 import { Dispatch } from 'redux';
 import { ThunkAction } from 'redux-thunk';
-import skygear from 'skygear';
+import skygear, { Query, QueryResult, Record } from 'skygear';
 
 import { PushCampaign } from '../types';
 import { RootState } from '../states';
@@ -9,12 +9,18 @@ import { RootState } from '../states';
 export type PushCampaignListActions =
   | FetchPushCampaignListRequest
   | FetchPushCampaignListSuccess
-  | FetchPushCampaignListFailure;
+  | FetchPushCampaignListFailure
+  | FetchUserListRequest
+  | FetchUserListSuccess
+  | FetchUserListFailure;
 
 export enum PushCampaignActionTypes {
   FetchListRequest = 'FETCH_PUSH_CAMPAIGN_LIST_REQUEST',
-  FetchListSuccess = 'FETCH_PUSH_CAMPAIGN_SUCCESS',
-  FetchListFailure = 'FETCH_PUSH_CAMPAIGN_FAILURE',
+  FetchListSuccess = 'FETCH_PUSH_CAMPAIGN_LIST_SUCCESS',
+  FetchListFailure = 'FETCH_PUSH_CAMPAIGN_LIST_FAILURE',
+  FetchUserListRequest = 'FETCH_USER_LIST_REQUEST',
+  FetchUserListSuccess = 'FETCH_USER_LIST_SUCCESS',
+  FetchUserListFailure = 'FETCH_USER_LIST_FAILURE',
 }
 
 export interface FetchPushCampaignListRequest {
@@ -39,6 +45,24 @@ export interface FetchPushCampaignListFailure {
     error: Error;
   };
   type: PushCampaignActionTypes.FetchListFailure;
+}
+
+export interface FetchUserListRequest {
+  type: PushCampaignActionTypes.FetchUserListRequest;
+}
+
+export interface FetchUserListSuccess {
+  payload: {
+    queryResult: QueryResult<Record>;
+  };
+  type: PushCampaignActionTypes.FetchUserListSuccess;
+}
+
+export interface FetchUserListFailure {
+  payload: {
+    error: Error;
+  };
+  type: PushCampaignActionTypes.FetchUserListFailure;
 }
 
 function fetchPushCampaignListRequest(
@@ -78,6 +102,59 @@ function fetchPushCampaignListFailure(
     },
     type: PushCampaignActionTypes.FetchListFailure,
   };
+}
+
+function fetchUserListRequest(): FetchUserListRequest {
+  return {
+    type: PushCampaignActionTypes.FetchUserListRequest,
+  };
+}
+
+function fetchUserListSuccess(
+  queryResult: QueryResult<Record>
+): FetchUserListSuccess {
+  return {
+    payload: {
+      queryResult,
+    },
+    type: PushCampaignActionTypes.FetchUserListSuccess,
+  };
+}
+
+function fetchUserListFailure(
+  error: Error
+): FetchUserListFailure {
+  return {
+    payload: {
+      error,
+    },
+    type: PushCampaignActionTypes.FetchUserListFailure,
+  };
+}
+
+function fetchUserList(): ThunkAction<Promise<void>, {}, {}> {
+  return dispatch => {
+    const query = new Query(Record.extend('user'));
+    query.overallCount = true;
+    dispatch(fetchUserListRequest());
+    return fetchUserListOperation(query).then(
+      queryResult => {
+        console.log(queryResult);
+        dispatch(fetchUserListSuccess(queryResult));
+      },
+      error => {
+        dispatch(fetchUserListFailure(error));
+      }
+    );
+  };
+}
+
+function fetchUserListOperation(query: Query): Promise<QueryResult<Record>> {
+  return skygear.publicDB
+    .query(query)
+    .then((queryResult: QueryResult<Record>) => {
+      return queryResult;
+    });
 }
 
 interface fetchListResult {
@@ -127,6 +204,13 @@ export class PushCampaignActionDispatcher {
   public fetchList(page: number, perPage: number): Promise<void> {
     return this.dispatch(
       fetchPushCampaignList(page, perPage)
+    );
+  }
+
+  public fetchUserList(): Promise<void> {
+    console.log('fetchUserList');
+    return this.dispatch(
+      fetchUserList()
     );
   }
 }

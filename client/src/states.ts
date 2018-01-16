@@ -104,10 +104,16 @@ export interface PushCampaignListState {
 
 export interface NewPushCampaignState {
   savingPushCampaign?: Remote<PushCampaign>;
+  userList: Record[];
+  userListTotalCount: number;
+  error?: Error;
 }
 
 export const initialNewPushCampaignState: NewPushCampaignState = {
   savingPushCampaign: undefined,
+  userList: [],
+  userListTotalCount: 0,
+  error: undefined,
 }
 
 export const initialPushCampaignListState: PushCampaignListState = {
