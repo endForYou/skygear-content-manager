@@ -91,6 +91,7 @@ export const initialImportState: ImportState = {
 
 export interface PushCampaignState {
   list: PushCampaignListState;
+  new: NewPushCampaignState;
 }
 
 export interface PushCampaignListState {
@@ -99,6 +100,14 @@ export interface PushCampaignListState {
   totalCount: number;
   pushCampaigns: PushCampaign[];
   error?: Error;
+}
+
+export interface NewPushCampaignState {
+  savingPushCampaign?: Remote<PushCampaign>;
+}
+
+export const initialNewPushCampaignState: NewPushCampaignState = {
+  savingPushCampaign: undefined,
 }
 
 export const initialPushCampaignListState: PushCampaignListState = {
@@ -111,6 +120,7 @@ export const initialPushCampaignListState: PushCampaignListState = {
 
 export const initialPushCampaignState: PushCampaignState = {
   list: initialPushCampaignListState,
+  new: initialNewPushCampaignState,
 };
 
 export function initialRootState(
