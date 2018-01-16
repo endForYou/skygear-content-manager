@@ -183,7 +183,7 @@ interface RecordTypeContext {
   cmsRecordByName: CmsRecordByName;
 }
 
-interface ConfigContext {
+export interface ConfigContext {
   cmsRecordByName: CmsRecordByName;
   associationRecordByName: AssociationRecordByName;
 }
@@ -237,7 +237,7 @@ export function parseCmsConfig(input: any): CmsConfig {
       return { ...obj, [name]: parseRecordConfig(context, name, recordConfig) };
     }, {}),
     site: parseSiteConfigs(site),
-    pushNotifications: parsePushNotificationConfig(pushNotifications),
+    pushNotifications: parsePushNotificationConfig(context, pushNotifications),
   };
 }
 
@@ -415,7 +415,7 @@ function parseRecordFormPageConfig(
 }
 
 // tslint:disable-next-line: no-any
-function parseFieldConfig(context: ConfigContext, a: any): FieldConfig {
+export function parseFieldConfig(context: ConfigContext, a: any): FieldConfig {
   switch (a.type) {
     case 'String':
       return parseStringFieldConfig(a);

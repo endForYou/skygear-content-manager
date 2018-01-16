@@ -1,95 +1,98 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
-// import { Effect } from '../components/RecordFormPage';
 
-import * as moment from 'moment';
-import * as Datetime from 'react-datetime';
 import { RootState } from '../states';
-import { PushCampaign, Remote } from '../types';
+import { Remote, RemoteType } from '../types';
+import { FieldConfig } from '../cmsConfig';
+import { UserFilterFieldGroup } from './components/UserFilterFieldGroup';
 
 type Props = StateProps & DispatchProps;
 
+interface NewPushCampaign {
+  type: string;
+}
+
 interface StateProps {
-  savingPushCampaign?: Remote<PushCampaign>;
+  content: string;
+  savingPushCampaign?: Remote<NewPushCampaign>;
+  userFilters: FieldConfig[];
 }
 
 interface DispatchProps {
   dispatch: Dispatch<RootState>;
 }
 
-// Handle change propagated from Field. A undefined value would yield no changes
-// on State.recordChange[name].
-// tslint:disable-next-line: no-any
-// type FieldChangeHandler = (value: any, effect?: Effect) => void;
-
-const DATE_FORMAT = 'YYYY-MM-DD';
-const TIME_FORMAT = 'HH:mm:ss[Z]';
-// const DATETIME_FORMAT = 'YYYY-MM-DD HH:mm:ss[Z]';
-
 class NewPushNotificationPageImpl extends React.PureComponent<Props> {
-
   constructor(props: Props) {
     super(props);
   }
 
   public render() {
-    const className = 'form-control'
+    const className = 'form-control';
+    const { dispatch, userFilters, content, savingPushCampaign } = this.props;
 
     return (
       <div>
         <h1 className="display-4">New Push Campaign</h1>
         <div>
+          <UserFilterFieldGroup
+            dispatch={dispatch}
+            filterConfigs={userFilters}
+          />
           <div className="form-group">
-            <label htmlFor="content">Audience</label>
-          </div>
-          <div className="form-group">
-            <label htmlFor="content">Mesage</label>
+            <label htmlFor="content">Message</label>
             <textarea
-              value={undefined}
-              onChange={this.handleChange}
+              value={content}
+              onChange={this.contentOnChange}
               className={className}
               rows={5}
             />
           </div>
-          <div className="form-group">
-            <label htmlFor="delivery-time">Delivery Time</label>
-            <Datetime
-              dateFormat={DATE_FORMAT}
-              timeFormat={TIME_FORMAT}
-              value={undefined}
-              onChange={this.handleChange}
-              inputProps={{ className }}
-              utc={true}
-            />
-          </div>
         </div>
+        <SubmitButton savingPushCampaign={savingPushCampaign} />
       </div>
     );
   }
 
-  public handleChange: (
-    // tslint:disable-next-line: no-any
-    event: string | moment.Moment | React.ChangeEvent<any>
-  ) => void = event => {
-    if (!moment.isMoment(event)) {
-      return;
-    }
-
-    // const d = event.toDate();
-
-    // this.setState({ ...this.state, value: d });
-    // if (this.props.onFieldChange) {
-    //   this.props.onFieldChange(d);
-    // }
+  private contentOnChange: React.ChangeEventHandler<
+    HTMLTextAreaElement
+  > = event => {
+    const value = event.target.value;
+    console.log(value);
+    // this.handleValueChange(value);
   };
+}
+
+interface SubmitProps {
+  savingPushCampaign?: Remote<NewPushCampaign>;
+}
+
+function SubmitButton(props: SubmitProps): JSX.Element {
+  const { savingPushCampaign } = props;
+  if (savingPushCampaign !== undefined && savingPushCampaign.type === RemoteType.Loading) {
+    return (
+      <button type="submit" className="btn btn-primary" disabled={true}>
+        Save
+      </button>
+    );
+  } else {
+    return (
+      <button type="submit" className="btn btn-primary">
+        Save
+      </button>
+    );
+  }
 }
 
 function mapStateToProps(
   state: RootState
 ): StateProps {
+  console.log('mapStateToProps');
   return {
+    content: '',
     savingPushCampaign: undefined,
+    userFilters: state.cmsConfig.pushNotifications.filterUserConfigs,
   };
 }
 
