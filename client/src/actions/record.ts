@@ -1,13 +1,31 @@
 import { Dispatch } from 'redux';
 import { ThunkAction } from 'redux-thunk';
-import skygear, { Query, QueryResult, Record, Reference } from 'skygear';
+import skygear, {
+  Query,
+  QueryResult,
+  Record,
+  RecordCls,
+  Reference,
+} from 'skygear';
 
 import {
   AssociationReferenceFieldConfig,
+  BooleanFilter,
+  BooleanFilterQueryType,
   CmsRecord,
+  DateTimeFilter,
+  DateTimeFilterQueryType,
   FieldConfigTypes,
+  Filter,
+  FilterType,
+  GeneralFilter,
+  GeneralFilterQueryType,
+  IntegerFilter,
+  IntegerFilterQueryType,
   ReferenceConfig,
   ReferenceFieldConfig,
+  StringFilter,
+  StringFilterQueryType,
 } from '../cmsConfig';
 import { parseReference } from '../recordUtil';
 import { RootState } from '../states';
@@ -246,9 +264,9 @@ export function fetchRecord(
   id: string
 ): ThunkAction<Promise<void>, {}, {}> {
   return dispatch => {
-    const RecordCls = Record.extend(cmsRecord.recordType);
+    const recordCls = Record.extend(cmsRecord.recordType);
 
-    const query = new Query(RecordCls);
+    const query = new Query(recordCls);
     query.equalTo('_id', id);
     query.limit = 1;
 
@@ -294,17 +312,17 @@ function saveRecord(
 function fetchRecordList(
   cmsRecord: CmsRecord,
   references: ReferenceConfig[],
+  filters: Filter[],
   page: number = 1,
   perPage: number = 25
 ): ThunkAction<Promise<void>, {}, {}> {
   return dispatch => {
-    const RecordCls = Record.extend(cmsRecord.recordType);
+    const recordCls = Record.extend(cmsRecord.recordType);
+    const query = queryWithFilters(filters, recordCls);
 
-    const query = new Query(RecordCls);
     query.overallCount = true;
     query.limit = perPage;
     query.offset = (page - 1) * perPage;
-
     query.addDescending('_created_at');
 
     dispatch(fetchRecordListRequest(cmsRecord, page));
@@ -317,6 +335,143 @@ function fetchRecordList(
       }
     );
   };
+}
+
+function queryWithFilters(filters: Filter[], recordCls: RecordCls): Query {
+  const firstFilter = filters[0];
+
+  if (
+    filters.length === 1 &&
+    firstFilter.type === FilterType.GeneralFilterType
+  ) {
+    return createGeneralFilterQuery(firstFilter, recordCls);
+  } else {
+    const query = new Query(recordCls);
+    filters.forEach(filter => {
+      addFilterToQuery(query, filter, recordCls);
+    });
+    return query;
+  }
+}
+
+function addFilterToQuery(query: Query, filter: Filter, recordCls: RecordCls) {
+  switch (filter.type) {
+    case FilterType.StringFilterType:
+      addStringFilterToQuery(query, filter);
+      break;
+    case FilterType.IntegerFilterType:
+      addIntegerFilterToQuery(query, filter);
+      break;
+    case FilterType.BooleanFilterType:
+      addBooleanFilterToQuery(query, filter);
+      break;
+    case FilterType.DateTimeFilterType:
+      addDatetimeFilterToQuery(query, filter);
+      break;
+    default:
+      throw new Error(
+        `addFilterToQuery does not support FilterType ${filter.type}`
+      );
+  }
+}
+
+function addStringFilterToQuery(query: Query, filter: StringFilter) {
+  switch (filter.query) {
+    case StringFilterQueryType.EqualTo:
+      query.equalTo(filter.name, filter.value);
+      break;
+    case StringFilterQueryType.NotEqualTo:
+      query.notEqualTo(filter.name, filter.value);
+      break;
+    case StringFilterQueryType.Like:
+      query.like(filter.name, filter.value);
+      break;
+    case StringFilterQueryType.NotLike:
+      query.notLike(filter.name, filter.value);
+      break;
+    default:
+      throw new Error(
+        `addStringFilterToQuery does not support StringFilterQueryType ${filter.type}`
+      );
+  }
+}
+
+function addIntegerFilterToQuery(query: Query, filter: IntegerFilter) {
+  switch (filter.query) {
+    case IntegerFilterQueryType.EqualTo:
+      query.equalTo(filter.name, filter.value);
+      break;
+    case IntegerFilterQueryType.NotEqualTo:
+      query.notEqualTo(filter.name, filter.value);
+      break;
+    case IntegerFilterQueryType.LessThan:
+      query.lessThan(filter.name, filter.value);
+      break;
+    case IntegerFilterQueryType.GreaterThan:
+      query.greaterThan(filter.name, filter.value);
+      break;
+    case IntegerFilterQueryType.LessThanOrEqualTo:
+      query.lessThanOrEqualTo(filter.name, filter.value);
+      break;
+    case IntegerFilterQueryType.GreaterThanOrEqualTo:
+      query.greaterThanOrEqualTo(filter.name, filter.value);
+      break;
+    default:
+      throw new Error(
+        `addIntegerFilterToQuery does not support IntegerFilterQueryType ${filter.type}`
+      );
+  }
+}
+
+function addBooleanFilterToQuery(query: Query, filter: BooleanFilter) {
+  switch (filter.query) {
+    case BooleanFilterQueryType.True:
+      query.equalTo(filter.name, true);
+      break;
+    case BooleanFilterQueryType.False:
+      query.equalTo(filter.name, false);
+      break;
+    default:
+      throw new Error(
+        `addBooleanFilterToQuery does not support BooleanFilterQueryType ${filter.type}`
+      );
+  }
+}
+
+function addDatetimeFilterToQuery(query: Query, filter: DateTimeFilter) {
+  switch (filter.query) {
+    case DateTimeFilterQueryType.Before:
+      query.lessThan(filter.name, filter.value);
+      break;
+    case DateTimeFilterQueryType.After:
+      query.greaterThan(filter.name, filter.value);
+      break;
+    default:
+      throw new Error(
+        `addDatetimeFilterToQuery does not support DateTimeFilterQueryType ${filter.type}`
+      );
+  }
+}
+
+function createGeneralFilterQuery(filter: GeneralFilter, recordCls: RecordCls) {
+  switch (filter.query) {
+    case GeneralFilterQueryType.Contains:
+      const generalQuery = filter.names
+        .map(name => {
+          const q = new Query(recordCls);
+          q.like(name, `%${filter.value}%`);
+          return q;
+        })
+        .reduce((accumulator, currentValue) =>
+          Query.or(accumulator, currentValue)
+        );
+
+      return generalQuery;
+    default:
+      throw new Error(
+        `createGeneralFilterQuery does not support GeneralFilterQueryType ${filter.query}`
+      );
+  }
 }
 
 function queryWithTarget(
@@ -460,9 +615,13 @@ export class RecordActionDispatcher {
     return this.dispatch(fetchRecord(this.cmsRecord, this.references, id));
   }
 
-  public fetchList(page: number, perPage: number): Promise<void> {
+  public fetchList(
+    page: number,
+    perPage: number,
+    filters: Filter[] = []
+  ): Promise<void> {
     return this.dispatch(
-      fetchRecordList(this.cmsRecord, this.references, page, perPage)
+      fetchRecordList(this.cmsRecord, this.references, filters, page, perPage)
     );
   }
 

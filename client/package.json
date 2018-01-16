@@ -17,10 +17,10 @@
     "jest": "20.0.4",
     "js-yaml": "3.10.0",
     "moment": "2.19.1",
-    "promise": "8.0.1",
     "object-assign": "4.1.1",
     "postcss-flexbugs-fixes": "3.2.0",
     "postcss-loader": "2.0.6",
+    "promise": "8.0.1",
     "query-string": "5.0.1",
     "react": "16.0.0",
     "react-datetime": "2.10.3",
@@ -47,6 +47,7 @@
     "tslint-react": "3.2.0",
     "typescript": "2.6.1",
     "url-loader": "0.5.9",
+    "uuid": "3.1.0",
     "webpack": "3.5.1",
     "webpack-dev-server": "2.8.2",
     "webpack-manifest-plugin": "1.2.1",
@@ -72,6 +73,7 @@
     "@types/react-router-dom": "4.2.0",
     "@types/react-router-redux": "5.0.10",
     "@types/react-select": "1.0.59",
+    "@types/uuid": "3.4.3",
     "prettier": "1.7.4"
   },
   "jest": {

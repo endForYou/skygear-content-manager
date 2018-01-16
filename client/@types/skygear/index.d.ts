@@ -186,11 +186,11 @@ declare module 'skygear' {
     public equalTo(key: string, value: AnyValue): this;
     public notEqualTo(key: string, value: AnyValue): this;
 
-    public greaterThan(key: string, value: number): this;
-    public greaterThanOrEqualTo(key: string, value: number): this;
-    public lessThan(key: string, value: number): this;
-    public lessThanOrEqualTo(key: string, value: number): this;
-    public greaterThanOrEqualTo(key: string, value: number): this;
+    public greaterThan(key: string, value: number | Date): this;
+    public greaterThanOrEqualTo(key: string, value: number | Date): this;
+    public lessThan(key: string, value: number | Date): this;
+    public lessThanOrEqualTo(key: string, value: number | Date): this;
+    public greaterThanOrEqualTo(key: string, value: number | Date): this;
 
     public distanceGreaterThan(
       key: string,

@@ -1,3 +1,4 @@
+import classNames from 'classnames';
 import * as qs from 'query-string';
 import * as React from 'react';
 import { connect } from 'react-redux';
@@ -6,10 +7,28 @@ import { Dispatch } from 'redux';
 import { Record } from 'skygear';
 
 import { RecordActionDispatcher } from '../actions/record';
-import { FieldConfig, ListPageConfig } from '../cmsConfig';
+import {
+  BooleanFilterQueryType,
+  DateTimeFilter,
+  DateTimeFilterQueryType,
+  FieldConfig,
+  Filter,
+  FilterConfig,
+  FilterConfigTypes,
+  filterFactory,
+  FilterType,
+  GeneralFilter,
+  IntegerFilter,
+  IntegerFilterQueryType,
+  ListPageConfig,
+  StringFilter,
+  StringFilterQueryType,
+} from '../cmsConfig';
+import { FilterList } from '../components/FilterList';
 import Pagination from '../components/Pagination';
 import { Field, FieldContext } from '../fields';
 import { RootState } from '../states';
+import { debounce } from '../util';
 
 interface TableHeaderProps {
   fieldConfigs: FieldConfig[];
@@ -99,29 +118,160 @@ export interface StateProps {
   records: Record[];
 }
 
+interface State {
+  showfilterMenu: boolean;
+  filters: Filter[];
+}
+
 export interface DispatchProps {
   dispatch: Dispatch<RootState>;
 }
 
-class ListPageImpl extends React.PureComponent<ListPageProps> {
+class ListPageImpl extends React.PureComponent<ListPageProps, State> {
   public recordActionCreator: RecordActionDispatcher;
 
   constructor(props: ListPageProps) {
     super(props);
 
     const { dispatch, pageConfig: { cmsRecord, references } } = this.props;
+    const filters: Filter[] = [];
+
+    this.state = {
+      filters,
+      showfilterMenu: false,
+    };
 
     this.recordActionCreator = new RecordActionDispatcher(
       dispatch,
       cmsRecord,
       references
     );
+
+    this.fetchList = debounce(this.fetchList.bind(this), 200);
   }
 
   public componentDidMount() {
     const { page, pageConfig } = this.props;
+    const { filters } = this.state;
+    this.fetchList(page, pageConfig.perPage, filters);
+  }
 
-    this.recordActionCreator.fetchList(page, pageConfig.perPage);
+  public toggleFilterMenu() {
+    this.setState({ showfilterMenu: !this.state.showfilterMenu });
+  }
+
+  public handleQueryTypeChange(
+    filter: Filter,
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) {
+    const { page, pageConfig } = this.props;
+
+    const filters = this.state.filters.map(f => {
+      if (f.id === filter.id) {
+        switch (filter.type) {
+          case FilterType.StringFilterType:
+            return {
+              ...f,
+              query: StringFilterQueryType[event.target.value],
+            };
+          case FilterType.IntegerFilterType:
+            return {
+              ...f,
+              query: IntegerFilterQueryType[event.target.value],
+            };
+          case FilterType.BooleanFilterType:
+            return {
+              ...f,
+              query: BooleanFilterQueryType[event.target.value],
+            };
+          case FilterType.DateTimeFilterType:
+            return {
+              ...f,
+              query: DateTimeFilterQueryType[event.target.value],
+            };
+          default:
+            throw new Error(
+              `handleQueryTypeChange does not support FilterType ${f.type}`
+            );
+        }
+      }
+      return f;
+    });
+
+    this.setState({ filters });
+    this.fetchList(page, pageConfig.perPage, filters);
+  }
+
+  public handleFilterValueChange(
+    filter: Filter,
+    event: React.ChangeEvent<HTMLInputElement>
+  ) {
+    const { page, pageConfig } = this.props;
+    const filters = this.state.filters.map(f => {
+      if (f.id === filter.id) {
+        switch (filter.type) {
+          case FilterType.StringFilterType:
+            return { ...(f as StringFilter), value: event.target.value };
+          case FilterType.IntegerFilterType:
+            return {
+              ...(f as IntegerFilter),
+              value: Number(event.target.value),
+            };
+          case FilterType.BooleanFilterType:
+          case FilterType.DateTimeFilterType:
+            return f;
+          case FilterType.GeneralFilterType:
+            return { ...(f as GeneralFilter), value: event.target.value };
+          default:
+            throw new Error(
+              `handleFilterValueChange does not support FilterType ${f.type}`
+            );
+        }
+      }
+      return f;
+    });
+
+    this.setState({ filters });
+    this.fetchList(page, pageConfig.perPage, filters);
+  }
+
+  public handleDateTimeValueChange(filter: Filter, datetime: Date) {
+    const { page, pageConfig } = this.props;
+    const filters = this.state.filters.map(f => {
+      if (f.id === filter.id) {
+        return { ...(f as DateTimeFilter), value: datetime };
+      } else {
+        return f;
+      }
+    });
+    this.setState({ filters });
+    this.fetchList(page, pageConfig.perPage, filters);
+  }
+
+  public onFilterItemClicked(filterConfig: FilterConfig) {
+    const { page, pageConfig } = this.props;
+    const newFilter = filterFactory(filterConfig);
+
+    const filters =
+      filterConfig.type === FilterConfigTypes.General
+        ? [newFilter]
+        : [
+            ...this.state.filters.filter(
+              f => f.type !== FilterType.GeneralFilterType
+            ),
+            newFilter,
+          ];
+
+    this.setState({ filters });
+    this.fetchList(page, pageConfig.perPage, filters);
+    this.toggleFilterMenu();
+  }
+
+  public onCloseFilterClicked(filter: Filter) {
+    const { page, pageConfig } = this.props;
+    const filters = this.state.filters.filter(f => f.id !== filter.id);
+    this.setState({ filters });
+    this.fetchList(page, pageConfig.perPage, filters);
   }
 
   public render() {
@@ -134,15 +284,65 @@ class ListPageImpl extends React.PureComponent<ListPageProps> {
       records,
     } = this.props;
 
+    const { showfilterMenu, filters } = this.state;
+
     return (
       <div>
-        <h1 className="display-4 d-inline-block">{pageConfig.label}</h1>
-        <Link
-          className="btn btn-light float-right"
-          to={`/records/${recordName}/new`}
-        >
-          New
-        </Link>
+        <div className="navbar">
+          <h1 className="display-4">{pageConfig.label}</h1>
+          <div className="float-right">
+            {pageConfig.filters && (
+              <div className="dropdown float-right ml-2">
+                <button
+                  type="button"
+                  className="btn btn-primary dropdown-toggle"
+                  onClick={() => this.toggleFilterMenu()}
+                >
+                  Add Filter <span className="caret" />
+                </button>
+
+                <div
+                  style={{ right: 0, left: 'unset' }}
+                  className={classNames(
+                    'dropdown-menu-right',
+                    'dropdown-menu',
+                    showfilterMenu ? 'show' : ''
+                  )}
+                >
+                  {pageConfig.filters.map(filterConfig => (
+                    <a
+                      key={filterConfig.label}
+                      className="dropdown-item"
+                      onClick={() => this.onFilterItemClicked(filterConfig)}
+                    >
+                      {filterConfig.label}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
+            <Link
+              className="btn btn-light float-right"
+              to={`/records/${recordName}/new`}
+            >
+              New
+            </Link>
+          </div>
+        </div>
+
+        <div className="float-right">
+          <FilterList
+            filters={filters}
+            handleQueryTypeChange={(filter, evt) =>
+              this.handleQueryTypeChange(filter, evt)}
+            handleFilterValueChange={(filter, evt) =>
+              this.handleFilterValueChange(filter, evt)}
+            onCloseFilterClicked={filter => this.onCloseFilterClicked(filter)}
+            handleDateTimeValueChange={(filter, datetime) =>
+              this.handleDateTimeValueChange(filter, datetime)}
+          />
+        </div>
+
         <div className="table-responsive">
           {(() => {
             if (isLoading) {
@@ -176,9 +376,13 @@ class ListPageImpl extends React.PureComponent<ListPageProps> {
 
   public onPageItemClicked = (page: number) => {
     const { pageConfig } = this.props;
-
-    this.recordActionCreator.fetchList(page, pageConfig.perPage);
+    const { filters } = this.state;
+    this.fetchList(page, pageConfig.perPage, filters);
   };
+
+  public fetchList(page: number, perPage: number, filters: Filter[]) {
+    this.recordActionCreator.fetchList(page, perPage, filters);
+  }
 }
 
 function ListPageFactory(recordName: string) {
