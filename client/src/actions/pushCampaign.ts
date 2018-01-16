@@ -89,10 +89,7 @@ function fetchListOperation(
   page: number,
   perPage: number
 ): Promise<fetchListResult> {
-  // WTF: To avoid compilation error: 
-  // "Property 'lambda' does not exist on type 'Container'."
-  // tslint:disable-next-line: no-any
-  return (skygear as any)
+  return skygear
     .lambda('push_campaign:get_all', {page, perPage})
     .then(
       // tslint:disable-next-line: no-any
