@@ -1,26 +1,26 @@
 import { Dispatch } from 'redux';
 import { ThunkAction } from 'redux-thunk';
-import skygear, { Query, QueryResult, Record } from 'skygear';
+import skygear from 'skygear';
 
-import { PushCampaign } from '../types';
+import { PushCampaign, NewPushCampaign } from '../types';
 import { RootState } from '../states';
 
 
-export type PushCampaignListActions =
+export type PushCampaignActions =
   | FetchPushCampaignListRequest
   | FetchPushCampaignListSuccess
   | FetchPushCampaignListFailure
-  | FetchUserListRequest
-  | FetchUserListSuccess
-  | FetchUserListFailure;
+  | SavePushCampaignRequest
+  | SavePushCampaignSuccess
+  | SavePushCampaignFailure;
 
 export enum PushCampaignActionTypes {
   FetchListRequest = 'FETCH_PUSH_CAMPAIGN_LIST_REQUEST',
   FetchListSuccess = 'FETCH_PUSH_CAMPAIGN_LIST_SUCCESS',
   FetchListFailure = 'FETCH_PUSH_CAMPAIGN_LIST_FAILURE',
-  FetchUserListRequest = 'FETCH_USER_LIST_REQUEST',
-  FetchUserListSuccess = 'FETCH_USER_LIST_SUCCESS',
-  FetchUserListFailure = 'FETCH_USER_LIST_FAILURE',
+  SavePushCampaignRequest = 'SAVE_PUSH_CAMPAIGN_REQUEST',
+  SavePushCampaignSuccess = 'SAVE_PUSH_CAMPAIGN_SUCCESS',
+  SavePushCampaignFailure = 'SAVE_PUSH_CAMPAIGN_FAILURE',
 }
 
 export interface FetchPushCampaignListRequest {
@@ -47,22 +47,25 @@ export interface FetchPushCampaignListFailure {
   type: PushCampaignActionTypes.FetchListFailure;
 }
 
-export interface FetchUserListRequest {
-  type: PushCampaignActionTypes.FetchUserListRequest;
-}
-
-export interface FetchUserListSuccess {
+export interface SavePushCampaignRequest {
   payload: {
-    queryResult: QueryResult<Record>;
+    newPushCampaign: NewPushCampaign
   };
-  type: PushCampaignActionTypes.FetchUserListSuccess;
+  type: PushCampaignActionTypes.SavePushCampaignRequest;
 }
 
-export interface FetchUserListFailure {
+export interface SavePushCampaignSuccess {
+  payload: {
+    newPushCampaign: NewPushCampaign
+  };
+  type: PushCampaignActionTypes.SavePushCampaignSuccess;
+}
+
+export interface SavePushCampaignFailure {
   payload: {
     error: Error;
   };
-  type: PushCampaignActionTypes.FetchUserListFailure;
+  type: PushCampaignActionTypes.SavePushCampaignFailure;
 }
 
 function fetchPushCampaignListRequest(
@@ -104,57 +107,61 @@ function fetchPushCampaignListFailure(
   };
 }
 
-function fetchUserListRequest(): FetchUserListRequest {
-  return {
-    type: PushCampaignActionTypes.FetchUserListRequest,
-  };
-}
-
-function fetchUserListSuccess(
-  queryResult: QueryResult<Record>
-): FetchUserListSuccess {
+function savePushCampaignRequest(
+  newPushCampaign: NewPushCampaign
+): SavePushCampaignRequest {
   return {
     payload: {
-      queryResult,
+      newPushCampaign,
     },
-    type: PushCampaignActionTypes.FetchUserListSuccess,
+    type: PushCampaignActionTypes.SavePushCampaignRequest,
   };
 }
 
-function fetchUserListFailure(
+function savePushCampaignSuccess(
+  newPushCampaign: NewPushCampaign
+): SavePushCampaignSuccess {
+  return {
+    payload: {
+      newPushCampaign,
+    },
+    type: PushCampaignActionTypes.SavePushCampaignSuccess,
+  };
+}
+
+function savePushCampaignFailure(
   error: Error
-): FetchUserListFailure {
+): SavePushCampaignFailure {
   return {
     payload: {
       error,
     },
-    type: PushCampaignActionTypes.FetchUserListFailure,
+    type: PushCampaignActionTypes.SavePushCampaignFailure,
   };
 }
 
-function fetchUserList(): ThunkAction<Promise<void>, {}, {}> {
+function savePushCampaign(newPushCampaign: NewPushCampaign): ThunkAction<Promise<void>, {}, {}> {
   return dispatch => {
-    const query = new Query(Record.extend('user'));
-    query.overallCount = true;
-    dispatch(fetchUserListRequest());
-    return fetchUserListOperation(query).then(
-      queryResult => {
-        console.log(queryResult);
-        dispatch(fetchUserListSuccess(queryResult));
+    dispatch(savePushCampaignRequest(newPushCampaign));
+    return savePushCampaignOperation(newPushCampaign).then(
+      result => {
+        dispatch(savePushCampaignSuccess(newPushCampaign));
       },
       error => {
-        dispatch(fetchUserListFailure(error));
+        dispatch(savePushCampaignFailure(error));
       }
     );
   };
 }
 
-function fetchUserListOperation(query: Query): Promise<QueryResult<Record>> {
-  return skygear.publicDB
-    .query(query)
-    .then((queryResult: QueryResult<Record>) => {
-      return queryResult;
-    });
+function savePushCampaignOperation(newPushCampaign: NewPushCampaign): Promise<void> {
+  return skygear
+    .lambda('push_campaign:create_new', {newPushCampaign})
+    .then(
+      // tslint:disable-next-line: no-any
+      (result: any) => {
+        console.log(result);
+      });
 }
 
 interface fetchListResult {
@@ -207,10 +214,9 @@ export class PushCampaignActionDispatcher {
     );
   }
 
-  public fetchUserList(): Promise<void> {
-    console.log('fetchUserList');
+  public savePushCampaign(newPushCampaign: NewPushCampaign): Promise<void> {
     return this.dispatch(
-      fetchUserList()
+      savePushCampaign(newPushCampaign)
     );
   }
 }

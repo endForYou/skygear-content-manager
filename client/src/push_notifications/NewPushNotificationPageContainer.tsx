@@ -31,10 +31,6 @@ class NewPushNotificationPageContainerImpl extends React.PureComponent<Props> {
     this.notificationActionDispatcher = new PushCampaignActionDispatcher(dispatch);
   }
 
-  public componentDidMount() {
-    this.notificationActionDispatcher.fetchUserList();
-  }
-
   public render() {
     const { dispatch, userFilters, savingPushCampaign } = this.props;
 

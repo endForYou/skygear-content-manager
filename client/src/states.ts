@@ -2,7 +2,13 @@ import { RouterState } from 'react-router-redux';
 import { Record } from 'skygear';
 
 import { CmsConfig } from './cmsConfig';
-import { ImportResult, Remote, RemoteLoading, PushCampaign } from './types';
+import {
+  ImportResult,
+  NewPushCampaign,
+  PushCampaign,
+  Remote,
+  RemoteLoading,
+} from './types';
 import { objectFrom } from './util';
 
 export interface RootState {
@@ -103,17 +109,11 @@ export interface PushCampaignListState {
 }
 
 export interface NewPushCampaignState {
-  savingPushCampaign?: Remote<PushCampaign>;
-  userList: Record[];
-  userListTotalCount: number;
-  error?: Error;
+  savingPushCampaign?: Remote<NewPushCampaign>;
 }
 
 export const initialNewPushCampaignState: NewPushCampaignState = {
   savingPushCampaign: undefined,
-  userList: [],
-  userListTotalCount: 0,
-  error: undefined,
 }
 
 export const initialPushCampaignListState: PushCampaignListState = {

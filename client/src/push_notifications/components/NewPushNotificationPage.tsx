@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Dispatch } from 'react-redux';
+import { push } from 'react-router-redux';
 import Select from 'react-select';
 import skygear, { Record, Query, QueryResult } from 'skygear';
 
@@ -17,11 +18,9 @@ export interface NewPushNotificationPageProps {
 }
 
 interface State {
-  type: string;
+  newPushCampaign: NewPushCampaign;
   filterOptionsByName: FilterOptionsByName;
-  messageContent: string;
-  userList: Record[];
-  userListTotalCount: number;
+  errorMessage?: string;
 }
 
 interface FilterOptionsByName {
@@ -43,14 +42,14 @@ interface CampaignTypeOption {
   value: string;
 }
 
-enum CampaignTypes {
+enum PushCampaignType {
   AllUsers = 'all_users',
   SpecificUsers = 'specific_users',
 }
 
 const campaignTypeOptions: CampaignTypeOption[] = [
-  { value: CampaignTypes.AllUsers, label: 'All Users' },
-  { value: CampaignTypes.SpecificUsers, label: 'Specific Users' },
+  { value: PushCampaignType.AllUsers, label: 'All Users' },
+  { value: PushCampaignType.SpecificUsers, label: 'Specific Users' },
 ];
 
 // Handle change propagated from Field. A undefined value would yield no changes
@@ -70,11 +69,14 @@ class NewPushNotificationPageImpl extends React.PureComponent<
     const { dispatch } = this.props;
 
     this.state = {
-      type: CampaignTypes.AllUsers,
+      newPushCampaign: {
+        type: PushCampaignType.AllUsers,
+        messageContent: '',
+        userIds: [],
+        numberOfAudiences: 0,
+      },
       filterOptionsByName: {},
-      messageContent: '',
-      userList: [],
-      userListTotalCount: 0,
+      errorMessage: undefined,
     };
 
     this.notificationActionDispatcher = new PushCampaignActionDispatcher(dispatch);
@@ -83,17 +85,18 @@ class NewPushNotificationPageImpl extends React.PureComponent<
 
   public render() {
     const { filterConfigs, savingPushCampaign } = this.props;
+    const { newPushCampaign: { type, numberOfAudiences }, filterOptionsByName } = this.state;
     let filterConditionTitle = null;
     let formGroups = null;
 
-    if (this.state.type == CampaignTypes.SpecificUsers) {
+    if (type == PushCampaignType.SpecificUsers) {
       filterConditionTitle = <h5>Filter Conditions</h5>;
       formGroups = filterConfigs.map((fieldConfig, index) => {
         return (
           <FormGroup
             key={index}
             fieldConfig={fieldConfig}
-            filterOptionsByName={this.state.filterOptionsByName}
+            filterOptionsByName={filterOptionsByName}
             onFilterChange={this.handleFilterChange}
           />
         );
@@ -101,20 +104,20 @@ class NewPushNotificationPageImpl extends React.PureComponent<
     };
 
     return (
-      <div>
+      <form onSubmit={this.handleSubmit}>
         <h3>Audiences</h3>
         <div className="form-group">
           <Select
             name="selecttype"
             searchable={false}
-            value={this.state.type}
+            value={type}
             onChange={this.selectTypeChangeHandler}
             options={campaignTypeOptions}
           />
         </div>
         {filterConditionTitle}
         {formGroups}
-        <p>No of audiences: {this.state.userListTotalCount}</p>
+        <p>No. of audiences: {numberOfAudiences}</p>
         <h3>Content</h3>
         <div className="form-group">
           <label htmlFor="content">Message</label>
@@ -124,26 +127,42 @@ class NewPushNotificationPageImpl extends React.PureComponent<
             rows={5}
           />
         </div>
+        {this.state.errorMessage !== undefined && (
+          <div className="alert alert-danger form-login-alert" role="alert">
+            {this.state.errorMessage}
+          </div>
+        )}
         <SubmitButton savingPushCampaign={savingPushCampaign} />
-      </div>
+      </form>
     );
   }
 
   // tslint:disable-next-line: no-any
   public selectTypeChangeHandler = (selectedOption: any) => {
     if (selectedOption != null) {
-      if (selectedOption.value == CampaignTypes.AllUsers) {
-        this.setState({
-          type: selectedOption.value,
-          filterOptionsByName: {},
-          userList: [],
-          userListTotalCount: 0,
+      if (selectedOption.value == PushCampaignType.AllUsers) {
+        this.setState(preState => {
+          return {
+            newPushCampaign: {
+              ...preState.newPushCampaign,
+              type: selectedOption.value,
+              numberOfAudiences: 0,
+              userIds: [],
+            },
+            filterOptionsByName: {},
+          }
         });
       } else {
-        this.setState({
-          type: selectedOption.value,
-          userList: [],
-          userListTotalCount: 0,
+        this.setState(preState => {
+          return {
+            newPushCampaign: {
+              ...preState.newPushCampaign,
+              type: selectedOption.value,
+              numberOfAudiences: 0,
+              userIds: [],
+            },
+            filterOptionsByName: {},
+          }
         });
       }
     }
@@ -162,9 +181,11 @@ class NewPushNotificationPageImpl extends React.PureComponent<
     HTMLTextAreaElement
   > = event => {
     const value = event.target.value;
-    this.setState({
-      messageContent: value,
-    })
+    this.setState(preState => {
+      return {
+        newPushCampaign: {...preState.newPushCampaign, messageContent: value},
+      }
+    });
   };
 
   private fetchUserList = (filterOptionsByName = this.state.filterOptionsByName) => {
@@ -188,11 +209,44 @@ class NewPushNotificationPageImpl extends React.PureComponent<
     skygear.publicDB
     .query(query)
     .then((queryResult: QueryResult<Record>) => {
-      this.setState({
-        userList: queryResult.map((record: Record) => record),
-        userListTotalCount: queryResult.overallCount,
-      })
+      this.setState(preState => {
+        return {
+          newPushCampaign: {
+            ...preState.newPushCampaign,
+            numberOfAudiences: queryResult.overallCount,
+            userIds: queryResult.map((record: Record) => record._id),
+          },
+        }
+      });
     });
+  }
+
+  public handleSubmit: React.FormEventHandler<HTMLFormElement> = event => {
+    event.preventDefault();
+
+    const { dispatch } = this.props;
+    const { newPushCampaign } = this.state;
+
+    if (!newPushCampaign.messageContent) {
+      this.setState({
+        errorMessage: 'Empty message content.',
+      });
+      return
+    } else if (newPushCampaign.numberOfAudiences == 0) {
+      this.setState({
+        errorMessage: 'No audiences.',
+      });
+      return
+    } else {
+      this.setState({
+        errorMessage: undefined,
+      });
+    }
+
+    this.notificationActionDispatcher.savePushCampaign(newPushCampaign)
+      .then(() => {
+        dispatch(push(`/notification`));
+      });
   }
 }
 
