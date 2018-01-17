@@ -7,14 +7,13 @@ import {
 } from 'react-select';
 // tslint:disable-next-line: no-submodule-imports
 import 'react-select/dist/react-select.css';
-// import skygear, { Query, Record, Reference } from 'skygear';
 import skygear, { Query, Record } from 'skygear';
 
-import { ReferenceFieldConfig } from '../../cmsConfig';
-import { RequiredFieldProps } from './FilterField';
+import { RequiredFilterFieldProps } from './FilterField';
+import { ReferenceFilterConfig } from '../../cmsConfig';
 import { makeArray } from '../../util';
 
-export type ReferenceFieldProps = RequiredFieldProps<ReferenceFieldConfig>;
+export type ReferenceFieldProps = RequiredFilterFieldProps<ReferenceFilterConfig>;
 
 interface State {
   values: RefOption[];
@@ -68,6 +67,7 @@ class ReferenceFilterFieldImpl extends React.PureComponent<
 
     const RecordCls = Record.extend(targetCmsRecord.recordType);
     const query = new Query(RecordCls);
+    query.limit = 1024;
     return skygear.publicDB.query(query).then(records => {
       const options = records.map(record => {
         return recordToOption(record, displayFieldName);
@@ -80,7 +80,7 @@ class ReferenceFilterFieldImpl extends React.PureComponent<
   };
 
   public onChange: OnChangeHandler<string> = value => {
-    const values = makeArray(value);
+    const values = makeArray(value).map(a => a.value);
     this.setState({ values });
 
     if (value === null) {
@@ -92,8 +92,6 @@ class ReferenceFilterFieldImpl extends React.PureComponent<
     }
 
     if (this.props.onFieldChange) {
-    //   const recordType = this.props.config.targetCmsRecord.recordType;
-    //   this.props.onFieldChange(new Reference(`${recordType}/${value.value}`));
       this.props.onFieldChange(values);
     }
   };

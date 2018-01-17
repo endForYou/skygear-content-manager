@@ -4,13 +4,14 @@ import Select from 'react-select';
 import skygear, { Record, Query, QueryResult } from 'skygear';
 
 import { PushCampaignActionDispatcher } from '../../actions/pushCampaign';
-import { FieldConfig, FieldConfigTypes } from '../../cmsConfig';
+import { FilterConfig, FilterConfigTypes } from '../../cmsConfig';
 import { RootState } from '../../states';
 import { FilterField } from './FilterField';
+// import { ReferenceFilterField } from './ReferenceFilterField';
 import { Remote, RemoteType, NewPushCampaign } from '../../types';
 
-export interface UserFilterFieldGroupProps {
-  filterConfigs: FieldConfig[];
+export interface NewPushNotificationPageProps {
+  filterConfigs: FilterConfig[];
   dispatch: Dispatch<RootState>;
   savingPushCampaign?: Remote<NewPushCampaign>;
 }
@@ -57,13 +58,13 @@ const campaignTypeOptions: CampaignTypeOption[] = [
 // tslint:disable-next-line: no-any
 type FilterChangeHandler = (name: string, type: string, value: any, effect?: Effect) => void;
 
-class UserFilterFieldGroupImpl extends React.PureComponent<
-  UserFilterFieldGroupProps,
+class NewPushNotificationPageImpl extends React.PureComponent<
+  NewPushNotificationPageProps,
   State
 > {
   public notificationActionDispatcher: PushCampaignActionDispatcher;
 
-  constructor(props: UserFilterFieldGroupProps) {
+  constructor(props: NewPushNotificationPageProps) {
     super(props);
 
     const { dispatch } = this.props;
@@ -150,11 +151,11 @@ class UserFilterFieldGroupImpl extends React.PureComponent<
   }
 
   public handleFilterChange: FilterChangeHandler = (name, type, value, effect) => {
-    this.setState(prevState => {
-      return {
-        filterOptionsByName: { ...prevState.filterOptionsByName, [name]: { value, type }},
-      }
-    }, this.fetchUserList());
+    const newFilterOptionsByName = { ...this.state.filterOptionsByName, [name]: { value, type }};
+    this.setState({
+      filterOptionsByName: newFilterOptionsByName,
+    });
+    this.fetchUserList(newFilterOptionsByName);
   };
 
   private contentOnChange: React.ChangeEventHandler<
@@ -173,7 +174,7 @@ class UserFilterFieldGroupImpl extends React.PureComponent<
     for (const key in filterOptionsByName) {
       const filterOption = filterOptionsByName[key];
       switch (filterOption.type) {
-        case FieldConfigTypes.Reference:
+        case FilterConfigTypes.Reference:
           query.contains(key, filterOption.value);
           break;
         default:
@@ -196,16 +197,17 @@ class UserFilterFieldGroupImpl extends React.PureComponent<
 }
 
 interface FieldProps {
-  fieldConfig: FieldConfig;
+  fieldConfig: FilterConfig;
   onFilterChange: FilterChangeHandler;
   filterOptionsByName: FilterOptionsByName;
 }
 
 function FormGroup(props: FieldProps): JSX.Element {
   const { fieldConfig } = props;
+  const name = fieldConfig.name || 'general';
   return (
     <div className="form-group">
-      <label htmlFor={fieldConfig.name}>{fieldConfig.label}</label>
+      <label htmlFor={name}>{fieldConfig.label}</label>
       <FormField {...props} />
     </div>
   );
@@ -248,6 +250,6 @@ function SubmitButton(props: SubmitProps): JSX.Element {
   }
 }
 
-export const UserFilterFieldGroup: React.ComponentClass<
-  UserFilterFieldGroupProps
-> = UserFilterFieldGroupImpl;
+export const NewPushNotificationPage: React.ComponentClass<
+  NewPushNotificationPageProps
+> = NewPushNotificationPageImpl;

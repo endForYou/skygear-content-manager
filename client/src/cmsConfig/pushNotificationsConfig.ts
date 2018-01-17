@@ -1,8 +1,9 @@
-import { FieldConfig, ConfigContext, parseFieldConfig } from './cmsConfig';
+import { ConfigContext } from './cmsConfig';
+import { FilterConfig, parseFilterConfig } from './filterConfig';
 
 export interface PushNotificationsConfig {
   enabled: boolean;
-  filterUserConfigs: FieldConfig[];
+  filterUserConfigs: FilterConfig[];
 }
 
 // tslint:disable-next-line: no-any
@@ -18,11 +19,8 @@ export function parsePushNotificationConfig(context: ConfigContext, input: any):
 
   // tslint:disable-next-line: no-any
   const filterUserConfigs = filters.map((f: any) =>
-    parseFieldConfig(context, f)
-  ) as FieldConfig[];
-
-  console.log('filterUserConfigs:');
-  console.log(filterUserConfigs);
+    parseFilterConfig(f, context)
+  ) as FilterConfig[];
 
   return {
     enabled,

@@ -1,26 +1,24 @@
 import * as React from 'react';
-import { Record } from 'skygear';
 
-import { FieldConfig, FieldConfigTypes } from '../../cmsConfig';
-// import { FieldConfig } from '../cmsConfig';
+import { FilterConfig, FilterConfigTypes } from '../../cmsConfig';
 import { Effect } from '../../components/RecordFormPage';
 
 // import { AssociationReferenceFilterField } from './AssociationReferenceFilterField';
 import { ReferenceFilterField } from './ReferenceFilterField';
+import { StringFilterField } from './StringFilterField';
 
-export type FieldProps = ChildProps<FieldConfig>;
+export type FilterFieldProps = ChildProps<FilterConfig>;
 
 // props that child component must possess
-export type RequiredFieldProps<C extends FieldConfig> = ChildProps<C>;
+export type RequiredFilterFieldProps<C extends FilterConfig> = ChildProps<C>;
 
 // props that pass through from Field to concerte field implementation
-export interface ChildProps<C extends FieldConfig> {
+export interface ChildProps<C extends FilterConfig> {
   config: C;
 
   // HTML related attrs
   name?: string;
   className?: string;
-
   onFieldChange?: FieldChangeHandler;
 
   // tslint:disable-next-line: no-any
@@ -30,23 +28,14 @@ export interface ChildProps<C extends FieldConfig> {
 // tslint:disable-next-line: no-any
 export type FieldChangeHandler = (value: any, effect?: Effect) => void;
 
-export interface FieldContext {
-  record: Record;
-}
-
-export function FieldContext(record: Record): FieldContext {
-  return {
-    record,
-  };
-}
-
-export class FilterField extends React.PureComponent<FieldProps> {
+export class FilterField extends React.PureComponent<FilterFieldProps> {
   public render() {
     const { config, ...rest } = this.props;
-    // return <ReferenceFilterField {...rest} config={config} />;
     switch (config.type) {
-      case FieldConfigTypes.Reference:
+      case FilterConfigTypes.Reference:
         return <ReferenceFilterField {...rest} config={config} />;
+      case FilterConfigTypes.String:
+        return <StringFilterField {...rest} config={config} />;
       default:
         return null;
       // case FieldConfigTypes.AssociationReference:

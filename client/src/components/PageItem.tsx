@@ -23,9 +23,6 @@ export class PageItem extends React.PureComponent<PageItemProps> {
       isActive = false,
     } = this.props;
 
-    console.log('this.context:');
-    console.log(this.context);
-
     if (isDisabled) {
       return (
         <li className="page-item disabled">

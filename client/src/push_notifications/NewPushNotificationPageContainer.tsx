@@ -2,8 +2,8 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 
-import { FieldConfig } from '../cmsConfig';
-import { UserFilterFieldGroup } from './components/UserFilterFieldGroup';
+import { FilterConfig } from '../cmsConfig';
+import { NewPushNotificationPage } from './components/NewPushNotificationPage';
 import { PushCampaignActionDispatcher } from '../actions/pushCampaign';
 import { RootState } from '../states';
 import { Remote, NewPushCampaign } from '../types';
@@ -13,14 +13,14 @@ type Props = StateProps & DispatchProps;
 interface StateProps {
   content: string;
   savingPushCampaign?: Remote<NewPushCampaign>;
-  userFilters: FieldConfig[];
+  userFilters: FilterConfig[];
 }
 
 interface DispatchProps {
   dispatch: Dispatch<RootState>;
 }
 
-class NewPushNotificationPageImpl extends React.PureComponent<Props> {
+class NewPushNotificationPageContainerImpl extends React.PureComponent<Props> {
   public notificationActionDispatcher: PushCampaignActionDispatcher;
 
   constructor(props: Props) {
@@ -42,7 +42,7 @@ class NewPushNotificationPageImpl extends React.PureComponent<Props> {
       <div>
         <h1 className="display-4">New Push Campaign</h1>
         <div>
-          <UserFilterFieldGroup
+          <NewPushNotificationPage
             dispatch={dispatch}
             filterConfigs={userFilters}
             savingPushCampaign={savingPushCampaign}
@@ -67,8 +67,8 @@ function mapDispatchToProps(dispatch: Dispatch<RootState>): DispatchProps {
   return { dispatch };
 }
 
-const ConnectedNewPushNotificationPage = connect(mapStateToProps, mapDispatchToProps)(
-  NewPushNotificationPageImpl
+const ConnectedNewPushNotificationPageContainer = connect(mapStateToProps, mapDispatchToProps)(
+  NewPushNotificationPageContainerImpl
 );
 
-export const NewPushNotificationPage: React.ComponentType = ConnectedNewPushNotificationPage;
+export const NewPushNotificationPageContainer: React.ComponentType = ConnectedNewPushNotificationPageContainer;

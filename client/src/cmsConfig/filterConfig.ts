@@ -52,6 +52,7 @@ export interface DateTimeFilterConfig extends FilterConfigInput {
 
 export interface GeneralFilterConfig extends FilterConfigInput {
   type: FilterConfigTypes.General;
+  name: string;
   names: string[];
 }
 
@@ -136,6 +137,7 @@ function parseGeneralFilterConfig(
   const names = parseStringArray(input, 'name', 'General');
   return {
     label,
+    name: 'general',
     names,
     type: FilterConfigTypes.General,
   };
