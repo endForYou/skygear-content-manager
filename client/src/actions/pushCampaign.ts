@@ -156,7 +156,7 @@ function savePushCampaign(newPushCampaign: NewPushCampaign): ThunkAction<Promise
 
 function savePushCampaignOperation(newPushCampaign: NewPushCampaign): Promise<void> {
   return skygear
-    .lambda('push_campaign:create_new', {newPushCampaign})
+    .lambda('push_campaign:create_new', {new_push_campaign: newPushCampaign})
     .then(
       // tslint:disable-next-line: no-any
       (result: any) => {

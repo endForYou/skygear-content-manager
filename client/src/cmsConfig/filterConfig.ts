@@ -260,7 +260,7 @@ export interface GeneralFilter extends FilterAttrs {
 export interface ReferenceFilter extends FilterAttrs {
   type: FilterType.ReferenceFilterType;
   query: ReferenceFilterQueryType;
-  value: string;
+  values: string[];
   name: string;
 }
 
@@ -325,7 +325,7 @@ export function filterFactory(filterConfig: FilterConfig): Filter {
         name: filterConfig.name,
         query: ReferenceFilterQueryType.Contains,
         type: FilterType.ReferenceFilterType,
-        value: '',
+        values: [],
       };
     default:
       throw new Error(`unsupported FilterConfigTypes in filterFactory`);

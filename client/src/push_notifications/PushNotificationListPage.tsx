@@ -49,15 +49,6 @@ const TableRow: React.SFC<TableRowProps> = ({ pushCampaign }) => {
   return (
     <tr>
       {columns}
-      <td>
-        <Link className="btn btn-light" to={`/notification`}>
-          Show
-        </Link>
-        &nbsp;
-        <Link className="btn btn-light" to={`/notification`}>
-          Edit
-        </Link>
-      </td>
     </tr>
   );
 };

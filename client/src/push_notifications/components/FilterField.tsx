@@ -3,7 +3,6 @@ import * as React from 'react';
 import { FilterConfig, FilterConfigTypes } from '../../cmsConfig';
 import { Effect } from '../../components/RecordFormPage';
 
-// import { AssociationReferenceFilterField } from './AssociationReferenceFilterField';
 import { ReferenceFilterField } from './ReferenceFilterField';
 import { StringFilterField } from './StringFilterField';
 
@@ -38,8 +37,6 @@ export class FilterField extends React.PureComponent<FilterFieldProps> {
         return <StringFilterField {...rest} config={config} />;
       default:
         return null;
-      // case FieldConfigTypes.AssociationReference:
-      //   return <AssociationReferenceFilterField {...rest} config={config} />;
     }
   }
 }
