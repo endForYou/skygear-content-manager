@@ -1,13 +1,15 @@
 import uuid from 'uuid';
 import { humanize } from '.././util';
 import { parseOptionalString, parseString, parseStringArray } from './util';
+import { CmsRecord, ConfigContext } from './cmsConfig';
 
 export type FilterConfig =
   | StringFilterConfig
   | IntegerFilterConfig
   | BooleanFilterConfig
   | DateTimeFilterConfig
-  | GeneralFilterConfig;
+  | GeneralFilterConfig
+  | ReferenceFilterConfig;
 
 export enum FilterConfigTypes {
   String = 'String',
@@ -15,6 +17,7 @@ export enum FilterConfigTypes {
   Boolean = 'Boolean',
   Integer = 'Integer',
   General = 'General',
+  Reference = 'Reference',
 }
 
 export interface FilterConfigAttrs {
@@ -52,8 +55,15 @@ export interface GeneralFilterConfig extends FilterConfigInput {
   names: string[];
 }
 
+export interface ReferenceFilterConfig extends FilterConfigInput {
+  type: FilterConfigTypes.Reference;
+  name: string;
+  targetCmsRecord: CmsRecord;
+  displayFieldName: string;
+}
+
 // tslint:disable-next-line: no-any
-export function parseFilterConfig(a: any): FilterConfig {
+export function parseFilterConfig(a: any, context: ConfigContext): FilterConfig {
   switch (a.type) {
     case 'String':
       return parseStringFilterConfig(a);
@@ -65,6 +75,8 @@ export function parseFilterConfig(a: any): FilterConfig {
       return parseDateTimeFilterConfig(a);
     case 'General':
       return parseGeneralFilterConfig(a);
+    case 'Reference':
+      return parseReferenceFilterConfig(a, context);
     default:
       throw new Error(`Received unknown filter config type: ${a.type}`);
   }
@@ -129,6 +141,29 @@ function parseGeneralFilterConfig(
   };
 }
 
+function parseReferenceFilterConfig(
+  input: FilterConfigInput,
+  context: ConfigContext
+): ReferenceFilterConfig {
+  const targetRecordName = parseString(input, 'target', 'Reference');
+  const displayFieldName =
+    parseOptionalString(input, 'displayFieldName', 'Reference') || '_id';
+  const targetCmsRecord = context.cmsRecordByName[targetRecordName];
+
+  if (targetCmsRecord === undefined) {
+    throw new Error(
+      `Couldn't find configuration of Reference.target = ${targetRecordName}`
+    );
+  }
+
+  return {
+    ...parseFilterConfigAttrs(input, 'Reference'),
+    type: FilterConfigTypes.Reference,
+    targetCmsRecord,
+    displayFieldName,
+  };
+}
+
 export enum StringFilterQueryType {
   EqualTo = 'EqualTo',
   NotEqualTo = 'NotEqualTo',
@@ -159,12 +194,17 @@ export enum GeneralFilterQueryType {
   Contains = 'Contains',
 }
 
+export enum ReferenceFilterQueryType {
+  Contains = 'Contains',
+}
+
 export type Filter =
   | StringFilter
   | IntegerFilter
   | BooleanFilter
   | DateTimeFilter
-  | GeneralFilter;
+  | GeneralFilter
+  | ReferenceFilter;
 
 export enum FilterType {
   StringFilterType = 'StringFilterType',
@@ -172,6 +212,7 @@ export enum FilterType {
   BooleanFilterType = 'BooleanFilterType',
   DateTimeFilterType = 'DateTimeFilterType',
   GeneralFilterType = 'GeneralFilterType',
+  ReferenceFilterType = 'ReferenceFilterType',
 }
 
 export interface FilterAttrs {
@@ -214,12 +255,20 @@ export interface GeneralFilter extends FilterAttrs {
   value: string;
 }
 
+export interface ReferenceFilter extends FilterAttrs {
+  type: FilterType.ReferenceFilterType;
+  query: ReferenceFilterQueryType;
+  value: string;
+  name: string;
+}
+
 export type FilterQueryType =
   | StringFilterQueryType
   | IntegerFilterQueryType
   | BooleanFilterQueryType
   | DateTimeFilterQueryType
-  | GeneralFilterQueryType;
+  | GeneralFilterQueryType
+  | ReferenceFilterQueryType;
 
 export function filterFactory(filterConfig: FilterConfig): Filter {
   switch (filterConfig.type) {
@@ -265,6 +314,15 @@ export function filterFactory(filterConfig: FilterConfig): Filter {
         names: filterConfig.names,
         query: GeneralFilterQueryType.Contains,
         type: FilterType.GeneralFilterType,
+        value: '',
+      };
+    case FilterConfigTypes.Reference:
+      return {
+        id: uuid(),
+        label: filterConfig.label,
+        name: filterConfig.name,
+        query: ReferenceFilterQueryType.Contains,
+        type: FilterType.ReferenceFilterType,
         value: '',
       };
     default:

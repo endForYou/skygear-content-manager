@@ -337,7 +337,7 @@ function parseListPageConfig(
   const filters =
     input.filters &&
     // tslint:disable-next-line: no-any
-    (input.filters as any[]).map(f => parseFilterConfig(f));
+    (input.filters as any[]).map(f => parseFilterConfig(f, context));
 
   const { actions = [] } = input;
 
