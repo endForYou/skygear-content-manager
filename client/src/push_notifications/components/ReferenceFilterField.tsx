@@ -12,6 +12,7 @@ import skygear, { Query, Record } from 'skygear';
 import { RequiredFilterFieldProps } from './FilterField';
 import { ReferenceFilterConfig } from '../../cmsConfig';
 import { makeArray } from '../../util';
+import { debouncePromise1 } from '../../util';
 
 export type ReferenceFieldProps = RequiredFilterFieldProps<ReferenceFilterConfig>;
 
@@ -54,9 +55,8 @@ class ReferenceFilterFieldImpl extends React.PureComponent<
       <StringSelectAsync
         {...rest}
         multi={true}
-        loadOptions={this.loadOptions}
+        loadOptions={this.debouncedLoadOptions}
         onChange={this.onChange}
-        searchable={false}
         value={values}
       />
     );
@@ -67,7 +67,13 @@ class ReferenceFilterFieldImpl extends React.PureComponent<
 
     const RecordCls = Record.extend(targetCmsRecord.recordType);
     const query = new Query(RecordCls);
-    query.limit = 1024;
+    if (input !== '') {
+      query.caseInsensitiveLike(
+        this.props.config.displayFieldName,
+        `%${input}%`
+      );
+    }
+    query.limit = 500;
     return skygear.publicDB.query(query).then(records => {
       const options = records.map(record => {
         return recordToOption(record, displayFieldName);
@@ -78,6 +84,11 @@ class ReferenceFilterFieldImpl extends React.PureComponent<
       };
     });
   };
+
+  // tslint:disable-next-line: member-ordering
+  public debouncedLoadOptions: LoadOptionsAsyncHandler<
+    string
+  > = debouncePromise1(this.loadOptions, 300);
 
   public onChange: OnChangeHandler<string> = value => {
     const values = makeArray(value).map(a => a.value);

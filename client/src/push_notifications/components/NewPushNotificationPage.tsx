@@ -8,7 +8,6 @@ import { PushCampaignActionDispatcher } from '../../actions/pushCampaign';
 import { FilterConfig, FilterConfigTypes } from '../../cmsConfig';
 import { RootState } from '../../states';
 import { FilterField } from './FilterField';
-// import { ReferenceFilterField } from './ReferenceFilterField';
 import { Remote, RemoteType, NewPushCampaign } from '../../types';
 
 export interface NewPushNotificationPageProps {
@@ -28,7 +27,7 @@ interface FilterOptionsByName {
 }
 
 interface FilterOption {
-  type: string;
+  filterType: string;
   // tslint:disable-next-line: no-any
   value: any;
 }
@@ -152,6 +151,7 @@ class NewPushNotificationPageImpl extends React.PureComponent<
             filterOptionsByName: {},
           }
         });
+        this.fetchUserList({}, selectedOption.value);
       } else {
         this.setState(preState => {
           return {
@@ -166,11 +166,10 @@ class NewPushNotificationPageImpl extends React.PureComponent<
         });
       }
     }
-    this.fetchUserList();
   }
 
-  public handleFilterChange: FilterChangeHandler = (name, type, value, effect) => {
-    const newFilterOptionsByName = { ...this.state.filterOptionsByName, [name]: { value, type }};
+  public handleFilterChange: FilterChangeHandler = (name, filterType, value, effect) => {
+    const newFilterOptionsByName = { ...this.state.filterOptionsByName, [name]: { value, filterType }};
     this.setState({
       filterOptionsByName: newFilterOptionsByName,
     });
@@ -188,20 +187,29 @@ class NewPushNotificationPageImpl extends React.PureComponent<
     });
   };
 
-  private fetchUserList = (filterOptionsByName = this.state.filterOptionsByName) => {
+  private fetchUserList = (
+    filterOptionsByName = this.state.filterOptionsByName,
+    type = this.state.newPushCampaign.type
+  ) => {
     const query = new Query(Record.extend('user'));
 
-    // TODO: Implement filter by primitive data types such as string or boolean
-    for (const key in filterOptionsByName) {
-      const filterOption = filterOptionsByName[key];
-      switch (filterOption.type) {
-        case FilterConfigTypes.Reference:
-          query.contains(key, filterOption.value);
-          break;
-        default:
-          throw new Error(
-            `Currently does not support Filter with FieldConfigType ${filterOption.type}`
-          );
+    // TODO: Implement filter by primitive data types such as string or boolean.
+    // And support various query type of different data types.
+    if (type == PushCampaignType.SpecificUsers) {
+      for (const key in filterOptionsByName) {
+        const filterOption = filterOptionsByName[key];
+        switch (filterOption.filterType) {
+          case FilterConfigTypes.Reference:
+            query.contains(key, filterOption.value);
+            break;
+          case FilterConfigTypes.String:
+            query.equalTo(key, filterOption.value);
+            break;
+          default:
+            throw new Error(
+              `Currently does not support Filter with FieldConfigType ${filterOption.filterType}`
+            );
+        }
       }
     }
 
@@ -216,7 +224,12 @@ class NewPushNotificationPageImpl extends React.PureComponent<
             numberOfAudiences: queryResult.overallCount,
             userIds: queryResult.map((record: Record) => record._id),
           },
+          errorMessage: undefined,
         }
+      });
+    }).catch(error => {
+      this.setState({
+        errorMessage: error.toString(),
       });
     });
   }
@@ -246,7 +259,11 @@ class NewPushNotificationPageImpl extends React.PureComponent<
     this.notificationActionDispatcher.savePushCampaign(newPushCampaign)
       .then(() => {
         dispatch(push(`/notification`));
-      });
+        }).catch(error => {
+          this.setState({
+            errorMessage: error.toString(),
+          });
+        });
   }
 }
 
@@ -269,7 +286,7 @@ function FormGroup(props: FieldProps): JSX.Element {
 
 function FormField(props: FieldProps): JSX.Element {
   const { fieldConfig, onFilterChange, filterOptionsByName } = props;
-  const { name, type } = fieldConfig;
+  const { name, type: filterType } = fieldConfig;
 
   const fieldValue =
     filterOptionsByName[name] === undefined ? name : filterOptionsByName[name];
@@ -278,7 +295,7 @@ function FormField(props: FieldProps): JSX.Element {
       className="form-control"
       config={fieldConfig}
       value={fieldValue}
-      onFieldChange={(value, effect) => onFilterChange(name, type, value, effect)}
+      onFieldChange={(value, effect) => onFilterChange(name, filterType, value, effect)}
     />
   );
 }

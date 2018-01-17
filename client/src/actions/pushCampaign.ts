@@ -160,7 +160,7 @@ function savePushCampaignOperation(newPushCampaign: NewPushCampaign): Promise<vo
     .then(
       // tslint:disable-next-line: no-any
       (result: any) => {
-        console.log(result);
+        return result;
       });
 }
 

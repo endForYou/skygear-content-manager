@@ -8,8 +8,6 @@ import Pagination from '../components/Pagination';
 import { PushCampaignActionDispatcher } from '../actions/pushCampaign';
 import { RootState } from '../states';
 import { PushCampaign } from '../types';
-// import { Field, FieldContext } from '../fields';
-// import { FieldConfig } from '../cmsConfig';
 
 const pageSize: number = 25;
 
