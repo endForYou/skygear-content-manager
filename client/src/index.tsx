@@ -98,8 +98,15 @@ function createHistoryFromPublicUrl(publicUrl: string): History {
   if (publicUrl === '.') {
     return createBrowserHistory();
   } else {
+    let pathname: string;
+    try {
+      pathname = getPath(publicUrl);
+    } catch (_) {
+      pathname = publicUrl;
+    }
+
     return createBrowserHistory({
-      basename: getPath(publicUrl),
+      basename: pathname,
     });
   }
 }
