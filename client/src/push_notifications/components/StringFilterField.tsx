@@ -8,9 +8,14 @@ export interface StringFilterFieldState {
   value: string;
 }
 
-export type StringFilterFieldProps = RequiredFilterFieldProps<StringFilterConfig>;
+export type StringFilterFieldProps = RequiredFilterFieldProps<
+  StringFilterConfig
+>;
 
-export class StringFilterField extends React.PureComponent<StringFilterFieldProps, StringFilterFieldState> {
+export class StringFilterField extends React.PureComponent<
+  StringFilterFieldProps,
+  StringFilterFieldState
+> {
   public onFieldChange: FieldChangeHandler | undefined;
   constructor(props: StringFilterFieldProps) {
     super(props);

@@ -53,8 +53,13 @@ const campaignTypeOptions: CampaignTypeOption[] = [
 
 // Handle change propagated from Field. A undefined value would yield no changes
 // on State.recordChange[name].
-// tslint:disable-next-line: no-any
-type FilterChangeHandler = (name: string, type: string, value: any, effect?: Effect) => void;
+type FilterChangeHandler = (
+  name: string,
+  type: string,
+  // tslint:disable-next-line: no-any
+  value: any,
+  effect?: Effect
+) => void;
 
 class NewPushNotificationPageImpl extends React.PureComponent<
   NewPushNotificationPageProps,
@@ -79,13 +84,18 @@ class NewPushNotificationPageImpl extends React.PureComponent<
       },
     };
 
-    this.notificationActionDispatcher = new PushCampaignActionDispatcher(dispatch);
+    this.notificationActionDispatcher = new PushCampaignActionDispatcher(
+      dispatch
+    );
     this.fetchUserList();
   }
 
   public render() {
     const { filterConfigs, savingPushCampaign } = this.props;
-    const { newPushCampaign: { type, numberOfAudiences, title, content }, filterOptionsByName } = this.state;
+    const {
+      newPushCampaign: { type, numberOfAudiences, title, content },
+      filterOptionsByName,
+    } = this.state;
 
     const formGroups = filterConfigs.map((filterConfig, index) => {
       return (
@@ -179,7 +189,7 @@ class NewPushNotificationPageImpl extends React.PureComponent<
         });
       }
     }
-  }
+  };
 
   public handleSubmit: React.FormEventHandler<HTMLFormElement> = event => {
     event.preventDefault();
@@ -198,18 +208,28 @@ class NewPushNotificationPageImpl extends React.PureComponent<
       });
     }
 
-    this.notificationActionDispatcher.savePushCampaign(newPushCampaign)
+    this.notificationActionDispatcher
+      .savePushCampaign(newPushCampaign)
       .then(() => {
         dispatch(push(`/notification`));
-      }).catch(error => {
+      })
+      .catch(error => {
         this.setState({
           errorMessage: error.toString(),
         });
       });
-  }
+  };
 
-  public handleFilterChange: FilterChangeHandler = (name, filterType, value, effect) => {
-    const newFilterOptionsByName = { ...this.state.filterOptionsByName, [name]: { value, filterType }};
+  public handleFilterChange: FilterChangeHandler = (
+    name,
+    filterType,
+    value,
+    effect
+  ) => {
+    const newFilterOptionsByName = {
+      ...this.state.filterOptionsByName,
+      [name]: { value, filterType },
+    };
     if (value == null || value === '' || value.length === 0) {
       delete newFilterOptionsByName[name];
     }
@@ -225,7 +245,7 @@ class NewPushNotificationPageImpl extends React.PureComponent<
     const value = event.target.value;
     this.setState(preState => {
       return {
-        newPushCampaign: {...preState.newPushCampaign, title: value},
+        newPushCampaign: { ...preState.newPushCampaign, title: value },
       };
     });
   };
@@ -236,7 +256,7 @@ class NewPushNotificationPageImpl extends React.PureComponent<
     const value = event.target.value;
     this.setState(preState => {
       return {
-        newPushCampaign: {...preState.newPushCampaign, content: value},
+        newPushCampaign: { ...preState.newPushCampaign, content: value },
       };
     });
   };
@@ -267,26 +287,30 @@ class NewPushNotificationPageImpl extends React.PureComponent<
 
     query.overallCount = true;
     skygear.publicDB
-    .query(query)
-    .then((queryResult: QueryResult<Record>) => {
-      this.setState(preState => {
-        return {
-          errorMessage: undefined,
-          newPushCampaign: {
-            ...preState.newPushCampaign,
-            numberOfAudiences: queryResult.overallCount,
-            userIds: queryResult.map((record: Record) => record._id),
-          },
-        };
+      .query(query)
+      .then((queryResult: QueryResult<Record>) => {
+        this.setState(preState => {
+          return {
+            errorMessage: undefined,
+            newPushCampaign: {
+              ...preState.newPushCampaign,
+              numberOfAudiences: queryResult.overallCount,
+              userIds: queryResult.map((record: Record) => record._id),
+            },
+          };
+        });
+      })
+      .catch(error => {
+        this.setState({
+          errorMessage: error.toString(),
+        });
       });
-    }).catch(error => {
-      this.setState({
-        errorMessage: error.toString(),
-      });
-    });
-  }
+  };
 
-  private queryWithFilters(query: Query, filterOptionsByName: FilterOptionsByName): Query {
+  private queryWithFilters(
+    query: Query,
+    filterOptionsByName: FilterOptionsByName
+  ): Query {
     // TODO: Implement filter by primitive data types such as string or boolean.
     // And support various query type of different data types.
     Object.entries(filterOptionsByName).forEach(([key, filterOption]) => {
@@ -336,7 +360,8 @@ function FormField(props: FieldProps): JSX.Element {
       className="form-control"
       config={filterFieldConfig}
       value={fieldValue}
-      onFieldChange={(value, effect) => onFilterChange(name, filterType, value, effect)}
+      onFieldChange={(value, effect) =>
+        onFilterChange(name, filterType, value, effect)}
     />
   );
 }
@@ -347,7 +372,10 @@ interface SubmitProps {
 
 function SubmitButton(props: SubmitProps): JSX.Element {
   const { savingPushCampaign } = props;
-  if (savingPushCampaign !== undefined && savingPushCampaign.type === RemoteType.Loading) {
+  if (
+    savingPushCampaign !== undefined &&
+    savingPushCampaign.type === RemoteType.Loading
+  ) {
     return (
       <button type="submit" className="btn btn-primary" disabled={true}>
         Save

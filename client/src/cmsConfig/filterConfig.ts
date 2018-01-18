@@ -64,8 +64,11 @@ export interface ReferenceFilterConfig extends FilterConfigInput {
   displayFieldName: string;
 }
 
-// tslint:disable-next-line: no-any
-export function parseFilterConfig(a: any, context: ConfigContext): FilterConfig {
+export function parseFilterConfig(
+  // tslint:disable-next-line: no-any
+  a: any,
+  context: ConfigContext
+): FilterConfig {
   switch (a.type) {
     case 'String':
       return parseStringFilterConfig(a);

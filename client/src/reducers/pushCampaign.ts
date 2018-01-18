@@ -8,7 +8,12 @@ import {
   PushCampaignListState,
   PushCampaignState,
 } from '../states';
-import { PushCampaign, RemoteFailure, RemoteLoading, RemoteSuccess } from '../types';
+import {
+  PushCampaign,
+  RemoteFailure,
+  RemoteLoading,
+  RemoteSuccess,
+} from '../types';
 
 // fix issue with incorrect redux definition file.
 // See https://github.com/reactjs/redux/issues/2709
@@ -31,8 +36,10 @@ function pushCampaignListReducer(
       return {
         ...state,
         isLoading: false,
-        pushCampaigns: fetchResult.map((pushCampaign: PushCampaign) => pushCampaign),
-        totalCount
+        pushCampaigns: fetchResult.map(
+          (pushCampaign: PushCampaign) => pushCampaign
+        ),
+        totalCount,
       };
     case PushCampaignActionTypes.FetchListFailure:
       return { ...state, isLoading: false, error: action.payload.error };
@@ -57,7 +64,10 @@ function newPushCampaignReducer(
         savingPushCampaign: RemoteSuccess(action.payload.newPushCampaign),
       };
     case PushCampaignActionTypes.SavePushCampaignFailure:
-      return { ...state, savingPushCampaign: RemoteFailure(action.payload.error) };
+      return {
+        ...state,
+        savingPushCampaign: RemoteFailure(action.payload.error),
+      };
     default:
       return state;
   }

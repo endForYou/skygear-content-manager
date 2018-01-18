@@ -120,7 +120,7 @@ function makeNewPushNotificationRoute(): JSX.Element {
       key={`notification-new`}
       exact={true}
       path={`/notification/new`}
-      render={routeProps => <NewPushNotificationPageContainer/>}
+      render={routeProps => <NewPushNotificationPageContainer />}
     />
   );
 }

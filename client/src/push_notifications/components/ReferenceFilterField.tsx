@@ -13,7 +13,9 @@ import { ReferenceFilterConfig } from '../../cmsConfig';
 import { debouncePromise1, makeArray } from '../../util';
 import { RequiredFilterFieldProps } from './FilterField';
 
-export type ReferenceFieldProps = RequiredFilterFieldProps<ReferenceFilterConfig>;
+export type ReferenceFieldProps = RequiredFilterFieldProps<
+  ReferenceFilterConfig
+>;
 
 interface State {
   values: RefOption[];

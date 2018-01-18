@@ -17,10 +17,10 @@ interface FieldConfig {
 }
 
 const pushCampaignConfig: FieldConfig[] = [
-  {field: 'type', fieldTitle: 'Type'},
-  {field: 'number_of_audiences', fieldTitle: 'No. of audiences'},
-  {field: 'content', fieldTitle: 'Content'},
-  {field: 'send_time', fieldTitle: 'Time'},
+  { field: 'type', fieldTitle: 'Type' },
+  { field: 'number_of_audiences', fieldTitle: 'No. of audiences' },
+  { field: 'content', fieldTitle: 'Content' },
+  { field: 'send_time', fieldTitle: 'Time' },
 ];
 
 const TableHeader: React.SFC = () => {
@@ -29,9 +29,7 @@ const TableHeader: React.SFC = () => {
   });
   return (
     <thead className="thead-light">
-      <tr>
-        {columns}
-      </tr>
+      <tr>{columns}</tr>
     </thead>
   );
 };
@@ -42,13 +40,13 @@ interface TableRowProps {
 
 const TableRow: React.SFC<TableRowProps> = ({ pushCampaign }) => {
   const columns = pushCampaignConfig.map((fieldName, index) => {
-    return <td key={index}><span>{pushCampaign[fieldName.field]}</span></td>;
+    return (
+      <td key={index}>
+        <span>{pushCampaign[fieldName.field]}</span>
+      </td>
+    );
   });
-  return (
-    <tr>
-      {columns}
-    </tr>
-  );
+  return <tr>{columns}</tr>;
 };
 
 interface TableBodyProps {
@@ -67,9 +65,9 @@ interface ListTableProps {
 }
 
 const ListTable: React.SFC<ListTableProps> = ({ pushCampaigns }) => {
-    return (
+  return (
     <table key="table" className="table table-sm table-hover table-responsive">
-      <TableHeader/>
+      <TableHeader />
       <TableBody pushCampaigns={pushCampaigns} />
     </table>
   );
@@ -88,7 +86,9 @@ export interface DispatchProps {
   dispatch: Dispatch<RootState>;
 }
 
-class PushNotificationListPageImpl extends React.PureComponent<PushNotificationListPageProps> {
+class PushNotificationListPageImpl extends React.PureComponent<
+  PushNotificationListPageProps
+> {
   public notificationActionDispatcher: PushCampaignActionDispatcher;
 
   constructor(props: PushNotificationListPageProps) {
@@ -96,7 +96,9 @@ class PushNotificationListPageImpl extends React.PureComponent<PushNotificationL
 
     const { dispatch } = this.props;
 
-    this.notificationActionDispatcher = new PushCampaignActionDispatcher(dispatch);
+    this.notificationActionDispatcher = new PushCampaignActionDispatcher(
+      dispatch
+    );
   }
 
   public componentDidMount() {
@@ -105,21 +107,13 @@ class PushNotificationListPageImpl extends React.PureComponent<PushNotificationL
   }
 
   public render() {
-    const {
-      page,
-      maxPage,
-      isLoading,
-      pushCampaigns
-    } = this.props;
+    const { page, maxPage, isLoading, pushCampaigns } = this.props;
 
     return (
       <div>
         <div>
           <h1 className="display-4 d-inline-block">Push Notifications</h1>
-          <Link
-            className="btn btn-light float-right"
-            to={`/notification/new`}
-          >
+          <Link className="btn btn-light float-right" to={`/notification/new`}>
             New Notification
           </Link>
         </div>
@@ -131,11 +125,7 @@ class PushNotificationListPageImpl extends React.PureComponent<PushNotificationL
               if (pushCampaigns.length === 0) {
                 return <div>No campaigns found.</div>;
               } else {
-                return (
-                  <ListTable
-                    pushCampaigns={pushCampaigns}
-                  />
-                );
+                return <ListTable pushCampaigns={pushCampaigns} />;
               }
             }
           })()}
@@ -171,7 +161,7 @@ function PushNotificationListPageFactory() {
       isLoading,
       maxPage,
       page,
-      pushCampaigns
+      pushCampaigns,
     };
   }
 
@@ -179,10 +169,13 @@ function PushNotificationListPageFactory() {
     return { dispatch };
   }
 
-  return connect(mapStateToProps, mapDispatchToProps)(PushNotificationListPageImpl);
+  return connect(mapStateToProps, mapDispatchToProps)(
+    PushNotificationListPageImpl
+  );
 }
 
-export const PushNotificationListPage: React.ComponentClass<PushNotificationListPageProps>
-  = PushNotificationListPageImpl;
+export const PushNotificationListPage: React.ComponentClass<
+  PushNotificationListPageProps
+> = PushNotificationListPageImpl;
 
 export { PushNotificationListPageFactory };

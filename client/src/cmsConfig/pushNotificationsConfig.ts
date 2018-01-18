@@ -6,8 +6,11 @@ export interface PushNotificationsConfig {
   filterUserConfigs: FilterConfig[];
 }
 
-// tslint:disable-next-line: no-any
-export function parsePushNotificationConfig(context: ConfigContext, input: any): PushNotificationsConfig {
+export function parsePushNotificationConfig(
+  context: ConfigContext,
+  // tslint:disable-next-line: no-any
+  input: any
+): PushNotificationsConfig {
   if (input == null) {
     return {
       enabled: false,

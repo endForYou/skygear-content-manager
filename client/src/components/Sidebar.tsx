@@ -28,7 +28,10 @@ class Sidebar extends React.PureComponent<SidebarProps> {
   }
 }
 
-function ListItems({ items, pushNotificationEnabled }: SidebarProps): JSX.Element {
+function ListItems({
+  items,
+  pushNotificationEnabled,
+}: SidebarProps): JSX.Element {
   const listItems = items.map((item, index) => {
     return (
       <li key={index} className="nav-item">

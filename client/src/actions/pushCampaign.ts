@@ -48,14 +48,14 @@ export interface FetchPushCampaignListFailure {
 
 export interface SavePushCampaignRequest {
   payload: {
-    newPushCampaign: NewPushCampaign
+    newPushCampaign: NewPushCampaign;
   };
   type: PushCampaignActionTypes.SavePushCampaignRequest;
 }
 
 export interface SavePushCampaignSuccess {
   payload: {
-    newPushCampaign: NewPushCampaign
+    newPushCampaign: NewPushCampaign;
   };
   type: PushCampaignActionTypes.SavePushCampaignSuccess;
 }
@@ -82,7 +82,7 @@ function fetchPushCampaignListSuccess(
   fetchResult: PushCampaign[],
   page: number,
   perPage: number,
-  totalCount: number,
+  totalCount: number
 ): FetchPushCampaignListSuccess {
   return {
     payload: {
@@ -128,9 +128,7 @@ function savePushCampaignSuccess(
   };
 }
 
-function savePushCampaignFailure(
-  error: Error
-): SavePushCampaignFailure {
+function savePushCampaignFailure(error: Error): SavePushCampaignFailure {
   return {
     payload: {
       error,
@@ -139,7 +137,9 @@ function savePushCampaignFailure(
   };
 }
 
-function savePushCampaign(newPushCampaign: NewPushCampaign): ThunkAction<Promise<void>, {}, {}> {
+function savePushCampaign(
+  newPushCampaign: NewPushCampaign
+): ThunkAction<Promise<void>, {}, {}> {
   return dispatch => {
     dispatch(savePushCampaignRequest(newPushCampaign));
     return savePushCampaignOperation(newPushCampaign).then(
@@ -153,14 +153,17 @@ function savePushCampaign(newPushCampaign: NewPushCampaign): ThunkAction<Promise
   };
 }
 
-function savePushCampaignOperation(newPushCampaign: NewPushCampaign): Promise<void> {
+function savePushCampaignOperation(
+  newPushCampaign: NewPushCampaign
+): Promise<void> {
   return skygear
-    .lambda('push_campaign:create_new', {new_push_campaign: newPushCampaign})
+    .lambda('push_campaign:create_new', { new_push_campaign: newPushCampaign })
     .then(
       // tslint:disable-next-line: no-any
       (result: any) => {
         return result;
-      });
+      }
+    );
 }
 
 interface FetchListResult {
@@ -172,13 +175,15 @@ function fetchListOperation(
   page: number,
   perPage: number
 ): Promise<FetchListResult> {
-  return skygear
-    .lambda('push_campaign:get_all', {page, perPage})
-    .then(
-      // tslint:disable-next-line: no-any
-      (queryResult: any) => {
-        return { pushCampaigns: queryResult.pushCampaigns, totalCount: queryResult.totalCount };
-      });
+  return skygear.lambda('push_campaign:get_all', { page, perPage }).then(
+    // tslint:disable-next-line: no-any
+    (queryResult: any) => {
+      return {
+        pushCampaigns: queryResult.pushCampaigns,
+        totalCount: queryResult.totalCount,
+      };
+    }
+  );
 }
 
 function fetchPushCampaignList(
@@ -189,7 +194,14 @@ function fetchPushCampaignList(
     dispatch(fetchPushCampaignListRequest(page));
     return fetchListOperation(page, perPage).then(
       fetchResult => {
-        dispatch(fetchPushCampaignListSuccess(fetchResult.pushCampaigns, page, perPage, fetchResult.totalCount));
+        dispatch(
+          fetchPushCampaignListSuccess(
+            fetchResult.pushCampaigns,
+            page,
+            perPage,
+            fetchResult.totalCount
+          )
+        );
       },
       error => {
         dispatch(fetchPushCampaignListFailure(error));
@@ -201,21 +213,15 @@ function fetchPushCampaignList(
 export class PushCampaignActionDispatcher {
   private dispatch: Dispatch<RootState>;
 
-  constructor(
-    dispatch: Dispatch<RootState>
-  ) {
+  constructor(dispatch: Dispatch<RootState>) {
     this.dispatch = dispatch;
   }
 
   public fetchList(page: number, perPage: number): Promise<void> {
-    return this.dispatch(
-      fetchPushCampaignList(page, perPage)
-    );
+    return this.dispatch(fetchPushCampaignList(page, perPage));
   }
 
   public savePushCampaign(newPushCampaign: NewPushCampaign): Promise<void> {
-    return this.dispatch(
-      savePushCampaign(newPushCampaign)
-    );
+    return this.dispatch(savePushCampaign(newPushCampaign));
   }
 }

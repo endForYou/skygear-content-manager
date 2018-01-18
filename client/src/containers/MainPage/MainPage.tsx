@@ -38,9 +38,7 @@ class MainPage extends React.PureComponent<MainPageProps> {
           <Route exact={true} path="/" component={AnyFrontPage} />
 
           {this.recordRoutes}
-          {pushNotificationEnabled &&
-            this.pushNotificationRoutes
-          }
+          {pushNotificationEnabled && this.pushNotificationRoutes}
 
           <Route component={NotFoundPage} />
         </Switch>

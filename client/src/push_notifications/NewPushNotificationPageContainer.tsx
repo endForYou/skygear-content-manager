@@ -28,7 +28,9 @@ class NewPushNotificationPageContainerImpl extends React.PureComponent<Props> {
 
     const { dispatch } = this.props;
 
-    this.notificationActionDispatcher = new PushCampaignActionDispatcher(dispatch);
+    this.notificationActionDispatcher = new PushCampaignActionDispatcher(
+      dispatch
+    );
   }
 
   public render() {
@@ -49,9 +51,7 @@ class NewPushNotificationPageContainerImpl extends React.PureComponent<Props> {
   }
 }
 
-function mapStateToProps(
-  state: RootState
-): StateProps {
+function mapStateToProps(state: RootState): StateProps {
   return {
     content: '',
     savingPushCampaign: undefined,
@@ -63,8 +63,9 @@ function mapDispatchToProps(dispatch: Dispatch<RootState>): DispatchProps {
   return { dispatch };
 }
 
-const ConnectedNewPushNotificationPageContainer = connect(mapStateToProps, mapDispatchToProps)(
-  NewPushNotificationPageContainerImpl
-);
+const ConnectedNewPushNotificationPageContainer = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(NewPushNotificationPageContainerImpl);
 
 export const NewPushNotificationPageContainer: React.ComponentType = ConnectedNewPushNotificationPageContainer;
