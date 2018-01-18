@@ -17,7 +17,7 @@ class CmsPushCampaign(Base):
 
     def __init__(self, new_push_campaign):
         self.id = str(uuid4())
-        self.content = new_push_campaign['messageContent']
+        self.content = new_push_campaign['content']
         # TODO: Implement scheduled push campaign
         self.send_time = datetime.utcnow()
         self.sent = True

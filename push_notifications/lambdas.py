@@ -25,7 +25,8 @@ class CmsPushCampaignSchema(Schema):
 class NewPushCampaignSchema(Schema):
     type = fields.String(required=True, allow_none=False)
     numberOfAudiences = fields.Integer(required=True, allow_none=False)
-    messageContent = fields.String(required=True, allow_none=False)
+    title = fields.String()
+    content = fields.String(required=True, allow_none=False)
     userIds = fields.List(fields.String)
 
 
@@ -55,8 +56,9 @@ def create_push_notification(**kwargs):
     if len(errors) > 0:
         return {'errors': errors}
     user_ids = new_push_campaign['userIds']
-    message_content = new_push_campaign['messageContent']
-    PushNotificationHelper().push_to_users(user_ids, '', message_content)
+    message_content = new_push_campaign['content']
+    message_title = new_push_campaign.get('title', '')
+    PushNotificationHelper().push_to_users(user_ids, message_title, message_content)
     _create_cms_push_campaign(new_push_campaign)
     return {'result': 'ok'}
 

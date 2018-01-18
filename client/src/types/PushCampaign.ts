@@ -11,5 +11,6 @@ export interface NewPushCampaign {
   type: string;
   userIds: string[];
   numberOfAudiences: number;
-  messageContent: string;
+  title: string;
+  content: string;
 }
