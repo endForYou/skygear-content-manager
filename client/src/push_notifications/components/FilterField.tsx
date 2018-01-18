@@ -36,7 +36,9 @@ export class FilterField extends React.PureComponent<FilterFieldProps> {
       case FilterConfigTypes.String:
         return <StringFilterField {...rest} config={config} />;
       default:
-        return null;
+        throw new Error(
+          `Currently does not support Filter with FieldConfigType ${config.type}`
+        );
     }
   }
 }

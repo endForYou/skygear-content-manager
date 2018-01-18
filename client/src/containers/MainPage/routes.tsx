@@ -22,6 +22,10 @@ export function routesFromRecordConfigs(
   }, []);
 }
 
+export function pushNotificationRoutes(): JSX.Element[] {
+  return [makeNewPushNotificationRoute(), makeNotificationListRoute()];
+}
+
 function routesFromRecordConfig(config: RecordConfig): JSX.Element[] {
   const routes: JSX.Element[] = [];
   if (config.list) {
@@ -36,8 +40,6 @@ function routesFromRecordConfig(config: RecordConfig): JSX.Element[] {
   if (config.edit) {
     routes.push(makeEditRoute(config.edit));
   }
-  routes.push(makeNewPushNotificationRoute());
-  routes.push(makeNotificationListRoute());
 
   return routes;
 }

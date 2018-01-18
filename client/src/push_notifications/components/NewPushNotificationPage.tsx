@@ -169,7 +169,7 @@ class NewPushNotificationPageImpl extends React.PureComponent<
   }
 
   public handleFilterChange: FilterChangeHandler = (name, filterType, value, effect) => {
-    const newFilterOptionsByName = { ...this.state.filterOptionsByName, [name]: { value, filterType }};
+    let newFilterOptionsByName = { ...this.state.filterOptionsByName, [name]: { value, filterType }};
     this.setState({
       filterOptionsByName: newFilterOptionsByName,
     });
@@ -191,26 +191,10 @@ class NewPushNotificationPageImpl extends React.PureComponent<
     filterOptionsByName = this.state.filterOptionsByName,
     type = this.state.newPushCampaign.type
   ) => {
-    const query = new Query(Record.extend('user'));
+    let query = new Query(Record.extend('user'));
 
-    // TODO: Implement filter by primitive data types such as string or boolean.
-    // And support various query type of different data types.
     if (type == PushCampaignType.SpecificUsers) {
-      for (const key in filterOptionsByName) {
-        const filterOption = filterOptionsByName[key];
-        switch (filterOption.filterType) {
-          case FilterConfigTypes.Reference:
-            query.contains(key, filterOption.value);
-            break;
-          case FilterConfigTypes.String:
-            query.equalTo(key, filterOption.value);
-            break;
-          default:
-            throw new Error(
-              `Currently does not support Filter with FieldConfigType ${filterOption.filterType}`
-            );
-        }
-      }
+      query = this.queryWithFilters(query, filterOptionsByName);
     }
 
     query.overallCount = true;
@@ -232,6 +216,31 @@ class NewPushNotificationPageImpl extends React.PureComponent<
         errorMessage: error.toString(),
       });
     });
+  }
+
+  private queryWithFilters(query: Query, filterOptionsByName: FilterOptionsByName): Query {
+    // TODO: Implement filter by primitive data types such as string or boolean.
+    // And support various query type of different data types.
+    for (const key in filterOptionsByName) {
+      const filterOption = filterOptionsByName[key];
+      const value = filterOption.value
+      if (value == null || value == '' || value == []) {
+        continue;
+      }
+      switch (filterOption.filterType) {
+        case FilterConfigTypes.Reference:
+          query.contains(key, value);
+          break;
+        case FilterConfigTypes.String:
+          query.like(key, '%'+value+'%');
+          break;
+        default:
+          throw new Error(
+            `Currently does not support Filter with FieldConfigType ${filterOption.filterType}`
+          );
+      }
+    }
+    return query;
   }
 
   public handleSubmit: React.FormEventHandler<HTMLFormElement> = event => {
