@@ -114,14 +114,14 @@ export interface NewPushCampaignState {
 
 export const initialNewPushCampaignState: NewPushCampaignState = {
   savingPushCampaign: undefined,
-}
+};
 
 export const initialPushCampaignListState: PushCampaignListState = {
+  error: undefined,
   isLoading: true,
   page: 1,
-  totalCount: 0,
   pushCampaigns: [],
-  error: undefined
+  totalCount: 0,
 };
 
 export const initialPushCampaignState: PushCampaignState = {

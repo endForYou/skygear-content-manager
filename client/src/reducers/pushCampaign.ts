@@ -2,14 +2,13 @@ import { combineReducers, Reducer } from 'redux';
 import { Actions } from '../actions';
 import { PushCampaignActionTypes } from '../actions/pushCampaign';
 import {
-  PushCampaignState,
-  initialPushCampaignListState,
-  PushCampaignListState,
-  NewPushCampaignState,
   initialNewPushCampaignState,
+  initialPushCampaignListState,
+  NewPushCampaignState,
+  PushCampaignListState,
+  PushCampaignState,
 } from '../states';
-import { PushCampaign } from '../types';
-import { RemoteFailure, RemoteLoading, RemoteSuccess } from '../types';
+import { PushCampaign, RemoteFailure, RemoteLoading, RemoteSuccess } from '../types';
 
 // fix issue with incorrect redux definition file.
 // See https://github.com/reactjs/redux/issues/2709

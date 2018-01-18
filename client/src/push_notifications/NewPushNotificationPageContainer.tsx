@@ -2,11 +2,11 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 
-import { FilterConfig } from '../cmsConfig';
-import { NewPushNotificationPage } from './components/NewPushNotificationPage';
 import { PushCampaignActionDispatcher } from '../actions/pushCampaign';
+import { FilterConfig } from '../cmsConfig';
 import { RootState } from '../states';
-import { Remote, NewPushCampaign } from '../types';
+import { NewPushCampaign, Remote } from '../types';
+import { NewPushNotificationPage } from './components/NewPushNotificationPage';
 
 type Props = StateProps & DispatchProps;
 

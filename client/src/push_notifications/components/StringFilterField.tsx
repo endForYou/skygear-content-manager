@@ -1,7 +1,8 @@
 import * as React from 'react';
 
 import { StringFilterConfig } from '../../cmsConfig';
-import { RequiredFilterFieldProps } from './FilterField';
+import { debounce } from '../../util';
+import { FieldChangeHandler, RequiredFilterFieldProps } from './FilterField';
 
 export interface StringFilterFieldState {
   value: string;
@@ -10,22 +11,18 @@ export interface StringFilterFieldState {
 export type StringFilterFieldProps = RequiredFilterFieldProps<StringFilterConfig>;
 
 export class StringFilterField extends React.PureComponent<StringFilterFieldProps, StringFilterFieldState> {
+  public onFieldChange: FieldChangeHandler | undefined;
   constructor(props: StringFilterFieldProps) {
     super(props);
+
+    if (this.props.onFieldChange) {
+      this.onFieldChange = debounce(this.props.onFieldChange, 300).bind(this);
+    }
 
     this.state = {
       value: '',
     };
   }
-
-  private handleChange: React.ChangeEventHandler<HTMLInputElement> = event => {
-    const value = event.target.value;
-    this.setState({ ...this.state, value });
-
-    if (this.props.onFieldChange) {
-      this.props.onFieldChange(value);
-    }
-  };
 
   public render() {
     const { onFieldChange: _, ...rest } = this.props;
@@ -39,4 +36,13 @@ export class StringFilterField extends React.PureComponent<StringFilterFieldProp
       />
     );
   }
+
+  private handleChange: React.ChangeEventHandler<HTMLInputElement> = event => {
+    const value = event.target.value;
+    this.setState({ ...this.state, value });
+
+    if (this.onFieldChange) {
+      this.onFieldChange(value);
+    }
+  };
 }

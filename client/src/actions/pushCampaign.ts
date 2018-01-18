@@ -2,9 +2,8 @@ import { Dispatch } from 'redux';
 import { ThunkAction } from 'redux-thunk';
 import skygear from 'skygear';
 
-import { PushCampaign, NewPushCampaign } from '../types';
 import { RootState } from '../states';
-
+import { NewPushCampaign, PushCampaign } from '../types';
 
 export type PushCampaignActions =
   | FetchPushCampaignListRequest
@@ -164,7 +163,7 @@ function savePushCampaignOperation(newPushCampaign: NewPushCampaign): Promise<vo
       });
 }
 
-interface fetchListResult {
+interface FetchListResult {
   pushCampaigns: PushCampaign[];
   totalCount: number;
 }
@@ -172,13 +171,13 @@ interface fetchListResult {
 function fetchListOperation(
   page: number,
   perPage: number
-): Promise<fetchListResult> {
+): Promise<FetchListResult> {
   return skygear
     .lambda('push_campaign:get_all', {page, perPage})
     .then(
       // tslint:disable-next-line: no-any
       (queryResult: any) => {
-        return {'pushCampaigns': queryResult.pushCampaigns, 'totalCount': queryResult.totalCount};
+        return { pushCampaigns: queryResult.pushCampaigns, totalCount: queryResult.totalCount };
       });
 }
 

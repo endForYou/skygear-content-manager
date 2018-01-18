@@ -1,6 +1,7 @@
 import uuid from 'uuid';
 import { humanize } from '.././util';
 import { parseOptionalString, parseString, parseStringArray } from './util';
+
 import { CmsRecord, ConfigContext } from './cmsConfig';
 
 export type FilterConfig =
@@ -160,9 +161,9 @@ function parseReferenceFilterConfig(
 
   return {
     ...parseFilterConfigAttrs(input, 'Reference'),
-    type: FilterConfigTypes.Reference,
-    targetCmsRecord,
     displayFieldName,
+    targetCmsRecord,
+    type: FilterConfigTypes.Reference,
   };
 }
 

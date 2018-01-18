@@ -10,9 +10,10 @@ import {
 import { EditPageContainer } from '../../pages/EditPageContainer';
 import { ListPageFactory } from '../../pages/ListPage';
 import { NewPageContainer } from '../../pages/NewPageContainer';
-import { PushNotificationListPageFactory } from '../../push_notifications/PushNotificationListPage';
-import { NewPushNotificationPageContainer } from '../../push_notifications/NewPushNotificationPageContainer';
 import { ShowPageContainer } from '../../pages/ShowPageContainer';
+
+import { NewPushNotificationPageContainer } from '../../push_notifications/NewPushNotificationPageContainer';
+import { PushNotificationListPageFactory } from '../../push_notifications/PushNotificationListPage';
 
 export function routesFromRecordConfigs(
   configs: RecordConfig[]

@@ -46,7 +46,7 @@ function ListItems({ items, pushNotificationEnabled }: SidebarProps): JSX.Elemen
           Push Notifications
         </NavLink>
       </li>
-    )
+    );
   }
 
   return (

@@ -9,10 +9,9 @@ import {
 import 'react-select/dist/react-select.css';
 import skygear, { Query, Record } from 'skygear';
 
-import { RequiredFilterFieldProps } from './FilterField';
 import { ReferenceFilterConfig } from '../../cmsConfig';
-import { makeArray } from '../../util';
-import { debouncePromise1 } from '../../util';
+import { debouncePromise1, makeArray } from '../../util';
+import { RequiredFilterFieldProps } from './FilterField';
 
 export type ReferenceFieldProps = RequiredFilterFieldProps<ReferenceFilterConfig>;
 

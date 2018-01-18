@@ -1,6 +1,6 @@
 import { humanize, isObject, objectFrom } from './../util';
 import { FilterConfig, parseFilterConfig } from './filterConfig';
-import { PushNotificationsConfig, parsePushNotificationConfig } from './pushNotificationsConfig'
+import { parsePushNotificationConfig, PushNotificationsConfig } from './pushNotificationsConfig';
 import { parseOptionalString, parseString } from './util';
 
 export interface CmsConfig {
@@ -230,6 +230,7 @@ export function parseCmsConfig(input: any): CmsConfig {
 
   return {
     associationRecordByName,
+    pushNotifications: parsePushNotificationConfig(context, pushNotifications),
     records: Object.entries(
       records
       // tslint:disable-next-line: no-any
@@ -237,7 +238,6 @@ export function parseCmsConfig(input: any): CmsConfig {
       return { ...obj, [name]: parseRecordConfig(context, name, recordConfig) };
     }, {}),
     site: parseSiteConfigs(site),
-    pushNotifications: parsePushNotificationConfig(context, pushNotifications),
   };
 }
 

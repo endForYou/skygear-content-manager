@@ -1,11 +1,11 @@
 import * as qs from 'query-string';
 import * as React from 'react';
 import { connect } from 'react-redux';
-import { Dispatch } from 'redux';
 import { Link } from 'react-router-dom';
+import { Dispatch } from 'redux';
 
-import Pagination from '../components/Pagination';
 import { PushCampaignActionDispatcher } from '../actions/pushCampaign';
+import Pagination from '../components/Pagination';
 import { RootState } from '../states';
 import { PushCampaign } from '../types';
 
@@ -168,9 +168,9 @@ function PushNotificationListPageFactory() {
     const maxPage = Math.ceil(totalCount / pageSize);
 
     return {
-      page,
-      maxPage,
       isLoading,
+      maxPage,
+      page,
       pushCampaigns
     };
   }
@@ -182,6 +182,7 @@ function PushNotificationListPageFactory() {
   return connect(mapStateToProps, mapDispatchToProps)(PushNotificationListPageImpl);
 }
 
-export const PushNotificationListPage: React.ComponentClass<PushNotificationListPageProps> = PushNotificationListPageImpl;
+export const PushNotificationListPage: React.ComponentClass<PushNotificationListPageProps>
+  = PushNotificationListPageImpl;
 
 export { PushNotificationListPageFactory };

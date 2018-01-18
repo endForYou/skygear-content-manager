@@ -2,13 +2,13 @@ import * as React from 'react';
 import { Dispatch } from 'react-redux';
 import { push } from 'react-router-redux';
 import Select from 'react-select';
-import skygear, { Record, Query, QueryResult } from 'skygear';
+import skygear, { Query, QueryResult, Record } from 'skygear';
 
 import { PushCampaignActionDispatcher } from '../../actions/pushCampaign';
 import { FilterConfig, FilterConfigTypes } from '../../cmsConfig';
 import { RootState } from '../../states';
+import { NewPushCampaign, Remote, RemoteType } from '../../types';
 import { FilterField } from './FilterField';
-import { Remote, RemoteType, NewPushCampaign } from '../../types';
 
 export interface NewPushNotificationPageProps {
   filterConfigs: FilterConfig[];
@@ -68,15 +68,15 @@ class NewPushNotificationPageImpl extends React.PureComponent<
     const { dispatch } = this.props;
 
     this.state = {
-      newPushCampaign: {
-        type: PushCampaignType.AllUsers,
-        title: '',
-        content: '',
-        userIds: [],
-        numberOfAudiences: 0,
-      },
-      filterOptionsByName: {},
       errorMessage: undefined,
+      filterOptionsByName: {},
+      newPushCampaign: {
+        content: '',
+        numberOfAudiences: 0,
+        title: '',
+        type: PushCampaignType.AllUsers,
+        userIds: [],
+      },
     };
 
     this.notificationActionDispatcher = new PushCampaignActionDispatcher(dispatch);
@@ -110,7 +110,7 @@ class NewPushNotificationPageImpl extends React.PureComponent<
             options={campaignTypeOptions}
           />
         </div>
-        {type == PushCampaignType.SpecificUsers && (
+        {type === PushCampaignType.SpecificUsers && (
           <div style={{ marginLeft: 20 }}>
             <h5>Filter Conditions</h5>
             {formGroups}
@@ -123,7 +123,6 @@ class NewPushNotificationPageImpl extends React.PureComponent<
           <input
             type="text"
             className="form-control"
-            id="title"
             name="title"
             placeholder="Title"
             value={title}
@@ -153,119 +152,33 @@ class NewPushNotificationPageImpl extends React.PureComponent<
   // tslint:disable-next-line: no-any
   public handleSelectTypeChange = (selectedOption: any) => {
     if (selectedOption != null) {
-      if (selectedOption.value == PushCampaignType.AllUsers) {
+      if (selectedOption.value === PushCampaignType.AllUsers) {
         this.setState(preState => {
           return {
+            filterOptionsByName: {},
             newPushCampaign: {
               ...preState.newPushCampaign,
-              type: selectedOption.value,
               numberOfAudiences: 0,
+              type: selectedOption.value,
               userIds: [],
             },
-            filterOptionsByName: {},
-          }
+          };
         });
         this.fetchUserList({}, selectedOption.value);
       } else {
         this.setState(preState => {
           return {
+            filterOptionsByName: {},
             newPushCampaign: {
               ...preState.newPushCampaign,
-              type: selectedOption.value,
               numberOfAudiences: 0,
+              type: selectedOption.value,
               userIds: [],
             },
-            filterOptionsByName: {},
-          }
+          };
         });
       }
     }
-  }
-
-  public handleFilterChange: FilterChangeHandler = (name, filterType, value, effect) => {
-    let newFilterOptionsByName = { ...this.state.filterOptionsByName, [name]: { value, filterType }};
-    this.setState({
-      filterOptionsByName: newFilterOptionsByName,
-    });
-    this.fetchUserList(newFilterOptionsByName);
-  };
-
-  public handleTitleChange: React.ChangeEventHandler<
-    HTMLInputElement
-  > = event => {
-    const value = event.target.value;
-    this.setState(preState => {
-      return {
-        newPushCampaign: {...preState.newPushCampaign, title: value},
-      }
-    });
-  };
-
-  private handlerContentChange: React.ChangeEventHandler<
-    HTMLTextAreaElement
-  > = event => {
-    const value = event.target.value;
-    this.setState(preState => {
-      return {
-        newPushCampaign: {...preState.newPushCampaign, content: value},
-      }
-    });
-  };
-
-  private fetchUserList = (
-    filterOptionsByName = this.state.filterOptionsByName,
-    type = this.state.newPushCampaign.type
-  ) => {
-    let query = new Query(Record.extend('user'));
-
-    if (type == PushCampaignType.SpecificUsers) {
-      query = this.queryWithFilters(query, filterOptionsByName);
-    }
-
-    query.overallCount = true;
-    skygear.publicDB
-    .query(query)
-    .then((queryResult: QueryResult<Record>) => {
-      this.setState(preState => {
-        return {
-          newPushCampaign: {
-            ...preState.newPushCampaign,
-            numberOfAudiences: queryResult.overallCount,
-            userIds: queryResult.map((record: Record) => record._id),
-          },
-          errorMessage: undefined,
-        }
-      });
-    }).catch(error => {
-      this.setState({
-        errorMessage: error.toString(),
-      });
-    });
-  }
-
-  private queryWithFilters(query: Query, filterOptionsByName: FilterOptionsByName): Query {
-    // TODO: Implement filter by primitive data types such as string or boolean.
-    // And support various query type of different data types.
-    for (const key in filterOptionsByName) {
-      const filterOption = filterOptionsByName[key];
-      const value = filterOption.value
-      if (value == null || value == '' || value == []) {
-        continue;
-      }
-      switch (filterOption.filterType) {
-        case FilterConfigTypes.Reference:
-          query.contains(key, value);
-          break;
-        case FilterConfigTypes.String:
-          query.like(key, '%'+value+'%');
-          break;
-        default:
-          throw new Error(
-            `Currently does not support Filter with FieldConfigType ${filterOption.filterType}`
-          );
-      }
-    }
-    return query;
   }
 
   public handleSubmit: React.FormEventHandler<HTMLFormElement> = event => {
@@ -278,7 +191,7 @@ class NewPushNotificationPageImpl extends React.PureComponent<
       this.setState({
         errorMessage: 'Empty message content.',
       });
-      return
+      return;
     } else {
       this.setState({
         errorMessage: undefined,
@@ -293,6 +206,105 @@ class NewPushNotificationPageImpl extends React.PureComponent<
           errorMessage: error.toString(),
         });
       });
+  }
+
+  public handleFilterChange: FilterChangeHandler = (name, filterType, value, effect) => {
+    const newFilterOptionsByName = { ...this.state.filterOptionsByName, [name]: { value, filterType }};
+    if (value == null || value === '' || value.length === 0) {
+      delete newFilterOptionsByName[name];
+    }
+    this.setState({
+      filterOptionsByName: newFilterOptionsByName,
+    });
+    this.fetchUserList(newFilterOptionsByName);
+  };
+
+  public handleTitleChange: React.ChangeEventHandler<
+    HTMLInputElement
+  > = event => {
+    const value = event.target.value;
+    this.setState(preState => {
+      return {
+        newPushCampaign: {...preState.newPushCampaign, title: value},
+      };
+    });
+  };
+
+  private handlerContentChange: React.ChangeEventHandler<
+    HTMLTextAreaElement
+  > = event => {
+    const value = event.target.value;
+    this.setState(preState => {
+      return {
+        newPushCampaign: {...preState.newPushCampaign, content: value},
+      };
+    });
+  };
+
+  private fetchUserList = (
+    filterOptionsByName = this.state.filterOptionsByName,
+    type = this.state.newPushCampaign.type
+  ) => {
+    let query = new Query(Record.extend('user'));
+
+    if (type === PushCampaignType.SpecificUsers) {
+      // Will not fetch user list if specific users without any filters.
+      if (Object.keys(filterOptionsByName).length === 0) {
+        this.setState(preState => {
+          return {
+            newPushCampaign: {
+              ...preState.newPushCampaign,
+              numberOfAudiences: 0,
+              userIds: [],
+            },
+          };
+        });
+        return;
+      }
+
+      query = this.queryWithFilters(query, filterOptionsByName);
+    }
+
+    query.overallCount = true;
+    skygear.publicDB
+    .query(query)
+    .then((queryResult: QueryResult<Record>) => {
+      this.setState(preState => {
+        return {
+          errorMessage: undefined,
+          newPushCampaign: {
+            ...preState.newPushCampaign,
+            numberOfAudiences: queryResult.overallCount,
+            userIds: queryResult.map((record: Record) => record._id),
+          },
+        };
+      });
+    }).catch(error => {
+      this.setState({
+        errorMessage: error.toString(),
+      });
+    });
+  }
+
+  private queryWithFilters(query: Query, filterOptionsByName: FilterOptionsByName): Query {
+    // TODO: Implement filter by primitive data types such as string or boolean.
+    // And support various query type of different data types.
+    Object.entries(filterOptionsByName).forEach(([key, filterOption]) => {
+      const value = filterOption.value;
+      switch (filterOption.filterType) {
+        case FilterConfigTypes.Reference:
+          query.contains(key, value);
+          break;
+        case FilterConfigTypes.String:
+          query.like(key, '%' + value + '%');
+          break;
+        default:
+          throw new Error(
+            `Currently does not support Filter with FieldConfigType ${filterOption.filterType}`
+          );
+      }
+    });
+    return query;
   }
 }
 

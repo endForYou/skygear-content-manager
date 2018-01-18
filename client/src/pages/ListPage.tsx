@@ -381,7 +381,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
     } = this.props;
 
     const { showfilterMenu, filters } = this.state;
-    const pathname = `/records/${recordName}`
+    const pathname = `/records/${recordName}`;
 
     return (
       <div>

@@ -8,7 +8,7 @@ import NotFoundPage from '../../components/NotFoundPage';
 import { RootState } from '../../states';
 import FrontPage from '../FrontPage';
 
-import { routesFromRecordConfigs, pushNotificationRoutes } from './routes';
+import { pushNotificationRoutes, routesFromRecordConfigs } from './routes';
 
 export interface MainPageProps {
   recordConfigs: RecordConfig[];
@@ -51,10 +51,10 @@ class MainPage extends React.PureComponent<MainPageProps> {
 
 function mapStateToProps(state: RootState): MainPageProps {
   return {
+    pushNotificationEnabled: state.cmsConfig.pushNotifications.enabled,
     recordConfigs: Object.values(state.cmsConfig.records)
       .filter(recordConfig => recordConfig !== undefined)
       .map(recordConfig => recordConfig!),
-    pushNotificationEnabled: state.cmsConfig.pushNotifications.enabled,
   };
 }
 
