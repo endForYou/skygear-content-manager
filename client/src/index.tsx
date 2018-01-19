@@ -112,6 +112,7 @@ function createHistoryFromPublicUrl(publicUrl: string): History {
 }
 
 function fetchUser(endPoint: string, apiKey: string) {
+  skygear.pubsub.autoPubsub = false;
   return skygear
     .config({
       apiKey,

@@ -124,6 +124,7 @@ declare module 'skygear' {
   export class Container {
     public auth: AuthContainer;
     public publicDB: Database;
+    public pubsub: PubsubContainer;
 
     public config(options: {
       apiKey: string;
@@ -140,6 +141,10 @@ declare module 'skygear' {
       username: string,
       password: string
     ): Promise<Record>;
+  }
+
+  export class PubsubContainer {
+    public autoPubsub: boolean;
   }
 
   export class Database {
