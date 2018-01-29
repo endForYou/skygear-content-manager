@@ -43,12 +43,7 @@ class ReferenceFieldImpl extends React.PureComponent<
   constructor(props: ReferenceFieldProps) {
     super(props);
 
-    const selectedRecord =
-      props.context.record.$transient[props.config.name] || null;
-    const recordsById: RecordsById = {};
-    if (selectedRecord !== null) {
-      recordsById[selectedRecord._id] = selectedRecord;
-    }
+    const recordsById: RecordsById = propsMergeRecordsById(props, {});
 
     this.state = {
       recordsById,
@@ -57,8 +52,13 @@ class ReferenceFieldImpl extends React.PureComponent<
   }
 
   public componentWillReceiveProps(nextProps: ReferenceFieldProps) {
+    const recordsById: RecordsById = propsMergeRecordsById(
+      nextProps,
+      this.state.recordsById
+    );
     this.setState({
-      value: propsToRefOption(nextProps, this.state.recordsById),
+      recordsById,
+      value: propsToRefOption(nextProps, recordsById),
     });
   }
 
@@ -211,6 +211,19 @@ function recordsToRecordsById(records: Record[]): RecordsById {
       return [record._id, record] as [string, Record];
     })
   );
+}
+
+function propsMergeRecordsById(
+  props: ReferenceFieldProps,
+  recordsById: RecordsById
+): RecordsById {
+  const selectedRecord =
+    props.context.record.$transient[props.config.name] || null;
+  const newRecordsById: RecordsById = { ...recordsById };
+  if (selectedRecord !== null) {
+    newRecordsById[selectedRecord._id] = selectedRecord;
+  }
+  return newRecordsById;
 }
 
 export const ReferenceField: React.ComponentClass<
