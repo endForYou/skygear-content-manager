@@ -144,7 +144,8 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
     this.recordActionCreator = new RecordActionDispatcher(
       dispatch,
       cmsRecord,
-      references
+      references,
+      'list'
     );
 
     this.fetchList = debounce(this.fetchList.bind(this), 200);

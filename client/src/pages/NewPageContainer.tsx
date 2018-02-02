@@ -33,7 +33,8 @@ class NewPageContainerImpl extends React.PureComponent<Props> {
     this.recordDispatcher = new RecordActionDispatcher(
       props.dispatch,
       props.config.cmsRecord,
-      props.config.references
+      props.config.references,
+      'new'
     );
 
     this.newRecord = new (Record.extend(props.config.cmsRecord.name))();

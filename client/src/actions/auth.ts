@@ -16,6 +16,7 @@ export interface LoginSuccess {
   payload: {
     user: Record;
   };
+  context: undefined;
 }
 
 export interface LoginFailure {
@@ -23,6 +24,7 @@ export interface LoginFailure {
   payload: {
     error: Error;
   };
+  context: undefined;
 }
 
 export interface UpdateUser {
@@ -30,10 +32,12 @@ export interface UpdateUser {
   payload: {
     user: Record;
   };
+  context: undefined;
 }
 
 export function loginSuccess(user: Record): LoginSuccess {
   return {
+    context: undefined,
     payload: {
       user,
     },
@@ -43,6 +47,7 @@ export function loginSuccess(user: Record): LoginSuccess {
 
 export function loginFailure(error: Error): LoginFailure {
   return {
+    context: undefined,
     payload: {
       error,
     },
@@ -52,6 +57,7 @@ export function loginFailure(error: Error): LoginFailure {
 
 export function updateUser(user: Record): UpdateUser {
   return {
+    context: undefined,
     payload: {
       user,
     },

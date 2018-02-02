@@ -54,6 +54,10 @@ function recordListReducer(
   state: ListState = initialListState,
   action: Actions
 ): ListState {
+  if (action.context !== 'list') {
+    return state;
+  }
+
   switch (action.type) {
     case RecordActionTypes.FetchListRequest:
       return { ...state, page: action.payload.page };
@@ -76,6 +80,10 @@ function recordShowReducer(
   state: ShowState = initialShowState,
   action: Actions
 ): ShowState {
+  if (action.context !== 'show') {
+    return state;
+  }
+
   switch (action.type) {
     case RecordActionTypes.FetchRequest:
       return {
@@ -101,6 +109,10 @@ function recordEditReducer(
   state: EditState = initialEditState,
   action: Actions
 ): EditState {
+  if (action.context !== 'edit') {
+    return state;
+  }
+
   switch (action.type) {
     case RecordActionTypes.FetchRequest:
       return {
@@ -143,6 +155,10 @@ function recordNewReducer(
   state: NewState = initialNewState,
   action: Actions
 ): NewState {
+  if (action.context !== 'new') {
+    return state;
+  }
+
   switch (action.type) {
     case RecordActionTypes.SaveRequest:
       return {
