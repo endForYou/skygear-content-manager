@@ -43,7 +43,7 @@ services:
       context: .
     volumes:
       - ./:/usr/src/app
-    command: py-skygear
+    command: py-skygear skygear_content_manager
     environment:
       DATABASE_URL: postgresql://postgres:@db:5432/postgres?sslmode=disable
       PUBSUB_URL: ws://app:3000/pubsub
