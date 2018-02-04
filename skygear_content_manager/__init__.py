@@ -1,5 +1,6 @@
 import json
 import os
+import yaml
 
 from jose import JWTError, jwt
 import requests
@@ -7,6 +8,9 @@ import skygear
 from skygear import static_assets
 from skygear.options import options
 from skygear.utils.assets import directory_assets
+
+from .cms_config import CMSConfig
+from .schema import SkygearSchema
 
 
 CMS_USER_PERMITTED_ROLE = os.environ.get('CMS_USER_PERMITTED_ROLE', 'Admin')
@@ -43,6 +47,18 @@ RESPONSE_HEADER_BLACKLIST = [
 
 
 def includeme(settings):
+    cms_config = None
+
+    @skygear.event('after-plugins-ready')
+    def after_plugins_ready(config):
+        schema = SkygearSchema.from_dict(get_schema())
+
+        r = requests.get(CMS_CONFIG_FILE_URL)
+        config = yaml.load(r.text)
+        cms_config = CMSConfig.from_dict(config,
+                                         context={'schema': schema})
+
+
     @skygear.handler('cms/')
     def index(request):
         context = {
@@ -90,6 +106,12 @@ def includeme(settings):
 
         req.is_master = True
         return request_skygear(req).to_werkzeug()
+
+
+    @skygear.handler('cms-api/export')
+    def export(request):
+        req = SkygearRequest.from_werkzeug(request)
+        return {}
 
 
 class SkygearRequest:
@@ -239,14 +261,18 @@ class Body:
         if not b:
             self.data = b
 
-        try:
-            json_body = json.loads(b.decode('utf-8'))
-        except json.decoder.JSONDecodeError:
-            self.data = b
-            return
+        if isinstance(b, bytes):
+            try:
+                json_body = json.loads(b.decode('utf-8'))
+            except json.decoder.JSONDecodeError:
+                self.data = b
+                return
 
-        self.kind = self.KIND_JSON
-        self.data = json_body
+            self.kind = self.KIND_JSON
+            self.data = json_body
+        elif isinstance(b, dict):
+            self.kind = self.KIND_JSON
+            self.data = b
 
     @property
     def is_json(self):
@@ -389,6 +415,17 @@ def get_roles(json_body):
         return None
 
     return roles
+
+
+def get_schema():
+    body = Body({
+        'action': 'schema:fetch',
+        'api_key': options.masterkey,
+    })
+    req = SkygearRequest('POST', {}, body)
+    req.is_master = True
+    resp = request_skygear(req)
+    return resp.body.data['result']
 
 
 INDEX_HTML_FORMAT = """<!doctype html>
