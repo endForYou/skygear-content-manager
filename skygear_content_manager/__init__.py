@@ -9,6 +9,7 @@ from skygear import static_assets
 from skygear.options import options
 from skygear.utils.assets import directory_assets
 
+from .import_export import RecordSerializer
 from .schema.cms_config import CMSConfigSchema
 from .schema.skygear_schema import SkygearSchemaSchema
 
@@ -45,10 +46,10 @@ RESPONSE_HEADER_BLACKLIST = [
     'Server',
 ]
 
+cms_config = None
+
 
 def includeme(settings):
-    cms_config = None
-
     @skygear.event('after-plugins-ready')
     def after_plugins_ready(config):
         schema = SkygearSchemaSchema().load(get_schema()).data
@@ -59,6 +60,8 @@ def includeme(settings):
         config_schema = CMSConfigSchema()
         config_schema.context = {'schema': schema}
         result = config_schema.load(config)
+
+        global cms_config
         cms_config = result.data
 
 
@@ -114,7 +117,25 @@ def includeme(settings):
     @skygear.handler('cms-api/export')
     def export(request):
         req = SkygearRequest.from_werkzeug(request)
-        return {}
+        data = req.body.data
+        name = data.get('export_name')
+
+        global cms_config
+        export_config = cms_config.get_export_config(name)
+        record_type = export_config.record_type
+        includes = export_config.get_reference_targets()
+
+        records = fetch_records(record_type, includes=includes)
+        for record in records:
+            foriegn_records = transient_foreign_records(
+                record,
+                export_config,
+                cms_config.association_records
+            )
+            import pprint; pprint.pprint(foriegn_records)
+
+        serializer = RecordSerializer(export_config.fields)
+        return [serializer.serialize(r) for r in records]
 
 
 class SkygearRequest:
@@ -334,6 +355,18 @@ def request_skygear(req):
     return SkygearResponse.from_requests(requests_resp)
 
 
+def request_skygear_api(action, data={}, is_master=True):
+    body_dict = {
+        'action': action,
+        'api_key': options.masterkey,
+    }
+    body_dict.update(data)
+    body = Body(body_dict)
+    req = SkygearRequest('POST', {}, body)
+    req.is_master = is_master
+    return request_skygear(req)
+
+
 def intercept_login(req):
     resp = request_skygear(req)
 
@@ -421,14 +454,54 @@ def get_roles(json_body):
 
 
 def get_schema():
-    body = Body({
-        'action': 'schema:fetch',
-        'api_key': options.masterkey,
-    })
-    req = SkygearRequest('POST', {}, body)
-    req.is_master = True
-    resp = request_skygear(req)
+    resp = request_skygear_api('schema:fetch')
     return resp.body.data['result']
+
+
+def fetch_records(record_type, predicate = None, includes = []):
+    resp = request_skygear_api('record:query', data={
+        'record_type': record_type,
+        'database_id': '_union',
+        'include': {i: {'$type': 'keypath', '$val': i} for i in includes},
+        'predicate': predicate,
+    })
+    return resp.body.data['result']
+
+
+def eq_predicate(key, value):
+    return ['eq', {'$type': 'keypath', '$val': key}, value]
+
+
+def transient_foreign_records(record, export_config, association_records):
+    reference_fields = export_config.get_many_reference_fields()
+    record_id = record['_id'].split('/')[1]
+
+    for field in reference_fields:
+        reference = field.reference
+        records = None
+
+        if reference.name in record['_transient']:
+            continue
+
+        if reference.is_via_association_record:
+            foreign_field = \
+                [f for f in association_records[reference.name].fields
+                 if f.target == reference.target][0]
+            self_field = \
+                [f for f in association_records[reference.name].fields
+                 if f.target != reference.target][0]
+
+            predicate = eq_predicate(self_field.name, record_id)
+            foreign_records = fetch_records(reference.name,
+                                            predicate=predicate,
+                                            includes=[foreign_field.name])
+            records = \
+                [r['_transient'][foreign_field.name] for r in foreign_records]
+        else:
+            # TODO
+            pass
+
+        record['_transient'][reference.name] = records
 
 
 INDEX_HTML_FORMAT = """<!doctype html>

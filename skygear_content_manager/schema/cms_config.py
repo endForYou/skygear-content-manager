@@ -4,7 +4,9 @@ from marshmallow import Schema, fields, post_load, pre_load
 
 from ..models.cms_config import (CMSConfig, CMSRecord, CMSRecordList,
                                  CMSRecordExport, CMSRecordExportField,
-                                 CMSRecordExportReference)
+                                 CMSRecordExportReference,
+                                 CMSAssociationRecord,
+                                 CMSAssociationRecordField)
 
 
 class NestedDict(fields.Nested):
@@ -30,6 +32,7 @@ class NestedDict(fields.Nested):
 class CMSConfigSchema(Schema):
 
     records = NestedDict('CMSRecordSchema', key='record_type')
+    association_records = NestedDict('CMSAssociationRecordSchema', key='name')
 
     @pre_load
     def pre_load(self, data):
@@ -161,6 +164,7 @@ class CMSRecordExportFieldSchema(Schema):
         for reserved_field in reserved_fields:
             if reserved_field['name'] == data['name']:
                 matched_reserved_field = reserved_field
+                break
 
         type = None
         reference = None
@@ -169,6 +173,7 @@ class CMSRecordExportFieldSchema(Schema):
             if field.is_ref:
                 reference = CMSRecordExportReference(
                     ref_type=CMSRecordExportReference.REF_TYPE_DIRECT,
+                    name=field.name,
                     target=field.ref_target,
                     field_name=data['reference_field_name'],
                 )
@@ -181,16 +186,23 @@ class CMSRecordExportFieldSchema(Schema):
                     'field name "%s" not found in schema, ' % data['name'] +
                     'should be reference ' +
                     'but neither reference_via_association_record or ' +
-                    'reference_via_back_reference is found'
+                    'reference_via_back_reference is found.'
                 )
 
             type = 'reference'
-            ref_type = CMSRecordExportReference.REF_TYPE_VIA_ASSOCIATION_RECORD
-            if 'reference_via_association_record' in data:
+            ref_type = None
+            ref_name = None
+            if 'reference_via_back_reference' in data:
                 ref_type = CMSRecordExportReference.REF_TYPE_VIA_BACK_REF
+                ref_name = data['reference_via_back_reference']
+            else:
+                ref_type =\
+                    CMSRecordExportReference.REF_TYPE_VIA_ASSOCIATION_RECORD
+                ref_name = data['reference_via_association_record']
 
             reference = CMSRecordExportReference(
                 ref_type=ref_type,
+                name=ref_name,
                 target=data['reference_target'],
                 field_name=data['reference_field_name'],
             )
@@ -205,3 +217,23 @@ class CMSRecordExportFieldSchema(Schema):
         data.pop('reference_via_association_record', None)
 
         return CMSRecordExportField(**data)
+
+
+class CMSAssociationRecordSchema(Schema):
+
+    name = fields.String()
+    fields = fields.Nested('CMSAssociationRecordFieldSchema', many=True)
+
+    @post_load
+    def make_object(self, data):
+        return CMSAssociationRecord(**data)
+
+
+class CMSAssociationRecordFieldSchema(Schema):
+
+    name = fields.String()
+    target = fields.String()
+
+    @post_load
+    def make_object(self, data):
+        return CMSAssociationRecordField(**data)
