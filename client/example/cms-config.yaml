@@ -2,50 +2,679 @@ site:
   - type: Record
     name: user
     label: User
+  - type: Record
+    name: joblisting
+    label: Joblisting
+  - type: Record
+    name: job_application
+    label: Job Application
+  - type: Record
+    name: job_suggestion
+    label: Job Suggestion
+  - type: Record
+    name: imported_user
+    label: Imported User
+  - type: Record
+    name: skill
+    label: Skill
+  - type: Record
+    name: cfunction
+    label: Cfunction
+  - type: Record
+    name: city
+    label: City
+  - type: Record
+    name: country
+    label: Country
+  - type: Record
+    name: welcome_message
+    label: Welcome Message
 records:
   user:
     list:
       fields:
         - type: _id
-        - name: username
-          type: String
-        - name: email
+        - name: name
           type: String
         - type: _created_at
         - type: _updated_at
-      filters:
-        - name: username
-          type: String
-          label: Username
         - name: email
           type: String
-          label: Email
-        - name: _created_at
-          type: DateTime
-          label: Created at
+        - name: profile_image
+          type: ImageAsset
+        - name: city
+          type: Reference
+          label: City
+          target: city
+          displayFieldName: _id
+        - name: country
+          type: Reference
+          label: Country
+          target: country
+          displayFieldName: _id
+      actions:
+        - type: export
+          name: export-user
+          fields:
+            - name: _id
+              label: id
+            - name: name
+            - name: _created_at
+            - name: _updated_at
+            - name: email
+            - name: city
+              label: City
+              reference_target: city
+              reference_field_name: _id
+            - name: country
+              label: Country
+              reference_target: country
+              reference_field_name: _id
+            - name: has_skills
+              label: Has skills
+              reference_target: skill
+              reference_field_name: _id
+              reference_via_association_record: user_has_skill
     show:
       fields:
         - type: _id
-        - name: username
+        - name: name
           type: String
+        - type: _created_at
+        - type: _updated_at
         - name: email
           type: String
+        - name: profile_image
+          type: ImageAsset
+        - name: city
+          type: Reference
+          label: City
+          target: city
+          displayFieldName: _id
+        - name: country
+          type: Reference
+          label: Country
+          target: country
+          displayFieldName: _id
+          # reminder: name field is useless in many-to-many relation, but required
+        - name: has_skills
+          label: Has skills
+          type: Reference
+          target: skill
+          displayFieldName: _id
+          via_association_record: user_has_skill
+        - name: wants_skills
+          label: Wants skills
+          type: Reference
+          target: skill
+          displayFieldName: _id
+          via_association_record: user_wants_skill
+        - name: has_cfunctions
+          label: Has cfunctions
+          type: Reference
+          target: cfunction
+          displayFieldName: _id
+          via_association_record: user_has_cfunction
+        - name: wants_cfunctions
+          label: Wants cfunctions
+          type: Reference
+          target: cfunction
+          displayFieldName: _id
+          via_association_record: user_wants_cfunction
+        - name: applications
+          type: Reference
+          label: Applications
+          target: joblisting
+          displayFieldName: proj_name
+          via_association_record: job_application
+    edit:
+      fields:
+        - name: name
+          type: String
+        - name: city
+          type: Reference
+          label: City
+          target: city
+          displayFieldName: _id
+        - name: country
+          type: Reference
+          label: Country
+          target: country
+          displayFieldName: _id
+          # reminder: name field is useless in many-to-many relation, but required
+        - name: has_skills
+          label: Has skills
+          type: Reference
+          target: skill
+          displayFieldName: _id
+          via_association_record: user_has_skill
+        - name: wants_skills
+          label: Wants skills
+          type: Reference
+          target: skill
+          displayFieldName: _id
+          via_association_record: user_wants_skill
+        - name: has_cfunctions
+          label: Has cfunctions
+          type: Reference
+          target: cfunction
+          displayFieldName: _id
+          via_association_record: user_has_cfunction
+        - name: wants_cfunctions
+          label: Wants cfunctions
+          type: Reference
+          target: cfunction
+          displayFieldName: _id
+          via_association_record: user_wants_cfunction
+    new:
+      fields:
+        - name: name
+          type: String
+        - name: city
+          type: Reference
+          label: City
+          target: city
+          displayFieldName: _id
+        - name: country
+          type: Reference
+          label: Country
+          target: country
+          displayFieldName: _id
+          # reminder: name field is useless in many-to-many relation, but required
+        - name: has_skills
+          label: Has skills
+          type: Reference
+          target: skill
+          displayFieldName: _id
+          via_association_record: user_has_skill
+        - name: wants_skills
+          label: Wants skills
+          type: Reference
+          target: skill
+          displayFieldName: _id
+          via_association_record: user_wants_skill
+        - name: has_cfunctions
+          label: Has cfunctions
+          type: Reference
+          target: cfunction
+          displayFieldName: _id
+          via_association_record: user_has_cfunction
+        - name: wants_cfunctions
+          label: Wants cfunctions
+          type: Reference
+          target: cfunction
+          displayFieldName: _id
+          via_association_record: user_wants_cfunction
+  skill:
+    list:
+      fields:
+        - type: _id
+        - name: display_name
+          type: String
+    show:
+      fields:
+        - type: _id
+        - type: _created_at
+        - type: _updated_at
+        - name: display_name
+          type: String
+    edit:
+      fields:
+        - name: display_name
+          type: String
+    new:
+      fields:
+        - name: display_name
+          type: String
+  cfunction:
+    list:
+      fields:
+        - type: _id
+        - name: display_name
+          type: String
+    show:
+      fields:
+        - type: _id
+        - type: _created_at
+        - type: _updated_at
+        - name: display_name
+          type: String
+    edit:
+      fields:
+        - name: display_name
+          type: String
+    new:
+      fields:
+        - name: display_name
+          type: String
+  city:
+    list:
+      fields:
+        - type: _id
+    show:
+      fields:
+        - type: _id
         - type: _created_at
         - type: _updated_at
     edit:
       fields:
-        - type: _id
-        - name: username
+        - name: display_name
           type: String
-        - name: email
-          type: String
-        - type: _created_at
-        - type: _updated_at
     new:
       fields:
-        - type: _id
-        - name: username
+        - name: display_name
           type: String
+  country:
+    list:
+      fields:
+        - type: _id
+    show:
+      fields:
+        - type: _id
+        - type: _created_at
+        - type: _updated_at
+    edit:
+      fields:
+        - name: display_name
+          type: String
+    new:
+      fields:
+        - name: display_name
+          type: String
+  welcome_message:
+    list:
+      fields:
+        - name: ordering
+          type: Integer
+        - name: text_en
+          type: String
+          label: English
+    show:
+      fields:
+        - name: ordering
+          type: Integer
+        - name: text_en
+          type: String
+          label: English
+        - name: text_ja
+          type: String
+          label: Japanese
+    edit:
+      fields:
+        - name: text_en
+          type: String
+          label: en
+        - name: text_ja
+          type: String
+          label: ja
+    new:
+      fields:
+        - name: text_en
+          type: String
+          label: en
+        - name: text_ja
+          type: String
+          label: ja
+  job_application:
+    list:
+      fields:
+        - type: _id
+        - type: _created_at
+        - type: _updated_at
+        - name: manager_interested
+          type: Boolean
+        - name: manager_passed
+          type: Boolean
+        - name: applicant_interested
+          type: Boolean
+        - name: applicant_passed
+          type: Boolean
+        - name: matched_at
+          type: DateTime
+        - name: applicant_id
+          type: Reference
+          label: Applicant
+          target: user
+          displayFieldName: name
+        - name: joblisting_id
+          type: Reference
+          label: Job
+          target: joblisting
+          displayFieldName: proj_name
+    show:
+      fields:
+        - type: _id
+        - type: _created_at
+        - type: _updated_at
+        - name: manager_interested
+          type: Boolean
+        - name: manager_passed
+          type: Boolean
+        - name: applicant_interested
+          type: Boolean
+        - name: applicant_passed
+          type: Boolean
+        - name: matched_at
+          type: DateTime
+        - name: applicant_id
+          type: Reference
+          label: Applicant
+          target: user
+          displayFieldName: name
+        - name: joblisting_id
+          type: Reference
+          label: Job
+          target: joblisting
+          displayFieldName: proj_name
+  joblisting:
+    list:
+      fields:
+        - type: _id
+        - type: _created_at
+        - type: _updated_at
+        - name: proj_name
+          type: String
+          label: Project name
+        - name: role
+          type: String
+        - name: proj_type
+          type: String
+          label: Project type
+        - name: manager_id
+          type: Reference
+          label: Manager
+          target: user
+          displayFieldName: name
+        - name: role_description
+          type: String
+        - name: cfunction_id
+          type: Reference
+          label: Cfunction
+          target: cfunction
+          displayFieldName: _id
+        - name: city
+          type: Reference
+          label: City
+          target: city
+          displayFieldName: _id
+        - name: country
+          type: Reference
+          label: Country
+          target: country
+          displayFieldName: _id
+        - name: proj_start_date
+          type: DateTime
+          label: Project Start Date
+        - name: proj_end_date
+          type: DateTime
+          label: Project End Date
+        - name: required_availability
+          type: Integer
+          label: Required availability
+        - name: listing_closing_date
+          type: DateTime
+          label: Listing closing date
+        - name: offers_skill
+          type: Reference
+          label: Offers skills
+          target: skill
+          displayFieldName: _id
+          via_association_record: joblisting_offers_skill
+        - name: requires_skill
+          type: Reference
+          label: Requires skills
+          target: skill
+          displayFieldName: _id
+          via_association_record: joblisting_requires_skill
+        - name: applicants
+          type: Reference
+          label: Appplicants
+          target: user
+          displayFieldName: name
+          via_association_record: job_application
+    show:
+      fields:
+        - type: _id
+        - type: _created_at
+        - type: _updated_at
+        - name: proj_name
+          type: String
+          label: Project name
+        - name: role
+          type: String
+        - name: proj_type
+          type: String
+          label: Project type
+        - name: manager_id
+          type: Reference
+          label: Manager
+          target: user
+          displayFieldName: name
+        - name: role_description
+          type: String
+        - name: cfunction_id
+          type: Reference
+          label: Cfunction
+          target: cfunction
+          displayFieldName: _id
+        - name: city
+          type: Reference
+          label: City
+          target: city
+          displayFieldName: _id
+        - name: country
+          type: Reference
+          label: Country
+          target: country
+          displayFieldName: _id
+        - name: proj_start_date
+          type: DateTime
+          label: Project Start Date
+        - name: proj_end_date
+          type: DateTime
+          label: Project End Date
+        - name: required_availability
+          type: Integer
+          label: Required availability
+        - name: listing_closing_date
+          type: DateTime
+          label: Listing closing date
+        - name: offers_skill
+          type: Reference
+          label: Offers skills
+          target: skill
+          displayFieldName: _id
+          via_association_record: joblisting_offers_skill
+        - name: requires_skill
+          type: Reference
+          label: Requires skills
+          target: skill
+          displayFieldName: _id
+          via_association_record: joblisting_requires_skill
+        - name: applicants
+          type: Reference
+          label: Appplicants
+          target: user
+          displayFieldName: name
+          via_association_record: job_application
+    edit:
+      fields:
+        - name: proj_name
+          type: String
+          label: Project name
+        - name: role
+          type: String
+        - name: role_description
+          type: String
+        - name: cfunction_id
+          type: Reference
+          label: Cfunction
+          target: cfunction
+          displayFieldName: _id
+        - name: city
+          type: Reference
+          label: City
+          target: city
+          displayFieldName: _id
+        - name: country
+          type: Reference
+          label: Country
+          target: country
+          displayFieldName: _id
+        - name: required_availability
+          type: Integer
+          label: Required availability
+        - name: offers_skill
+          type: Reference
+          label: Offers skills
+          target: skill
+          displayFieldName: _id
+          via_association_record: joblisting_offers_skill
+        - name: requires_skill
+          type: Reference
+          label: Requires skills
+          target: skill
+          displayFieldName: _id
+          via_association_record: joblisting_requires_skill
+    new:
+      fields:
+        - name: proj_name
+          type: String
+          label: Project name
+        - name: role
+          type: String
+        - name: role_description
+          type: String
+        - name: cfunction_id
+          type: Reference
+          label: Cfunction
+          target: cfunction
+          displayFieldName: _id
+        - name: city
+          type: Reference
+          label: City
+          target: city
+          displayFieldName: _id
+        - name: country
+          type: Reference
+          label: Country
+          target: country
+          displayFieldName: _id
+        - name: required_availability
+          type: Integer
+          label: Required availability
+        - name: offers_skill
+          type: Reference
+          label: Offers skills
+          target: skill
+          displayFieldName: _id
+          via_association_record: joblisting_offers_skill
+        - name: requires_skill
+          type: Reference
+          label: Requires skills
+          target: skill
+          displayFieldName: _id
+          via_association_record: joblisting_requires_skill
+  job_suggestion:
+    list:
+      fields:
+        - type: _id
+        - name: joblisting_id
+          type: Reference
+          label: Joblisting
+          target: joblisting
+          displayFieldName: proj_name
+        - name: applicant_id
+          type: Reference
+          label: Applicant
+          target: user
+          displayFieldName: name
+        - name: show_in_suggested_tab
+          type: Boolean
+    show:
+      fields:
+        - type: _id
+        - type: _created_at
+        - type: _updated_at
+        - name: joblisting_id
+          type: Reference
+          label: Joblisting
+          target: joblisting
+          displayFieldName: proj_name
+        - name: applicant_id
+          type: Reference
+          label: Applicant
+          target: user
+          displayFieldName: name
+        - name: show_in_suggested_tab
+          type: Boolean
+  imported_user:
+    list:
+      fields:
+        - type: _id
         - name: email
           type: String
-
+    show:
+      fields:
+        - type: _id
+        - type: _created_at
+        - type: _updated_at
+        - name: email
+          type: String
+association_records:
+  user_has_skill:
+    fields:
+      - name: user_id
+        type: Reference
+        target: user
+      - name: skill_id
+        type: Reference
+        target: skill
+  user_wants_skill:
+    fields:
+      - name: user_id
+        type: Reference
+        target: user
+      - name: skill_id
+        type: Reference
+        target: skill
+  user_has_cfunction:
+    fields:
+      - name: user_id
+        type: Reference
+        target: user
+      - name: cfunction_id
+        type: Reference
+        target: cfunction
+  user_wants_cfunction:
+    fields:
+      - name: user_id
+        type: Reference
+        target: user
+      - name: cfunction_id
+        type: Reference
+        target: cfunction
+  joblisting_offers_skill:
+    fields:
+      - name: joblisting_id
+        type: Reference
+        target: joblisting
+      - name: skill_id
+        type: Reference
+        target: skill
+  joblisting_requires_skill:
+    fields:
+      - name: joblisting_id
+        type: Reference
+        target: joblisting
+      - name: skill_id
+        type: Reference
+        target: skill
+  job_application:
+    fields:
+      - name: joblisting_id
+        type: Reference
+        target: joblisting
+      - name: applicant_id
+        type: Reference
+        target: user
