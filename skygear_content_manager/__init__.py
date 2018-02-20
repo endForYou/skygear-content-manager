@@ -9,7 +9,8 @@ from skygear import static_assets
 from skygear.options import options
 from skygear.utils.assets import directory_assets
 
-from .import_export import RecordSerializer
+from .import_export import RecordSerializer, render_records
+from .import_export import prepare_response as prepare_export_response
 from .schema.cms_config import CMSConfigSchema
 from .schema.skygear_schema import SkygearSchemaSchema
 
@@ -132,10 +133,13 @@ def includeme(settings):
                 export_config,
                 cms_config.association_records
             )
-            import pprint; pprint.pprint(foriegn_records)
 
         serializer = RecordSerializer(export_config.fields)
-        return [serializer.serialize(r) for r in records]
+        serialized_records = [serializer.serialize(r) for r in records]
+
+        response = prepare_export_response(name)
+        render_records(serialized_records, export_config, response.stream)
+        return response
 
 
 class SkygearRequest:
