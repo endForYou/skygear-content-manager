@@ -1,15 +1,3 @@
-from marshmallow import Schema, fields, post_load
-
-
-class SkygearSchemaSchema(Schema):
-
-    record_types = fields.Dict(fields.Nested('SkygearRecordSchema'))
-
-    @post_load
-    def make_object(self, data):
-        return SkygearSchema(**data)
-
-
 class SkygearSchema:
 
     record_types = {}
@@ -19,7 +7,7 @@ class SkygearSchema:
 
     @classmethod
     def from_dict(cls, d):
-        result, _ = SkygearSchemaSchema().load(d)
+        result, _ = SkygearDatabaseSchema().load(d)
         return result
 
     def field_of(self, record_type, field_name):
@@ -28,31 +16,12 @@ class SkygearSchema:
         return fields[0] if len(fields) > 0 else None
 
 
-class SkygearRecordSchema(Schema):
-
-    fields = fields.Nested('SkygearFieldSchema', many=True)
-
-    @post_load
-    def make_object(self, data):
-        return SkygearRecord(**data)
-
-
 class SkygearRecord:
 
     fields = []
 
     def __init__(self, fields):
         self.fields = fields
-
-
-class SkygearFieldSchema(Schema):
-
-    name = fields.String()
-    type = fields.String()
-
-    @post_load
-    def make_object(self, data):
-        return SkygearField(**data)
 
 
 class SkygearField:

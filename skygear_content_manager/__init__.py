@@ -9,8 +9,8 @@ from skygear import static_assets
 from skygear.options import options
 from skygear.utils.assets import directory_assets
 
-from .cms_config import CMSConfig
-from .schema import SkygearSchema
+from .schema.cms_config import CMSConfigSchema
+from .schema.skygear_schema import SkygearSchemaSchema
 
 
 CMS_USER_PERMITTED_ROLE = os.environ.get('CMS_USER_PERMITTED_ROLE', 'Admin')
@@ -51,12 +51,15 @@ def includeme(settings):
 
     @skygear.event('after-plugins-ready')
     def after_plugins_ready(config):
-        schema = SkygearSchema.from_dict(get_schema())
+        schema = SkygearSchemaSchema().load(get_schema()).data
 
         r = requests.get(CMS_CONFIG_FILE_URL)
         config = yaml.load(r.text)
-        cms_config = CMSConfig.from_dict(config,
-                                         context={'schema': schema})
+
+        config_schema = CMSConfigSchema()
+        config_schema.context = {'schema': schema}
+        result = config_schema.load(config)
+        cms_config = result.data
 
 
     @skygear.handler('cms/')
