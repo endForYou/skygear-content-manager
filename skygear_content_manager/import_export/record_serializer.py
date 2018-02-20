@@ -104,6 +104,10 @@ class BooleanSerializer(BaseValueSerializer):
             'Number',
         ]
 
+    @property
+    def default_format(self):
+        return self.supported_formats[0]
+
     def serialize(self, value):
         fn = None
         if self.format == 'Long':
