@@ -4,7 +4,7 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { Dispatch } from 'redux';
-import skygear, { Record } from 'skygear';
+import { Record } from 'skygear';
 
 import { RecordActionDispatcher } from '../actions/record';
 import {
@@ -25,6 +25,7 @@ import {
   StringFilter,
   StringFilterQueryType,
 } from '../cmsConfig';
+import { ExportButton } from '../components/ExportButton';
 import { FilterList } from '../components/FilterList';
 import Pagination from '../components/Pagination';
 import { Field, FieldContext } from '../fields';
@@ -112,30 +113,12 @@ function ActionButtonFactory(
   recordName: string,
   actionConfig: ListActionConfig
 ) {
-  let action: string = '';
-  let title: string = '';
-
   switch (actionConfig.type) {
     case 'Export':
-      const searchParams = new URLSearchParams();
-      searchParams.append('export_name', actionConfig.name);
-      searchParams.append('key', skygear.auth.accessToken || '');
-      action = `${skygear.endPoint}export?${searchParams}`;
-      title = actionConfig.label || actionConfig.name;
-      break;
+      return <ExportButton actionConfig={actionConfig} />;
     default:
       return null;
   }
-
-  return (
-    <a
-      className="btn btn-light"
-      href={action}
-      target="_blank"
-    >
-      {title}
-    </a>
-  );
 }
 
 export type ListPageProps = StateProps & DispatchProps;
