@@ -65,6 +65,8 @@ def main():
         '_id': user_id,
         'city': {'$type': 'ref', '$id': 'city/hk'},
         'country': {'$type': 'ref', '$id': 'country/hk'},
+        'name': context['username'],
+        'email': context['username'] + '@oursky.com',
     }]
     data = send_action('record:save', {
         'database_id': '_public',
