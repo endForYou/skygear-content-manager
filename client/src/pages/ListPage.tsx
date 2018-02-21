@@ -4,7 +4,7 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { Dispatch } from 'redux';
-import { Record } from 'skygear';
+import skygear, { Record } from 'skygear';
 
 import { RecordActionDispatcher } from '../actions/record';
 import {
@@ -20,6 +20,7 @@ import {
   GeneralFilter,
   IntegerFilter,
   IntegerFilterQueryType,
+  ListActionConfig,
   ListPageConfig,
   StringFilter,
   StringFilterQueryType,
@@ -106,6 +107,36 @@ const ListTable: React.SFC<ListTableProps> = ({ fieldConfigs, records }) => {
     </table>
   );
 };
+
+function ActionButtonFactory(
+  recordName: string,
+  actionConfig: ListActionConfig
+) {
+  let action: string = '';
+  let title: string = '';
+
+  switch (actionConfig.type) {
+    case 'Export':
+      const searchParams = new URLSearchParams();
+      searchParams.append('export_name', actionConfig.name);
+      searchParams.append('key', skygear.auth.accessToken || '');
+      action = `${skygear.endPoint}export?${searchParams}`;
+      title = actionConfig.label || actionConfig.name;
+      break;
+    default:
+      return null;
+  }
+
+  return (
+    <a
+      className="btn btn-light"
+      href={action}
+      target="_blank"
+    >
+      {title}
+    </a>
+  );
+}
 
 export type ListPageProps = StateProps & DispatchProps;
 
@@ -275,6 +306,39 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
     this.fetchList(page, pageConfig.perPage, filters);
   }
 
+  public renderActionButtons() {
+    const {
+      recordName,
+      pageConfig: {
+        actions
+      },
+    } = this.props;
+
+    // TODO (Steven-Chan):
+    // Add action type `New`
+    const newRecordButton = (
+      <Link
+        className="btn btn-light float-right"
+        to={`/records/${recordName}/new`}
+      >
+        New
+      </Link>
+    );
+
+    const actionsButtons = [
+      ...(actions.map(action =>
+        ActionButtonFactory(recordName, action)
+      )),
+      newRecordButton,
+    ];
+
+    return actionsButtons
+      // tslint:disable-next-line: no-any
+      .reduce((prev: JSX.Element | null, current: JSX.Element | null): any =>
+        [prev, (<span>&nbsp;</span>), current]
+      );
+  }
+
   public render() {
     const {
       recordName,
@@ -322,12 +386,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
                 </div>
               </div>
             )}
-            <Link
-              className="btn btn-light float-right"
-              to={`/records/${recordName}/new`}
-            >
-              New
-            </Link>
+            {this.renderActionButtons()}
           </div>
         </div>
 

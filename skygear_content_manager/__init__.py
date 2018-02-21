@@ -10,6 +10,7 @@ import skygear
 from skygear import static_assets
 from skygear.options import options
 from skygear.utils.assets import directory_assets
+from urllib.parse import parse_qs
 
 from .import_export import RecordSerializer, render_records
 from .import_export import prepare_response as prepare_export_response
@@ -129,9 +130,16 @@ def includeme(settings):
 
     @skygear.handler('cms-api/export')
     def export(request):
-        req = SkygearRequest.from_werkzeug(request)
-        data = req.body.data
-        name = data.get('export_name')
+        data = parse_qs(request.query_string.decode())
+        name = data.get('export_name', [None])[0]
+        key = data.get('key', [None])[0]
+
+        if not key:
+            return SkygearResponse.forbidden().to_werkzeug()
+
+        authdata = AuthData.from_cms_token(key)
+        if not authdata or not authdata.is_admin:
+            return SkygearResponse.forbidden().to_werkzeug()
 
         cms_config = get_cms_config()
         export_config = cms_config.get_export_config(name)

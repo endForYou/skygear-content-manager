@@ -54,6 +54,7 @@ export interface ListPageConfig {
   fields: FieldConfig[];
   filters: FilterConfig[];
   references: ReferenceConfig[];
+  actions: ListActionConfig[];
 }
 
 export interface ShowPageConfig {
@@ -185,6 +186,23 @@ interface ConfigContext {
   associationRecordByName: AssociationRecordByName;
 }
 
+export type ListActionConfig =
+  ExportActionConfig;
+export enum ListActionConfigTypes {
+  Export = 'Export',
+
+  // TODO (Steven-Chan):
+  // Add list action type `New`, `Import`
+}
+export interface ExportActionConfig {
+  type: ListActionConfigTypes.Export;
+  name: string;
+  label: string | undefined;
+
+  // ignore field config
+  // client side only need name for calling export API
+}
+
 // tslint:disable-next-line: no-any
 export function parseCmsConfig(input: any): CmsConfig {
   const { site, records, association_records: associationRecords } = input;
@@ -310,7 +328,10 @@ function parseListPageConfig(
     // tslint:disable-next-line: no-any
     (input.filters as any[]).map(f => parseFilterConfig(f));
 
+  const { actions = [] } = input;
+
   return {
+    actions,
     cmsRecord,
     fields: compactFields,
     filters,
