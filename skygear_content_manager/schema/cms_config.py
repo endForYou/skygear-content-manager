@@ -63,7 +63,7 @@ class CMSRecordSchema(Schema):
 class RecordListActionField(fields.Field):
 
     type_mapping = {
-        'export': 'CMSRecordExportSchema'
+        'Export': 'CMSRecordExportSchema'
     }
 
     def _serialize(self, value, attr, obj):
