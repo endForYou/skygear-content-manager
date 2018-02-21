@@ -20,6 +20,8 @@ services:
     extends:
       file: docker-compose.yml
       service: plugin
+    environment:
+      CMS_CONFIG_FILE_URL: http://cms-client:8080/cms-config.yaml
 
   cms-client-lib:
     build:
@@ -38,7 +40,10 @@ services:
       REACT_APP_SKYGEAR_API_KEY: my_skygear_key
       REACT_APP_SKYGEAR_ENDPOINT: http://localhost:3001/cms-api/
 
-  # client files are served from webpack dev server
+  cms-client:
+    extends:
+      file: docker-compose.yml
+      service: cms-client
 
 # The volume container for skygear
 volumes:
