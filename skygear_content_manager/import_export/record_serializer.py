@@ -38,6 +38,9 @@ class FieldSerializer:
         self.field_config = field_config
 
     def serialize(self, value):
+        if value == None:
+            return ''
+
         serializer = None
         if self.field_config.reference and \
            self.field_config.reference.is_many and \
@@ -50,6 +53,8 @@ class FieldSerializer:
             serializer = BooleanSerializer()
         elif self.field_config.type == 'json':
             serializer = JSONSerializer()
+        elif self.field_config.type == 'location':
+            serializer = LocationSerializer()
 
         if not serializer:
             serializer = StringSerializer()
@@ -87,9 +92,6 @@ class ListSerializer(BaseValueSerializer):
 class StringSerializer(BaseValueSerializer):
 
     def serialize(self, value):
-        if value == None:
-            return ''
-
         return str(value)
 
 
@@ -138,3 +140,9 @@ class JSONSerializer(BaseValueSerializer):
 
     def serialize(self, value):
         return json.dumps(value)
+
+
+class LocationSerializer(BaseValueSerializer):
+
+    def serialize(self, value):
+        return '(' + str(value['$lat']) + ',' + str(value['$lng']) + ')'
