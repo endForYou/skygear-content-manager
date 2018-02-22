@@ -81,6 +81,10 @@ records:
               reference_target: skill
               reference_field_name: display_name
               reference_via_association_record: user_has_skill
+            - name: json
+              label: Data
+            - name: location
+              label: Location
     show:
       fields:
         - type: _id
