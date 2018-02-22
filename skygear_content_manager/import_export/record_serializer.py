@@ -1,3 +1,5 @@
+import json
+
 class RecordSerializer:
 
     field_configs = []
@@ -46,6 +48,8 @@ class FieldSerializer:
             serializer = StringSerializer()
         elif self.field_config.type == 'boolean':
             serializer = BooleanSerializer()
+        elif self.field_config.type == 'json':
+            serializer = JSONSerializer()
 
         if not serializer:
             serializer = StringSerializer()
@@ -128,3 +132,9 @@ class BooleanSerializer(BaseValueSerializer):
 
     def serialize_number(self, value):
         return '1' if value else '0'
+
+
+class JSONSerializer(BaseValueSerializer):
+
+    def serialize(self, value):
+        return json.dumps(value)
