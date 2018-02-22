@@ -73,8 +73,9 @@ class ListSerializer(BaseValueSerializer):
     field_serializer = None
 
     def serialize(self, value):
-        value = [v.replace('"', '\"') for v in value]
         value = [self.field_serializer.serialize(v) for v in value]
+        value = [v.replace("'", "\\'") for v in value]
+        value = ["'" + v + "'" for v in value]
         value = ','.join(value)
         return value
 
