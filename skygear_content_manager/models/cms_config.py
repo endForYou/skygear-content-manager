@@ -8,6 +8,13 @@ class CMSConfig:
         self.association_records = association_records
 
     @classmethod
+    def empty(cls):
+        return cls(
+            records={},
+            association_records={}
+        )
+
+    @classmethod
     def from_dict(cls, d, context):
         schema = CMSConfigSchema()
         schema.context = context

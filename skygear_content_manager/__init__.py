@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 import yaml
 
@@ -11,9 +12,12 @@ from skygear.utils.assets import directory_assets
 
 from .import_export import RecordSerializer, render_records
 from .import_export import prepare_response as prepare_export_response
+from .models.cms_config import CMSConfig
 from .schema.cms_config import CMSConfigSchema
 from .schema.skygear_schema import SkygearSchemaSchema
 
+
+logger = logging.getLogger('skygear_content_manager')
 
 CMS_USER_PERMITTED_ROLE = os.environ.get('CMS_USER_PERMITTED_ROLE', 'Admin')
 CMS_AUTH_SECRET = os.environ.get('CMS_AUTH_SECRET', 'FAKE_AUTH_SECRET')
@@ -53,17 +57,22 @@ cms_config = None
 def includeme(settings):
     @skygear.event('after-plugins-ready')
     def after_plugins_ready(config):
-        schema = SkygearSchemaSchema().load(get_schema()).data
-
-        r = requests.get(CMS_CONFIG_FILE_URL)
-        config = yaml.load(r.text)
-
-        config_schema = CMSConfigSchema()
-        config_schema.context = {'schema': schema}
-        result = config_schema.load(config)
-
         global cms_config
-        cms_config = result.data
+        try:
+            cms_config = parse_cms_config()
+        except Exception as e:
+            cms_config = CMSConfig.empty()
+            logger.error(e)
+
+
+    @skygear.event('schema-changed')
+    def schema_change(config):
+        global cms_config
+        try:
+            cms_config = parse_cms_config()
+        except Exception as e:
+            cms_config = CMSConfig.empty()
+            logger.error(e)
 
 
     @skygear.handler('cms/')
@@ -123,6 +132,9 @@ def includeme(settings):
 
         global cms_config
         export_config = cms_config.get_export_config(name)
+        if not export_config:
+            return skygear.Response('Export config not found', 404)
+
         record_type = export_config.record_type
         includes = export_config.get_reference_targets()
 
@@ -455,6 +467,22 @@ def get_roles(json_body):
         return None
 
     return roles
+
+
+def parse_cms_config():
+    schema = SkygearSchemaSchema().load(get_schema()).data
+
+    r = requests.get(CMS_CONFIG_FILE_URL)
+    if not (200 <= r.status_code <= 299):
+        raise Exception('Failed to get cms config yaml file')
+
+    config = yaml.load(r.text)
+
+    config_schema = CMSConfigSchema()
+    config_schema.context = {'schema': schema}
+    result = config_schema.load(config)
+
+    return result.data
 
 
 def get_schema():
