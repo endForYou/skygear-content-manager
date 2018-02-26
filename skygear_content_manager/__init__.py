@@ -4,6 +4,7 @@ import os
 import yaml
 
 from jose import JWTError, jwt
+from marshmallow import ValidationError
 import requests
 import skygear
 from skygear import static_assets
@@ -481,6 +482,8 @@ def parse_cms_config():
     config_schema = CMSConfigSchema()
     config_schema.context = {'schema': schema}
     result = config_schema.load(config)
+    if result.errors:
+        raise ValidationError(result.errors)
 
     return result.data
 
