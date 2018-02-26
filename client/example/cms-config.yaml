@@ -53,6 +53,28 @@ records:
           target: country
           displayFieldName: _id
       actions:
+        - type: Import
+          name: import-user
+          label: Import user
+          fields:
+            - name: _id
+            - name: email
+        - type: Import
+          name: import-user-with-name
+          label: Import user with name
+          identifier: name
+          reference_handling: use-first
+          fields:
+            - name: name
+            - name: email
+        - type: Import
+          name: import-user-with-name-strict
+          label: Import user with name (Strict)
+          identifier: name
+          reference_handling: throw-errorabc
+          fields:
+            - name: name
+            - name: email
         - type: Export
           name: export-user
           fields:

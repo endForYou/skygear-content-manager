@@ -60,11 +60,13 @@ class CMSRecordExport:
 
     record_type = ''
     name = ''
+    label = ''
     fields = []
 
-    def __init__(self, record_type, name, fields):
+    def __init__(self, record_type, name, label, fields):
         self.record_type = record_type
         self.name = name
+        self.label = label
         self.fields = fields
 
     def get_reference_targets(self):
@@ -154,3 +156,55 @@ class CMSAssociationRecordField:
     def __init__(self, name, target):
         self.name = name
         self.target = target
+
+
+class CMSRecordImport:
+
+    REFERENCE_HANDLING_USE_FIRST = 'use-first'
+    REFERENCE_HANDLING_THROW_ERROR = 'throw-error'
+
+    record_type = ''
+    name = ''
+    label = ''
+    reference_handling = ''
+    identifier = ''
+    fields = []
+
+    def __init__(self, record_type, name, label, fields,
+                 reference_handling = REFERENCE_HANDLING_USE_FIRST,
+                 identifier = '_id'):
+        self.record_type = record_type
+        self.name = name
+        self.label = label
+        self.reference_handling = reference_handling
+        self.identifier = identifier
+        self.fields = fields
+
+
+class CMSRecordImportField:
+
+    record_type = ''
+    name = ''
+    label = ''
+    type = ''
+
+    reference = None
+
+    def __init__(self, record_type, name, label, type, reference = None):
+        self.record_type = record_type
+        self.name = name
+        self.label = label
+        self.type = type
+        self.reference = reference
+
+
+class CMSRecordImportReference:
+
+    name = ''
+    target = ''
+    field_name = ''
+
+    def __init__(self, name, target, field_name):
+        self.name = name
+        self.target = target
+        self.field_name = field_name

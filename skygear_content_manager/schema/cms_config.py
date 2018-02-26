@@ -1,12 +1,27 @@
 import sys
 
-from marshmallow import Schema, fields, post_load, pre_load, ValidationError
+from marshmallow import (Schema, fields, post_load, pre_load, validates,
+                         ValidationError)
 
 from ..models.cms_config import (CMSConfig, CMSRecord, CMSRecordList,
                                  CMSRecordExport, CMSRecordExportField,
                                  CMSRecordExportReference,
                                  CMSAssociationRecord,
-                                 CMSAssociationRecordField)
+                                 CMSAssociationRecordField,
+                                 CMSRecordImport, CMSRecordImportField)
+
+
+# constants
+reserved_fields = [{
+    'name': '_id',
+    'type': 'string',
+}, {
+    'name': '_created_at',
+    'type': 'datetime',
+}, {
+    'name': '_updated_at',
+    'type': 'datetime',
+}]
 
 
 class NestedDict(fields.Nested):
@@ -63,7 +78,8 @@ class CMSRecordSchema(Schema):
 class RecordListActionField(fields.Field):
 
     type_mapping = {
-        'Export': 'CMSRecordExportSchema'
+        'Export': 'CMSRecordExportSchema',
+        'Import': 'CMSRecordImportSchema',
     }
 
     def _serialize(self, value, attr, obj):
@@ -111,6 +127,7 @@ class CMSRecordListActionSchema(Schema):
 class CMSRecordExportSchema(CMSRecordListActionSchema):
 
     name = fields.String()
+    label = fields.String(required=False)
     fields = fields.Nested('CMSRecordExportFieldSchema', many=True)
 
     @pre_load
@@ -123,6 +140,9 @@ class CMSRecordExportSchema(CMSRecordListActionSchema):
 
     @post_load
     def make_object(self, data):
+        if 'label' not in data:
+            data['label'] = data['name']
+
         del data['type']
         return CMSRecordExport(**data)
 
@@ -152,17 +172,6 @@ class CMSRecordExportFieldSchema(Schema):
         schema = self.context['schema']
         field = schema.field_of(data['record_type'], data['name'])
 
-        reserved_fields = [{
-            'name': '_id',
-            'type': 'string',
-        }, {
-            'name': '_created_at',
-            'type': 'datetime',
-        }, {
-            'name': '_updated_at',
-            'type': 'datetime',
-        }]
-
         matched_reserved_field = None
         for reserved_field in reserved_fields:
             if reserved_field['name'] == data['name']:
@@ -185,12 +194,12 @@ class CMSRecordExportFieldSchema(Schema):
         else:
             if 'reference_via_association_record' not in data and \
                'reference_via_back_reference' not in data:
-                raise Exception(
-                    'field name "%s" not found in schema, ' % data['name'] +
-                    'should be reference ' +
-                    'but neither reference_via_association_record or ' +
+                raise Exception((
+                    'field name "{record_type}.{name}" ' +
+                    'not found in schema, ' +
+                    'and neither reference_via_association_record or ' +
                     'reference_via_back_reference is found.'
-                )
+                ).format(**data))
 
             type = 'reference'
             ref_type = None
@@ -240,3 +249,103 @@ class CMSAssociationRecordFieldSchema(Schema):
     @post_load
     def make_object(self, data):
         return CMSAssociationRecordField(**data)
+
+
+class CMSRecordImportSchema(CMSRecordListActionSchema):
+
+    name = fields.String()
+    label = fields.String()
+    reference_handling = fields.String(required=False)
+    identifier = fields.String(required=False)
+
+    fields = fields.Nested('CMSRecordImportFieldSchema', many=True)
+
+    @validates('reference_handling')
+    def validate_reference_handling(self, value):
+        if value and \
+           value != CMSRecordImport.REFERENCE_HANDLING_USE_FIRST and \
+           value != CMSRecordImport.REFERENCE_HANDLING_THROW_ERROR:
+            raise ValidationError('Invalid reference_handling value.')
+
+    @pre_load
+    def pre_load(self, data):
+        if 'fields' in data:
+            for field in data['fields']:
+                field['record_type'] = data['record_type']
+
+        return data
+
+    @post_load
+    def make_object(self, data):
+        if 'label' not in data:
+            data['label'] = data['name']
+
+        if 'identifier' not in data:
+            data['identifier'] = '_id'
+
+        field_names = [f.name for f in data['fields']]
+        if data['identifier'] and data['identifier'] not in field_names:
+            raise Exception((
+                'identifier "{identifier}" does not match any ' +
+                'field names in import config "{name}"'
+            ).format(**data))
+
+        del data['type']
+        return CMSRecordImport(**data)
+
+
+class CMSRecordImportFieldSchema(Schema):
+
+    record_type = fields.String()
+    name = fields.String()
+    label = fields.String(required=False)
+
+    reference_target = fields.String(required=False)
+    reference_field_name = fields.String(required=False)
+
+    @pre_load
+    def pre_load(self, data):
+        return data
+
+    @post_load
+    def make_object(self, data):
+        # show name as label if label not provided
+        if 'label' not in data:
+            data['label'] = data['name']
+
+        # find field type from schema
+        schema = self.context['schema']
+        field = schema.field_of(data['record_type'], data['name'])
+
+        matched_reserved_field = None
+        for reserved_field in reserved_fields:
+            if reserved_field['name'] == data['name']:
+                matched_reserved_field = reserved_field
+                break
+
+        type = None
+        reference = None
+        if field:
+            type = field.type
+            if field.is_ref:
+                reference = CMSRecordImportReference(
+                    name=field.name,
+                    target=field.ref_target,
+                    field_name=data['reference_field_name'],
+                )
+        elif matched_reserved_field:
+            type = matched_reserved_field['type']
+        else:
+            raise Exception((
+                'field name "{record_type}.{name}" ' +
+                'not found in schema.'
+            ).format(**data))
+
+        data['type'] = type
+        if reference:
+            data['reference'] = reference
+
+        data.pop('reference_target', None)
+        data.pop('reference_field_name', None)
+
+        return CMSRecordImportField(**data)
