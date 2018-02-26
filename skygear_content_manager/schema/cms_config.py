@@ -8,7 +8,8 @@ from ..models.cms_config import (CMSConfig, CMSRecord, CMSRecordList,
                                  CMSRecordExportReference,
                                  CMSAssociationRecord,
                                  CMSAssociationRecordField,
-                                 CMSRecordImport, CMSRecordImportField)
+                                 CMSRecordImport, CMSRecordImportField,
+                                 CMSRecordImportReference)
 
 
 # constants

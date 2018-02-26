@@ -1,5 +1,6 @@
 import json
 
+
 class RecordSerializer:
 
     field_configs = []

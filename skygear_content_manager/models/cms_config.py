@@ -21,13 +21,19 @@ class CMSConfig:
         result = schema.load(d)
         return result.data
 
-    def get_export_config(self, name):
+    def get_action_config(self, name, action_cls):
         for _, record in self.records.items():
-            config = record.get_export_config(name)
+            config = record.get_action_config(name, action_cls)
             if config is not None:
                 return config
 
         return None
+
+    def get_export_config(self, name):
+        return self.get_action_config(name, CMSRecordExport)
+
+    def get_import_config(self, name):
+        return self.get_action_config(name, CMSRecordImport)
 
 
 class CMSRecord:
@@ -39,9 +45,9 @@ class CMSRecord:
         self.record_type = record_type
         self.list = list
 
-    def get_export_config(self, name):
+    def get_action_config(self, name, action_cls):
         actions = [action for action in self.list.actions
-                   if isinstance(action, CMSRecordExport) and
+                   if isinstance(action, action_cls) and
                       action.name == name]
         return actions[0] if len(actions) > 0 else None
 
@@ -179,6 +185,9 @@ class CMSRecordImport:
         self.reference_handling = reference_handling
         self.identifier = identifier
         self.fields = fields
+
+    def get_reference_fields(self):
+        return [f for f in self.fields if f.reference]
 
 
 class CMSRecordImportField:
