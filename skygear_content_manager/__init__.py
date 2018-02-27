@@ -128,7 +128,7 @@ def includeme(settings):
 
         records = fetch_records(record_type, includes=includes)
         for record in records:
-            foriegn_records = transient_foreign_records(
+            transient_foreign_records(
                 record,
                 export_config,
                 cms_config.association_records
@@ -477,6 +477,15 @@ def eq_predicate(key, value):
 
 
 def transient_foreign_records(record, export_config, association_records):
+    """
+    Fetch and embed foreign records, with one-to-many or many-to-many
+    relationship, to _transient of the record.
+
+    For example, each "user" record has many "skill", with config field
+    name "user_has_skill". This function would fetch "skill" records that
+    are referenced by the "user" record, and embed the "skill" record list in
+    user['_transient']['user_has_skill'].
+    """
     reference_fields = export_config.get_many_reference_fields()
     record_id = record['_id'].split('/')[1]
 
