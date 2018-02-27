@@ -18,9 +18,11 @@ class SkygearSchema:
 
 class SkygearRecord:
 
+    record_type = ''
     fields = []
 
-    def __init__(self, fields):
+    def __init__(self, record_type, fields):
+        self.record_type = record_type
         self.fields = fields
 
 

@@ -67,6 +67,8 @@ def main():
         'country': {'$type': 'ref', '$id': 'country/hk'},
         'name': context['username'],
         'email': context['username'] + '@oursky.com',
+        'json': {'a': 'b'},
+        'location': {'$type': 'geo', '$lat': 22, '$lng': 114},
     }]
     data = send_action('record:save', {
         'database_id': '_public',

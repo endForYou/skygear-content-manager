@@ -62,6 +62,7 @@ records:
             - name: _created_at
             - name: _updated_at
             - name: email
+              label: Email
             - name: city
               label: City
               reference_target: city
@@ -69,12 +70,21 @@ records:
             - name: country
               label: Country
               reference_target: country
-              reference_field_name: _id
+              reference_field_name: display_name
             - name: has_skills
               label: Has skills
               reference_target: skill
               reference_field_name: _id
               reference_via_association_record: user_has_skill
+            - name: has_skills
+              label: Has skills (name)
+              reference_target: skill
+              reference_field_name: display_name
+              reference_via_association_record: user_has_skill
+            - name: json
+              label: Data
+            - name: location
+              label: Location
     show:
       fields:
         - type: _id
