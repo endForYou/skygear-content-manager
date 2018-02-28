@@ -259,8 +259,7 @@ def save_records(records, database_id = '_public'):
         'database_id': database_id,
         'records': records
     })
-    data = resp.body.data
-    return data.get('result', data['error'])
+    return resp.body.data['result']
 
 
 def fetch_records(record_type, predicate = None, includes = []):

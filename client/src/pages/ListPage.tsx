@@ -4,8 +4,9 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { Dispatch } from 'redux';
-import skygear, { Record } from 'skygear';
+import { Record } from 'skygear';
 
+import { importRecords } from '../actions/import';
 import { RecordActionDispatcher } from '../actions/record';
 import {
   BooleanFilterQueryType,
@@ -18,15 +19,18 @@ import {
   filterFactory,
   FilterType,
   GeneralFilter,
+  ImportActionConfig,
   IntegerFilter,
   IntegerFilterQueryType,
   ListActionConfig,
+  ListActionConfigTypes,
   ListPageConfig,
   StringFilter,
   StringFilterQueryType,
 } from '../cmsConfig';
 import { ExportButton } from '../components/ExportButton';
 import { FilterList } from '../components/FilterList';
+import { ImportButton } from '../components/ImportButton';
 import Pagination from '../components/Pagination';
 import { Field, FieldContext } from '../fields';
 import { RootState } from '../states';
@@ -109,18 +113,6 @@ const ListTable: React.SFC<ListTableProps> = ({ fieldConfigs, records }) => {
   );
 };
 
-function ActionButtonFactory(
-  recordName: string,
-  actionConfig: ListActionConfig
-) {
-  switch (actionConfig.type) {
-    case 'Export':
-      return <ExportButton actionConfig={actionConfig} />;
-    default:
-      return null;
-  }
-}
-
 export type ListPageProps = StateProps & DispatchProps;
 
 export interface StateProps {
@@ -163,6 +155,8 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
     );
 
     this.fetchList = debounce(this.fetchList.bind(this), 200);
+
+    this.onImportFileSelected = this.onImportFileSelected.bind(this);
   }
 
   public componentDidMount() {
@@ -289,6 +283,30 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
     this.fetchList(page, pageConfig.perPage, filters);
   }
 
+  public onImportFileSelected(actionConfig: ImportActionConfig, file: File) {
+    const { dispatch } = this.props;
+    dispatch(importRecords(actionConfig.name, file));
+  }
+
+  public renderActionButton(
+    recordName: string,
+    actionConfig: ListActionConfig
+  ) {
+    switch (actionConfig.type) {
+      case ListActionConfigTypes.Export:
+        return <ExportButton actionConfig={actionConfig} />;
+      case ListActionConfigTypes.Import:
+        return (
+          <ImportButton
+            actionConfig={actionConfig}
+            onFileSelected={this.onImportFileSelected}
+          />
+        );
+      default:
+        return null;
+    }
+  }
+
   public renderActionButtons() {
     const { recordName, pageConfig: { actions } } = this.props;
 
@@ -304,7 +322,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
     );
 
     const actionsButtons = [
-      ...actions.map(action => ActionButtonFactory(recordName, action)),
+      ...actions.map(action => this.renderActionButton(recordName, action)),
       newRecordButton,
     ];
 

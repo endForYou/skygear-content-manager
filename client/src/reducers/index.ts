@@ -4,6 +4,7 @@ import { combineReducers, Reducer } from 'redux';
 import { RootState } from '../states';
 
 import auth from './auth';
+import importReducer from './import';
 import { recordViewsByNameReducerFactory } from './recordFactory';
 
 const constReducer = (state = {}) => {
@@ -17,6 +18,7 @@ function rootReducerFactory(recordNames: string[]) {
   return combineReducers<RootState>({
     auth: auth as Reducer<any>,
     cmsConfig: constReducer as Reducer<any>,
+    import: importReducer as Reducer<any>,
     recordViewsByName: recordViewsByNameReducerFactory(recordNames) as Reducer<
       any
     >,

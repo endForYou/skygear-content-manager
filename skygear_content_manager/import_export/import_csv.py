@@ -1,4 +1,5 @@
 import csv
+import uuid
 
 from .csv_deserializer import RecordDeserializer
 from ..skygear_utils import (save_records, fetch_records, eq_predicate,
@@ -106,23 +107,33 @@ def import_records(records):
 
     resp = {'result': []}
     if len(records) > 0:
-        resp = save_records(records)
+        resp['result'] = save_records(records)
 
-    result = resp.get('result')
-    if result != None:
-        for item in index_mappings:
-            index = item[0]
-            value = item[1]
-            if isinstance(value, DuplicateIdentifierValueException):
-                value = {
-                    '_id': value.id,
-                    '_type': 'error',
-                    'code': 109,
-                    'message': str(value),
-                    'name': 'DuplicateIdentifierValueException',
-                }
+    success_count = 0
+    error_count = 0
+    result = resp['result']
+    for item in index_mappings:
+        index = item[0]
+        value = item[1]
+        if isinstance(value, DuplicateIdentifierValueException):
+            value = {
+                '_id': value.id,
+                '_type': 'error',
+                'code': 109,
+                'message': str(value),
+                'name': 'DuplicateIdentifierValueException',
+            }
 
-            result.insert(index, value)
+        result.insert(index, value)
+
+    for item in result:
+        if item['_type'] == 'record':
+            success_count = success_count + 1
+        else:
+            error_count = error_count + 1
+
+    resp['success_count'] = success_count
+    resp['error_count'] = error_count
 
     return resp
 
@@ -217,6 +228,8 @@ def populate_record_id(data_list, import_config, identifier_map):
                 result.append(data)
             except DuplicateIdentifierValueException as e:
                 result.append(e)
+        else:
+            result.append(data)
 
     return result
 
