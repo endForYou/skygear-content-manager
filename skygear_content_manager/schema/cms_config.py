@@ -12,19 +12,6 @@ from ..models.cms_config import (CMSConfig, CMSRecord, CMSRecordList,
                                  CMSRecordImportReference)
 
 
-# constants
-reserved_fields = [{
-    'name': '_id',
-    'type': 'string',
-}, {
-    'name': '_created_at',
-    'type': 'datetime',
-}, {
-    'name': '_updated_at',
-    'type': 'datetime',
-}]
-
-
 class NestedDict(fields.Nested):
     def __init__(self, nested, key, *args, **kwargs):
         super(NestedDict, self).__init__(nested, many=True, *args, **kwargs)
@@ -173,25 +160,27 @@ class CMSRecordExportFieldSchema(Schema):
         schema = self.context['schema']
         field = schema.field_of(data['record_type'], data['name'])
 
-        matched_reserved_field = None
-        for reserved_field in reserved_fields:
-            if reserved_field['name'] == data['name']:
-                matched_reserved_field = reserved_field
-                break
-
         type = None
         reference = None
-        if field:
+        if field and field.is_ref:
+            type = 'reference'
+            foreign_field = schema.field_of(data['reference_target'],
+                                            data['reference_field_name'])
+            if not foreign_field:
+                raise Exception((
+                    'field name "{reference_target}.{reference_field_name}" ' +
+                    'not found in schema.'
+                ).format(**data))
+
+            reference = CMSRecordExportReference(
+                ref_type=CMSRecordExportReference.REF_TYPE_DIRECT,
+                name=field.name,
+                target=field.ref_target,
+                field_name=data['reference_field_name'],
+                field_type=foreign_field.type,
+            )
+        elif field:
             type = field.type
-            if field.is_ref:
-                reference = CMSRecordExportReference(
-                    ref_type=CMSRecordExportReference.REF_TYPE_DIRECT,
-                    name=field.name,
-                    target=field.ref_target,
-                    field_name=data['reference_field_name'],
-                )
-        elif matched_reserved_field:
-            type = matched_reserved_field['type']
         else:
             if 'reference_via_association_record' not in data and \
                'reference_via_back_reference' not in data:
@@ -213,11 +202,15 @@ class CMSRecordExportFieldSchema(Schema):
                     CMSRecordExportReference.REF_TYPE_VIA_ASSOCIATION_RECORD
                 ref_name = data['reference_via_association_record']
 
+            foreign_field = schema.field_of(data['reference_target'],
+                                            data['reference_field_name'])
+
             reference = CMSRecordExportReference(
                 ref_type=ref_type,
                 name=ref_name,
                 target=data['reference_target'],
                 field_name=data['reference_field_name'],
+                field_type=foreign_field.type,
             )
 
         data['type'] = type
@@ -318,24 +311,26 @@ class CMSRecordImportFieldSchema(Schema):
         schema = self.context['schema']
         field = schema.field_of(data['record_type'], data['name'])
 
-        matched_reserved_field = None
-        for reserved_field in reserved_fields:
-            if reserved_field['name'] == data['name']:
-                matched_reserved_field = reserved_field
-                break
-
         type = None
         reference = None
-        if field:
+        if field and field.is_ref:
+            type = 'reference'
+            foreign_field = schema.field_of(data['reference_target'],
+                                            data['reference_field_name'])
+            if not foreign_field:
+                raise Exception((
+                    'field name "{reference_target}.{reference_field_name}" ' +
+                    'not found in schema.'
+                ).format(**data))
+
+            reference = CMSRecordImportReference(
+                name=field.name,
+                target=field.ref_target,
+                field_name=data['reference_field_name'],
+                field_type=foreign_field.type,
+            )
+        elif field:
             type = field.type
-            if field.is_ref:
-                reference = CMSRecordImportReference(
-                    name=field.name,
-                    target=field.ref_target,
-                    field_name=data['reference_field_name'],
-                )
-        elif matched_reserved_field:
-            type = matched_reserved_field['type']
         else:
             raise Exception((
                 'field name "{record_type}.{name}" ' +

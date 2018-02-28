@@ -1,3 +1,4 @@
+import arrow
 import json
 
 
@@ -42,25 +43,46 @@ class FieldSerializer:
         if value == None:
             return ''
 
+        serializer = self.get_serializer(value)
+
+        if not serializer:
+            field_name = self.field_config.name \
+                         if not self.field_config.reference \
+                         else self.field_config.reference.field_name
+
+            raise Exception((
+                'field "{}" has unsupported field type "{}"'
+            ).format(field_name, self.field_config.type))
+
+        return serializer.serialize(value)
+
+    def get_serializer(self, value):
         serializer = None
+        type = self.field_config.type \
+               if not self.field_config.reference \
+               else self.field_config.reference.field_type
+
         if self.field_config.reference and \
            self.field_config.reference.is_many and \
            isinstance(value, list):
             serializer = ListSerializer()
             serializer.field_serializer = self
-        elif self.field_config.type == 'string':
+        elif type == 'string':
             serializer = StringSerializer()
-        elif self.field_config.type == 'boolean':
+        elif type in 'number':
+            serializer = StringSerializer()
+        elif type == 'boolean':
             serializer = BooleanSerializer()
-        elif self.field_config.type == 'json':
+        elif type == 'json':
             serializer = JSONSerializer()
-        elif self.field_config.type == 'location':
+        elif type == 'location':
             serializer = LocationSerializer()
-
-        if not serializer:
+        elif type == 'datetime':
+            serializer = DatetimeSerializer()
+        elif type == 'integer':
             serializer = StringSerializer()
 
-        return serializer.serialize(value)
+        return serializer
 
 
 class BaseValueSerializer:
@@ -147,3 +169,14 @@ class LocationSerializer(BaseValueSerializer):
 
     def serialize(self, value):
         return '(' + str(value['$lat']) + ',' + str(value['$lng']) + ')'
+
+
+class DatetimeSerializer(BaseValueSerializer):
+
+    @property
+    def default_format(self):
+        return 'YYYY-MM-DDTHH:MM:SS.mmmmmm'
+
+    def serialize(self, value):
+        datetime = arrow.get(value)
+        return datetime.format(self.format)

@@ -119,12 +119,14 @@ class CMSRecordExportReference:
     name = ''
     target = ''
     field_name = ''
+    field_type = ''
 
-    def __init__(self, ref_type, name, target, field_name):
+    def __init__(self, ref_type, name, target, field_name, field_type):
         self.ref_type = ref_type
         self.name = name
         self.target = target
         self.field_name = field_name
+        self.field_type = field_type
 
     @property
     def is_direct(self):
@@ -212,8 +214,10 @@ class CMSRecordImportReference:
     name = ''
     target = ''
     field_name = ''
+    field_type = ''
 
-    def __init__(self, name, target, field_name):
+    def __init__(self, name, target, field_name, field_type):
         self.name = name
         self.target = target
         self.field_name = field_name
+        self.field_type = field_type

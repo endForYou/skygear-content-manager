@@ -1,6 +1,7 @@
+import arrow
 import json
 import re
-import skygear
+import strict_rfc3339
 
 
 class RecordDeserializer:
@@ -31,22 +32,40 @@ class FieldDeserializer:
         self.field_config = field_config
 
     def deserialize(self, value):
+        deserializer = self.get_deserializer()
+
+        if not deserializer:
+            field_name = self.field_config.name \
+                         if not self.field_config.reference \
+                         else self.field_config.reference.field_name
+
+            raise Exception((
+                'field "{}" has unsupported field type "{}"'
+            ).format(field_name, self.field_config.type))
+
+        return deserializer.deserialize(value)
+
+    def get_deserializer(self):
         deserializer = None
-        if self.field_config.type == 'string':
+
+        if self.field_config.reference:
+            deserializer = ReferenceDeserializer()
+        elif self.field_config.type == 'string':
             deserializer = StringDeserializer()
+        elif self.field_config.type == 'number':
+            deserializer = NumberDeserializer()
         elif self.field_config.type == 'boolean':
             deserializer = BooleanDeserializer()
         elif self.field_config.type == 'json':
             deserializer = JSONDeserializer()
         elif self.field_config.type == 'location':
             deserializer = LocationDeserializer()
-        elif self.field_config.reference:
-            deserializer = ReferenceDeserializer()
+        elif self.field_config.type == 'datetime':
+            deserializer = DatetimeDeserializer()
+        elif self.field_config.type == 'integer':
+            deserializer = IntegerDeserializer()
 
-        if not deserializer:
-            deserializer = StringDeserializer()
-
-        return deserializer.deserialize(value)
+        return deserializer
 
 
 class BaseValueDeserializer:
@@ -71,6 +90,12 @@ class StringDeserializer(BaseValueDeserializer):
 
     def deserialize(self, value):
         return value
+
+
+class NumberDeserializer(BaseValueDeserializer):
+
+    def deserialize(self, value):
+        return float(value)
 
 
 class BooleanDeserializer(BaseValueDeserializer):
@@ -110,3 +135,19 @@ class LocationDeserializer(BaseValueDeserializer):
             }
         except:
             return None
+
+
+class DatetimeDeserializer(BaseValueDeserializer):
+
+    def deserialize(self, value):
+        ts = arrow.get(value).timestamp
+        return {
+            '$type': 'date',
+            '$date': strict_rfc3339.timestamp_to_rfc3339_utcoffset(ts),
+        }
+
+
+class IntegerDeserializer(BaseValueDeserializer):
+
+    def deserialize(self, value):
+        return int(value)
