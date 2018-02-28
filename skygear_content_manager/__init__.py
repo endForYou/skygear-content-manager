@@ -10,7 +10,7 @@ from urllib.parse import parse_qs
 
 from .import_export import (RecordSerializer, RecordDeserializer,
                             RecordIdentifierMap, render_records,
-                            prepare_import_records)
+                            prepare_import_records, import_records)
 from .import_export import prepare_response as prepare_export_response
 from .models.cms_config import CMSConfig
 from .schema.cms_config import CMSConfigSchema
@@ -169,7 +169,7 @@ def includeme(settings):
             next(fp)
             records = prepare_import_records(fp, import_config)
 
-        resp = save_records(records)
+        resp = import_records(records)
         return resp
 
 

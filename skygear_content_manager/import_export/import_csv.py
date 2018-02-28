@@ -1,18 +1,25 @@
 import csv
 
 from .csv_deserializer import RecordDeserializer
-from ..skygear_utils import fetch_records, eq_predicate, or_predicate
+from ..skygear_utils import (save_records, fetch_records, eq_predicate,
+                             or_predicate)
+from ..models.cms_config import CMSRecordImport
 
 
 class RecordIdentifierMap:
     """
     A custom identifier to record id mapping.
+
+    If allow_duplicate_value is False, error is thrown when getting record_id
+    of a certain value.
     """
 
     backup = {}
+    allow_duplicate_value = True
 
-    def __init__(self):
+    def __init__(self, allow_duplicate_value = True):
         self.backup = {}
+        self.allow_duplicate_value = allow_duplicate_value
 
     def get(self, record_type, key, value):
         if key == '_id':
@@ -23,7 +30,14 @@ class RecordIdentifierMap:
         if not mapping:
             return None
 
-        return mapping.get(value)
+        record_ids = mapping.get(value)
+        if not record_ids or len(record_ids) == 0:
+            return None
+
+        if len(record_ids) > 1 and not self.allow_duplicate_value:
+            raise(DuplicateIdentifierValueException(record_type, key, value))
+
+        return record_ids[0]
 
     def set(self, record_type, key, value, record_id):
         if key == '_id':
@@ -35,7 +49,22 @@ class RecordIdentifierMap:
             mapping = {}
             self.backup[mapping_key_for_keypath] = mapping
 
-        mapping[value] = record_id
+        record_ids = mapping.get(value)
+        if not record_ids:
+            record_ids = []
+            mapping[value] = record_ids
+
+        record_ids.append(record_id)
+
+
+class DuplicateIdentifierValueException(Exception):
+
+    def __init__(self, record_type, key, value):
+        message = 'duplicate identifier value for "{}.{} == {}"' \
+                  .format(record_type, key, value)
+        super(DuplicateIdentifierValueException, self).__init__(message)
+
+        self.id = None
 
 
 def prepare_import_records(stream, import_config):
@@ -48,21 +77,54 @@ def prepare_import_records(stream, import_config):
 
     identifier_map = create_identifier_map(data_list, import_config)
 
-    populate_record_id(data_list, import_config, identifier_map)
-    populate_record_reference(data_list, import_config, identifier_map)
+    data_list = populate_record_id(data_list, import_config, identifier_map)
+    data_list = populate_record_reference(data_list, import_config, identifier_map)
 
     deserializer = RecordDeserializer(import_config.fields)
     records = deserialize_record_data(data_list, deserializer)
 
     for record in records:
-        if not record['_id']:
-            record['_id'] = str(uuid.uuid4())
+        if not isinstance(record, DuplicateIdentifierValueException):
+            if not record['_id']:
+                record['_id'] = str(uuid.uuid4())
 
-        id_prefix = import_config.record_type + '/'
-        if record['_id'][:len(id_prefix)] != id_prefix:
-            record['_id'] = '{}{}'.format(id_prefix, record['_id'])
+            id_prefix = import_config.record_type + '/'
+            if record['_id'][:len(id_prefix)] != id_prefix:
+                record['_id'] = '{}{}'.format(id_prefix, record['_id'])
 
     return records
+
+
+def import_records(records):
+    """
+    Extract non-record data from the list and save.
+    """
+    index_mappings = []
+    for i in range(len(records)):
+        if isinstance(records[i], DuplicateIdentifierValueException):
+            index_mappings.append((i, records.pop(i)))
+
+    resp = {'result': []}
+    if len(records) > 0:
+        resp = save_records(records)
+
+    result = resp.get('result')
+    if result != None:
+        for item in index_mappings:
+            index = item[0]
+            value = item[1]
+            if isinstance(value, DuplicateIdentifierValueException):
+                value = {
+                    '_id': value.id,
+                    '_type': 'error',
+                    'code': 109,
+                    'message': str(value),
+                    'name': 'DuplicateIdentifierValueException',
+                }
+
+            result.insert(index, value)
+
+    return resp
 
 
 def project_csv_data(row, import_config):
@@ -78,7 +140,9 @@ def create_identifier_map(data_list, import_config):
     - Query record by custom identifier.
     - Map the queried record id to custom identifier value.
     """
-    identifier_map = RecordIdentifierMap()
+    identifier_map = RecordIdentifierMap(
+        allow_duplicate_value=import_config.reference_handling == CMSRecordImport.REFERENCE_HANDLING_USE_FIRST
+    )
     reference_fields = import_config.get_reference_fields()
 
     # for record custom id
@@ -115,16 +179,24 @@ def populate_record_reference(data_list, import_config, identifier_map):
     """
     For each reference field, find and assign reference id from identifier map.
     """
+    result = []
     reference_fields = import_config.get_reference_fields()
     for data in data_list:
-        # merge data with reference
-        for reference_field in reference_fields:
-            reference = reference_field.reference
-            data[reference_field.name] = identifier_map.get(
-                record_type=reference.target,
-                key=reference.field_name,
-                value=data[reference_field.name]
-            )
+        try:
+            # merge data with reference
+            for reference_field in reference_fields:
+                reference = reference_field.reference
+                data[reference_field.name] = identifier_map.get(
+                    record_type=reference.target,
+                    key=reference.field_name,
+                    value=data[reference_field.name]
+                )
+            result.append(data)
+        except DuplicateIdentifierValueException as e:
+            e.id = data.get('_id')
+            result.append(e)
+
+    return result
 
 
 def populate_record_id(data_list, import_config, identifier_map):
@@ -132,24 +204,34 @@ def populate_record_id(data_list, import_config, identifier_map):
     If import config use custom identifier, find and assign record id from
     identifier map.
     """
+    result = []
     record_type = import_config.record_type
     for data in data_list:
         if import_config.identifier != '_id':
-            data['_id'] = identifier_map.get(
-                record_type=record_type,
-                key=import_config.identifier,
-                value=data[import_config.identifier]
-            )
+            try:
+                data['_id'] = identifier_map.get(
+                    record_type=record_type,
+                    key=import_config.identifier,
+                    value=data[import_config.identifier]
+                )
+                result.append(data)
+            except DuplicateIdentifierValueException as e:
+                result.append(e)
+
+    return result
 
 
 def deserialize_record_data(data_list, deserializer):
     records = []
     for data in data_list:
-        record = deserializer.deserialize(data)
+        if not isinstance(data, DuplicateIdentifierValueException):
+            record = deserializer.deserialize(data)
 
-        # record id does not exist in record if using custom identifier
-        record['_id'] = data['_id']
-        records.append(record)
+            # record id does not exist in record if using custom identifier
+            record['_id'] = data['_id']
+            records.append(record)
+        else:
+            records.append(data)
 
     return records
 
