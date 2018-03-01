@@ -58,22 +58,24 @@ cms_config = None
 def includeme(settings):
     @skygear.event('after-plugins-ready')
     def after_plugins_ready(config):
-        global cms_config
+        cms_config = CMSConfig.empty()
         try:
             cms_config = parse_cms_config()
         except Exception as e:
-            cms_config = CMSConfig.empty()
             logger.error(e)
+
+        set_cms_config(cms_config)
 
 
     @skygear.event('schema-changed')
     def schema_change(config):
-        global cms_config
+        cms_config = CMSConfig.empty()
         try:
             cms_config = parse_cms_config()
         except Exception as e:
-            cms_config = CMSConfig.empty()
             logger.error(e)
+
+        set_cms_config(cms_config)
 
 
     @skygear.handler('cms/')
@@ -131,7 +133,7 @@ def includeme(settings):
         data = req.body.data
         name = data.get('export_name')
 
-        global cms_config
+        cms_config = get_cms_config()
         export_config = cms_config.get_export_config(name)
         if not export_config:
             return skygear.Response('Export config not found', 404)
@@ -505,6 +507,16 @@ def fetch_records(record_type, predicate = None, includes = []):
 
 def eq_predicate(key, value):
     return ['eq', {'$type': 'keypath', '$val': key}, value]
+
+
+def set_cms_config(_cms_config):
+    global cms_config
+    cms_config = _cms_config
+
+
+def get_cms_config():
+    global cms_config
+    return cms_config
 
 
 def transient_foreign_records(record, export_config, association_records):
