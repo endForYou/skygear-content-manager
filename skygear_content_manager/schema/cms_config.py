@@ -1,6 +1,6 @@
 import sys
 
-from marshmallow import Schema, fields, post_load, pre_load
+from marshmallow import Schema, fields, post_load, pre_load, ValidationError
 
 from ..models.cms_config import (CMSConfig, CMSRecord, CMSRecordList,
                                  CMSRecordExport, CMSRecordExportField,
@@ -78,6 +78,9 @@ class RecordListActionField(fields.Field):
         schema = schema_cls()
         schema.context = self.context
         valid_data = schema.load(value)
+        if valid_data.errors:
+            raise ValidationError(valid_data.errors)
+
         return valid_data.data
 
 

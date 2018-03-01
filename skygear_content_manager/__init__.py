@@ -1,8 +1,10 @@
 import json
+import logging
 import os
 import yaml
 
 from jose import JWTError, jwt
+from marshmallow import ValidationError
 import requests
 import skygear
 from skygear import static_assets
@@ -11,9 +13,12 @@ from skygear.utils.assets import directory_assets
 
 from .import_export import RecordSerializer, render_records
 from .import_export import prepare_response as prepare_export_response
+from .models.cms_config import CMSConfig
 from .schema.cms_config import CMSConfigSchema
 from .schema.skygear_schema import SkygearSchemaSchema
 
+
+logger = logging.getLogger('skygear_content_manager')
 
 CMS_USER_PERMITTED_ROLE = os.environ.get('CMS_USER_PERMITTED_ROLE', 'Admin')
 CMS_AUTH_SECRET = os.environ.get('CMS_AUTH_SECRET', 'FAKE_AUTH_SECRET')
@@ -53,17 +58,24 @@ cms_config = None
 def includeme(settings):
     @skygear.event('after-plugins-ready')
     def after_plugins_ready(config):
-        schema = SkygearSchemaSchema().load(get_schema()).data
+        cms_config = CMSConfig.empty()
+        try:
+            cms_config = parse_cms_config()
+        except Exception as e:
+            logger.error(e)
 
-        r = requests.get(CMS_CONFIG_FILE_URL)
-        config = yaml.load(r.text)
+        set_cms_config(cms_config)
 
-        config_schema = CMSConfigSchema()
-        config_schema.context = {'schema': schema}
-        result = config_schema.load(config)
 
-        global cms_config
-        cms_config = result.data
+    @skygear.event('schema-changed')
+    def schema_change(config):
+        cms_config = CMSConfig.empty()
+        try:
+            cms_config = parse_cms_config()
+        except Exception as e:
+            logger.error(e)
+
+        set_cms_config(cms_config)
 
 
     @skygear.handler('cms/')
@@ -121,8 +133,11 @@ def includeme(settings):
         data = req.body.data
         name = data.get('export_name')
 
-        global cms_config
+        cms_config = get_cms_config()
         export_config = cms_config.get_export_config(name)
+        if not export_config:
+            return skygear.Response('Export config not found', 404)
+
         record_type = export_config.record_type
         includes = export_config.get_reference_targets()
 
@@ -457,6 +472,24 @@ def get_roles(json_body):
     return roles
 
 
+def parse_cms_config():
+    schema = SkygearSchemaSchema().load(get_schema()).data
+
+    r = requests.get(CMS_CONFIG_FILE_URL)
+    if not (200 <= r.status_code <= 299):
+        raise Exception('Failed to get cms config yaml file')
+
+    config = yaml.load(r.text)
+
+    config_schema = CMSConfigSchema()
+    config_schema.context = {'schema': schema}
+    result = config_schema.load(config)
+    if result.errors:
+        raise ValidationError(result.errors)
+
+    return result.data
+
+
 def get_schema():
     resp = request_skygear_api('schema:fetch')
     return resp.body.data['result']
@@ -474,6 +507,16 @@ def fetch_records(record_type, predicate = None, includes = []):
 
 def eq_predicate(key, value):
     return ['eq', {'$type': 'keypath', '$val': key}, value]
+
+
+def set_cms_config(_cms_config):
+    global cms_config
+    cms_config = _cms_config
+
+
+def get_cms_config():
+    global cms_config
+    return cms_config
 
 
 def transient_foreign_records(record, export_config, association_records):
