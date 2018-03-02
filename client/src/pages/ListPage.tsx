@@ -290,12 +290,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
   }
 
   public renderActionButtons() {
-    const {
-      recordName,
-      pageConfig: {
-        actions
-      },
-    } = this.props;
+    const { recordName, pageConfig: { actions } } = this.props;
 
     // TODO (Steven-Chan):
     // Add action type `New`
@@ -309,17 +304,16 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
     );
 
     const actionsButtons = [
-      ...(actions.map(action =>
-        ActionButtonFactory(recordName, action)
-      )),
+      ...actions.map(action => ActionButtonFactory(recordName, action)),
       newRecordButton,
     ];
 
-    return actionsButtons
+    return actionsButtons.reduce((
+      prev: JSX.Element | null,
+      current: JSX.Element | null,
+      index: number
       // tslint:disable-next-line: no-any
-      .reduce((prev: JSX.Element | null, current: JSX.Element | null): any =>
-        [prev, (<span>&nbsp;</span>), current]
-      );
+    ): any => [prev, <span key={index}>&nbsp;</span>, current]);
   }
 
   public render() {

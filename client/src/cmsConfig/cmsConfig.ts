@@ -186,8 +186,7 @@ interface ConfigContext {
   associationRecordByName: AssociationRecordByName;
 }
 
-export type ListActionConfig =
-  ExportActionConfig;
+export type ListActionConfig = ExportActionConfig;
 export enum ListActionConfigTypes {
   Export = 'Export',
 

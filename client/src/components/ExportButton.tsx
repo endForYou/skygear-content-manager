@@ -1,8 +1,6 @@
 import * as React from 'react';
 import skygear from 'skygear';
-import {
-  ExportActionConfig
-} from '../cmsConfig';
+import { ExportActionConfig } from '../cmsConfig';
 
 export interface ExportButtonProps {
   actionConfig: ExportActionConfig;
@@ -18,11 +16,7 @@ export const ExportButton: React.SFC<ExportButtonProps> = props => {
   const title = actionConfig.label || actionConfig.name;
 
   return (
-    <a
-      className="btn btn-light"
-      href={action}
-      target="_blank"
-    >
+    <a className="btn btn-light" href={action} target="_blank">
       {title}
     </a>
   );
