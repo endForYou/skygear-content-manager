@@ -7,7 +7,6 @@ export interface ImportButtonProps {
 }
 
 export class ImportButton extends React.PureComponent<ImportButtonProps> {
-
   private fileInput: HTMLInputElement | null;
 
   constructor(props: ImportButtonProps) {
@@ -39,18 +38,15 @@ export class ImportButton extends React.PureComponent<ImportButtonProps> {
     const title = actionConfig.label || actionConfig.name;
 
     return (
-      <div
-        className="btn btn-light"
-        onClick={this.onClick}
-      >
+      <a href="#" className="btn btn-light" onClick={this.onClick}>
         {title}
         <input
-          ref={ref => this.fileInput = ref}
-          style={{display: 'none'}}
+          ref={ref => (this.fileInput = ref)}
+          style={{ display: 'none' }}
           type="file"
           onChange={this.onChange}
         />
-      </div>
+      </a>
     );
   }
 }

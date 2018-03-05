@@ -3,6 +3,7 @@ import requests
 import skygear
 
 from jose import JWTError, jwt
+from skygear.error import PermissionDenied
 from skygear.options import options
 
 from .settings import CMS_AUTH_SECRET
@@ -134,12 +135,24 @@ class SkygearResponse:
 
         self.headers['X-Skygear-Access-Token'] = access_token
 
+    @classmethod
+    def forbidden_werkzeug(cls):
+        data = {
+            'error': {
+                'code': PermissionDenied,
+                'message': 'You are not permitted to access CMS',
+                'name': 'PermissionDenied',
+            }
+        }
+        return skygear.Response(
+            json.dumps(data).encode('utf-8'),
+            403,
+            mimetype='application/json',
+        )
+
     def to_werkzeug(self):
         if self.is_forbidden:
-            return skygear.Response(
-                'You are not permitted to access CMS',
-                403
-            )
+            return SkygearResponse.forbidden_werkzeug()
 
         filtered_headers = [
             (k, v)

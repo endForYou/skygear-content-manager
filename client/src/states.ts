@@ -79,11 +79,13 @@ export const initialRecordViewState: RecordViewState = {
 };
 
 export interface ImportState {
-  importRecord: Remote<ImportResult>;
+  errorMessage: string;
+  importResult?: Remote<ImportResult>;
 }
 
 export const initialImportState: ImportState = {
-  importRecord: RemoteLoading,
+  errorMessage: '',
+  importResult: undefined,
 };
 
 export function initialRootState(
