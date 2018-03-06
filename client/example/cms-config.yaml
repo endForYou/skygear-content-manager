@@ -52,6 +52,13 @@ records:
           label: Country
           target: country
           displayFieldName: _id
+      filters:
+        - name: _created_at
+          type: DateTime
+          label: Created At
+        - name: email
+          type: String
+          label: Email
       actions:
         - type: Import
           name: import-user
