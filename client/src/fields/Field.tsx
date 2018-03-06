@@ -12,6 +12,7 @@ import { IntegerField } from './IntegerField';
 import { ReferenceField } from './ReferenceField';
 import { StringField } from './StringField';
 import { TextArea } from './TextArea';
+import { WYSIWYGEditor } from './WYSIWYGEditor';
 
 export type FieldProps = ChildProps<FieldConfig>;
 
@@ -56,6 +57,8 @@ export class Field extends React.PureComponent<FieldProps> {
         return <DateTimeField {...rest} config={config} />;
       case FieldConfigTypes.TextArea:
         return <TextArea {...rest} config={config} />;
+      case FieldConfigTypes.WYSIWYG:
+        return <WYSIWYGEditor {...rest} config={config} />;
       case FieldConfigTypes.Boolean:
         return <BooleanField {...rest} config={config} />;
       case FieldConfigTypes.Integer:

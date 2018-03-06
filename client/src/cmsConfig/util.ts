@@ -50,3 +50,22 @@ export function parseStringArray(
 
   throw new Error(`${context}.${fieldName} want an array, got ${typeof value}`);
 }
+
+export function parseOptionalBoolean(
+  // tslint:disable-next-line: no-any
+  a: any,
+  fieldName: string,
+  context: string
+): boolean | undefined {
+  const value = a[fieldName];
+
+  if (value == null) {
+    return undefined;
+  }
+
+  if (typeof value === 'boolean') {
+    return value;
+  }
+
+  throw new Error(`${context}.${fieldName} want a boolean, got ${typeof a}`);
+}
