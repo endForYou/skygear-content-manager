@@ -30,7 +30,15 @@ services:
     ports:
       - "3002:80"
     volumes:
-      - ./client:/usr/src/app
+      - ./client/@types:/usr/src/app/@types
+      - ./client/config:/usr/src/app/config
+      - ./client/example:/usr/src/app/example
+      - ./client/public:/usr/src/app/public
+      - ./client/scripts:/usr/src/app/scripts
+      - ./client/src:/usr/src/app/src
+      - ./client/.eslintrc.yml:/usr/src/app/.eslintrc.yml
+      - ./client/tsconfig.json:/usr/src/app/tsconfig.json
+      - ./client/tslint.json:/usr/src/app/tslint.json
     command: npm start
     environment:
       BROWSER: none
