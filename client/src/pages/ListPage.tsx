@@ -7,11 +7,12 @@ import { Dispatch } from 'redux';
 import { Record } from 'skygear';
 
 import { dismissImport, importRecords } from '../actions/import';
-import { RecordActionDispatcher } from '../actions/record';
+import { queryWithFilters, RecordActionDispatcher } from '../actions/record';
 import {
   BooleanFilterQueryType,
   DateTimeFilter,
   DateTimeFilterQueryType,
+  ExportActionConfig,
   FieldConfig,
   Filter,
   FilterConfig,
@@ -29,6 +30,7 @@ import {
   StringFilterQueryType,
 } from '../cmsConfig';
 import { ExportButton } from '../components/ExportButton';
+import { ExportModal } from '../components/ExportModal';
 import { FilterList } from '../components/FilterList';
 import { ImportButton } from '../components/ImportButton';
 import {
@@ -132,6 +134,7 @@ export interface StateProps {
 }
 
 interface State {
+  exporting?: ExportActionConfig;
   showfilterMenu: boolean;
   filters: Filter[];
 }
@@ -150,6 +153,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
     const filters: Filter[] = [];
 
     this.state = {
+      exporting: undefined,
       filters,
       showfilterMenu: false,
     };
@@ -301,7 +305,12 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
   ) {
     switch (actionConfig.type) {
       case ListActionConfigTypes.Export:
-        return <ExportButton actionConfig={actionConfig} />;
+        return (
+          <ExportButton
+            actionConfig={actionConfig}
+            onClick={() => this.setState({ exporting: actionConfig })}
+          />
+        );
       case ListActionConfigTypes.Import:
         return (
           <ImportButton
@@ -370,6 +379,24 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
     }
   }
 
+  public renderExportModal() {
+    if (!this.state.exporting) {
+      return undefined;
+    }
+
+    const recordType = this.props.recordName;
+    const filters = this.state.filters;
+    const query = queryWithFilters(filters, Record.extend(recordType));
+
+    return (
+      <ExportModal
+        query={query}
+        actionConfig={this.state.exporting}
+        onDismiss={() => this.setState({ exporting: undefined })}
+      />
+    );
+  }
+
   public render() {
     const {
       recordName,
@@ -386,6 +413,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
     return (
       <div>
         {this.renderImportModal()}
+        {this.renderExportModal()}
         <div className="navbar">
           <h1 className="display-4">{pageConfig.label}</h1>
           <div className="float-right">

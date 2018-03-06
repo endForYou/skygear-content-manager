@@ -369,7 +369,10 @@ function fetchRecordList(
   };
 }
 
-function queryWithFilters(filters: Filter[], recordCls: RecordCls): Query {
+export function queryWithFilters(
+  filters: Filter[],
+  recordCls: RecordCls
+): Query {
   const firstFilter = filters[0];
 
   if (
