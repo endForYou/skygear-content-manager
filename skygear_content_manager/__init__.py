@@ -1,3 +1,4 @@
+import json
 import tempfile
 import yaml
 
@@ -113,6 +114,7 @@ def includeme(settings):
         data = parse_qs(request.query_string.decode())
         name = data.get('export_name', [None])[0]
         key = data.get('key', [None])[0]
+        predicate_string = data.get('predicate', [None])[0]
 
         if not key:
             return SkygearResponse.forbidden().to_werkzeug()
@@ -129,7 +131,16 @@ def includeme(settings):
         record_type = export_config.record_type
         includes = export_config.get_reference_targets()
 
-        records = fetch_records(record_type, includes=includes)
+        predicate = None
+        if predicate_string:
+            try:
+                predicate = json.loads(predicate_string)
+            except Exception:
+                return skygear.Response('Invalid predicate', 400)
+
+        records = fetch_records(record_type,
+                                includes=includes,
+                                predicate=predicate)
         for record in records:
             transient_foreign_records(
                 record,
