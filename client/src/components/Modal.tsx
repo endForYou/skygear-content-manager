@@ -24,10 +24,6 @@ export interface FailureModalProps {
   errorMessage: string;
 }
 
-export interface CloseModalButtonProps {
-  onClick?: () => void;
-}
-
 const defaultBackDropStyle: React.CSSProperties = {
   backgroundColor: 'rgba(0, 0, 0, 0.5)',
 };
@@ -35,9 +31,7 @@ const defaultBackDropStyle: React.CSSProperties = {
 export const Modal: React.SFC<ModalProps> = props => {
   const { body, footer, onDismiss, show, title } = props;
 
-  const modalStyle: React.CSSProperties = {
-    ...defaultBackDropStyle,
-  };
+  const modalStyle: React.CSSProperties = {};
   if (show) {
     modalStyle.display = 'block';
   }
@@ -54,9 +48,14 @@ export const Modal: React.SFC<ModalProps> = props => {
   const footerElement = typeof footer === 'function' ? footer() : footer;
 
   return (
-    <div className="modal" style={modalStyle} tabIndex={-1} onClick={onDismiss}>
+    <div className="modal" style={modalStyle} tabIndex={-1}>
       <div className="modal-dialog">
-        <div className="modal-content">
+        <div
+          className="modal-backdrop"
+          style={defaultBackDropStyle}
+          onClick={onDismiss}
+        />
+        <div className="modal-content modal-above-backdrop">
           <div className="modal-header">
             <h5 className="modal-title">{title}</h5>
           </div>
@@ -65,19 +64,6 @@ export const Modal: React.SFC<ModalProps> = props => {
         </div>
       </div>
     </div>
-  );
-};
-
-export const CloseModalButton: React.SFC<CloseModalButtonProps> = props => {
-  return (
-    <a
-      href="#"
-      role="button"
-      className="btn btn-primary"
-      onClick={props.onClick}
-    >
-      Close
-    </a>
   );
 };
 
@@ -111,7 +97,16 @@ export function createFailureModal(title: string) {
         show={show}
         title={title}
         body={errorMessage}
-        footer={() => <CloseModalButton onClick={onDismiss} />}
+        footer={() => (
+          <a
+            href="#"
+            role="button"
+            className="btn btn-primary"
+            onClick={onDismiss}
+          >
+            Close
+          </a>
+        )}
         onDismiss={onDismiss}
       />
     );
