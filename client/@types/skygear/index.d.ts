@@ -122,6 +122,8 @@ declare module 'skygear' {
   }
 
   export class Container {
+    public endPoint: string;
+
     public auth: AuthContainer;
     public publicDB: Database;
     public pubsub: PubsubContainer;
@@ -133,7 +135,8 @@ declare module 'skygear' {
   }
 
   export class AuthContainer {
-    public currentUser(): Record | undefined;
+    public currentUser: Record | undefined;
+    public accessToken: string | undefined;
 
     public whoami(): Promise<Record>;
 

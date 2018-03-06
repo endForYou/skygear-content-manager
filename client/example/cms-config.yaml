@@ -53,7 +53,7 @@ records:
           target: country
           displayFieldName: _id
       actions:
-        - type: export
+        - type: Export
           name: export-user
           fields:
             - name: _id

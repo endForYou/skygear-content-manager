@@ -20,10 +20,12 @@ import {
   GeneralFilter,
   IntegerFilter,
   IntegerFilterQueryType,
+  ListActionConfig,
   ListPageConfig,
   StringFilter,
   StringFilterQueryType,
 } from '../cmsConfig';
+import { ExportButton } from '../components/ExportButton';
 import { FilterList } from '../components/FilterList';
 import Pagination from '../components/Pagination';
 import { Field, FieldContext } from '../fields';
@@ -106,6 +108,18 @@ const ListTable: React.SFC<ListTableProps> = ({ fieldConfigs, records }) => {
     </table>
   );
 };
+
+function ActionButtonFactory(
+  recordName: string,
+  actionConfig: ListActionConfig
+) {
+  switch (actionConfig.type) {
+    case 'Export':
+      return <ExportButton actionConfig={actionConfig} />;
+    default:
+      return null;
+  }
+}
 
 export type ListPageProps = StateProps & DispatchProps;
 
@@ -275,6 +289,33 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
     this.fetchList(page, pageConfig.perPage, filters);
   }
 
+  public renderActionButtons() {
+    const { recordName, pageConfig: { actions } } = this.props;
+
+    // TODO (Steven-Chan):
+    // Add action type `New`
+    const newRecordButton = (
+      <Link
+        className="btn btn-light float-right"
+        to={`/records/${recordName}/new`}
+      >
+        New
+      </Link>
+    );
+
+    const actionsButtons = [
+      ...actions.map(action => ActionButtonFactory(recordName, action)),
+      newRecordButton,
+    ];
+
+    return actionsButtons.reduce((
+      prev: JSX.Element | null,
+      current: JSX.Element | null,
+      index: number
+      // tslint:disable-next-line: no-any
+    ): any => [prev, <span key={index}>&nbsp;</span>, current]);
+  }
+
   public render() {
     const {
       recordName,
@@ -322,12 +363,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
                 </div>
               </div>
             )}
-            <Link
-              className="btn btn-light float-right"
-              to={`/records/${recordName}/new`}
-            >
-              New
-            </Link>
+            {this.renderActionButtons()}
           </div>
         </div>
 
