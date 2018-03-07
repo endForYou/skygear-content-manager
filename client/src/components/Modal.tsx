@@ -88,7 +88,7 @@ export function createLoadingModal(title: string) {
       <Modal
         show={show}
         title={title}
-        body={() =>
+        body={() => (
           <div>
             <img
               className="modal-lodaing-img img-fluid"
@@ -97,7 +97,7 @@ export function createLoadingModal(title: string) {
             />
             <p className="modal-loading-text">In Progress...</p>
           </div>
-        }
+        )}
       />
     );
   };
