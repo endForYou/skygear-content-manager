@@ -10,11 +10,7 @@ import {
 } from '../types';
 
 function errorMessageFromError(error: Error) {
-  console.log('errorMessageFromError', error, isOutlawError(error));
   if (isOutlawError(error)) {
-    console.log('errorMessageFromError isOutlawError', error);
-    console.log('errorMessageFromError isOutlawError', error.error);
-    console.log('errorMessageFromError isOutlawError', error.error.message);
     return `Failed to import: ${error.error.message}`;
   }
 
