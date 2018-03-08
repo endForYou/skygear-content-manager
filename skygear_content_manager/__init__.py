@@ -1,57 +1,27 @@
-import json
-import logging
-import os
+import tempfile
 import yaml
 
-from jose import JWTError, jwt
 from marshmallow import ValidationError
 import requests
 import skygear
 from skygear import static_assets
-from skygear.options import options
 from skygear.utils.assets import directory_assets
 from urllib.parse import parse_qs
 
-from .import_export import RecordSerializer, render_records
+from .import_export import (RecordSerializer, RecordDeserializer,
+                            RecordIdentifierMap, render_records,
+                            prepare_import_records, import_records)
 from .import_export import prepare_response as prepare_export_response
 from .models.cms_config import CMSConfig
 from .schema.cms_config import CMSConfigSchema
 from .schema.skygear_schema import SkygearSchemaSchema
+from .settings import (CMS_USER_PERMITTED_ROLE, CMS_SKYGEAR_ENDPOINT,
+                       CMS_SKYGEAR_API_KEY, CMS_PUBLIC_URL, CMS_STATIC_URL,
+                       CMS_SITE_TITLE, CMS_CONFIG_FILE_URL)
+from .skygear_utils import (SkygearRequest, SkygearResponse, AuthData,
+                            request_skygear, get_schema, save_records,
+                            fetch_records, eq_predicate)
 
-
-logger = logging.getLogger('skygear_content_manager')
-
-CMS_USER_PERMITTED_ROLE = os.environ.get('CMS_USER_PERMITTED_ROLE', 'Admin')
-CMS_AUTH_SECRET = os.environ.get('CMS_AUTH_SECRET', 'FAKE_AUTH_SECRET')
-
-# cms index params
-
-CMS_SKYGEAR_ENDPOINT = \
-    os.environ.get('CMS_SKYGEAR_ENDPOINT', 'http://localhost:3000/')
-CMS_SKYGEAR_API_KEY = \
-    os.environ.get('CMS_SKYGEAR_API_KEY', 'FAKE_API_KEY')
-CMS_PUBLIC_URL = \
-    os.environ.get('CMS_PUBLIC_URL', 'http://localhost:3000/cms')
-CMS_STATIC_URL = \
-    os.environ.get('CMS_STATIC_URL', 'http://localhost:3001/static/')
-CMS_SITE_TITLE = \
-    os.environ.get('CMS_SITE_TITLE', 'Skygear CMS')
-CMS_CONFIG_FILE_URL = \
-    os.environ.get('CMS_CONFIG_FILE_URL',
-                   'http://localhost:3002/cms-config.yaml')
-
-# other constants
-
-REQUEST_HEADER_BLACKLIST = [
-    'Host',
-    'Accept-Encoding',
-]
-RESPONSE_HEADER_BLACKLIST = [
-    'Access-Control-Allow-Credentials',
-    'Access-Control-Allow-Origin',
-    'Content-Encoding',
-    'Server',
-]
 
 cms_config = None
 
@@ -165,233 +135,42 @@ def includeme(settings):
         return response
 
 
-class SkygearRequest:
+    @skygear.handler('cms-api/import')
+    def import_data(request):
+        files = request.files
+        form = request.form
+        key = form.get('key')
 
-    method = None
-    headers = {}
-    body = None
+        if not key:
+            return SkygearResponse.forbidden().to_werkzeug()
 
-    is_master = False
+        authdata = AuthData.from_cms_token(key)
+        if not authdata or not authdata.is_admin:
+            return SkygearResponse.forbidden().to_werkzeug()
 
-    def __init__(self, method, headers, body):
-        self.method = method
-        self.headers = headers
-        self.body = body
+        if 'file' not in files:
+            return skygear.Response('Missing file', 400)
 
-    # req: skygear's wrapped werkzeug request
-    @classmethod
-    def from_werkzeug(cls, req):
-        return cls(
-            method=req.method,
-            body=Body(req.data),
-            headers={k: v for k, v in req.headers},
-        )
+        file = files['file']
+        name = form.get('import_name')
 
-    @property
-    def access_token(self):
-        if self.body.is_dict:
-            access_token = self.body.data.get('access_token')
-            if access_token:
-                return access_token
+        global cms_config
+        import_config = cms_config.get_import_config(name)
 
-        return self.headers.get('X-Skygear-Access-Token')
+        if not import_config:
+            return skygear.Response('Import config not found', 404)
 
-    @access_token.setter
-    def access_token(self, access_token):
-        if self.body.is_dict:
-            self.body.data['access_token'] = access_token
+        temp_file = tempfile.NamedTemporaryFile(suffix='.csv')
+        file.save(temp_file.name)
 
-        self.headers['X-Skygear-Access-Token'] = access_token
+        records = None
+        with open(temp_file.name, 'r') as fp:
+            # skip first row
+            next(fp)
+            records = prepare_import_records(fp, import_config)
 
-    def to_requests(self):
-        method = self.method
-        # TODO: should clone body here
-        body = self.body
-        headers = {
-            k: v
-            for k, v in self.headers.items()
-            if k not in REQUEST_HEADER_BLACKLIST
-        }
-
-        if self.is_master:
-            if body.is_dict:
-                body.data['api_key'] = options.masterkey
-            headers['X-Skygear-Api-Key'] = options.masterkey
-
-        return requests.Request(
-            method=method,
-            url=options.skygear_endpoint,
-            data=body.to_data(),
-            headers=headers,
-        )
-
-
-class SkygearResponse:
-
-    is_forbidden = False
-
-    status_code = None
-    headers = {}
-    body = None
-
-    # resp: requests response
-    def __init__(self, status_code, headers, body, is_forbidden=False):
-        self.is_forbidden = is_forbidden
-
-        self.status_code = status_code
-        self.headers = headers
-        self.body = body
-
-    @classmethod
-    def forbidden(cls):
-        return cls(
-            status_code=None,
-            headers=None,
-            body=None,
-            is_forbidden=True,
-        )
-
-    @classmethod
-    def from_requests(cls, resp):
-        status_code = resp.status_code
-        body = Body(resp.content)
-        headers = {k: v for k, v in resp.headers.items()}
-
-        return cls(
-            status_code=status_code,
-            headers=headers,
-            body=body,
-        )
-
-    @property
-    def access_token(self):
-        if self.body.is_dict:
-            access_token = self.body.data.get('result', {}).get('access_token')
-            if access_token:
-                return access_token
-
-        return self.headers.get('X-Skygear-Access-Token')
-
-    @access_token.setter
-    def access_token(self, access_token):
-        if self.body.is_dict:
-            self.body.data['result']['access_token'] = access_token
-
-        self.headers['X-Skygear-Access-Token'] = access_token
-
-    def to_werkzeug(self):
-        if self.is_forbidden:
-            return skygear.Response(
-                'You are not permitted to access CMS',
-                403
-            )
-
-        filtered_headers = [
-            (k, v)
-            for k, v in self.headers.items()
-            if k not in RESPONSE_HEADER_BLACKLIST
-        ]
-
-        return skygear.Response(
-            response=self.body.to_data(),
-            status=str(self.status_code),
-            headers=filtered_headers,
-        )
-
-
-class Body:
-
-    KIND_JSON = 'json'
-    KIND_OTHER = 'other'
-
-    kind = KIND_OTHER
-    data = None
-
-    # b: bytes
-    def __init__(self, b):
-        if not b:
-            self.data = b
-
-        if isinstance(b, bytes):
-            try:
-                json_body = json.loads(b.decode('utf-8'))
-            except json.decoder.JSONDecodeError:
-                self.data = b
-                return
-
-            self.kind = self.KIND_JSON
-            self.data = json_body
-        elif isinstance(b, dict):
-            self.kind = self.KIND_JSON
-            self.data = b
-
-    @property
-    def is_json(self):
-        return self.kind == self.KIND_JSON
-
-    @property
-    def is_dict(self):
-        return self.is_json and isinstance(self.data, dict)
-
-    def to_data(self):
-        data = self.data
-
-        if self.is_json:
-            return json.dumps(data).encode('utf-8')
-
-        return data
-
-
-class AuthData:
-
-    is_admin = False
-    skygear_token = None
-
-    def __init__(self, is_admin, skygear_token):
-        self.is_admin = is_admin
-        self.skygear_token = skygear_token
-
-    @classmethod
-    def from_cms_token(cls, cms_token):
-        try:
-            authdict = jwt.decode(
-                cms_token,
-                CMS_AUTH_SECRET,
-                algorithms=['HS256'],
-            )
-        except JWTError:
-            return None
-
-        return cls(
-            is_admin=authdict.get('is_admin', False),
-            skygear_token=authdict.get('skygear_access_token', None)
-        )
-
-    def to_cms_token(self):
-        return jwt.encode({
-            'iss': 'skygear-content-manager',
-            'skygear_access_token': self.skygear_token,
-            'is_admin': self.is_admin,
-        }, CMS_AUTH_SECRET, algorithm='HS256')
-
-
-# req: SkygearRequest
-def request_skygear(req):
-    requests_req = req.to_requests()
-    requests_resp = requests.Session().send(requests_req.prepare())
-    return SkygearResponse.from_requests(requests_resp)
-
-
-def request_skygear_api(action, data={}, is_master=True):
-    body_dict = {
-        'action': action,
-        'api_key': options.masterkey,
-    }
-    body_dict.update(data)
-    body = Body(body_dict)
-    req = SkygearRequest('POST', {}, body)
-    req.is_master = is_master
-    return request_skygear(req)
+        resp = import_records(records)
+        return resp
 
 
 def intercept_login(req):
@@ -496,25 +275,6 @@ def parse_cms_config():
         raise ValidationError(result.errors)
 
     return result.data
-
-
-def get_schema():
-    resp = request_skygear_api('schema:fetch')
-    return resp.body.data['result']
-
-
-def fetch_records(record_type, predicate = None, includes = []):
-    resp = request_skygear_api('record:query', data={
-        'record_type': record_type,
-        'database_id': '_union',
-        'include': {i: {'$type': 'keypath', '$val': i} for i in includes},
-        'predicate': predicate,
-    })
-    return resp.body.data['result']
-
-
-def eq_predicate(key, value):
-    return ['eq', {'$type': 'keypath', '$val': key}, value]
 
 
 def set_cms_config(_cms_config):

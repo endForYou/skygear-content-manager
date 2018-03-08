@@ -253,6 +253,7 @@ declare module 'skygear' {
   export class SkygearError extends Error {
     code: ErrorCodeType[keyof ErrorCodeType];
     info: KVObject | null;
+    message: string;
   }
 
   export interface ErrorCodeType {

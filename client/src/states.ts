@@ -2,12 +2,13 @@ import { RouterState } from 'react-router-redux';
 import { Record } from 'skygear';
 
 import { CmsConfig } from './cmsConfig';
-import { Remote, RemoteLoading } from './types';
+import { ImportResult, Remote, RemoteLoading } from './types';
 import { objectFrom } from './util';
 
 export interface RootState {
   auth: AuthState;
   cmsConfig: CmsConfig;
+  import: ImportState;
   recordViewsByName: RecordViewsByName;
   router: RouterState;
 }
@@ -77,6 +78,16 @@ export const initialRecordViewState: RecordViewState = {
   show: initialShowState,
 };
 
+export interface ImportState {
+  errorMessage: string;
+  importResult?: Remote<ImportResult>;
+}
+
+export const initialImportState: ImportState = {
+  errorMessage: '',
+  importResult: undefined,
+};
+
 export function initialRootState(
   cmsConfig: CmsConfig,
   recordNames: string[],
@@ -87,6 +98,7 @@ export function initialRootState(
       user: user === null ? undefined : user,
     },
     cmsConfig,
+    import: initialImportState,
     recordViewsByName: objectFrom(
       recordNames.map(recordName => {
         return [recordName, initialRecordViewState] as [

@@ -186,12 +186,13 @@ interface ConfigContext {
   associationRecordByName: AssociationRecordByName;
 }
 
-export type ListActionConfig = ExportActionConfig;
+export type ListActionConfig = ExportActionConfig | ImportActionConfig;
 export enum ListActionConfigTypes {
   Export = 'Export',
+  Import = 'Import',
 
   // TODO (Steven-Chan):
-  // Add list action type `New`, `Import`
+  // Add list action type `New`
 }
 export interface ExportActionConfig {
   type: ListActionConfigTypes.Export;
@@ -199,6 +200,14 @@ export interface ExportActionConfig {
   label: string | undefined;
 
   // ignore field config
+  // client side only need name for calling export API
+}
+export interface ImportActionConfig {
+  type: ListActionConfigTypes.Import;
+  name: string;
+  label: string | undefined;
+
+  // ignore field config and other config
   // client side only need name for calling export API
 }
 

@@ -1,8 +1,5 @@
 class CMSConfig:
 
-    records = {}
-    association_records = {}
-
     def __init__(self, records, association_records):
         self.records = records
         self.association_records = association_records
@@ -21,35 +18,35 @@ class CMSConfig:
         result = schema.load(d)
         return result.data
 
-    def get_export_config(self, name):
+    def get_action_config(self, name, action_cls):
         for _, record in self.records.items():
-            config = record.get_export_config(name)
+            config = record.get_action_config(name, action_cls)
             if config is not None:
                 return config
 
         return None
 
+    def get_export_config(self, name):
+        return self.get_action_config(name, CMSRecordExport)
+
+    def get_import_config(self, name):
+        return self.get_action_config(name, CMSRecordImport)
+
 
 class CMSRecord:
-
-    record_type = ''
-    list = None
 
     def __init__(self, record_type, list):
         self.record_type = record_type
         self.list = list
 
-    def get_export_config(self, name):
+    def get_action_config(self, name, action_cls):
         actions = [action for action in self.list.actions
-                   if isinstance(action, CMSRecordExport) and
+                   if isinstance(action, action_cls) and
                       action.name == name]
         return actions[0] if len(actions) > 0 else None
 
 
 class CMSRecordList:
-
-    record_type = ''
-    actions = []
 
     def __init__(self, record_type, actions = []):
         self.record_type = record_type
@@ -58,13 +55,10 @@ class CMSRecordList:
 
 class CMSRecordExport:
 
-    record_type = ''
-    name = ''
-    fields = []
-
-    def __init__(self, record_type, name, fields):
+    def __init__(self, record_type, name, label, fields):
         self.record_type = record_type
         self.name = name
+        self.label = label
         self.fields = fields
 
     def get_reference_targets(self):
@@ -86,13 +80,6 @@ class CMSRecordExport:
 
 class CMSRecordExportField:
 
-    record_type = ''
-    name = ''
-    label = ''
-    type = ''
-
-    reference = None
-
     def __init__(self, record_type, name, label, type, reference = None):
         self.record_type = record_type
         self.name = name
@@ -107,16 +94,12 @@ class CMSRecordExportReference:
     REF_TYPE_VIA_BACK_REF = 'via_back_reference'
     REF_TYPE_VIA_ASSOCIATION_RECORD = 'via_association_record'
 
-    ref_type = REF_TYPE_DIRECT
-    name = ''
-    target = ''
-    field_name = ''
-
-    def __init__(self, ref_type, name, target, field_name):
+    def __init__(self, ref_type, name, target, field_name, field_type):
         self.ref_type = ref_type
         self.name = name
         self.target = target
         self.field_name = field_name
+        self.field_type = field_type
 
     @property
     def is_direct(self):
@@ -138,9 +121,6 @@ class CMSRecordExportReference:
 
 class CMSAssociationRecord:
 
-    name = ''
-    fields = []
-
     def __init__(self, name, fields):
         self.name = name
         self.fields = fields
@@ -148,9 +128,44 @@ class CMSAssociationRecord:
 
 class CMSAssociationRecordField:
 
-    name = ''
-    target = ''
-
     def __init__(self, name, target):
         self.name = name
         self.target = target
+
+
+class CMSRecordImport:
+
+    USE_FIRST = 'use-first'
+    THROW_ERROR = 'throw-error'
+
+    def __init__(self, record_type, name, label, fields,
+                 reference_handling = USE_FIRST,
+                 identifier = '_id'):
+        self.record_type = record_type
+        self.name = name
+        self.label = label
+        self.reference_handling = reference_handling
+        self.identifier = identifier
+        self.fields = fields
+
+    def get_reference_fields(self):
+        return [f for f in self.fields if f.reference]
+
+
+class CMSRecordImportField:
+
+    def __init__(self, record_type, name, label, type, reference = None):
+        self.record_type = record_type
+        self.name = name
+        self.label = label
+        self.type = type
+        self.reference = reference
+
+
+class CMSRecordImportReference:
+
+    def __init__(self, name, target, field_name, field_type):
+        self.name = name
+        self.target = target
+        self.field_name = field_name
+        self.field_type = field_type

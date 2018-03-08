@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import { Dispatch } from 'redux';
 import { Record } from 'skygear';
 
+import { dismissImport, importRecords } from '../actions/import';
 import { RecordActionDispatcher } from '../actions/record';
 import {
   BooleanFilterQueryType,
@@ -18,18 +19,27 @@ import {
   filterFactory,
   FilterType,
   GeneralFilter,
+  ImportActionConfig,
   IntegerFilter,
   IntegerFilterQueryType,
   ListActionConfig,
+  ListActionConfigTypes,
   ListPageConfig,
   StringFilter,
   StringFilterQueryType,
 } from '../cmsConfig';
 import { ExportButton } from '../components/ExportButton';
 import { FilterList } from '../components/FilterList';
+import { ImportButton } from '../components/ImportButton';
+import {
+  ImportFailureModal,
+  ImportingModal,
+  ImportModal,
+} from '../components/ImportModal';
 import Pagination from '../components/Pagination';
 import { Field, FieldContext } from '../fields';
-import { RootState } from '../states';
+import { ImportState, RootState } from '../states';
+import { RemoteType } from '../types';
 import { debounce } from '../util';
 
 interface TableHeaderProps {
@@ -109,21 +119,10 @@ const ListTable: React.SFC<ListTableProps> = ({ fieldConfigs, records }) => {
   );
 };
 
-function ActionButtonFactory(
-  recordName: string,
-  actionConfig: ListActionConfig
-) {
-  switch (actionConfig.type) {
-    case 'Export':
-      return <ExportButton actionConfig={actionConfig} />;
-    default:
-      return null;
-  }
-}
-
 export type ListPageProps = StateProps & DispatchProps;
 
 export interface StateProps {
+  import: ImportState;
   recordName: string;
   pageConfig: ListPageConfig;
   page: number;
@@ -163,6 +162,8 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
     );
 
     this.fetchList = debounce(this.fetchList.bind(this), 200);
+
+    this.onImportFileSelected = this.onImportFileSelected.bind(this);
   }
 
   public componentDidMount() {
@@ -289,6 +290,30 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
     this.fetchList(page, pageConfig.perPage, filters);
   }
 
+  public onImportFileSelected(actionConfig: ImportActionConfig, file: File) {
+    const { dispatch } = this.props;
+    dispatch(importRecords(actionConfig.name, file));
+  }
+
+  public renderActionButton(
+    recordName: string,
+    actionConfig: ListActionConfig
+  ) {
+    switch (actionConfig.type) {
+      case ListActionConfigTypes.Export:
+        return <ExportButton actionConfig={actionConfig} />;
+      case ListActionConfigTypes.Import:
+        return (
+          <ImportButton
+            actionConfig={actionConfig}
+            onFileSelected={this.onImportFileSelected}
+          />
+        );
+      default:
+        return null;
+    }
+  }
+
   public renderActionButtons() {
     const { recordName, pageConfig: { actions } } = this.props;
 
@@ -304,7 +329,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
     );
 
     const actionsButtons = [
-      ...actions.map(action => ActionButtonFactory(recordName, action)),
+      ...actions.map(action => this.renderActionButton(recordName, action)),
       newRecordButton,
     ];
 
@@ -314,6 +339,35 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
       index: number
       // tslint:disable-next-line: no-any
     ): any => [prev, <span key={index}>&nbsp;</span>, current]);
+  }
+
+  public renderImportModal() {
+    const dispatch = this.props.dispatch;
+    const importState = this.props.import;
+    const { importResult, errorMessage } = importState;
+
+    if (!importResult) {
+      return undefined;
+    }
+
+    switch (importResult.type) {
+      case RemoteType.Failure:
+        return (
+          <ImportFailureModal
+            onDismiss={() => dispatch(dismissImport())}
+            errorMessage={errorMessage}
+          />
+        );
+      case RemoteType.Loading:
+        return <ImportingModal />;
+      case RemoteType.Success:
+        return (
+          <ImportModal
+            onDismiss={() => dispatch(dismissImport())}
+            result={importResult.value}
+          />
+        );
+    }
   }
 
   public render() {
@@ -330,6 +384,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
 
     return (
       <div>
+        {this.renderImportModal()}
         <div className="navbar">
           <h1 className="display-4">{pageConfig.label}</h1>
           <div className="float-right">
@@ -447,6 +502,7 @@ function ListPageFactory(recordName: string) {
     const maxPage = Math.ceil(totalCount / pageConfig.perPage);
 
     return {
+      import: state.import,
       isLoading,
       maxPage,
       page,
