@@ -15,9 +15,6 @@ class RecordIdentifierMap:
     of a certain value.
     """
 
-    backup = {}
-    allow_duplicate_value = True
-
     def __init__(self, allow_duplicate_value = True):
         self.backup = {}
         self.allow_duplicate_value = allow_duplicate_value

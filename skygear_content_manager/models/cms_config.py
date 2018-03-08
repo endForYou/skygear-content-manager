@@ -1,8 +1,5 @@
 class CMSConfig:
 
-    records = {}
-    association_records = {}
-
     def __init__(self, records, association_records):
         self.records = records
         self.association_records = association_records
@@ -38,9 +35,6 @@ class CMSConfig:
 
 class CMSRecord:
 
-    record_type = ''
-    list = None
-
     def __init__(self, record_type, list):
         self.record_type = record_type
         self.list = list
@@ -54,20 +48,12 @@ class CMSRecord:
 
 class CMSRecordList:
 
-    record_type = ''
-    actions = []
-
     def __init__(self, record_type, actions = []):
         self.record_type = record_type
         self.actions = actions
 
 
 class CMSRecordExport:
-
-    record_type = ''
-    name = ''
-    label = ''
-    fields = []
 
     def __init__(self, record_type, name, label, fields):
         self.record_type = record_type
@@ -94,13 +80,6 @@ class CMSRecordExport:
 
 class CMSRecordExportField:
 
-    record_type = ''
-    name = ''
-    label = ''
-    type = ''
-
-    reference = None
-
     def __init__(self, record_type, name, label, type, reference = None):
         self.record_type = record_type
         self.name = name
@@ -114,12 +93,6 @@ class CMSRecordExportReference:
     REF_TYPE_DIRECT = ''
     REF_TYPE_VIA_BACK_REF = 'via_back_reference'
     REF_TYPE_VIA_ASSOCIATION_RECORD = 'via_association_record'
-
-    ref_type = REF_TYPE_DIRECT
-    name = ''
-    target = ''
-    field_name = ''
-    field_type = ''
 
     def __init__(self, ref_type, name, target, field_name, field_type):
         self.ref_type = ref_type
@@ -148,18 +121,12 @@ class CMSRecordExportReference:
 
 class CMSAssociationRecord:
 
-    name = ''
-    fields = []
-
     def __init__(self, name, fields):
         self.name = name
         self.fields = fields
 
 
 class CMSAssociationRecordField:
-
-    name = ''
-    target = ''
 
     def __init__(self, name, target):
         self.name = name
@@ -170,13 +137,6 @@ class CMSRecordImport:
 
     REFERENCE_HANDLING_USE_FIRST = 'use-first'
     REFERENCE_HANDLING_THROW_ERROR = 'throw-error'
-
-    record_type = ''
-    name = ''
-    label = ''
-    reference_handling = ''
-    identifier = ''
-    fields = []
 
     def __init__(self, record_type, name, label, fields,
                  reference_handling = REFERENCE_HANDLING_USE_FIRST,
@@ -194,13 +154,6 @@ class CMSRecordImport:
 
 class CMSRecordImportField:
 
-    record_type = ''
-    name = ''
-    label = ''
-    type = ''
-
-    reference = None
-
     def __init__(self, record_type, name, label, type, reference = None):
         self.record_type = record_type
         self.name = name
@@ -210,11 +163,6 @@ class CMSRecordImportField:
 
 
 class CMSRecordImportReference:
-
-    name = ''
-    target = ''
-    field_name = ''
-    field_type = ''
 
     def __init__(self, name, target, field_name, field_type):
         self.name = name

@@ -6,8 +6,6 @@ import strict_rfc3339
 
 class RecordDeserializer:
 
-    field_configs = []
-
     # field_configs: []CMSRecordImportField
     def __init__(self, field_configs):
         self.field_configs = field_configs
@@ -25,8 +23,6 @@ class RecordDeserializer:
 
 
 class FieldDeserializer:
-
-    field_config = None
 
     def __init__(self, field_config):
         self.field_config = field_config

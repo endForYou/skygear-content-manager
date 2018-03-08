@@ -23,16 +23,12 @@ RESPONSE_HEADER_BLACKLIST = [
 
 class SkygearRequest:
 
-    method = None
-    headers = {}
-    body = None
-
-    is_master = False
-
     def __init__(self, method, headers, body):
         self.method = method
         self.headers = headers
         self.body = body
+
+        self.is_master = False
 
     # req: skygear's wrapped werkzeug request
     @classmethod
@@ -83,12 +79,6 @@ class SkygearRequest:
 
 
 class SkygearResponse:
-
-    is_forbidden = False
-
-    status_code = None
-    headers = {}
-    body = None
 
     # resp: requests response
     def __init__(self, status_code, headers, body, is_forbidden=False):
@@ -172,11 +162,11 @@ class Body:
     KIND_JSON = 'json'
     KIND_OTHER = 'other'
 
-    kind = KIND_OTHER
-    data = None
-
     # b: bytes
     def __init__(self, b):
+        self.kind = self.KIND_OTHER
+        self.data = None
+
         if not b:
             self.data = b
 
@@ -211,9 +201,6 @@ class Body:
 
 
 class AuthData:
-
-    is_admin = False
-    skygear_token = None
 
     def __init__(self, is_admin, skygear_token):
         self.is_admin = is_admin

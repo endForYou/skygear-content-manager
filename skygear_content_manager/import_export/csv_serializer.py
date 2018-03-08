@@ -4,8 +4,6 @@ import json
 
 class RecordSerializer:
 
-    field_configs = []
-
     # field_configs: []CMSRecordExportField
     def __init__(self, field_configs):
         self.field_configs = field_configs
@@ -33,8 +31,6 @@ class RecordSerializer:
 
 
 class FieldSerializer:
-
-    field_config = None
 
     def __init__(self, field_config):
         self.field_config = field_config
@@ -87,8 +83,6 @@ class FieldSerializer:
 
 class BaseValueSerializer:
 
-    format = ''
-
     def __init__(self, format=None):
         self.format = format or self.default_format
 
@@ -101,8 +95,6 @@ class BaseValueSerializer:
 
 
 class ListSerializer(BaseValueSerializer):
-
-    field_serializer = None
 
     def serialize(self, value):
         value = [self.field_serializer.serialize(v) for v in value]

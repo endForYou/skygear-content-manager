@@ -17,8 +17,6 @@ reserved_fields = {
 
 class SkygearSchema:
 
-    record_types = {}
-
     def __init__(self, record_types):
         self.record_types = record_types
 
@@ -38,18 +36,12 @@ class SkygearSchema:
 
 class SkygearRecord:
 
-    record_type = ''
-    fields = []
-
     def __init__(self, record_type, fields):
         self.record_type = record_type
         self.fields = fields
 
 
 class SkygearField:
-
-    name = ''
-    type = ''
 
     def __init__(self, name, type):
         self.name = name
