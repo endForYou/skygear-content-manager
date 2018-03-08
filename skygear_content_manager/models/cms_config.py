@@ -135,11 +135,11 @@ class CMSAssociationRecordField:
 
 class CMSRecordImport:
 
-    REFERENCE_HANDLING_USE_FIRST = 'use-first'
-    REFERENCE_HANDLING_THROW_ERROR = 'throw-error'
+    USE_FIRST = 'use-first'
+    THROW_ERROR = 'throw-error'
 
     def __init__(self, record_type, name, label, fields,
-                 reference_handling = REFERENCE_HANDLING_USE_FIRST,
+                 reference_handling = USE_FIRST,
                  identifier = '_id'):
         self.record_type = record_type
         self.name = name

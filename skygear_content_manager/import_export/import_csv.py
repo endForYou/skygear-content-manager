@@ -169,7 +169,7 @@ def create_identifier_map(data_list, import_config):
     - Map the queried record id to custom identifier value.
     """
     identifier_map = RecordIdentifierMap(
-        allow_duplicate_value=import_config.reference_handling == CMSRecordImport.REFERENCE_HANDLING_USE_FIRST
+        allow_duplicate_value=import_config.reference_handling == CMSRecordImport.USE_FIRST
     )
     reference_fields = import_config.get_reference_fields()
 

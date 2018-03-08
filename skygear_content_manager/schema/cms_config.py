@@ -257,8 +257,8 @@ class CMSRecordImportSchema(CMSRecordListActionSchema):
     @validates('reference_handling')
     def validate_reference_handling(self, value):
         if value and \
-           value != CMSRecordImport.REFERENCE_HANDLING_USE_FIRST and \
-           value != CMSRecordImport.REFERENCE_HANDLING_THROW_ERROR:
+           value != CMSRecordImport.USE_FIRST and \
+           value != CMSRecordImport.THROW_ERROR:
             raise ValidationError('Invalid reference_handling value.')
 
     @pre_load
