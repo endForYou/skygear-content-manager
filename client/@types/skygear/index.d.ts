@@ -132,6 +132,8 @@ declare module 'skygear' {
       apiKey: string;
       endPoint: string;
     }): Promise<Container>;
+
+    public lambda(action: string, params: AnyValue): Promise<AnyValue>;
   }
 
   export class AuthContainer {

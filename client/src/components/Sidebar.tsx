@@ -10,24 +10,28 @@ import { RootState } from '../states';
 
 export interface SidebarProps {
   items: RecordSiteItemConfig[];
+  pushNotificationEnabled: boolean;
 }
 
 class Sidebar extends React.PureComponent<SidebarProps> {
   public render() {
-    const { items } = this.props;
+    // const { items } = this.props;
 
     return (
       <nav className="col-sm-3 sidebar">
         <Link className="sidebar-logo" to="/">
           <img className="img-fluid" src={logo} alt="Skygear CMS" />
         </Link>
-        <ListItems items={items} />
+        <ListItems {...this.props} />
       </nav>
     );
   }
 }
 
-function ListItems({ items }: SidebarProps): JSX.Element {
+function ListItems({
+  items,
+  pushNotificationEnabled,
+}: SidebarProps): JSX.Element {
   const listItems = items.map((item, index) => {
     return (
       <li key={index} className="nav-item">
@@ -36,7 +40,24 @@ function ListItems({ items }: SidebarProps): JSX.Element {
     );
   });
 
-  return <ul className="nav flex-column">{listItems}</ul>;
+  let pushNotificationTab = null;
+
+  if (pushNotificationEnabled) {
+    pushNotificationTab = (
+      <li key="notification" className="nav-item">
+        <NavLink className="nav-link" to={`/notification`}>
+          Push Notifications
+        </NavLink>
+      </li>
+    );
+  }
+
+  return (
+    <ul className="nav flex-column">
+      {listItems}
+      {pushNotificationTab}
+    </ul>
+  );
 }
 
 interface ItemProps {
@@ -64,6 +85,7 @@ function Item({ item }: ItemProps): JSX.Element {
 const mapStateToProps = (state: RootState): SidebarProps => {
   return {
     items: state.cmsConfig.site,
+    pushNotificationEnabled: state.cmsConfig.pushNotifications.enabled,
   };
 };
 

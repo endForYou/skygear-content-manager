@@ -720,3 +720,9 @@ association_records:
       - name: applicant_id
         type: Reference
         target: user
+push_notifications:
+  enabled: true
+  filters:
+    - name: name
+      type: String
+      label: Name

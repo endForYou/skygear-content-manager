@@ -12,12 +12,19 @@ import { ListPageFactory } from '../../pages/ListPage';
 import { NewPageContainer } from '../../pages/NewPageContainer';
 import { ShowPageContainer } from '../../pages/ShowPageContainer';
 
+import { NewPushNotificationPageContainer } from '../../push_notifications/NewPushNotificationPageContainer';
+import { PushNotificationListPageFactory } from '../../push_notifications/PushNotificationListPage';
+
 export function routesFromRecordConfigs(
   configs: RecordConfig[]
 ): JSX.Element[] {
   return configs.reduce((routes: JSX.Element[], config: RecordConfig) => {
     return [...routes, ...routesFromRecordConfig(config)];
   }, []);
+}
+
+export function pushNotificationRoutes(): JSX.Element[] {
+  return [makeNewPushNotificationRoute(), makeNotificationListRoute()];
 }
 
 function routesFromRecordConfig(config: RecordConfig): JSX.Element[] {
@@ -92,6 +99,28 @@ function makeNewRoute(config: RecordFormPageConfig): JSX.Element {
       exact={true}
       path={`/records/${recordName}/new`}
       render={routeProps => <NewPageContainer config={config} />}
+    />
+  );
+}
+
+function makeNotificationListRoute(): JSX.Element {
+  return (
+    <Route
+      key={`notification`}
+      exact={true}
+      path={`/notification`}
+      component={PushNotificationListPageFactory()}
+    />
+  );
+}
+
+function makeNewPushNotificationRoute(): JSX.Element {
+  return (
+    <Route
+      key={`notification-new`}
+      exact={true}
+      path={`/notification/new`}
+      render={routeProps => <NewPushNotificationPageContainer />}
     />
   );
 }

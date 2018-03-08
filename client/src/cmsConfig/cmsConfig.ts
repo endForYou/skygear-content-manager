@@ -1,11 +1,16 @@
 import { humanize, isObject, objectFrom } from './../util';
 import { FilterConfig, parseFilterConfig } from './filterConfig';
+import {
+  parsePushNotificationConfig,
+  PushNotificationsConfig,
+} from './pushNotificationsConfig';
 import { parseOptionalString, parseString } from './util';
 
 export interface CmsConfig {
   site: SiteConfig;
   records: RecordConfigMap;
   associationRecordByName: AssociationRecordByName;
+  pushNotifications: PushNotificationsConfig;
 }
 
 export type SiteConfig = SiteItemConfig[];
@@ -181,7 +186,7 @@ interface RecordTypeContext {
   cmsRecordByName: CmsRecordByName;
 }
 
-interface ConfigContext {
+export interface ConfigContext {
   cmsRecordByName: CmsRecordByName;
   associationRecordByName: AssociationRecordByName;
 }
@@ -213,7 +218,12 @@ export interface ImportActionConfig {
 
 // tslint:disable-next-line: no-any
 export function parseCmsConfig(input: any): CmsConfig {
-  const { site, records, association_records: associationRecords } = input;
+  const {
+    site,
+    records,
+    association_records: associationRecords,
+    push_notifications: pushNotifications,
+  } = input;
 
   const cmsRecordByName = preparseRecordConfigs(records);
   const associationRecordByName = parseAssociationRecordByName(
@@ -228,6 +238,7 @@ export function parseCmsConfig(input: any): CmsConfig {
 
   return {
     associationRecordByName,
+    pushNotifications: parsePushNotificationConfig(context, pushNotifications),
     records: Object.entries(
       records
       // tslint:disable-next-line: no-any
@@ -334,7 +345,7 @@ function parseListPageConfig(
   const filters =
     input.filters &&
     // tslint:disable-next-line: no-any
-    (input.filters as any[]).map(f => parseFilterConfig(f));
+    (input.filters as any[]).map(f => parseFilterConfig(f, context));
 
   const { actions = [] } = input;
 
@@ -412,7 +423,7 @@ function parseRecordFormPageConfig(
 }
 
 // tslint:disable-next-line: no-any
-function parseFieldConfig(context: ConfigContext, a: any): FieldConfig {
+export function parseFieldConfig(context: ConfigContext, a: any): FieldConfig {
   switch (a.type) {
     case 'String':
       return parseStringFieldConfig(a);

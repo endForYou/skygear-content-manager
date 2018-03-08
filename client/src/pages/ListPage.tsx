@@ -381,6 +381,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
     } = this.props;
 
     const { showfilterMenu, filters } = this.state;
+    const pathname = `/records/${recordName}`;
 
     return (
       <div>
@@ -455,7 +456,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
           {maxPage > 0 ? (
             <Pagination
               key="pagination"
-              recordName={recordName}
+              pathname={pathname}
               currentPage={page}
               maxPage={maxPage}
               onItemClicked={this.onPageItemClicked}

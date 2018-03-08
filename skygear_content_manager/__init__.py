@@ -13,6 +13,8 @@ from .import_export import (RecordSerializer, RecordDeserializer,
                             prepare_import_records, import_records)
 from .import_export import prepare_response as prepare_export_response
 from .models.cms_config import CMSConfig
+from .push_notifications import cms_push_notification_db_init
+from .push_notifications import register_lambda as register_push_notifications_lambda
 from .schema.cms_config import CMSConfigSchema
 from .schema.skygear_schema import SkygearSchemaSchema
 from .settings import (CMS_USER_PERMITTED_ROLE, CMS_SKYGEAR_ENDPOINT,
@@ -27,6 +29,14 @@ cms_config = None
 
 
 def includeme(settings):
+    register_push_notifications_lambda(settings)
+
+
+    @skygear.event("before-plugins-ready")
+    def before_plugins_ready(config):
+        cms_push_notification_db_init(config)
+
+
     @skygear.event('after-plugins-ready')
     def after_plugins_ready(config):
         cms_config = CMSConfig.empty()

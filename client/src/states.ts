@@ -2,13 +2,20 @@ import { RouterState } from 'react-router-redux';
 import { Record } from 'skygear';
 
 import { CmsConfig } from './cmsConfig';
-import { ImportResult, Remote, RemoteLoading } from './types';
+import {
+  ImportResult,
+  NewPushCampaign,
+  PushCampaign,
+  Remote,
+  RemoteLoading,
+} from './types';
 import { objectFrom } from './util';
 
 export interface RootState {
   auth: AuthState;
   cmsConfig: CmsConfig;
   import: ImportState;
+  pushCampaign: PushCampaignState;
   recordViewsByName: RecordViewsByName;
   router: RouterState;
 }
@@ -88,6 +95,40 @@ export const initialImportState: ImportState = {
   importResult: undefined,
 };
 
+export interface PushCampaignState {
+  list: PushCampaignListState;
+  new: NewPushCampaignState;
+}
+
+export interface PushCampaignListState {
+  isLoading: boolean;
+  page: number;
+  totalCount: number;
+  pushCampaigns: PushCampaign[];
+  error?: Error;
+}
+
+export interface NewPushCampaignState {
+  savingPushCampaign?: Remote<NewPushCampaign>;
+}
+
+export const initialNewPushCampaignState: NewPushCampaignState = {
+  savingPushCampaign: undefined,
+};
+
+export const initialPushCampaignListState: PushCampaignListState = {
+  error: undefined,
+  isLoading: true,
+  page: 1,
+  pushCampaigns: [],
+  totalCount: 0,
+};
+
+export const initialPushCampaignState: PushCampaignState = {
+  list: initialPushCampaignListState,
+  new: initialNewPushCampaignState,
+};
+
 export function initialRootState(
   cmsConfig: CmsConfig,
   recordNames: string[],
@@ -99,6 +140,7 @@ export function initialRootState(
     },
     cmsConfig,
     import: initialImportState,
+    pushCampaign: initialPushCampaignState,
     recordViewsByName: objectFrom(
       recordNames.map(recordName => {
         return [recordName, initialRecordViewState] as [
