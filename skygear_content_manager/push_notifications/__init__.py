@@ -1,11 +1,11 @@
 import skygear
 from skygear.utils import db
-from . import lambdas
+
+from .lambdas import *
 
 DB_VERSION = '1'
 
 
-@skygear.event("before-plugins-ready")
 def cms_push_notification_db_init(config):
     with db.conn() as conn:
 
