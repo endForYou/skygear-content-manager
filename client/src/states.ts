@@ -93,7 +93,7 @@ export interface ImportState {
 export const initialImportState: ImportState = {
   errorMessage: '',
   importResult: undefined,
-}
+};
 
 export interface PushCampaignState {
   list: PushCampaignListState;
