@@ -28,4 +28,3 @@ strict-rfc3339==0.7
 urllib3==1.22
 websocket-client==0.44.0
 Werkzeug==0.12.2
-marshmallow==2.13.6
