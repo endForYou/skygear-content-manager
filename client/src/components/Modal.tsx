@@ -9,7 +9,7 @@ import * as loading from '../assets/loading.png';
 export interface ModalProps {
   body?: (() => JSX.Element) | (() => JSX.Element[]) | string;
   footer?: (() => JSX.Element) | (() => JSX.Element[]);
-  onDismiss?: () => void; // `undefined` for non-dismissable modal
+  onDismiss?: () => void; // `undefined` for non-dismissible modal
   show: boolean;
   title: string;
 }
