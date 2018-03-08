@@ -55,14 +55,38 @@ class RecordIdentifierMap:
         record_ids.append(record_id)
 
 
+class ImportRecordException(Exception):
+
+    def __init__(self, record_data, underlying_error):
+        message = str(underlying_error)
+        super(ImportRecordException, self).__init__(message)
+
+        self.record_data = record_data
+        self.underlying_error = underlying_error
+
+    @classmethod
+    def error_code_for_exception(cls, e):
+        if isinstance(e, DuplicateIdentifierValueException):
+            return 109
+
+        return 10000
+
+    def to_dict(self):
+        return {
+            '_id': self.record_data.get('_id'),
+            '_type': 'error',
+            'code': self.error_code_for_exception(self.underlying_error),
+            'message': str(self.underlying_error),
+            'name': self.underlying_error.__class__.__name__,
+        }
+
+
 class DuplicateIdentifierValueException(Exception):
 
     def __init__(self, record_type, key, value):
         message = 'duplicate identifier value for "{}.{} == {}"' \
                   .format(record_type, key, value)
         super(DuplicateIdentifierValueException, self).__init__(message)
-
-        self.id = None
 
 
 def prepare_import_records(stream, import_config):
@@ -82,13 +106,15 @@ def prepare_import_records(stream, import_config):
     records = deserialize_record_data(data_list, deserializer)
 
     for record in records:
-        if not isinstance(record, DuplicateIdentifierValueException):
-            if not record['_id']:
-                record['_id'] = str(uuid.uuid4())
+        if isinstance(record, ImportRecordException):
+            continue
 
-            id_prefix = import_config.record_type + '/'
-            if record['_id'][:len(id_prefix)] != id_prefix:
-                record['_id'] = '{}{}'.format(id_prefix, record['_id'])
+        if not record['_id']:
+            record['_id'] = str(uuid.uuid4())
+
+        id_prefix = import_config.record_type + '/'
+        if record['_id'][:len(id_prefix)] != id_prefix:
+            record['_id'] = '{}{}'.format(id_prefix, record['_id'])
 
     return records
 
@@ -99,8 +125,11 @@ def import_records(records):
     """
     index_mappings = []
     for i in range(len(records)):
-        if isinstance(records[i], DuplicateIdentifierValueException):
-            index_mappings.append((i, records.pop(i)))
+        if isinstance(records[i], ImportRecordException):
+            index_mappings.append((i, records[i]))
+
+    for item in index_mappings:
+        records.pop(item[0])
 
     resp = {'result': []}
     if len(records) > 0:
@@ -112,16 +141,7 @@ def import_records(records):
     for item in index_mappings:
         index = item[0]
         value = item[1]
-        if isinstance(value, DuplicateIdentifierValueException):
-            value = {
-                '_id': value.id,
-                '_type': 'error',
-                'code': 109,
-                'message': str(value),
-                'name': 'DuplicateIdentifierValueException',
-            }
-
-        result.insert(index, value)
+        result.insert(index, value.to_dict())
 
     for item in result:
         if item['_type'] == 'record':
@@ -190,6 +210,10 @@ def populate_record_reference(data_list, import_config, identifier_map):
     result = []
     reference_fields = import_config.get_reference_fields()
     for data in data_list:
+        if isinstance(data, ImportRecordException):
+            result.append(data)
+            continue
+
         try:
             # merge data with reference
             for reference_field in reference_fields:
@@ -200,9 +224,8 @@ def populate_record_reference(data_list, import_config, identifier_map):
                     value=data[reference_field.name]
                 )
             result.append(data)
-        except DuplicateIdentifierValueException as e:
-            e.id = data.get('_id')
-            result.append(e)
+        except Exception as e:
+            result.append(ImportRecordException(data, e))
 
     return result
 
@@ -215,18 +238,20 @@ def populate_record_id(data_list, import_config, identifier_map):
     result = []
     record_type = import_config.record_type
     for data in data_list:
-        if import_config.identifier != '_id':
-            try:
-                data['_id'] = identifier_map.get(
-                    record_type=record_type,
-                    key=import_config.identifier,
-                    value=data[import_config.identifier]
-                )
-                result.append(data)
-            except DuplicateIdentifierValueException as e:
-                result.append(e)
-        else:
+        if import_config.identifier == '_id' or \
+           isinstance(data, ImportRecordException):
             result.append(data)
+            continue
+
+        try:
+            data['_id'] = identifier_map.get(
+                record_type=record_type,
+                key=import_config.identifier,
+                value=data[import_config.identifier]
+            )
+            result.append(data)
+        except Exception as e:
+            result.append(ImportRecordException(data, e))
 
     return result
 
@@ -234,14 +259,15 @@ def populate_record_id(data_list, import_config, identifier_map):
 def deserialize_record_data(data_list, deserializer):
     records = []
     for data in data_list:
-        if not isinstance(data, DuplicateIdentifierValueException):
-            record = deserializer.deserialize(data)
-
-            # record id does not exist in record if using custom identifier
-            record['_id'] = data['_id']
-            records.append(record)
-        else:
+        if isinstance(data, ImportRecordException):
             records.append(data)
+            continue
+
+        record = deserializer.deserialize(data)
+
+        # record id does not exist in record if using custom identifier
+        record['_id'] = data['_id']
+        records.append(record)
 
     return records
 
