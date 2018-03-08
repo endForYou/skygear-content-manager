@@ -23,6 +23,7 @@ export enum PushCampaignActionTypes {
 }
 
 export interface FetchPushCampaignListRequest {
+  context: undefined;
   payload: {
     page: number;
   };
@@ -30,6 +31,7 @@ export interface FetchPushCampaignListRequest {
 }
 
 export interface FetchPushCampaignListSuccess {
+  context: undefined;
   payload: {
     fetchResult: PushCampaign[];
     page: number;
@@ -40,6 +42,7 @@ export interface FetchPushCampaignListSuccess {
 }
 
 export interface FetchPushCampaignListFailure {
+  context: undefined;
   payload: {
     error: Error;
   };
@@ -47,6 +50,7 @@ export interface FetchPushCampaignListFailure {
 }
 
 export interface SavePushCampaignRequest {
+  context: undefined;
   payload: {
     newPushCampaign: NewPushCampaign;
   };
@@ -54,6 +58,7 @@ export interface SavePushCampaignRequest {
 }
 
 export interface SavePushCampaignSuccess {
+  context: undefined;
   payload: {
     newPushCampaign: NewPushCampaign;
   };
@@ -61,6 +66,7 @@ export interface SavePushCampaignSuccess {
 }
 
 export interface SavePushCampaignFailure {
+  context: undefined;
   payload: {
     error: Error;
   };
@@ -71,6 +77,7 @@ function fetchPushCampaignListRequest(
   page: number
 ): FetchPushCampaignListRequest {
   return {
+    context: undefined,
     payload: {
       page,
     },
@@ -85,6 +92,7 @@ function fetchPushCampaignListSuccess(
   totalCount: number
 ): FetchPushCampaignListSuccess {
   return {
+    context: undefined,
     payload: {
       fetchResult,
       page,
@@ -99,6 +107,7 @@ function fetchPushCampaignListFailure(
   error: Error
 ): FetchPushCampaignListFailure {
   return {
+    context: undefined,
     payload: {
       error,
     },
@@ -110,6 +119,7 @@ function savePushCampaignRequest(
   newPushCampaign: NewPushCampaign
 ): SavePushCampaignRequest {
   return {
+    context: undefined,
     payload: {
       newPushCampaign,
     },
@@ -121,6 +131,7 @@ function savePushCampaignSuccess(
   newPushCampaign: NewPushCampaign
 ): SavePushCampaignSuccess {
   return {
+    context: undefined,
     payload: {
       newPushCampaign,
     },
@@ -130,6 +141,7 @@ function savePushCampaignSuccess(
 
 function savePushCampaignFailure(error: Error): SavePushCampaignFailure {
   return {
+    context: undefined,
     payload: {
       error,
     },
