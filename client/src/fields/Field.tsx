@@ -7,6 +7,7 @@ import { Effect } from '../components/RecordFormPage';
 import { AssociationReferenceField } from './AssociationReferenceField';
 import { BooleanField } from './BooleanField';
 import { DateTimeField } from './DateTimeField';
+import { DropdownField } from './DropdownField';
 import { ImageAssetField } from './ImageAssetField';
 import { IntegerField } from './IntegerField';
 import { ReferenceField } from './ReferenceField';
@@ -54,6 +55,8 @@ export class Field extends React.PureComponent<FieldProps> {
         return <StringField {...rest} config={config} />;
       case FieldConfigTypes.DateTime:
         return <DateTimeField {...rest} config={config} />;
+      case FieldConfigTypes.Dropdown:
+        return <DropdownField {...rest} config={config} />;
       case FieldConfigTypes.TextArea:
         return <TextArea {...rest} config={config} />;
       case FieldConfigTypes.Boolean:
