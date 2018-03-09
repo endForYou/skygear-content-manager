@@ -88,6 +88,7 @@ export type ReferenceConfig =
 export type FieldConfig =
   | StringFieldConfig
   | TextAreaFieldConfig
+  | DropdownFieldConfig
   | DateTimeFieldConfig
   | BooleanFieldConfig
   | IntegerFieldConfig
@@ -97,6 +98,7 @@ export type FieldConfig =
 export enum FieldConfigTypes {
   String = 'String',
   TextArea = 'TextArea',
+  Dropdown = 'Dropdown',
   DateTime = 'DateTime',
   Boolean = 'Boolean',
   Integer = 'Integer',
@@ -120,6 +122,20 @@ export interface StringFieldConfig extends FieldConfigAttrs {
 
 export interface TextAreaFieldConfig extends FieldConfigAttrs {
   type: FieldConfigTypes.TextArea;
+}
+
+export interface DropdownFieldConfig extends FieldConfigAttrs {
+  type: FieldConfigTypes.Dropdown;
+  default: string | null;
+  nullOption: {
+    enabled: boolean;
+    label: string;
+  };
+  customOption: {
+    enabled: boolean;
+    label: string;
+  };
+  options: DropdownOption[];
 }
 
 export interface DateTimeFieldConfig extends FieldConfigAttrs {
@@ -161,6 +177,11 @@ export interface AssociationReferenceFieldConfig extends FieldConfigAttrs {
 
 export interface ImageAssetFieldConfig extends FieldConfigAttrs {
   type: FieldConfigTypes.ImageAsset;
+}
+
+interface DropdownOption {
+  label: string;
+  value: string;
 }
 
 interface FieldConfigInput {
@@ -429,6 +450,8 @@ export function parseFieldConfig(context: ConfigContext, a: any): FieldConfig {
       return parseStringFieldConfig(a);
     case 'TextArea':
       return parseTextAreaFieldConfig(a);
+    case 'Dropdown':
+      return parseDropdownFieldConfig(a);
     case 'DateTime':
       return parseDateTimeFieldConfig(a);
     case 'Boolean':
@@ -469,6 +492,46 @@ function parseTextAreaFieldConfig(
   return {
     ...parseFieldConfigAttrs(input, 'TextArea'),
     type: FieldConfigTypes.TextArea,
+  };
+}
+
+function parseDropdownFieldConfig(
+  input: FieldConfigInput
+): DropdownFieldConfig {
+  // tslint:disable-next-line: no-any
+  const options: DropdownOption[] = input.options.map((optIn: any) => {
+    let { label, value } = optIn;
+
+    if (typeof value !== 'string' || value === '') {
+      throw new Error('Dropdown option value must be non-empty string');
+    }
+
+    if (label === undefined || label === null || label === '') {
+      label = value;
+    } else if (typeof label !== 'string') {
+      throw new Error('Dropdown option label must be string');
+    }
+
+    return {
+      label,
+      value,
+    };
+  });
+
+  const nullOption = input.null || { enabled: true };
+  nullOption.label = nullOption.label || 'NULL';
+
+  const customOption = input.custom || { enabled: true };
+  customOption.label = customOption.label || 'Others';
+
+  return {
+    ...parseFieldConfigAttrs(input, 'Dropdown'),
+    customOption,
+    default:
+      parseOptionalString(input, 'default', 'Dropdown') || options[0].value,
+    nullOption,
+    options,
+    type: FieldConfigTypes.Dropdown,
   };
 }
 
