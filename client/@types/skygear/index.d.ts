@@ -183,6 +183,7 @@ declare module 'skygear' {
   export class Query {
     constructor(recordCls: RecordCls);
 
+    public recordType: string;
     public overallCount: boolean;
     public limit: number;
     public offset: number;
@@ -230,7 +231,9 @@ declare module 'skygear' {
       loc: Geolocation
     ): this;
 
-    // get predicate()
+    // TODO (Steven-Chan):
+    // Define type Predicate
+    readonly predicate: any[];
 
     public hash: string;
     public toJSON(): KVObject;

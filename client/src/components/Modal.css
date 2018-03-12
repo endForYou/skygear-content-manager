@@ -1,3 +1,7 @@
+.modal-above-backdrop {
+  z-index: 1050;
+}
+
 .modal-lodaing-img {
   display: block;
   width: 50px;

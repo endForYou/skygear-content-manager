@@ -1,12 +1,7 @@
 import * as React from 'react';
 
 import { ImportResult } from '../types';
-import {
-  CloseModalButton,
-  createFailureModal,
-  createLoadingModal,
-  Modal,
-} from './Modal';
+import { createFailureModal, createLoadingModal, Modal } from './Modal';
 
 export interface ImportModalProps {
   onDismiss: () => void;
@@ -27,7 +22,16 @@ export const ImportModal: React.SFC<ImportModalProps> = props => {
           <p key="error-count">Failed records: {result.errorCount}</p>,
         ];
       }}
-      footer={() => <CloseModalButton onClick={onDismiss} />}
+      footer={() => (
+        <a
+          href="#"
+          role="button"
+          className="btn btn-primary"
+          onClick={onDismiss}
+        >
+          Close
+        </a>
+      )}
     />
   );
 };
