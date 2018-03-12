@@ -500,7 +500,8 @@ function parseDropdownFieldConfig(
 ): DropdownFieldConfig {
   // tslint:disable-next-line: no-any
   const options: DropdownOption[] = input.options.map((optIn: any) => {
-    let { label, value } = optIn;
+    let { label } = optIn;
+    const { value } = optIn;
 
     if (typeof value !== 'string' || value === '') {
       throw new Error('Dropdown option value must be non-empty string');

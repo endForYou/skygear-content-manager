@@ -1,8 +1,7 @@
+import './DropdownField.css';
+
 import * as React from 'react';
-import Select, {
-  Option,
-  OptionValues,
-} from 'react-select';
+import Select, { Option, OptionValues } from 'react-select';
 
 import { RequiredFieldProps } from './Field';
 
@@ -13,7 +12,7 @@ export type DropdownFieldProps = RequiredFieldProps<DropdownFieldConfig>;
 enum MAGIC_NUMBER {
   NULL = 1,
   CUSTOM = 2,
-};
+}
 type SelectValueType = string | MAGIC_NUMBER;
 type ValueType = string | null | undefined;
 interface DropdownFieldState {
@@ -22,7 +21,10 @@ interface DropdownFieldState {
   expanded: boolean;
 }
 
-export class DropdownField extends React.PureComponent<DropdownFieldProps, DropdownFieldState> {
+export class DropdownField extends React.PureComponent<
+  DropdownFieldProps,
+  DropdownFieldState
+> {
   constructor(props: DropdownFieldProps) {
     super(props);
 
@@ -32,6 +34,7 @@ export class DropdownField extends React.PureComponent<DropdownFieldProps, Dropd
     };
 
     this.handleSelectChange = this.handleSelectChange.bind(this);
+    this.handleCustomValueChange = this.handleCustomValueChange.bind(this);
   }
 
   // Does not handle componentWillReceiveProps
@@ -40,16 +43,9 @@ export class DropdownField extends React.PureComponent<DropdownFieldProps, Dropd
   // custom value with matched value
 
   public deriveValueStates(props: DropdownFieldProps) {
-    const {
-      config: {
-        customOption,
-        options,
-      },
-      value,
-    } = props;
+    const { config: { customOption, options }, value } = props;
 
-    const matched = options
-      .filter(opt => opt.value === value).length > 0;
+    const matched = options.filter(opt => opt.value === value).length > 0;
     let selectValue: SelectValueType;
 
     if (typeof value !== 'string') {
@@ -68,7 +64,8 @@ export class DropdownField extends React.PureComponent<DropdownFieldProps, Dropd
 
   public handleSelectChange(option: Option<OptionValues> | null) {
     if (option == null) {
-      throw new Error('Unexpected null selected');
+      // throw new Error('Unexpected null selected');
+      return;
     }
 
     const optionValue = option.value;
@@ -99,27 +96,31 @@ export class DropdownField extends React.PureComponent<DropdownFieldProps, Dropd
     }
   }
 
+  public handleCustomValueChange(event: React.ChangeEvent<HTMLInputElement>) {
+    const value = event.target.value;
+    this.setState({
+      value,
+    });
+
+    if (this.props.onFieldChange) {
+      this.props.onFieldChange(value);
+    }
+  }
+
   get selectOptions() {
-    const {
-      config: {
-        options,
-        nullOption,
-        customOption,
-      },
-    } = this.props;
+    const { config: { options, nullOption, customOption } } = this.props;
 
     const selectValue = this.state.selectValue;
     const value = this.state.value;
-    const matched = options
-      .filter(opt => opt.value === selectValue).length > 0;
+    const matched = options.filter(opt => opt.value === selectValue).length > 0;
 
-    let combinedOptions: any[] = options;
+    let combinedOptions: Option[] = options;
     if (nullOption.enabled) {
       combinedOptions = [
         { label: nullOption.label, value: MAGIC_NUMBER.NULL },
         ...combinedOptions,
       ];
-    } else if (selectValue === MAGIC_NUMBER.NULL) {
+    } else if (selectValue === MAGIC_NUMBER.NULL || value == null) {
       combinedOptions = [
         { label: nullOption.label, value: MAGIC_NUMBER.NULL, disabled: true },
         ...combinedOptions,
@@ -131,9 +132,9 @@ export class DropdownField extends React.PureComponent<DropdownFieldProps, Dropd
         ...combinedOptions,
         { label: customOption.label, value: MAGIC_NUMBER.CUSTOM },
       ];
-    } else if (!matched && selectValue !== MAGIC_NUMBER.NULL) {
+    } else if (!matched && selectValue !== MAGIC_NUMBER.NULL && value != null) {
       combinedOptions = [
-        { label: value, value: value, disabled: true },
+        { label: value, value, disabled: true },
         ...combinedOptions,
       ];
     }
@@ -143,31 +144,38 @@ export class DropdownField extends React.PureComponent<DropdownFieldProps, Dropd
 
   public render() {
     const {
-      config: {
-        editable,
-        name,
-      },
+      config: { editable, name },
       onFieldChange: _,
       ...rest,
     } = this.props;
 
+    const { selectValue, value } = this.state;
+
     if (editable) {
       return (
-        <Select
-          name={name}
-          clearable={false}
-          searchable={false}
-          placeholder=''
-          value={this.state.selectValue}
-          onChange={this.handleSelectChange}
-          options={this.selectOptions}
-        />
-
-        // TODO (Steven-Chan):
-        // render custom value text input
+        <div>
+          <Select
+            name={name}
+            clearable={false}
+            searchable={true}
+            placeholder=""
+            value={this.state.selectValue}
+            onChange={this.handleSelectChange}
+            options={this.selectOptions}
+          />
+          {selectValue === MAGIC_NUMBER.CUSTOM && (
+            <input
+              {...rest}
+              className="form-control dropdown-custom-input"
+              type="text"
+              value={value || ''}
+              onChange={this.handleCustomValueChange}
+            />
+          )}
+        </div>
       );
     } else {
-      return <span {...rest}>{this.state.value}</span>
+      return <span {...rest}>{this.state.value}</span>;
     }
   }
 }
