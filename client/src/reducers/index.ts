@@ -7,6 +7,7 @@ import auth from './auth';
 import importReducer from './import';
 import { pushCampaignViewsReducer } from './pushCampaign';
 import { recordViewsByNameReducerFactory } from './recordFactory';
+import userReducer from './user';
 
 const constReducer = (state = {}) => {
   return state;
@@ -17,6 +18,7 @@ function rootReducerFactory(recordNames: string[]) {
   // See https://github.com/reactjs/redux/issues/2709
   // tslint:disable: no-any
   return combineReducers<RootState>({
+    adminRole: constReducer as Reducer<any>,
     auth: auth as Reducer<any>,
     cmsConfig: constReducer as Reducer<any>,
     import: importReducer as Reducer<any>,
@@ -25,6 +27,7 @@ function rootReducerFactory(recordNames: string[]) {
       any
     >,
     router: routerReducer as Reducer<any>,
+    user: userReducer as Reducer<any>,
   });
   // tslint:enable: no-any
 }

@@ -15,6 +15,8 @@ import { ShowPageContainer } from '../../pages/ShowPageContainer';
 import { NewPushNotificationPageContainer } from '../../push_notifications/NewPushNotificationPageContainer';
 import { PushNotificationListPageFactory } from '../../push_notifications/PushNotificationListPage';
 
+import { UserListPageFactory } from '../../pages/UserManagement/UserListPage';
+
 export function routesFromRecordConfigs(
   configs: RecordConfig[]
 ): JSX.Element[] {
@@ -25,6 +27,10 @@ export function routesFromRecordConfigs(
 
 export function pushNotificationRoutes(): JSX.Element[] {
   return [makeNewPushNotificationRoute(), makeNotificationListRoute()];
+}
+
+export function userManagementRoutes(): JSX.Element[] {
+  return [makeUserManagementRoute()];
 }
 
 function routesFromRecordConfig(config: RecordConfig): JSX.Element[] {
@@ -121,6 +127,17 @@ function makeNewPushNotificationRoute(): JSX.Element {
       exact={true}
       path={`/notification/new`}
       render={routeProps => <NewPushNotificationPageContainer />}
+    />
+  );
+}
+
+function makeUserManagementRoute(): JSX.Element {
+  return (
+    <Route
+      key="user-management"
+      exact={true}
+      path="/user-management"
+      component={UserListPageFactory()}
     />
   );
 }

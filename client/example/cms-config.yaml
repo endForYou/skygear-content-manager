@@ -1,4 +1,5 @@
 site:
+  - type: UserManagement
   - type: Record
     name: user
     label: User
@@ -52,13 +53,6 @@ records:
           label: Country
           target: country
           displayFieldName: _id
-      filters:
-        - name: _created_at
-          type: DateTime
-          label: Created At
-        - name: email
-          type: String
-          label: Email
       actions:
         - type: Import
           name: import-user
@@ -733,3 +727,5 @@ push_notifications:
     - name: name
       type: String
       label: Name
+user_management:
+  enabled: true

@@ -58,6 +58,16 @@ export function getPath(urlString: string): string {
   return url.pathname;
 }
 
+export function update<T>(
+  arr: T[],
+  fn: ((obj: T) => T),
+  filter?: ((obj: T) => boolean)
+): T[] {
+  return arr.map(obj => {
+    return filter && !filter(obj) ? obj : fn(obj);
+  });
+}
+
 export function debouncePromise1<T1, R>(
   f: ((a0: T1) => Promise<R>),
   wait: number
