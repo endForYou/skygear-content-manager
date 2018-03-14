@@ -118,7 +118,7 @@ export class DropdownField extends React.PureComponent<
 
     const selectValue = this.state.selectValue;
     const value = this.state.value;
-    const matched = options.filter(opt => opt.value === selectValue).length > 0;
+    const matched = options.filter(opt => opt.value === value).length > 0;
 
     let combinedOptions: Option[] = options;
     if (nullOption.enabled) {
@@ -154,7 +154,7 @@ export class DropdownField extends React.PureComponent<
 
   public render() {
     const {
-      config: { editable, name },
+      config: { editable, name, nullOption, options },
       onFieldChange: _,
       ...rest,
     } = this.props;
@@ -185,7 +185,16 @@ export class DropdownField extends React.PureComponent<
         </div>
       );
     } else {
-      return <span {...rest}>{this.state.value}</span>;
+      let displayValue: string;
+      const matches = options.filter(opt => opt.value === value);
+      if (matches.length > 0) {
+        displayValue = matches[0].label;
+      } else if (value == null) {
+        displayValue = nullOption.label;
+      } else {
+        displayValue = value;
+      }
+      return <span {...rest}>{displayValue}</span>;
     }
   }
 }
