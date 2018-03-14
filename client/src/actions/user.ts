@@ -212,6 +212,9 @@ function updateUserCMSAccessImpl(
   hasAccess: boolean,
   adminRole: string
 ): Promise<'OK'> {
+  // TODO (Steven-Chan):
+  // The api return OK even if the user is not found
+  // should handle this error case in application level?
   return hasAccess
     ? skygear.auth.assignUserRole([user.id], [adminRole])
     : skygear.auth.revokeUserRole([user.id], [adminRole]);
