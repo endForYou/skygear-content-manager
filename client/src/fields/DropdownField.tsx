@@ -9,11 +9,11 @@ import { DropdownFieldConfig } from '../cmsConfig';
 
 export type DropdownFieldProps = RequiredFieldProps<DropdownFieldConfig>;
 
-enum MAGIC_NUMBER {
-  NULL = 1,
-  CUSTOM = 2,
+enum SelectValue {
+  Null = 1,
+  Custom = 2,
 }
-type SelectValueType = string | MAGIC_NUMBER;
+type SelectValueType = string | SelectValue;
 type ValueType = string | null | undefined;
 interface DropdownFieldState {
   selectValue: SelectValueType;
@@ -55,9 +55,9 @@ export class DropdownField extends React.PureComponent<
     let selectValue: SelectValueType;
 
     if (typeof value !== 'string') {
-      selectValue = MAGIC_NUMBER.NULL;
+      selectValue = SelectValue.Null;
     } else if (!matched && customOption.enabled) {
-      selectValue = MAGIC_NUMBER.CUSTOM;
+      selectValue = SelectValue.Custom;
     } else {
       selectValue = value;
     }
@@ -79,11 +79,11 @@ export class DropdownField extends React.PureComponent<
     let newSelectValue: SelectValueType;
     let newValue: ValueType;
 
-    if (optionValue === MAGIC_NUMBER.NULL) {
-      newSelectValue = MAGIC_NUMBER.NULL;
+    if (optionValue === SelectValue.Null) {
+      newSelectValue = SelectValue.Null;
       newValue = null;
-    } else if (optionValue === MAGIC_NUMBER.CUSTOM) {
-      newSelectValue = MAGIC_NUMBER.CUSTOM;
+    } else if (optionValue === SelectValue.Custom) {
+      newSelectValue = SelectValue.Custom;
       newValue = '';
     } else if (typeof optionValue === 'string') {
       newSelectValue = optionValue;
@@ -123,12 +123,12 @@ export class DropdownField extends React.PureComponent<
     let combinedOptions: Option[] = options;
     if (nullOption.enabled) {
       combinedOptions = [
-        { label: nullOption.label, value: MAGIC_NUMBER.NULL },
+        { label: nullOption.label, value: SelectValue.Null },
         ...combinedOptions,
       ];
-    } else if (selectValue === MAGIC_NUMBER.NULL || value == null) {
+    } else if (selectValue === SelectValue.Null || value == null) {
       combinedOptions = [
-        { label: nullOption.label, value: MAGIC_NUMBER.NULL, disabled: true },
+        { label: nullOption.label, value: SelectValue.Null, disabled: true },
         ...combinedOptions,
       ];
     }
@@ -136,9 +136,9 @@ export class DropdownField extends React.PureComponent<
     if (customOption.enabled) {
       combinedOptions = [
         ...combinedOptions,
-        { label: customOption.label, value: MAGIC_NUMBER.CUSTOM },
+        { label: customOption.label, value: SelectValue.Custom },
       ];
-    } else if (!matched && selectValue !== MAGIC_NUMBER.NULL && value != null) {
+    } else if (!matched && selectValue !== SelectValue.Null && value != null) {
       combinedOptions = [
         { label: value, value, disabled: true },
         ...combinedOptions,
@@ -173,7 +173,7 @@ export class DropdownField extends React.PureComponent<
             onChange={this.handleSelectChange}
             options={this.selectOptions}
           />
-          {selectValue === MAGIC_NUMBER.CUSTOM && (
+          {selectValue === SelectValue.Custom && (
             <input
               {...rest}
               className="form-control dropdown-custom-input"
