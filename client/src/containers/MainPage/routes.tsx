@@ -15,6 +15,7 @@ import { ShowPageContainer } from '../../pages/ShowPageContainer';
 import { NewPushNotificationPageContainer } from '../../push_notifications/NewPushNotificationPageContainer';
 import { PushNotificationListPageFactory } from '../../push_notifications/PushNotificationListPage';
 
+import { ChangePasswordPageContainer } from '../../pages/UserManagement/ChangePasswordPage';
 import { UserListPageFactory } from '../../pages/UserManagement/UserListPage';
 
 export function routesFromRecordConfigs(
@@ -30,7 +31,7 @@ export function pushNotificationRoutes(): JSX.Element[] {
 }
 
 export function userManagementRoutes(): JSX.Element[] {
-  return [makeUserManagementRoute()];
+  return [makeUserManagementRoute(), makeChangePasswordRoute()];
 }
 
 function routesFromRecordConfig(config: RecordConfig): JSX.Element[] {
@@ -138,6 +139,19 @@ function makeUserManagementRoute(): JSX.Element {
       exact={true}
       path="/user-management"
       component={UserListPageFactory()}
+    />
+  );
+}
+
+function makeChangePasswordRoute(): JSX.Element {
+  return (
+    <Route
+      key="change-password"
+      exact={true}
+      path="/user-management/:userId/change-password"
+      render={routeProps => (
+        <ChangePasswordPageContainer userId={routeProps.match.params.userId} />
+      )}
     />
   );
 }

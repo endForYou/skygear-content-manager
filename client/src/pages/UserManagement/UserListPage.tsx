@@ -136,9 +136,9 @@ class UserListPageImpl extends React.PureComponent<UserListPageProps> {
   constructor(props: UserListPageProps) {
     super(props);
 
-    const { adminRole, dispatch } = props;
+    const { dispatch } = props;
 
-    this.userActionCreator = new UserActionDispatcher(dispatch, adminRole);
+    this.userActionCreator = new UserActionDispatcher(dispatch);
     this.fetchList = debounce(this.fetchList.bind(this), 200);
 
     this.onPageItemClicked = this.onPageItemClicked.bind(this);
@@ -198,7 +198,8 @@ class UserListPageImpl extends React.PureComponent<UserListPageProps> {
   }
 
   public onCMSAccessChange(user: SkygearUser, hasAccess: boolean) {
-    this.userActionCreator.updateUserCMSAccess(user, hasAccess);
+    const { adminRole } = this.props;
+    this.userActionCreator.updateUserCMSAccess(user.id, hasAccess, adminRole);
   }
 }
 

@@ -119,19 +119,19 @@ function fetchUserListFailure(error: Error): FetchUserListFailure {
 }
 
 function updateUserCMSAccessRequest(
-  user: SkygearUser
+  userId: string
 ): UpdateUserCMSAccessRequest {
   return {
     context: undefined,
     payload: {
-      id: user.id,
+      id: userId,
     },
     type: UserActionTypes.UpdateUserCMSAccessRequest,
   };
 }
 
 function updateUserCMSAccessSuccess(
-  user: SkygearUser,
+  userId: string,
   hasAccess: boolean,
   adminRole: string
 ): UpdateUserCMSAccessSuccess {
@@ -140,21 +140,21 @@ function updateUserCMSAccessSuccess(
     payload: {
       adminRole,
       hasAccess,
-      id: user.id,
+      id: userId,
     },
     type: UserActionTypes.UpdateUserCMSAccessSuccess,
   };
 }
 
 function updateUserCMSAccessFailure(
-  user: SkygearUser,
+  userId: string,
   error: Error
 ): UpdateUserCMSAccessFailure {
   return {
     context: undefined,
     payload: {
       error,
-      id: user.id,
+      id: userId,
     },
     type: UserActionTypes.UpdateUserCMSAccessFailure,
   };
@@ -208,20 +208,20 @@ function fetchUsers(
 }
 
 function updateUserCMSAccessImpl(
-  user: SkygearUser,
+  userId: string,
   hasAccess: boolean,
   adminRole: string
 ): Promise<'OK'> {
   const promise = hasAccess
-    ? skygear.auth.assignUserRole([user.id], [adminRole])
-    : skygear.auth.revokeUserRole([user.id], [adminRole]);
+    ? skygear.auth.assignUserRole([userId], [adminRole])
+    : skygear.auth.revokeUserRole([userId], [adminRole]);
 
   return promise
     .then(() => {
-      return skygear.auth.fetchUserRole([user.id]);
+      return skygear.auth.fetchUserRole([userId]);
     })
     .then((userRoles: { [id: string]: Role[] }) => {
-      const roles = userRoles[user.id];
+      const roles = userRoles[userId];
       const hasAdminRole = roles.filter(r => r.name === adminRole).length > 0;
       if ((hasAccess && !hasAdminRole) || (!hasAccess && hasAdminRole)) {
         throw new Error('Failed to update roles');
@@ -232,37 +232,46 @@ function updateUserCMSAccessImpl(
 }
 
 function updateUserCMSAccess(
-  user: SkygearUser,
+  userId: string,
   hasAccess: boolean,
   adminRole: string
 ): ThunkAction<Promise<void>, {}, {}> {
   return dispatch => {
-    dispatch(updateUserCMSAccessRequest(user));
+    dispatch(updateUserCMSAccessRequest(userId));
 
-    return updateUserCMSAccessImpl(user, hasAccess, adminRole)
+    return updateUserCMSAccessImpl(userId, hasAccess, adminRole)
       .then(() => {
-        dispatch(updateUserCMSAccessSuccess(user, hasAccess, adminRole));
+        dispatch(updateUserCMSAccessSuccess(userId, hasAccess, adminRole));
       })
       .catch((error: Error) => {
-        dispatch(updateUserCMSAccessFailure(user, error));
+        dispatch(updateUserCMSAccessFailure(userId, error));
       });
   };
 }
 
+export function changePassword(
+  userId: string,
+  password: string
+): Promise<string> {
+  return skygear.auth.adminResetPassword(userId, password);
+}
+
 export class UserActionDispatcher {
   private dispatch: Dispatch<RootState>;
-  private adminRole: string;
 
-  constructor(dispatch: Dispatch<RootState>, adminRole: string) {
+  constructor(dispatch: Dispatch<RootState>) {
     this.dispatch = dispatch;
-    this.adminRole = adminRole;
   }
 
   public fetchList(page: number, perPage: number) {
     this.dispatch(fetchUsers(page, perPage));
   }
 
-  public updateUserCMSAccess(user: SkygearUser, hasAccess: boolean) {
-    this.dispatch(updateUserCMSAccess(user, hasAccess, this.adminRole));
+  public updateUserCMSAccess(
+    userId: string,
+    hasAccess: boolean,
+    adminRole: string
+  ) {
+    this.dispatch(updateUserCMSAccess(userId, hasAccess, adminRole));
   }
 }
