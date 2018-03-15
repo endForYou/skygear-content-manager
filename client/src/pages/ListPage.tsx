@@ -176,6 +176,20 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
     this.fetchList(page, pageConfig.perPage, filters);
   }
 
+  public componentWillReceiveProps(nextProps: ListPageProps) {
+    // Refresh list after import success
+    if (
+      this.props.import.importResult &&
+      this.props.import.importResult.type === RemoteType.Loading &&
+      nextProps.import.importResult &&
+      nextProps.import.importResult.type === RemoteType.Success
+    ) {
+      const { page, pageConfig } = this.props;
+      const { filters } = this.state;
+      this.fetchList(page, pageConfig.perPage, filters);
+    }
+  }
+
   public toggleFilterMenu() {
     this.setState({ showfilterMenu: !this.state.showfilterMenu });
   }
