@@ -271,6 +271,21 @@ records:
       fields:
         - name: display_name
           type: String
+        - name: class
+          label: Class
+          type: Dropdown
+          null:
+            enabled: false
+            label: Unclassified
+          custom:
+            enabled: true
+          options:
+            - label: Class A
+              value: A
+            - label: Class B
+              value: B
+            - label: Class S
+              value: S
     new:
       fields:
         - name: display_name

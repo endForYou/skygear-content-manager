@@ -18,17 +18,16 @@ export function parseOptionalString(
   fieldName: string,
   context: string
 ): string | undefined {
-  const value = a[fieldName];
+  return parseOptional<string>('string', a, fieldName, context);
+}
 
-  if (value == null) {
-    return undefined;
-  }
-
-  if (typeof value === 'string') {
-    return value;
-  }
-
-  throw new Error(`${context}.${fieldName} want a string, got ${typeof a}`);
+export function parseOptionalBoolean(
+  // tslint:disable-next-line: no-any
+  a: any,
+  fieldName: string,
+  context: string
+): boolean | undefined {
+  return parseOptional<boolean>('boolean', a, fieldName, context);
 }
 
 export function parseStringArray(
@@ -49,4 +48,24 @@ export function parseStringArray(
   }
 
   throw new Error(`${context}.${fieldName} want an array, got ${typeof value}`);
+}
+
+export function parseOptional<T>(
+  t: string,
+  // tslint:disable-next-line: no-any
+  a: any,
+  fieldName: string,
+  context: string
+): T | undefined {
+  const value = a[fieldName];
+
+  if (value == null) {
+    return undefined;
+  }
+
+  if (typeof value === t) {
+    return value;
+  }
+
+  throw new Error(`${context}.${fieldName} want a ${t}, got ${typeof a}`);
 }
