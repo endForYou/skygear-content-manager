@@ -212,12 +212,23 @@ function updateUserCMSAccessImpl(
   hasAccess: boolean,
   adminRole: string
 ): Promise<'OK'> {
-  // TODO (Steven-Chan):
-  // The api return OK even if the user is not found
-  // should handle this error case in application level?
-  return hasAccess
+  const promise = hasAccess
     ? skygear.auth.assignUserRole([user.id], [adminRole])
     : skygear.auth.revokeUserRole([user.id], [adminRole]);
+
+  return promise
+    .then(() => {
+      return skygear.auth.fetchUserRole([user.id]);
+    })
+    .then((userRoles: { [id: string]: Role[] }) => {
+      const roles = userRoles[user.id];
+      const hasAdminRole = roles.filter(r => r.name === adminRole).length > 0;
+      if ((hasAccess && !hasAdminRole) || (!hasAccess && hasAdminRole)) {
+        throw new Error('Failed to update roles');
+      }
+
+      return 'OK' as 'OK';
+    });
 }
 
 function updateUserCMSAccess(

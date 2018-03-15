@@ -2,9 +2,7 @@ import './Modal.css';
 
 import * as React from 'react';
 
-// hotfix (Steven-Chan):
-// typescript cannot parse gif file, so use png
-import * as loading from '../assets/loading.png';
+import * as loading from '../assets/loading.gif';
 
 export interface ModalProps {
   body?: (() => JSX.Element) | (() => JSX.Element[]) | string;

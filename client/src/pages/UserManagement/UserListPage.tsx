@@ -9,6 +9,7 @@ import { Dispatch } from 'redux';
 import { Role } from 'skygear';
 
 import { UserActionDispatcher } from '../../actions/user';
+import { LoadingSpinner } from '../../components/LoadingSpinner';
 import Pagination from '../../components/Pagination';
 import { RootState } from '../../states';
 import { SkygearUser } from '../../types';
@@ -63,6 +64,7 @@ const TableRow: React.SFC<TableRowProps> = ({
           disabled={user.isRolesUpdating}
           onChange={onChange}
         />
+        {user.isRolesUpdating && <LoadingSpinner />}
       </td>
       <td>
         <Link
