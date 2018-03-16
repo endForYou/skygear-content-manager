@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
+import { Redirect, Route, Switch } from 'react-router-dom';
 
 import { CmsConfigState, RootState } from '../states';
 import { RemoteType } from '../types';
@@ -14,7 +15,12 @@ export interface AppProps {
 
 const App: React.StatelessComponent<AppProps> = ({ cmsConfig, isLoggedIn }) => {
   if (!isLoggedIn) {
-    return <LoginPage />;
+    return (
+      <Switch>
+        <Route exact={true} path="/" component={LoginPage} />
+        <Redirect to="/" />
+      </Switch>
+    );
   }
 
   if (cmsConfig && cmsConfig.type === RemoteType.Success) {
