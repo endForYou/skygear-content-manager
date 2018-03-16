@@ -3,12 +3,13 @@ import skygear, { Record } from 'skygear';
 
 import { AuthState } from '../states';
 
-export type AuthActions = LoginSuccess | LoginFailure | UpdateUser;
+export type AuthActions = LoginSuccess | LoginFailure | UpdateUser | Logout;
 
 export enum AuthActionTypes {
   LoginSuccess = 'LOGIN_SUCCESS',
   LoginFailure = 'LOGIN_FAILURE',
   UpdateUser = 'UPDATE_USER',
+  Logout = 'LOGOUT',
 }
 
 export interface LoginSuccess {
@@ -24,6 +25,12 @@ export interface LoginFailure {
   payload: {
     error: Error;
   };
+  context: undefined;
+}
+
+export interface Logout {
+  type: AuthActionTypes.Logout;
+  payload: undefined;
   context: undefined;
 }
 
@@ -62,6 +69,14 @@ export function updateUser(user: Record): UpdateUser {
       user,
     },
     type: AuthActionTypes.UpdateUser,
+  };
+}
+
+export function logout(): Logout {
+  return {
+    context: undefined,
+    payload: undefined,
+    type: AuthActionTypes.Logout,
   };
 }
 

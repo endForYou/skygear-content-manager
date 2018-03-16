@@ -6,7 +6,7 @@ import { Link, NavLink, withRouter } from 'react-router-dom';
 
 import * as logo from '../assets/logo.png';
 import { SiteItemConfig, SiteItemConfigTypes } from '../cmsConfig';
-import { RootState } from '../states';
+import { getCmsConfig, RootState } from '../states';
 
 export interface SidebarProps {
   items: SiteItemConfig[];
@@ -83,8 +83,8 @@ function Item({ item }: ItemProps): JSX.Element {
 
 const mapStateToProps = (state: RootState): SidebarProps => {
   return {
-    items: state.cmsConfig.site,
-    pushNotificationEnabled: state.cmsConfig.pushNotifications.enabled,
+    items: getCmsConfig(state).site,
+    pushNotificationEnabled: getCmsConfig(state).pushNotifications.enabled,
   };
 };
 

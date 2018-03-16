@@ -2,6 +2,7 @@ import { combineReducers, Reducer } from 'redux';
 import { Record } from 'skygear';
 
 import { Actions } from '../actions';
+import { CmsConfigActionTypes } from '../actions/cmsConfig';
 import { RecordActionTypes } from '../actions/record';
 import {
   EditState,
@@ -12,7 +13,6 @@ import {
   initialShowState,
   ListState,
   NewState,
-  RecordViewsByName,
   RecordViewState,
   ShowState,
 } from '../states';
@@ -29,17 +29,26 @@ const recordViewsReducer = combineReducers<RecordViewState>({
 });
 // tslint:enable: no-any
 
-function recordViewsByNameReducerFactory(
-  recordNames: string[] = []
-): Reducer<RecordViewsByName> {
-  const initialRecordState = initialRecordViewState;
-  const initialState = recordNames.reduce((state, recordName) => {
-    return { ...state, [recordName]: initialRecordState };
-  }, {});
+function createRecordViewsByNameReducer() {
+  const initialState = {};
+  return (state = initialState, action: Actions) => {
+    // initialize record view state
+    // when cms config fetched
+    if (action.type === CmsConfigActionTypes.FetchSuccess) {
+      const recordNames = Object.keys(action.payload.result.records);
+      state = recordNames.reduce(
+        (s, recordName) => ({
+          ...s,
+          [recordName]: initialRecordViewState,
+        }),
+        state
+      );
+    }
 
-  return (state = initialState, action) => {
-    if (action.payload && action.payload.cmsRecord) {
-      const recordName = action.payload.cmsRecord.name;
+    // tslint:disable-next-line: no-any
+    const payload: any = action.payload;
+    if (payload && payload.cmsRecord) {
+      const recordName = payload.cmsRecord.name;
       return {
         ...state,
         [recordName]: recordViewsReducer(state[recordName], action),
@@ -180,4 +189,4 @@ function recordNewReducer(
   }
 }
 
-export { recordViewsByNameReducerFactory };
+export default createRecordViewsByNameReducer();

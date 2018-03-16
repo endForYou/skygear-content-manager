@@ -40,7 +40,7 @@ import {
 } from '../components/ImportModal';
 import Pagination from '../components/Pagination';
 import { Field, FieldContext } from '../fields';
-import { ImportState, RootState } from '../states';
+import { getCmsConfig, ImportState, RootState } from '../states';
 import { RemoteType } from '../types';
 import { debounce } from '../util';
 
@@ -526,7 +526,7 @@ function ListPageFactory(recordName: string) {
     const { page: pageStr = '1' } = qs.parse(location ? location.search : '');
     const page = parseInt(pageStr, 10);
 
-    const recordConfig = state.cmsConfig.records[recordName];
+    const recordConfig = getCmsConfig(state).records[recordName];
     if (recordConfig == null) {
       throw new Error(
         `Couldn't find RecordConfig for record name = ${recordName}`

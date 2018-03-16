@@ -1,7 +1,6 @@
 import './index.css';
 
 import { createBrowserHistory, History } from 'history';
-import * as yaml from 'js-yaml';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
@@ -11,12 +10,12 @@ import { applyMiddleware, createStore, Store } from 'redux';
 import thunk from 'redux-thunk';
 import skygear from 'skygear';
 
-import { CmsConfig, parseCmsConfig } from './cmsConfig';
 import defaultAppConfig, { AppConfig } from './config';
 import { App } from './containers/App';
+import { CMSConfigProvider } from './containers/CMSConfigProvider';
 import rootReducerFactory from './reducers';
 import { initialRootState, RootState } from './states';
-import { getPath, isObject } from './util';
+import { getPath } from './util';
 
 // tslint:disable-next-line: no-any
 type User = any;
@@ -26,79 +25,43 @@ interface RootProps {
   store: Store<RootState>;
 }
 
-export interface CmsRenderConfig {
-  adminRole: string;
-  cmsConfig: CmsConfig;
-  publicUrl: string;
-  skygearApiKey: string;
-  skygearEndpoint: string;
-}
-
 const Root = ({ history, store }: RootProps) => {
   return (
     <Provider store={store}>
-      <ConnectedRouter history={history}>
-        <Switch>
-          <Route path="/" component={App} />
-        </Switch>
-      </ConnectedRouter>
+      <CMSConfigProvider>
+        <ConnectedRouter history={history}>
+          <Switch>
+            <Route path="/" component={App} />
+          </Switch>
+        </ConnectedRouter>
+      </CMSConfigProvider>
     </Provider>
   );
 };
 
+// TODO (Steven-Chan):
+// support registering custom CMSConfigProvider
 function main(appConfig: AppConfig = defaultAppConfig): void {
-  fetchCmsConfig(appConfig).then(
-    (cmsConfig: CmsConfig) => {
-      const cmsRenderConfig: CmsRenderConfig = {
-        adminRole: appConfig.adminRole,
-        cmsConfig,
-        publicUrl: appConfig.publicUrl,
-        skygearApiKey: appConfig.skygearApiKey,
-        skygearEndpoint: appConfig.skygearEndpoint,
-      };
-
-      renderCms(cmsRenderConfig);
-    },
-    error => {
-      console.log('Failed to initialize CMS:', error);
-    }
-  );
-}
-
-export function renderCms(cmsRenderConfig: CmsRenderConfig): void {
-  const cmsConfig: CmsConfig = cmsRenderConfig.cmsConfig;
-  const publicUrl: string = cmsRenderConfig.publicUrl;
-  const history: History = createHistoryFromPublicUrl(publicUrl);
-
   fetchUser(
-    cmsRenderConfig.skygearEndpoint,
-    cmsRenderConfig.skygearApiKey
-  ).then(
-    (user: User) => {
-      const recordNames = Object.keys(cmsConfig.records);
+    appConfig.skygearEndpoint,
+    appConfig.skygearApiKey
+  ).then((user: User) => {
+    const publicUrl: string = appConfig.publicUrl;
+    const history: History = createHistoryFromPublicUrl(publicUrl);
 
-      const rootReducer = rootReducerFactory(recordNames);
-      const initialState = initialRootState(
-        cmsRenderConfig.adminRole,
-        cmsConfig,
-        recordNames,
-        user
-      );
+    const initialState = initialRootState(appConfig.adminRole, appConfig, user);
+    const rootReducer = rootReducerFactory();
+    const store = createStore<RootState>(
+      rootReducer,
+      initialState,
+      applyMiddleware(thunk, routerMiddleware(history))
+    );
 
-      const store = createStore<RootState>(
-        rootReducer,
-        initialState,
-        applyMiddleware(thunk, routerMiddleware(history))
-      );
-      ReactDOM.render(
-        <Root history={history} store={store} />,
-        document.getElementById('root')
-      );
-    },
-    error => {
-      console.log('Failed to render CMS:', error);
-    }
-  );
+    ReactDOM.render(
+      <Root history={history} store={store} />,
+      document.getElementById('root')
+    );
+  });
 }
 
 function createHistoryFromPublicUrl(publicUrl: string): History {
@@ -134,27 +97,11 @@ function fetchCurrentUserIfNeeded() {
   if (skygear.auth.currentUser) {
     return skygear.auth.whoami().catch((error: Error) => {
       console.log('Failed to fetch current user:', error);
-
-      throw error;
+      return null;
     });
   } else {
     return Promise.resolve(null);
   }
-}
-
-function fetchCmsConfig(config: AppConfig) {
-  return fetch(config.cmsConfigUrl)
-    .then((resp: Response) => {
-      return resp.text();
-    })
-    .then(text => {
-      const parsed = yaml.safeLoad(text);
-      if (isObject(parsed)) {
-        return parseCmsConfig(parsed);
-      } else {
-        throw new Error(`Couldn't parse config file: ${text}`);
-      }
-    });
 }
 
 /**
