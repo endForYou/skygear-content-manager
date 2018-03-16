@@ -591,6 +591,7 @@ INDEX_HTML_FORMAT = """<!doctype html>
         skygearApiKey: "{CMS_SKYGEAR_API_KEY}",
         cmsConfigUrl: "{CMS_CONFIG_FILE_URL}",
         publicUrl: "{CMS_PUBLIC_URL}",
+        staticUrl: "{CMS_STATIC_URL}",
       }});
     </script>
   </body>

@@ -3,6 +3,7 @@ export interface AppConfig {
   publicUrl: string;
   skygearApiKey: string;
   skygearEndpoint: string;
+  staticUrl: string;
 }
 
 /**
@@ -14,4 +15,5 @@ export default {
   skygearApiKey: process.env.REACT_APP_SKYGEAR_API_KEY || 'FAKE_API_KEY',
   skygearEndpoint:
     process.env.REACT_APP_SKYGEAR_ENDPOINT || 'http://localhost:3000/cms-api/',
+  staticUrl: process.env.REACT_APP_PUBLIC_URL || '.',
 };

@@ -44,8 +44,8 @@ const EditorInitObj = {
     'anchor charmap code colorpicker contextmenu fullscreen hr image imagetools link lists nonbreaking paste tabfocus table textcolor',
   selector: 'textarea',
   skin_url:
-    (config.publicUrl === '.' ? '' : config.publicUrl) +
-    '/tinymce/skins/lightgray',
+    (config.staticUrl === '.' ? '/' : config.staticUrl) +
+    'tinymce/skins/lightgray',
   toolbar1:
     'bold italic strikethrough forecolor backcolor | link image | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent  | removeformat',
 };
