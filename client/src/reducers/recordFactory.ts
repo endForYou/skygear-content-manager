@@ -2,6 +2,7 @@ import { combineReducers, Reducer } from 'redux';
 import { Record } from 'skygear';
 
 import { Actions } from '../actions';
+import { AuthActionTypes } from '../actions/auth';
 import { CmsConfigActionTypes } from '../actions/cmsConfig';
 import { RecordActionTypes } from '../actions/record';
 import {
@@ -43,6 +44,10 @@ function createRecordViewsByNameReducer() {
         }),
         state
       );
+    }
+
+    if (action.type === AuthActionTypes.Logout) {
+      state = {};
     }
 
     // tslint:disable-next-line: no-any

@@ -13,6 +13,7 @@ import skygear from 'skygear';
 import defaultAppConfig, { AppConfig } from './config';
 import { App } from './containers/App';
 import { CMSConfigProvider } from './containers/CMSConfigProvider';
+import { getForbiddenMiddleware } from './middlewares';
 import rootReducerFactory from './reducers';
 import { initialRootState, RootState } from './states';
 import { getPath } from './util';
@@ -54,7 +55,11 @@ function main(appConfig: AppConfig = defaultAppConfig): void {
     const store = createStore<RootState>(
       rootReducer,
       initialState,
-      applyMiddleware(thunk, routerMiddleware(history))
+      applyMiddleware(
+        thunk,
+        routerMiddleware(history),
+        getForbiddenMiddleware()
+      )
     );
 
     ReactDOM.render(
