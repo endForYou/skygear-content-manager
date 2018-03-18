@@ -41,7 +41,10 @@ setup(
       url='https://github.com/oursky/skygear-content-manager',
       license='Other/Proprietary License',
       install_requires=[
-            'python-jose>=1.4.0',
+            'arrow>=0.12.1',
+            'marshmallow>=3.0.0b5',
+            'python-jose>=2.0',
+            'PyYAML>=3.12',
             'requests>=2.18.4',
             'skygear>=1.1.1',
       ],
