@@ -1,4 +1,5 @@
 import json
+import logging
 import tempfile
 import yaml
 
@@ -27,6 +28,7 @@ from .skygear_utils import (SkygearRequest, SkygearResponse, AuthData,
 
 
 cms_config = None
+logger = logging.getLogger(__name__)
 
 
 def includeme(settings):
