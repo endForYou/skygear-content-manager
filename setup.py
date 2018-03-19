@@ -42,7 +42,7 @@ setup(
       license='Other/Proprietary License',
       install_requires=[
             'arrow>=0.12.1',
-            'marshmallow>=3.0.0b5',
+            'marshmallow<=3.0.0b6',
             'python-jose>=2.0',
             'PyYAML>=3.12',
             'requests>=2.18.4',

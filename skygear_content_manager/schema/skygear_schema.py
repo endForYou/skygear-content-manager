@@ -1,11 +1,12 @@
 from marshmallow import Schema, fields, pre_load, post_load
 
+from .nested_dict import NestedDict
 from ..models.skygear_schema import SkygearSchema, SkygearRecord, SkygearField
 
 
 class SkygearSchemaSchema(Schema):
 
-    record_types = fields.Dict(fields.Nested('SkygearRecordSchema'))
+    record_types = NestedDict('SkygearRecordSchema', key='record_type')
 
     @pre_load
     def pre_load(self, data):
