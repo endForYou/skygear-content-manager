@@ -13,7 +13,7 @@ import skygear from 'skygear';
 import defaultAppConfig, { AppConfig } from './config';
 import { App } from './containers/App';
 import { CMSConfigProvider } from './containers/CMSConfigProvider';
-import { getForbiddenMiddleware } from './middlewares';
+import { getUnauthenticatedMiddleware } from './middlewares';
 import rootReducerFactory from './reducers';
 import { initialRootState, RootState } from './states';
 import { getPath } from './util';
@@ -58,7 +58,7 @@ function main(appConfig: AppConfig = defaultAppConfig): void {
       applyMiddleware(
         thunk,
         routerMiddleware(history),
-        getForbiddenMiddleware()
+        getUnauthenticatedMiddleware()
       )
     );
 

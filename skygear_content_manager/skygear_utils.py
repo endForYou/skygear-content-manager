@@ -3,7 +3,7 @@ import requests
 import skygear
 
 from jose import JWTError, jwt
-from skygear.error import PermissionDenied
+from skygear.error import AccessTokenNotAccepted, PermissionDenied
 from skygear.options import options
 
 from .settings import CMS_AUTH_SECRET
@@ -81,8 +81,8 @@ class SkygearRequest:
 class SkygearResponse:
 
     # resp: requests response
-    def __init__(self, status_code, headers, body, is_forbidden=False):
-        self.is_forbidden = is_forbidden
+    def __init__(self, status_code, headers, body, error_code=None):
+        self.error_code = error_code
 
         self.status_code = status_code
         self.headers = headers
@@ -94,7 +94,16 @@ class SkygearResponse:
             status_code=None,
             headers=None,
             body=None,
-            is_forbidden=True,
+            error_code=PermissionDenied,
+        )
+
+    @classmethod
+    def access_token_not_accepted(cls):
+        return cls(
+            status_code=None,
+            headers=None,
+            body=None,
+            error_code=AccessTokenNotAccepted,
         )
 
     @classmethod
@@ -126,23 +135,50 @@ class SkygearResponse:
         self.headers['X-Skygear-Access-Token'] = access_token
 
     @classmethod
-    def forbidden_werkzeug(cls):
+    def error_message(cls, error_code):
+        if error_code == PermissionDenied:
+            return 'You are not permitted to access CMS.'
+        elif error_code == AccessTokenNotAccepted:
+            return 'Access token is invalid.'
+
+        return 'An unexpected error has occurred.'
+
+    @classmethod
+    def error_name(cls, error_code):
+        if error_code == PermissionDenied:
+            return 'PermissionDenied'
+        elif error_code == AccessTokenNotAccepted:
+            return 'AccessTokenNotAccepted'
+
+        return 'UnexpectedError'
+
+    @classmethod
+    def error_status_code(cls, error_code):
+        if error_code == PermissionDenied:
+            return 403
+        elif error_code == AccessTokenNotAccepted:
+            return 401
+
+        return 500
+
+    @classmethod
+    def error_werkzeug(cls, error_code):
         data = {
             'error': {
-                'code': PermissionDenied,
-                'message': 'You are not permitted to access CMS',
-                'name': 'PermissionDenied',
+                'code': error_code,
+                'message': cls.error_message(error_code),
+                'name': cls.error_name(error_code),
             }
         }
         return skygear.Response(
             json.dumps(data).encode('utf-8'),
-            403,
+            cls.error_status_code(error_code),
             mimetype='application/json',
         )
 
     def to_werkzeug(self):
-        if self.is_forbidden:
-            return SkygearResponse.forbidden_werkzeug()
+        if self.error_code:
+            return SkygearResponse.error_werkzeug(self.error_code)
 
         filtered_headers = [
             (k, v)
