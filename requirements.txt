@@ -14,7 +14,7 @@ jmespath==0.9.3
 marshmallow==3.0.0b7
 psycopg2==2.7.4
 pycryptodome==3.5.1
-python-dateutil==2.7.0
+python-dateutil==2.6.1
 python-jose==2.0.2
 PyYAML==3.12
 requests==2.18.4
