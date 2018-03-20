@@ -16,7 +16,8 @@ from ..models.cms_config import (CMSConfig, CMSRecord, CMSRecordList,
 class CMSConfigSchema(Schema):
 
     records = NestedDict('CMSRecordSchema', key='record_type')
-    association_records = NestedDict('CMSAssociationRecordSchema', key='name')
+    association_records = NestedDict('CMSAssociationRecordSchema', key='name',
+                                     required=False)
 
     @pre_load
     def pre_load(self, data):

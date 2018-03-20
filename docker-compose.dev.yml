@@ -36,7 +36,7 @@ services:
       BROWSER: none
       PORT: 80
       PUBLIC_URL: .
-      REACT_APP_CMS_CONFIG_URI: /cms-config.yaml
+      REACT_APP_CMS_CONFIG_URL: /cms-config.yaml
       REACT_APP_SKYGEAR_API_KEY: my_skygear_key
       REACT_APP_SKYGEAR_ENDPOINT: http://localhost:3001/cms-api/
 

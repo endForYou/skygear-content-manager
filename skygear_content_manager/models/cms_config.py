@@ -1,6 +1,6 @@
 class CMSConfig:
 
-    def __init__(self, records, association_records):
+    def __init__(self, records, association_records={}):
         self.records = records
         self.association_records = association_records
 
