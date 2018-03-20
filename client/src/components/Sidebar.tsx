@@ -5,11 +5,11 @@ import { connect } from 'react-redux';
 import { Link, NavLink, withRouter } from 'react-router-dom';
 
 import * as logo from '../assets/logo.png';
-import { RecordSiteItemConfig, RecordSiteItemConfigType } from '../cmsConfig';
+import { SiteItemConfig, SiteItemConfigTypes } from '../cmsConfig';
 import { RootState } from '../states';
 
 export interface SidebarProps {
-  items: RecordSiteItemConfig[];
+  items: SiteItemConfig[];
   pushNotificationEnabled: boolean;
 }
 
@@ -61,23 +61,22 @@ function ListItems({
 }
 
 interface ItemProps {
-  item: RecordSiteItemConfig;
+  item: SiteItemConfig;
 }
 
 function Item({ item }: ItemProps): JSX.Element {
   switch (item.type) {
-    case RecordSiteItemConfigType.Record:
+    case SiteItemConfigTypes.Record:
       return (
         <NavLink className="nav-link" to={`/records/${item.name}`}>
           {item.label}
         </NavLink>
       );
-    default:
+    case SiteItemConfigTypes.UserManagement:
       return (
-        <span>
-          Unknown item type = {item.type}; name = {item.name}; label ={' '}
+        <NavLink className="nav-link" to={`/user-management`}>
           {item.label}
-        </span>
+        </NavLink>
       );
   }
 }

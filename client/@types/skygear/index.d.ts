@@ -65,8 +65,10 @@ declare module 'skygear' {
   // TODO: write better definition
   export class ACL {}
 
-  // tslint:disable-next-line: no-any
-  export type Role = any;
+  export class Role {
+    readonly name: string;
+    public constructor(name: string);
+  }
 
   export interface AssetAttrs {
     name: string;
@@ -128,6 +130,8 @@ declare module 'skygear' {
     public publicDB: Database;
     public pubsub: PubsubContainer;
 
+    public UserRecord: RecordCls;
+
     public config(options: {
       apiKey: string;
       endPoint: string;
@@ -146,6 +150,10 @@ declare module 'skygear' {
       username: string,
       password: string
     ): Promise<Record>;
+
+    public fetchUserRole(users: Record[] | string[]): Promise<{[id: string]: Role[]}>;
+    public assignUserRole(users: Record[] | string[], roles: Role[] | string[]): Promise<'OK'>;
+    public revokeUserRole(users: Record[] | string[], roles: Role[] | string[]): Promise<'OK'>;
   }
 
   export class PubsubContainer {

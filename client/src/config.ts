@@ -1,4 +1,5 @@
 export interface AppConfig {
+  adminRole: string;
   cmsConfigUrl: string;
   publicUrl: string;
   skygearApiKey: string;
@@ -9,6 +10,7 @@ export interface AppConfig {
  * Default App Config
  */
 export default {
+  adminRole: process.env.REACT_APP_ADMIN_ROLE || 'Admin',
   cmsConfigUrl: process.env.REACT_APP_CMS_CONFIG_URL || '/cms-config.yaml',
   publicUrl: process.env.PUBLIC_URL || '.',
   skygearApiKey: process.env.REACT_APP_SKYGEAR_API_KEY || 'FAKE_API_KEY',

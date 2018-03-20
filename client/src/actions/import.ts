@@ -20,6 +20,7 @@ export enum ImportActionTypes {
 
 export interface ImportRequest {
   type: ImportActionTypes.ImportRequest;
+  payload: undefined;
   context: undefined;
 }
 
@@ -48,6 +49,7 @@ export interface DismissImport {
 function importRequest(): ImportRequest {
   return {
     context: undefined,
+    payload: undefined,
     type: ImportActionTypes.ImportRequest,
   };
 }

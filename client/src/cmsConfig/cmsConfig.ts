@@ -4,6 +4,10 @@ import {
   parsePushNotificationConfig,
   PushNotificationsConfig,
 } from './pushNotificationsConfig';
+import {
+  parseUserManagementConfig,
+  UserManagementConfig,
+} from './userManagementConfig';
 import { parseOptionalString, parseString } from './util';
 
 export interface CmsConfig {
@@ -11,21 +15,30 @@ export interface CmsConfig {
   records: RecordConfigMap;
   associationRecordByName: AssociationRecordByName;
   pushNotifications: PushNotificationsConfig;
+  userManagement: UserManagementConfig;
 }
 
 export type SiteConfig = SiteItemConfig[];
+export type SiteItemConfig =
+  | RecordSiteItemConfig
+  | UserManagementSiteItemConfig;
+export enum SiteItemConfigTypes {
+  Record = 'Record',
+  UserManagement = 'UserManagement',
+}
 
-export type SiteItemConfig = RecordSiteItemConfig;
-
-export interface RecordSiteItemConfig {
-  type: RecordSiteItemConfigType;
-
-  name: string;
+export interface SiteItemConfigAttrs {
   label: string;
 }
 
-export enum RecordSiteItemConfigType {
-  Record = 'Record',
+export interface RecordSiteItemConfig extends SiteItemConfigAttrs {
+  type: SiteItemConfigTypes.Record;
+
+  name: string;
+}
+
+export interface UserManagementSiteItemConfig extends SiteItemConfigAttrs {
+  type: SiteItemConfigTypes.UserManagement;
 }
 
 export interface RecordConfigMap {
@@ -244,6 +257,7 @@ export function parseCmsConfig(input: any): CmsConfig {
     records,
     association_records: associationRecords,
     push_notifications: pushNotifications,
+    user_management: userManagement,
   } = input;
 
   const cmsRecordByName = preparseRecordConfigs(records);
@@ -267,6 +281,7 @@ export function parseCmsConfig(input: any): CmsConfig {
       return { ...obj, [name]: parseRecordConfig(context, name, recordConfig) };
     }, {}),
     site: parseSiteConfigs(site),
+    userManagement: parseUserManagementConfig(context, userManagement),
   };
 }
 
@@ -278,8 +293,10 @@ function parseSiteConfigs(siteConfigs: any[]): SiteConfig {
 // tslint:disable-next-line: no-any
 function parseSiteConfig(siteConfig: any): SiteItemConfig {
   switch (siteConfig.type) {
-    case 'Record':
+    case SiteItemConfigTypes.Record:
       return parseSiteRecordConfig(siteConfig);
+    case SiteItemConfigTypes.UserManagement:
+      return parseSiteUserManagementConfig(siteConfig);
     default:
       throw new Error(`Received unknown site config type: ${siteConfig.type}`);
   }
@@ -291,6 +308,16 @@ function parseSiteRecordConfig(input: any): RecordSiteItemConfig {
 
   const parsedLabel = label ? label : humanize(name);
   return { type, name, label: parsedLabel };
+}
+
+function parseSiteUserManagementConfig(
+  // tslint:disable-next-line: no-any
+  input: any
+): UserManagementSiteItemConfig {
+  const { type } = input;
+  const label =
+    parseOptionalString(input, 'label', 'UserManagement') || 'User Management';
+  return { type, label };
 }
 
 // tslint:disable-next-line: no-any

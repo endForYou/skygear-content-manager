@@ -27,6 +27,7 @@ interface RootProps {
 }
 
 export interface CmsRenderConfig {
+  adminRole: string;
   cmsConfig: CmsConfig;
   publicUrl: string;
   skygearApiKey: string;
@@ -49,6 +50,7 @@ function main(appConfig: AppConfig = defaultAppConfig): void {
   fetchCmsConfig(appConfig).then(
     (cmsConfig: CmsConfig) => {
       const cmsRenderConfig: CmsRenderConfig = {
+        adminRole: appConfig.adminRole,
         cmsConfig,
         publicUrl: appConfig.publicUrl,
         skygearApiKey: appConfig.skygearApiKey,
@@ -76,7 +78,12 @@ export function renderCms(cmsRenderConfig: CmsRenderConfig): void {
       const recordNames = Object.keys(cmsConfig.records);
 
       const rootReducer = rootReducerFactory(recordNames);
-      const initialState = initialRootState(cmsConfig, recordNames, user);
+      const initialState = initialRootState(
+        cmsRenderConfig.adminRole,
+        cmsConfig,
+        recordNames,
+        user
+      );
 
       const store = createStore<RootState>(
         rootReducer,

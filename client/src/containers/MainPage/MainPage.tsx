@@ -8,11 +8,16 @@ import NotFoundPage from '../../components/NotFoundPage';
 import { RootState } from '../../states';
 import FrontPage from '../FrontPage';
 
-import { pushNotificationRoutes, routesFromRecordConfigs } from './routes';
+import {
+  pushNotificationRoutes,
+  routesFromRecordConfigs,
+  userManagementRoutes,
+} from './routes';
 
 export interface MainPageProps {
   recordConfigs: RecordConfig[];
   pushNotificationEnabled: boolean;
+  userManagementEnabled: boolean;
 }
 
 // tslint:disable-next-line: no-any
@@ -21,16 +26,18 @@ const AnyFrontPage = FrontPage as any;
 class MainPage extends React.PureComponent<MainPageProps> {
   private recordRoutes: JSX.Element[];
   private pushNotificationRoutes: JSX.Element[];
+  private userManagementRoutes: JSX.Element[];
 
   constructor(props: MainPageProps) {
     super(props);
 
     this.recordRoutes = routesFromRecordConfigs(props.recordConfigs);
     this.pushNotificationRoutes = pushNotificationRoutes();
+    this.userManagementRoutes = userManagementRoutes();
   }
 
   public render() {
-    const { pushNotificationEnabled } = this.props;
+    const { pushNotificationEnabled, userManagementEnabled } = this.props;
 
     return (
       <Layout>
@@ -39,6 +46,7 @@ class MainPage extends React.PureComponent<MainPageProps> {
 
           {this.recordRoutes}
           {pushNotificationEnabled && this.pushNotificationRoutes}
+          {userManagementEnabled && this.userManagementRoutes}
 
           <Route component={NotFoundPage} />
         </Switch>
@@ -53,6 +61,7 @@ function mapStateToProps(state: RootState): MainPageProps {
     recordConfigs: Object.values(state.cmsConfig.records)
       .filter(recordConfig => recordConfig !== undefined)
       .map(recordConfig => recordConfig!),
+    userManagementEnabled: state.cmsConfig.userManagement.enabled,
   };
 }
 

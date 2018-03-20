@@ -8,16 +8,19 @@ import {
   PushCampaign,
   Remote,
   RemoteLoading,
+  SkygearUser,
 } from './types';
 import { objectFrom } from './util';
 
 export interface RootState {
+  adminRole: string;
   auth: AuthState;
   cmsConfig: CmsConfig;
   import: ImportState;
   pushCampaign: PushCampaignState;
   recordViewsByName: RecordViewsByName;
   router: RouterState;
+  user: UserState;
 }
 
 export interface AuthState {
@@ -111,7 +114,6 @@ export interface PushCampaignListState {
 export interface NewPushCampaignState {
   savingPushCampaign?: Remote<NewPushCampaign>;
 }
-
 export const initialNewPushCampaignState: NewPushCampaignState = {
   savingPushCampaign: undefined,
 };
@@ -129,12 +131,30 @@ export const initialPushCampaignState: PushCampaignState = {
   new: initialNewPushCampaignState,
 };
 
+export interface UserState {
+  users: SkygearUser[];
+  isLoading: boolean;
+  page: number;
+  totalCount: number;
+  error?: Error;
+}
+
+export const initialUserState: UserState = {
+  error: undefined,
+  isLoading: true,
+  page: 1,
+  totalCount: 0,
+  users: [],
+};
+
 export function initialRootState(
+  adminRole: string,
   cmsConfig: CmsConfig,
   recordNames: string[],
   user: Record
 ): RootState {
   return {
+    adminRole,
     auth: {
       user: user === null ? undefined : user,
     },
@@ -152,5 +172,6 @@ export function initialRootState(
     router: {
       location: null,
     },
+    user: initialUserState,
   };
 }
