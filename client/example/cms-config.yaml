@@ -326,6 +326,11 @@ records:
     list:
       fields:
         - type: _id
+      actions:
+        - type: Import
+          name: import-country
+          fields:
+              - name: display_name
     show:
       fields:
         - type: _id

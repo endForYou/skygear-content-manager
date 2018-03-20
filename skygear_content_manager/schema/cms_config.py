@@ -256,16 +256,6 @@ class CMSRecordImportSchema(CMSRecordListActionSchema):
         if 'label' not in data:
             data['label'] = data['name']
 
-        if 'identifier' not in data:
-            data['identifier'] = '_id'
-
-        field_names = [f.name for f in data['fields']]
-        if data['identifier'] and data['identifier'] not in field_names:
-            raise Exception((
-                'identifier "{identifier}" does not match any ' +
-                'field names in import config "{name}"'
-            ).format(**data))
-
         del data['type']
         return CMSRecordImport(**data)
 

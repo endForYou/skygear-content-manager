@@ -174,7 +174,7 @@ def create_identifier_map(data_list, import_config):
     reference_fields = import_config.get_reference_fields()
 
     # for record custom id
-    if import_config.identifier != '_id':
+    if import_config.identifier != None and import_config.identifier != '_id':
         record_type = import_config.record_type
         key = import_config.identifier
         values = [r[key] for r in data_list]
@@ -238,8 +238,21 @@ def populate_record_id(data_list, import_config, identifier_map):
     result = []
     record_type = import_config.record_type
     for data in data_list:
-        if import_config.identifier == '_id' or \
-           isinstance(data, ImportRecordException):
+        if isinstance(data, ImportRecordException):
+            result.append(data)
+            continue
+
+        if import_config.identifier == None:
+            """
+            Always create new record if identifier not specified
+            """
+            result.append(data)
+            continue
+
+        if import_config.identifier == '_id':
+            """
+            No need to map id if identifier is skygear id field
+            """
             result.append(data)
             continue
 
@@ -266,7 +279,7 @@ def deserialize_record_data(data_list, deserializer):
         record = deserializer.deserialize(data)
 
         # record id does not exist in record if using custom identifier
-        record['_id'] = data['_id']
+        record['_id'] = data.get('_id')
         records.append(record)
 
     return records

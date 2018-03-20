@@ -140,7 +140,7 @@ class CMSRecordImport:
 
     def __init__(self, record_type, name, label, fields,
                  duplicate_reference_handling = USE_FIRST,
-                 identifier = '_id'):
+                 identifier = None):
         self.record_type = record_type
         self.name = name
         self.label = label
