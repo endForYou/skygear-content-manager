@@ -1,6 +1,6 @@
 class CMSConfig:
 
-    def __init__(self, records, association_records):
+    def __init__(self, records, association_records={}):
         self.records = records
         self.association_records = association_records
 
@@ -139,12 +139,12 @@ class CMSRecordImport:
     THROW_ERROR = 'throw-error'
 
     def __init__(self, record_type, name, label, fields,
-                 reference_handling = USE_FIRST,
+                 duplicate_reference_handling = USE_FIRST,
                  identifier = '_id'):
         self.record_type = record_type
         self.name = name
         self.label = label
-        self.reference_handling = reference_handling
+        self.duplicate_reference_handling = duplicate_reference_handling
         self.identifier = identifier
         self.fields = fields
 

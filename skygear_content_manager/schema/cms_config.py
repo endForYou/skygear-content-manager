@@ -16,7 +16,8 @@ from ..models.cms_config import (CMSConfig, CMSRecord, CMSRecordList,
 class CMSConfigSchema(Schema):
 
     records = NestedDict('CMSRecordSchema', key='record_type')
-    association_records = NestedDict('CMSAssociationRecordSchema', key='name')
+    association_records = NestedDict('CMSAssociationRecordSchema', key='name',
+                                     required=False)
 
     @pre_load
     def pre_load(self, data):
@@ -230,17 +231,17 @@ class CMSRecordImportSchema(CMSRecordListActionSchema):
 
     name = fields.String()
     label = fields.String()
-    reference_handling = fields.String(required=False)
+    duplicate_reference_handling = fields.String(required=False)
     identifier = fields.String(required=False)
 
     fields = fields.Nested('CMSRecordImportFieldSchema', many=True)
 
-    @validates('reference_handling')
+    @validates('duplicate_reference_handling')
     def validate_reference_handling(self, value):
         if value and \
            value != CMSRecordImport.USE_FIRST and \
            value != CMSRecordImport.THROW_ERROR:
-            raise ValidationError('Invalid reference_handling value.')
+            raise ValidationError('Invalid duplicate_reference_handling value.')
 
     @pre_load
     def pre_load(self, data):

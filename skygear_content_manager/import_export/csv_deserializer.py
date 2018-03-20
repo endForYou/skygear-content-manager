@@ -91,6 +91,9 @@ class StringDeserializer(BaseValueDeserializer):
 class NumberDeserializer(BaseValueDeserializer):
 
     def deserialize(self, value):
+        if value == '':
+            return None
+
         return float(value)
 
 
@@ -113,6 +116,9 @@ class BooleanDeserializer(BaseValueDeserializer):
 class JSONDeserializer(BaseValueDeserializer):
 
     def deserialize(self, value):
+        if value == '':
+            return None
+
         return json.loads(value)
 
 
@@ -136,14 +142,23 @@ class LocationDeserializer(BaseValueDeserializer):
 class DatetimeDeserializer(BaseValueDeserializer):
 
     def deserialize(self, value):
-        ts = arrow.get(value).timestamp
-        return {
-            '$type': 'date',
-            '$date': strict_rfc3339.timestamp_to_rfc3339_utcoffset(ts),
-        }
+        dt = None
+        try:
+            ts = arrow.get(value).timestamp
+            dt = {
+                '$type': 'date',
+                '$date': strict_rfc3339.timestamp_to_rfc3339_utcoffset(ts),
+            }
+        except:
+            return None
+
+        return dt
 
 
 class IntegerDeserializer(BaseValueDeserializer):
 
     def deserialize(self, value):
+        if value == '':
+            return None
+
         return int(value)
