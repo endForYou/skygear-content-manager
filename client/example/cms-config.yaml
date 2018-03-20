@@ -70,7 +70,7 @@ records:
           name: import-user-with-name
           label: Import user with name
           identifier: name
-          reference_handling: use-first
+          duplicate_reference_handling: use-first
           fields:
             - name: name
             - name: email
@@ -78,7 +78,7 @@ records:
           name: import-user-with-name-strict
           label: Import user with name (Strict)
           identifier: name
-          reference_handling: throw-error
+          duplicate_reference_handling: throw-error
           fields:
             - name: name
             - name: email
