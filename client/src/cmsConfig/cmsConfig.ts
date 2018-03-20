@@ -1,4 +1,5 @@
 import { humanize, isObject, objectFrom } from './../util';
+import { mapDefaultActionToAction } from './defaultActions';
 import { FilterConfig, parseFilterConfig } from './filterConfig';
 import {
   parsePushNotificationConfig,
@@ -236,8 +237,10 @@ export enum ActionConfigTypes {
   Import = 'Import',
   Link = 'Link',
 
-  // TODO (Steven-Chan):
-  // Add list action type `New`
+  // Default actions
+  AddButton = 'AddButton',
+  ShowButton = 'ShowButton',
+  EditButton = 'EditButton',
 }
 export interface ExportActionConfig {
   type: ActionConfigTypes.Export;
@@ -407,7 +410,7 @@ function parseListPageConfig(
     // tslint:disable-next-line: no-any
     (input.filters as any[]).map(f => parseFilterConfig(f, context));
 
-  const { actions = [] } = input;
+  const actions = parseListActions(input.actions || []);
   const itemActions = parseListItemActions(input.item_actions || []);
 
   return {
@@ -423,20 +426,64 @@ function parseListPageConfig(
 }
 
 // tslint:disable-next-line: no-any
-function parseListItemActions(input: any): ListItemActionConfig[] {
-  const itemActionTypes = [ActionConfigTypes.Link];
+function parseListActions(input: any): ListActionConfig[] {
+  const itemActionTypes = [
+    ActionConfigTypes.Export,
+    ActionConfigTypes.Import,
+    ActionConfigTypes.Link,
+    ActionConfigTypes.AddButton,
+  ];
   return (
     input
       // tslint:disable-next-line: no-any
       .filter((item: any) => itemActionTypes.indexOf(item.type) !== -1)
+      .map(mapDefaultActionToAction)
       // tslint:disable-next-line: no-any
-      .map((item: any) => ({
-        href: parseOptionalString(item, 'href', 'list:item_actions') || '#',
-        label: parseString(item, 'label', 'list:item_actions'),
-        target: parseOptionalString(item, 'target', 'list:item_actions') || '',
-        type: item.type,
-      }))
+      .map((item: any) => {
+        switch (item.type) {
+          case ActionConfigTypes.Export:
+            return item;
+          case ActionConfigTypes.Import:
+            return item;
+          case ActionConfigTypes.Link:
+            return parseLinkAction(item);
+        }
+      })
   );
+}
+
+// tslint:disable-next-line: no-any
+function parseListItemActions(input: any): ListItemActionConfig[] {
+  const itemActionTypes = [
+    ActionConfigTypes.Link,
+    ActionConfigTypes.ShowButton,
+    ActionConfigTypes.EditButton,
+  ];
+  return (
+    input
+      // tslint:disable-next-line: no-any
+      .filter((item: any) => itemActionTypes.indexOf(item.type) !== -1)
+      .map(mapDefaultActionToAction)
+      // tslint:disable-next-line: no-any
+      .map((item: any) => {
+        switch (item.type) {
+          case ActionConfigTypes.Link:
+            return parseLinkAction(item);
+          default:
+            throw new Error(`Unexpected list item action types: ${item.type}`);
+        }
+      })
+  );
+}
+
+// tslint:disable-next-line: no-any
+function parseLinkAction(input: any): LinkActionConfig {
+  return {
+    href: parseOptionalString(input, 'href', 'list:item_actions') || '#',
+    label: parseString(input, 'label', 'list:item_actions'),
+    target: parseOptionalString(input, 'target', 'list:item_actions') || '',
+    type: input.type,
+  };
 }
 
 function parseShowPageConfig(

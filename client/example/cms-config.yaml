@@ -259,11 +259,14 @@ records:
           label: Search skills
           href: https://www.google.com/search?q=skill
           target: _blank
+        - type: AddButton
       item_actions:
         - type: Link
           label: Search
           href: https://www.google.com/search?q={record.display_name}
           target: _blank
+        - type: ShowButton
+        - type: EditButton
     show:
       fields:
         - type: _id

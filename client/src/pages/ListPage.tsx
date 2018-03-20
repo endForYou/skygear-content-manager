@@ -2,7 +2,6 @@ import classNames from 'classnames';
 import * as qs from 'query-string';
 import * as React from 'react';
 import { connect } from 'react-redux';
-import { Link } from 'react-router-dom';
 import { Dispatch } from 'redux';
 import { Record } from 'skygear';
 
@@ -45,6 +44,20 @@ import { Field, FieldContext } from '../fields';
 import { getCmsConfig, ImportState, RootState } from '../states';
 import { RemoteType } from '../types';
 import { debounce } from '../util';
+
+// tslint:disable: no-any
+function joinElements(els: any[]) {
+  if (els.length === 0) {
+    return els;
+  }
+
+  return els.reduce((prev: any, current: any, index: number): any => [
+    prev,
+    <span key={index}>&nbsp;</span>,
+    current,
+  ]);
+}
+// tslint:enable: no-any
 
 interface TableHeaderProps {
   fieldConfigs: FieldConfig[];
@@ -91,16 +104,15 @@ const TableRow: React.SFC<TableRowProps> = ({
     <tr>
       {columns}
       <td>
-        {itemActions.map((action, index) => (
-          <LinkButton key={index} actionConfig={action} context={{ record }} />
-        ))}
-        <Link className="btn btn-light" to={`/record/${record.id}`}>
-          Show
-        </Link>
-        &nbsp;
-        <Link className="btn btn-light" to={`/record/${record.id}/edit`}>
-          Edit
-        </Link>
+        {joinElements(
+          itemActions.map((action, index) => (
+            <LinkButton
+              key={index}
+              actionConfig={action}
+              context={{ record }}
+            />
+          ))
+        )}
       </td>
     </tr>
   );
@@ -380,29 +392,10 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
 
   public renderActionButtons() {
     const { recordName, pageConfig: { actions } } = this.props;
-
-    // TODO (Steven-Chan):
-    // Add action type `New`
-    const newRecordButton = (
-      <Link
-        className="btn btn-light float-right"
-        to={`/records/${recordName}/new`}
-      >
-        New
-      </Link>
+    const actionsButtons = actions.map(action =>
+      this.renderActionButton(recordName, action)
     );
-
-    const actionsButtons = [
-      ...actions.map(action => this.renderActionButton(recordName, action)),
-      newRecordButton,
-    ];
-
-    return actionsButtons.reduce((
-      prev: JSX.Element | null,
-      current: JSX.Element | null,
-      index: number
-      // tslint:disable-next-line: no-any
-    ): any => [prev, <span key={index}>&nbsp;</span>, current]);
+    return joinElements(actionsButtons);
   }
 
   public renderImportModal() {

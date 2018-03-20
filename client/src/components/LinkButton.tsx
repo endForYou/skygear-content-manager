@@ -1,4 +1,6 @@
 import * as React from 'react';
+import { Link } from 'react-router-dom';
+
 import { LinkActionConfig } from '../cmsConfig';
 import { get } from '../util';
 
@@ -30,13 +32,13 @@ export const LinkButton: React.SFC<LinkButtonProps> = props => {
   const { actionConfig: { href, label, target }, context } = props;
 
   return (
-    <a
-      href={applyContext(href, context)}
+    <Link
+      to={applyContext(href, context)}
       target={target === '' ? undefined : target}
       role="button"
       className="btn btn-light"
     >
       {label}
-    </a>
+    </Link>
   );
 };
