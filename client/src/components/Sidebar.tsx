@@ -1,9 +1,10 @@
 import './Sidebar.css';
 
 import * as React from 'react';
-import { connect } from 'react-redux';
+import { connect, MapDispatchToProps } from 'react-redux';
 import { Link, NavLink, withRouter } from 'react-router-dom';
 
+import { logout } from '../actions/auth';
 import * as logo from '../assets/logo.png';
 import { SiteItemConfig, SiteItemConfigTypes } from '../cmsConfig';
 import { getCmsConfig, RootState } from '../states';
@@ -13,7 +14,13 @@ export interface SidebarProps {
   pushNotificationEnabled: boolean;
 }
 
-class Sidebar extends React.PureComponent<SidebarProps> {
+interface DispatchProps {
+  onLogout: () => void;
+}
+
+type Props = SidebarProps & DispatchProps;
+
+class Sidebar extends React.PureComponent<Props> {
   public render() {
     // const { items } = this.props;
 
@@ -31,7 +38,8 @@ class Sidebar extends React.PureComponent<SidebarProps> {
 function ListItems({
   items,
   pushNotificationEnabled,
-}: SidebarProps): JSX.Element {
+  onLogout,
+}: Props): JSX.Element {
   const listItems = items.map((item, index) => {
     return (
       <li key={index} className="nav-item">
@@ -56,6 +64,9 @@ function ListItems({
     <ul className="nav flex-column">
       {listItems}
       {pushNotificationTab}
+      <li key="logout" className="nav-item">
+        <LogoutButton onClick={onLogout} />
+      </li>
     </ul>
   );
 }
@@ -81,6 +92,18 @@ function Item({ item }: ItemProps): JSX.Element {
   }
 }
 
+interface LogoutButtonProps {
+  onClick: () => void;
+}
+
+function LogoutButton({ onClick }: LogoutButtonProps): JSX.Element {
+  return (
+    <NavLink className="nav-link" to="#" onClick={onClick}>
+      Logout
+    </NavLink>
+  );
+}
+
 const mapStateToProps = (state: RootState): SidebarProps => {
   return {
     items: getCmsConfig(state).site,
@@ -88,6 +111,16 @@ const mapStateToProps = (state: RootState): SidebarProps => {
   };
 };
 
-const ConnectedSidebar = withRouter(connect(mapStateToProps)(Sidebar));
+const mapDispatchToProps: MapDispatchToProps<DispatchProps, {}> = dispatch => {
+  return {
+    onLogout: () => {
+      dispatch(logout());
+    },
+  };
+};
+
+const ConnectedSidebar = withRouter(
+  connect(mapStateToProps, mapDispatchToProps)(Sidebar)
+);
 
 export default ConnectedSidebar;

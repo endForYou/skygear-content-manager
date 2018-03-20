@@ -1,6 +1,6 @@
 import { Middleware } from 'redux';
 
-import { logout } from '../actions/auth';
+import { logoutSuccess } from '../actions/auth';
 import { isOutlawError } from '../recordUtil';
 
 // tslint:disable: no-any
@@ -31,7 +31,7 @@ export function getUnauthenticatedMiddleware() {
       return next(action);
     }
 
-    return next(logout());
+    return next(logoutSuccess());
   };
 
   return unauthenticatedMiddleware;

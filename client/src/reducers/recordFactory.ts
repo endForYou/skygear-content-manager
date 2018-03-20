@@ -46,7 +46,7 @@ function createRecordViewsByNameReducer() {
       );
     }
 
-    if (action.type === AuthActionTypes.Logout) {
+    if (action.type === AuthActionTypes.LogoutSuccess) {
       state = {};
     }
 
