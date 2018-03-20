@@ -73,6 +73,7 @@ export interface ListPageConfig {
   filters: FilterConfig[];
   references: ReferenceConfig[];
   actions: ListActionConfig[];
+  itemActions: ListItemActionConfig[];
 }
 
 export interface ShowPageConfig {
@@ -225,16 +226,21 @@ export interface ConfigContext {
   associationRecordByName: AssociationRecordByName;
 }
 
-export type ListActionConfig = ExportActionConfig | ImportActionConfig;
-export enum ListActionConfigTypes {
+export type ListActionConfig =
+  | ExportActionConfig
+  | ImportActionConfig
+  | LinkActionConfig;
+export type ListItemActionConfig = LinkActionConfig;
+export enum ActionConfigTypes {
   Export = 'Export',
   Import = 'Import',
+  Link = 'Link',
 
   // TODO (Steven-Chan):
   // Add list action type `New`
 }
 export interface ExportActionConfig {
-  type: ListActionConfigTypes.Export;
+  type: ActionConfigTypes.Export;
   name: string;
   label: string | undefined;
 
@@ -242,12 +248,18 @@ export interface ExportActionConfig {
   // client side only need name for calling export API
 }
 export interface ImportActionConfig {
-  type: ListActionConfigTypes.Import;
+  type: ActionConfigTypes.Import;
   name: string;
   label: string | undefined;
 
   // ignore field config and other config
   // client side only need name for calling export API
+}
+export interface LinkActionConfig {
+  type: ActionConfigTypes.Link;
+  label: string;
+  href: string;
+  target: string;
 }
 
 // tslint:disable-next-line: no-any
@@ -396,16 +408,35 @@ function parseListPageConfig(
     (input.filters as any[]).map(f => parseFilterConfig(f, context));
 
   const { actions = [] } = input;
+  const itemActions = parseListItemActions(input.item_actions || []);
 
   return {
     actions,
     cmsRecord,
     fields: compactFields,
     filters,
+    itemActions,
     label,
     perPage,
     references: filterReferences(compactFields),
   };
+}
+
+// tslint:disable-next-line: no-any
+function parseListItemActions(input: any): ListItemActionConfig[] {
+  const itemActionTypes = [ActionConfigTypes.Link];
+  return (
+    input
+      // tslint:disable-next-line: no-any
+      .filter((item: any) => itemActionTypes.indexOf(item.type) !== -1)
+      // tslint:disable-next-line: no-any
+      .map((item: any) => ({
+        href: parseOptionalString(item, 'href', 'list:item_actions') || '#',
+        label: parseString(item, 'label', 'list:item_actions'),
+        target: parseOptionalString(item, 'target', 'list:item_actions') || '',
+        type: item.type,
+      }))
+  );
 }
 
 function parseShowPageConfig(

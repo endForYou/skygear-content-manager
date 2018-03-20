@@ -12,6 +12,19 @@ export function objectFrom<V>(
   }, {});
 }
 
+// tslint:disable-next-line: no-any
+export function get(o: any, keypath: string[] | string): any {
+  if (typeof keypath === 'string') {
+    return o[keypath];
+  }
+
+  return keypath.reduce(
+    // tslint:disable-next-line: no-any
+    (acc: any, key: string) => (isObject(acc) ? acc[key] : undefined),
+    o
+  );
+}
+
 export function makeArray<T>(value: T | T[] | null | undefined): T[] {
   if (Array.isArray(value)) {
     return value;
