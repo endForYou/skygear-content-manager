@@ -248,25 +248,19 @@ export enum ActionConfigTypes {
   ShowButton = 'ShowButton',
   EditButton = 'EditButton',
 }
-export interface ExportActionConfig {
+export interface ActionConfigAttrs {
+  label: string;
+}
+export interface ExportActionConfig extends ActionConfigAttrs {
   type: ActionConfigTypes.Export;
   name: string;
-  label: string | undefined;
-
-  // ignore field config
-  // client side only need name for calling export API
 }
-export interface ImportActionConfig {
+export interface ImportActionConfig extends ActionConfigAttrs {
   type: ActionConfigTypes.Import;
   name: string;
-  label: string | undefined;
-
-  // ignore field config and other config
-  // client side only need name for calling export API
 }
-export interface LinkActionConfig {
+export interface LinkActionConfig extends ActionConfigAttrs {
   type: ActionConfigTypes.Link;
-  label: string;
   href: string;
   target: string;
 }
@@ -472,11 +466,13 @@ function parseListActions(input: any): ListActionConfig[] {
       .map((item: any) => {
         switch (item.type) {
           case ActionConfigTypes.Export:
-            return item;
+            return parseExportAction(item);
           case ActionConfigTypes.Import:
-            return item;
+            return parseImportAction(item);
           case ActionConfigTypes.Link:
             return parseLinkAction(item);
+          default:
+            throw new Error(`Unexpected list action types: ${item.type}`);
         }
       })
   );
@@ -518,6 +514,26 @@ function parseListItemActions(input: any): ListItemActionConfig[] {
         }
       })
   );
+}
+
+// tslint:disable-next-line: no-any
+function parseImportAction(input: any): ImportActionConfig {
+  const name = parseString(input, 'name', 'Import');
+  return {
+    label: parseOptionalString(input, 'label', 'Import') || name,
+    name,
+    type: input.type,
+  };
+}
+
+// tslint:disable-next-line: no-any
+function parseExportAction(input: any): ExportActionConfig {
+  const name = parseString(input, 'name', 'Export');
+  return {
+    label: parseOptionalString(input, 'label', 'Export') || name,
+    name,
+    type: input.type,
+  };
 }
 
 // tslint:disable-next-line: no-any

@@ -31,6 +31,68 @@ site:
     name: welcome_message
     label: Welcome Message
   - type: PushNotifications
+imports:
+  import-user:
+    record_type: user
+    fields:
+      - name: _id
+      - name: email
+  import-user-with-name:
+    record_type: user
+    identifier: name
+    duplicate_reference_handling: use-first
+    fields:
+      - name: name
+      - name: email
+  import-user-with-name-strict:
+    record_type: user
+    identifier: name
+    duplicate_reference_handling: throw-error
+    fields:
+      - name: name
+      - name: email
+  import-user-country:
+    record_type: user
+    identifier: name
+    fields:
+      - name: name
+      - name: email
+      - name: country
+        reference_target: country
+        reference_field_name: display_name
+exports:
+  export-user:
+    record_type: user
+    fields:
+      - name: _id
+        label: id
+      - name: name
+      - name: _created_at
+      - name: _updated_at
+      - name: email
+        label: Email
+      - name: city
+        label: City
+        reference_target: city
+        reference_field_name: _id
+      - name: country
+        label: Country
+        reference_target: country
+        reference_field_name: display_name
+      - name: has_skills
+        label: Has skills
+        reference_target: skill
+        reference_field_name: _id
+        reference_via_association_record: user_has_skill
+      - name: has_skills
+        label: Has skills (name)
+        reference_target: skill
+        reference_field_name: display_name
+        reference_via_association_record: user_has_skill
+      - name: json
+        label: Data
+      - name: location
+        label: Location
 records:
   user:
     list:
@@ -58,67 +120,17 @@ records:
         - type: Import
           name: import-user
           label: Import user
-          fields:
-            - name: _id
-            - name: email
         - type: Import
           name: import-user-with-name
           label: Import user with name
-          identifier: name
-          duplicate_reference_handling: use-first
-          fields:
-            - name: name
-            - name: email
         - type: Import
           name: import-user-with-name-strict
           label: Import user with name (Strict)
-          identifier: name
-          duplicate_reference_handling: throw-error
-          fields:
-            - name: name
-            - name: email
         - type: Import
           name: import-user-country
           label: Import user country
-          identifier: name
-          fields:
-            - name: name
-            - name: email
-            - name: country
-              reference_target: country
-              reference_field_name: display_name
         - type: Export
           name: export-user
-          fields:
-            - name: _id
-              label: id
-            - name: name
-            - name: _created_at
-            - name: _updated_at
-            - name: email
-              label: Email
-            - name: city
-              label: City
-              reference_target: city
-              reference_field_name: _id
-            - name: country
-              label: Country
-              reference_target: country
-              reference_field_name: display_name
-            - name: has_skills
-              label: Has skills
-              reference_target: skill
-              reference_field_name: _id
-              reference_via_association_record: user_has_skill
-            - name: has_skills
-              label: Has skills (name)
-              reference_target: skill
-              reference_field_name: display_name
-              reference_via_association_record: user_has_skill
-            - name: json
-              label: Data
-            - name: location
-              label: Location
     show:
       fields:
         - type: _id

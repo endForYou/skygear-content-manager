@@ -1,13 +1,15 @@
 class CMSConfig:
 
-    def __init__(self, records, association_records={}):
-        self.records = records
+    def __init__(self, imports={}, exports={}, association_records={}):
+        self.imports = imports
+        self.exports = exports
         self.association_records = association_records
 
     @classmethod
     def empty(cls):
         return cls(
-            records={},
+            imports={},
+            exports={},
             association_records={}
         )
 
@@ -18,47 +20,18 @@ class CMSConfig:
         result = schema.load(d)
         return result.data
 
-    def get_action_config(self, name, action_cls):
-        for _, record in self.records.items():
-            config = record.get_action_config(name, action_cls)
-            if config is not None:
-                return config
-
-        return None
-
     def get_export_config(self, name):
-        return self.get_action_config(name, CMSRecordExport)
+        return self.exports.get(name)
 
     def get_import_config(self, name):
-        return self.get_action_config(name, CMSRecordImport)
-
-
-class CMSRecord:
-
-    def __init__(self, record_type, list):
-        self.record_type = record_type
-        self.list = list
-
-    def get_action_config(self, name, action_cls):
-        actions = [action for action in self.list.actions
-                   if isinstance(action, action_cls) and
-                      action.name == name]
-        return actions[0] if len(actions) > 0 else None
-
-
-class CMSRecordList:
-
-    def __init__(self, record_type, actions = []):
-        self.record_type = record_type
-        self.actions = actions
+        return self.imports.get(name)
 
 
 class CMSRecordExport:
 
-    def __init__(self, record_type, name, label, fields):
+    def __init__(self, record_type, name, fields):
         self.record_type = record_type
         self.name = name
-        self.label = label
         self.fields = fields
 
     def get_reference_targets(self):
@@ -128,9 +101,9 @@ class CMSAssociationRecord:
 
 class CMSAssociationRecordField:
 
-    def __init__(self, name, target):
+    def __init__(self, name, reference_target):
         self.name = name
-        self.target = target
+        self.reference_target = reference_target
 
 
 class CMSRecordImport:
@@ -138,12 +111,11 @@ class CMSRecordImport:
     USE_FIRST = 'use-first'
     THROW_ERROR = 'throw-error'
 
-    def __init__(self, record_type, name, label, fields,
+    def __init__(self, record_type, name, fields,
                  duplicate_reference_handling = USE_FIRST,
                  identifier = None):
         self.record_type = record_type
         self.name = name
-        self.label = label
         self.duplicate_reference_handling = duplicate_reference_handling
         self.identifier = identifier
         self.fields = fields

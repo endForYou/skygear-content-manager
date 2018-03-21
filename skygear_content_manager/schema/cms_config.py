@@ -4,8 +4,8 @@ from marshmallow import (Schema, fields, post_load, pre_load, validates,
                          ValidationError)
 
 from .nested_dict import NestedDict
-from ..models.cms_config import (CMSConfig, CMSRecord, CMSRecordList,
-                                 CMSRecordExport, CMSRecordExportField,
+from ..models.cms_config import (CMSConfig, CMSRecordExport,
+                                 CMSRecordExportField,
                                  CMSRecordExportReference,
                                  CMSAssociationRecord,
                                  CMSAssociationRecordField,
@@ -15,7 +15,10 @@ from ..models.cms_config import (CMSConfig, CMSRecord, CMSRecordList,
 
 class CMSConfigSchema(Schema):
 
-    records = NestedDict('CMSRecordSchema', key='record_type')
+    imports = NestedDict('CMSRecordImportSchema', key='name',
+                         required=False)
+    exports = NestedDict('CMSRecordExportSchema', key='name',
+                         required=False)
     association_records = NestedDict('CMSAssociationRecordSchema', key='name',
                                      required=False)
 
@@ -28,76 +31,10 @@ class CMSConfigSchema(Schema):
         return CMSConfig(**data)
 
 
-class CMSRecordSchema(Schema):
+class CMSRecordExportSchema(Schema):
 
     record_type = fields.String()
-    list = fields.Nested('CMSRecordListSchema')
-
-    @pre_load
-    def pre_load(self, data):
-        if 'list' in data:
-            data['list']['record_type'] = data['record_type']
-
-        return data
-
-    @post_load
-    def make_object(self, data):
-        return CMSRecord(**data)
-
-
-class RecordListActionField(fields.Field):
-
-    type_mapping = {
-        'Export': 'CMSRecordExportSchema',
-        'Import': 'CMSRecordImportSchema',
-    }
-
-    def _serialize(self, value, attr, obj):
-        raise NotImplementedError
-
-    def _deserialize(self, value, attr, data):
-        return [self.deserialize_action(v) for v in value]
-
-    def deserialize_action(self, value):
-        schema_name = self.type_mapping[value['type']]
-        schema_cls = getattr(sys.modules[__name__], schema_name)
-        schema = schema_cls()
-        schema.context = self.context
-        valid_data = schema.load(value)
-        if valid_data.errors:
-            raise ValidationError(valid_data.errors)
-
-        return valid_data.data
-
-
-class CMSRecordListSchema(Schema):
-
-    record_type = fields.String()
-    actions = RecordListActionField()
-
-    @pre_load
-    def pre_load(self, data):
-        if 'actions' in data:
-            for action in data['actions']:
-                action['record_type'] = data['record_type']
-
-        return data
-
-    @post_load
-    def make_object(self, data):
-        return CMSRecordList(**data)
-
-
-class CMSRecordListActionSchema(Schema):
-
-    record_type = fields.String()
-    type = fields.String()
-
-
-class CMSRecordExportSchema(CMSRecordListActionSchema):
-
     name = fields.String()
-    label = fields.String(required=False)
     fields = fields.Nested('CMSRecordExportFieldSchema', many=True)
 
     @pre_load
@@ -110,10 +47,6 @@ class CMSRecordExportSchema(CMSRecordListActionSchema):
 
     @post_load
     def make_object(self, data):
-        if 'label' not in data:
-            data['label'] = data['name']
-
-        del data['type']
         return CMSRecordExport(**data)
 
 
@@ -220,17 +153,17 @@ class CMSAssociationRecordSchema(Schema):
 class CMSAssociationRecordFieldSchema(Schema):
 
     name = fields.String()
-    target = fields.String()
+    reference_target = fields.String()
 
     @post_load
     def make_object(self, data):
         return CMSAssociationRecordField(**data)
 
 
-class CMSRecordImportSchema(CMSRecordListActionSchema):
+class CMSRecordImportSchema(Schema):
 
+    record_type = fields.String()
     name = fields.String()
-    label = fields.String()
     duplicate_reference_handling = fields.String(required=False)
     identifier = fields.String(required=False)
 
@@ -253,10 +186,6 @@ class CMSRecordImportSchema(CMSRecordListActionSchema):
 
     @post_load
     def make_object(self, data):
-        if 'label' not in data:
-            data['label'] = data['name']
-
-        del data['type']
         return CMSRecordImport(**data)
 
 
