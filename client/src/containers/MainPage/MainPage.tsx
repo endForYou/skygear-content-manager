@@ -5,7 +5,7 @@ import { Route, Switch, withRouter } from 'react-router-dom';
 import { RecordConfig } from '../../cmsConfig';
 import Layout from '../../components/Layout';
 import NotFoundPage from '../../components/NotFoundPage';
-import { RootState } from '../../states';
+import { getCmsConfig, RootState } from '../../states';
 import FrontPage from '../FrontPage';
 
 import {
@@ -56,12 +56,13 @@ class MainPage extends React.PureComponent<MainPageProps> {
 }
 
 function mapStateToProps(state: RootState): MainPageProps {
+  const cmsConfig = getCmsConfig(state);
   return {
-    pushNotificationEnabled: state.cmsConfig.pushNotifications.enabled,
-    recordConfigs: Object.values(state.cmsConfig.records)
+    pushNotificationEnabled: cmsConfig.pushNotifications.enabled,
+    recordConfigs: Object.values(cmsConfig.records)
       .filter(recordConfig => recordConfig !== undefined)
       .map(recordConfig => recordConfig!),
-    userManagementEnabled: state.cmsConfig.userManagement.enabled,
+    userManagementEnabled: cmsConfig.userManagement.enabled,
   };
 }
 

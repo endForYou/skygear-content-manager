@@ -37,6 +37,10 @@ export default function auth(
       };
     case AuthActionTypes.UpdateUser:
       return { ...state, user: action.payload.user };
+    case AuthActionTypes.LogoutSuccess:
+      return { user: undefined, errorMessage: undefined };
+    case AuthActionTypes.LogoutFailure:
+      return state;
     default:
       return state;
   }

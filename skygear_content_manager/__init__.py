@@ -96,7 +96,7 @@ def includeme(settings):
 
         authdata = AuthData.from_cms_token(cms_access_token)
         if not authdata:
-            return SkygearResponse.forbidden().to_werkzeug()
+            return SkygearResponse.access_token_not_accepted().to_werkzeug()
 
         req.access_token = authdata.skygear_token
 
@@ -119,11 +119,11 @@ def includeme(settings):
         predicate_string = data.get('predicate', [None])[0]
 
         if not key:
-            return SkygearResponse.forbidden().to_werkzeug()
+            return SkygearResponse.access_token_not_accepted().to_werkzeug()
 
         authdata = AuthData.from_cms_token(key)
-        if not authdata or not authdata.is_admin:
-            return SkygearResponse.forbidden().to_werkzeug()
+        if not authdata:
+            return SkygearResponse.access_token_not_accepted().to_werkzeug()
 
         cms_config = get_cms_config()
         export_config = cms_config.get_export_config(name)
@@ -165,11 +165,11 @@ def includeme(settings):
         key = form.get('key')
 
         if not key:
-            return SkygearResponse.forbidden().to_werkzeug()
+            return SkygearResponse.access_token_not_accepted().to_werkzeug()
 
         authdata = AuthData.from_cms_token(key)
-        if not authdata or not authdata.is_admin:
-            return SkygearResponse.forbidden().to_werkzeug()
+        if not authdata:
+            return SkygearResponse.access_token_not_accepted().to_werkzeug()
 
         if 'file' not in files:
             return skygear.Response('Missing file', 400)

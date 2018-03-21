@@ -4,7 +4,7 @@ import { Dispatch } from 'redux';
 
 import { PushCampaignActionDispatcher } from '../actions/pushCampaign';
 import { FilterConfig } from '../cmsConfig';
-import { RootState } from '../states';
+import { getCmsConfig, RootState } from '../states';
 import { NewPushCampaign, Remote } from '../types';
 import { NewPushNotificationPage } from './components/NewPushNotificationPage';
 
@@ -55,7 +55,7 @@ function mapStateToProps(state: RootState): StateProps {
   return {
     content: '',
     savingPushCampaign: undefined,
-    userFilters: state.cmsConfig.pushNotifications.filterUserConfigs,
+    userFilters: getCmsConfig(state).pushNotifications.filterUserConfigs,
   };
 }
 

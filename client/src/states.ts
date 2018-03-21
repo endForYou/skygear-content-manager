@@ -2,20 +2,22 @@ import { RouterState } from 'react-router-redux';
 import { Record } from 'skygear';
 
 import { CmsConfig } from './cmsConfig';
+import { AppConfig } from './config';
 import {
   ImportResult,
   NewPushCampaign,
   PushCampaign,
   Remote,
   RemoteLoading,
+  RemoteType,
   SkygearUser,
 } from './types';
-import { objectFrom } from './util';
 
 export interface RootState {
   adminRole: string;
+  appConfig: AppConfig;
   auth: AuthState;
-  cmsConfig: CmsConfig;
+  cmsConfig: CmsConfigState;
   import: ImportState;
   pushCampaign: PushCampaignState;
   recordViewsByName: RecordViewsByName;
@@ -27,6 +29,8 @@ export interface AuthState {
   user?: Record;
   errorMessage?: string;
 }
+
+export type CmsConfigState = Remote<CmsConfig> | null;
 
 export interface RecordViewsByName {
   [recordName: string]: RecordViewState;
@@ -149,29 +153,32 @@ export const initialUserState: UserState = {
 
 export function initialRootState(
   adminRole: string,
-  cmsConfig: CmsConfig,
-  recordNames: string[],
+  appConfig: AppConfig,
   user: Record
 ): RootState {
   return {
     adminRole,
+    appConfig,
     auth: {
       user: user === null ? undefined : user,
     },
-    cmsConfig,
+    cmsConfig: null,
     import: initialImportState,
     pushCampaign: initialPushCampaignState,
-    recordViewsByName: objectFrom(
-      recordNames.map(recordName => {
-        return [recordName, initialRecordViewState] as [
-          string,
-          RecordViewState
-        ];
-      })
-    ),
-    router: {
-      location: null,
-    },
+    recordViewsByName: {},
+    router: { location: null },
     user: initialUserState,
   };
+}
+
+export function getCmsConfig(state: RootState): CmsConfig {
+  if (
+    !state.cmsConfig ||
+    state.cmsConfig.type === RemoteType.Loading ||
+    state.cmsConfig.type === RemoteType.Failure
+  ) {
+    throw new Error(`Couldn't find Cms config`);
+  }
+
+  return state.cmsConfig.value;
 }
