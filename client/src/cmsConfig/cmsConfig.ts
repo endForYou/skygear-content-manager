@@ -410,8 +410,8 @@ function parseListPageConfig(
     // tslint:disable-next-line: no-any
     (input.filters as any[]).map(f => parseFilterConfig(f, context));
 
-  const actions = parseListActions(input.actions || []);
-  const itemActions = parseListItemActions(input.item_actions || []);
+  const actions = parseListActions(input.actions);
+  const itemActions = parseListItemActions(input.item_actions);
 
   return {
     actions,
@@ -433,6 +433,17 @@ function parseListActions(input: any): ListActionConfig[] {
     ActionConfigTypes.Link,
     ActionConfigTypes.AddButton,
   ];
+
+  const defaultActions = [
+    {
+      type: ActionConfigTypes.AddButton,
+    },
+  ];
+
+  if (input == null) {
+    input = defaultActions;
+  }
+
   return (
     input
       // tslint:disable-next-line: no-any
@@ -459,6 +470,20 @@ function parseListItemActions(input: any): ListItemActionConfig[] {
     ActionConfigTypes.ShowButton,
     ActionConfigTypes.EditButton,
   ];
+
+  const defaultActions = [
+    {
+      type: ActionConfigTypes.ShowButton,
+    },
+    {
+      type: ActionConfigTypes.EditButton,
+    },
+  ];
+
+  if (input == null) {
+    input = defaultActions;
+  }
+
   return (
     input
       // tslint:disable-next-line: no-any

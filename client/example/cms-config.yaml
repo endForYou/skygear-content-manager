@@ -344,6 +344,7 @@ records:
           name: import-country
           fields:
               - name: display_name
+      item_actions: []
     show:
       fields:
         - type: _id
