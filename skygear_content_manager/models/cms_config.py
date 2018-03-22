@@ -1,8 +1,10 @@
 class CMSConfig:
 
-    def __init__(self, imports={}, exports={}, association_records={}):
+    def __init__(self, imports={}, exports={}, cms_records={},
+                 association_records={}):
         self.imports = imports
         self.exports = exports
+        self.cms_records = cms_records
         self.association_records = association_records
 
     @classmethod
@@ -10,21 +12,22 @@ class CMSConfig:
         return cls(
             imports={},
             exports={},
-            association_records={}
+            cms_records={},
+            association_records={},
         )
-
-    @classmethod
-    def from_dict(cls, d, context):
-        schema = CMSConfigSchema()
-        schema.context = context
-        result = schema.load(d)
-        return result.data
 
     def get_export_config(self, name):
         return self.exports.get(name)
 
     def get_import_config(self, name):
         return self.imports.get(name)
+
+
+class CMSRecord:
+
+    def __init__(self, name, record_type):
+        self.name = name
+        self.record_type = record_type
 
 
 class CMSRecordExport:
@@ -37,14 +40,13 @@ class CMSRecordExport:
     def get_reference_targets(self):
         fields = [f for f in self.fields
                   if f.reference and f.reference.is_direct]
-        targets = []
+        targets = set()
 
         for field in fields:
             reference = field.reference
-            if reference.target not in targets:
-                targets.append(reference.target)
+            targets.add(reference.name)
 
-        return targets
+        return list(targets)
 
     def get_many_reference_fields(self):
         return [f for f in self.fields
@@ -67,12 +69,11 @@ class CMSRecordExportReference:
     REF_TYPE_VIA_BACK_REF = 'via_back_reference'
     REF_TYPE_VIA_ASSOCIATION_RECORD = 'via_association_record'
 
-    def __init__(self, ref_type, name, target, field_name, field_type):
+    def __init__(self, ref_type, name, target_cms_record, target_field):
         self.ref_type = ref_type
         self.name = name
-        self.target = target
-        self.field_name = field_name
-        self.field_type = field_type
+        self.target_cms_record = target_cms_record
+        self.target_field = target_field
 
     @property
     def is_direct(self):
@@ -91,6 +92,13 @@ class CMSRecordExportReference:
     def is_many(self):
         return not self.is_direct
 
+    @property
+    def identifier(self):
+        if self.is_direct:
+            return self.name
+
+        return self.name + '.' + self.target_cms_record.name
+
 
 class CMSAssociationRecord:
 
@@ -101,9 +109,9 @@ class CMSAssociationRecord:
 
 class CMSAssociationRecordField:
 
-    def __init__(self, name, reference_target):
+    def __init__(self, name, target_cms_record):
         self.name = name
-        self.reference_target = reference_target
+        self.target_cms_record = target_cms_record
 
 
 class CMSRecordImport:
@@ -136,8 +144,7 @@ class CMSRecordImportField:
 
 class CMSRecordImportReference:
 
-    def __init__(self, name, target, field_name, field_type):
+    def __init__(self, name, target_cms_record, target_field):
         self.name = name
-        self.target = target
-        self.field_name = field_name
-        self.field_type = field_type
+        self.target_cms_record = target_cms_record
+        self.target_field = target_field

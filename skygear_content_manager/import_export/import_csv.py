@@ -189,8 +189,8 @@ def create_identifier_map(data_list, import_config):
     # for reference id
     for reference_field in reference_fields:
         reference = reference_field.reference
-        record_type = reference.target
-        key = reference.field_name
+        record_type = reference.target_cms_record.record_type
+        key = reference.target_field.name
         values = [r[reference_field.name] for r in data_list]
         for record in fetch_records_by_values_in_key(record_type, key, values):
             identifier_map.set(
@@ -219,8 +219,8 @@ def populate_record_reference(data_list, import_config, identifier_map):
             for reference_field in reference_fields:
                 reference = reference_field.reference
                 data[reference_field.name] = identifier_map.get(
-                    record_type=reference.target,
-                    key=reference.field_name,
+                    record_type=reference.target_cms_record.record_type,
+                    key=reference.target_field.name,
                     value=data[reference_field.name]
                 )
             result.append(data)

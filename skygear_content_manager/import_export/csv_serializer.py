@@ -16,11 +16,13 @@ class RecordSerializer:
 
             if field_config.reference:
                 reference = field_config.reference
-                transient = record['_transient'].get(reference.name)
+                display_field = reference.target_field
+
+                transient = record['_transient'].get(reference.identifier)
                 if isinstance(transient, list):
-                    value = [t.get(reference.field_name) for t in transient]
+                    value = [t.get(display_field.name) for t in transient]
                 elif transient != None:
-                    value = transient.get(reference.field_name)
+                    value = transient.get(display_field.name)
             else:
                 value = record.get(key)
 
@@ -56,7 +58,7 @@ class FieldSerializer:
         serializer = None
         type = self.field_config.type \
                if not self.field_config.reference \
-               else self.field_config.reference.field_type
+               else self.field_config.reference.target_field.type
 
         if self.field_config.reference and \
            self.field_config.reference.is_many and \
