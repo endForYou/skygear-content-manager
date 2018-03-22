@@ -2,13 +2,13 @@ import classNames from 'classnames';
 import * as qs from 'query-string';
 import * as React from 'react';
 import { connect } from 'react-redux';
-import { Link } from 'react-router-dom';
 import { Dispatch } from 'redux';
 import { Record } from 'skygear';
 
 import { dismissImport, importRecords } from '../actions/import';
 import { queryWithFilters, RecordActionDispatcher } from '../actions/record';
 import {
+  ActionConfigTypes,
   BooleanFilterQueryType,
   DateTimeFilter,
   DateTimeFilterQueryType,
@@ -24,7 +24,7 @@ import {
   IntegerFilter,
   IntegerFilterQueryType,
   ListActionConfig,
-  ListActionConfigTypes,
+  ListItemActionConfig,
   ListPageConfig,
   StringFilter,
   StringFilterQueryType,
@@ -38,11 +38,26 @@ import {
   ImportingModal,
   ImportModal,
 } from '../components/ImportModal';
+import { LinkButton } from '../components/LinkButton';
 import Pagination from '../components/Pagination';
 import { Field, FieldContext } from '../fields';
 import { getCmsConfig, ImportState, RootState } from '../states';
 import { RemoteType } from '../types';
 import { debounce } from '../util';
+
+// tslint:disable: no-any
+function joinElements(els: any[]) {
+  if (els.length === 0) {
+    return els;
+  }
+
+  return els.reduce((prev: any, current: any, index: number): any => [
+    prev,
+    <span key={index}>&nbsp;</span>,
+    current,
+  ]);
+}
+// tslint:enable: no-any
 
 interface TableHeaderProps {
   fieldConfigs: FieldConfig[];
@@ -64,10 +79,15 @@ const TableHeader: React.SFC<TableHeaderProps> = ({ fieldConfigs }) => {
 
 interface TableRowProps {
   fieldConfigs: FieldConfig[];
+  itemActions: ListItemActionConfig[];
   record: Record;
 }
 
-const TableRow: React.SFC<TableRowProps> = ({ fieldConfigs, record }) => {
+const TableRow: React.SFC<TableRowProps> = ({
+  fieldConfigs,
+  itemActions,
+  record,
+}) => {
   const columns = fieldConfigs.map((fieldConfig, index) => {
     return (
       <td key={index}>
@@ -79,17 +99,20 @@ const TableRow: React.SFC<TableRowProps> = ({ fieldConfigs, record }) => {
       </td>
     );
   });
+
   return (
     <tr>
       {columns}
       <td>
-        <Link className="btn btn-light" to={`/record/${record.id}`}>
-          Show
-        </Link>
-        &nbsp;
-        <Link className="btn btn-light" to={`/record/${record.id}/edit`}>
-          Edit
-        </Link>
+        {joinElements(
+          itemActions.map((action, index) => (
+            <LinkButton
+              key={index}
+              actionConfig={action}
+              context={{ record }}
+            />
+          ))
+        )}
       </td>
     </tr>
   );
@@ -97,26 +120,47 @@ const TableRow: React.SFC<TableRowProps> = ({ fieldConfigs, record }) => {
 
 interface TableBodyProps {
   fieldConfigs: FieldConfig[];
+  itemActions: ListItemActionConfig[];
   records: Record[];
 }
 
-const TableBody: React.SFC<TableBodyProps> = ({ fieldConfigs, records }) => {
+const TableBody: React.SFC<TableBodyProps> = ({
+  fieldConfigs,
+  itemActions,
+  records,
+}) => {
   const rows = records.map((record, index) => {
-    return <TableRow key={index} fieldConfigs={fieldConfigs} record={record} />;
+    return (
+      <TableRow
+        key={index}
+        fieldConfigs={fieldConfigs}
+        itemActions={itemActions}
+        record={record}
+      />
+    );
   });
   return <tbody>{rows}</tbody>;
 };
 
 interface ListTableProps {
   fieldConfigs: FieldConfig[];
+  itemActions: ListItemActionConfig[];
   records: Record[];
 }
 
-const ListTable: React.SFC<ListTableProps> = ({ fieldConfigs, records }) => {
+const ListTable: React.SFC<ListTableProps> = ({
+  fieldConfigs,
+  itemActions,
+  records,
+}) => {
   return (
     <table key="table" className="table table-sm table-hover table-responsive">
       <TableHeader fieldConfigs={fieldConfigs} />
-      <TableBody fieldConfigs={fieldConfigs} records={records} />
+      <TableBody
+        fieldConfigs={fieldConfigs}
+        itemActions={itemActions}
+        records={records}
+      />
     </table>
   );
 };
@@ -318,18 +362,27 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
     actionConfig: ListActionConfig
   ) {
     switch (actionConfig.type) {
-      case ListActionConfigTypes.Export:
+      case ActionConfigTypes.Export:
         return (
           <ExportButton
             actionConfig={actionConfig}
             onClick={() => this.setState({ exporting: actionConfig })}
           />
         );
-      case ListActionConfigTypes.Import:
+      case ActionConfigTypes.Import:
         return (
           <ImportButton
             actionConfig={actionConfig}
             onFileSelected={this.onImportFileSelected}
+          />
+        );
+      case ActionConfigTypes.Link:
+        return (
+          <LinkButton
+            actionConfig={actionConfig}
+            context={{
+              record_type: recordName,
+            }}
           />
         );
       default:
@@ -339,29 +392,10 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
 
   public renderActionButtons() {
     const { recordName, pageConfig: { actions } } = this.props;
-
-    // TODO (Steven-Chan):
-    // Add action type `New`
-    const newRecordButton = (
-      <Link
-        className="btn btn-light float-right"
-        to={`/records/${recordName}/new`}
-      >
-        New
-      </Link>
+    const actionsButtons = actions.map(action =>
+      this.renderActionButton(recordName, action)
     );
-
-    const actionsButtons = [
-      ...actions.map(action => this.renderActionButton(recordName, action)),
-      newRecordButton,
-    ];
-
-    return actionsButtons.reduce((
-      prev: JSX.Element | null,
-      current: JSX.Element | null,
-      index: number
-      // tslint:disable-next-line: no-any
-    ): any => [prev, <span key={index}>&nbsp;</span>, current]);
+    return joinElements(actionsButtons);
   }
 
   public renderImportModal() {
@@ -489,6 +523,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
                 return (
                   <ListTable
                     fieldConfigs={pageConfig.fields}
+                    itemActions={pageConfig.itemActions}
                     records={records}
                   />
                 );

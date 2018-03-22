@@ -254,6 +254,19 @@ records:
         - type: _id
         - name: display_name
           type: String
+      actions:
+        - type: Link
+          label: Search skills
+          href: https://www.google.com/search?q=skill
+          target: _blank
+        - type: AddButton
+      item_actions:
+        - type: Link
+          label: Search
+          href: https://www.google.com/search?q={record.display_name}
+          target: _blank
+        - type: ShowButton
+        - type: EditButton
     show:
       fields:
         - type: _id
@@ -331,6 +344,7 @@ records:
           name: import-country
           fields:
               - name: display_name
+      item_actions: []
     show:
       fields:
         - type: _id

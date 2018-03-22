@@ -1,4 +1,5 @@
 import { humanize, isObject, objectFrom } from './../util';
+import { mapDefaultActionToAction } from './defaultActions';
 import { FilterConfig, parseFilterConfig } from './filterConfig';
 import {
   parsePushNotificationConfig,
@@ -73,6 +74,7 @@ export interface ListPageConfig {
   filters: FilterConfig[];
   references: ReferenceConfig[];
   actions: ListActionConfig[];
+  itemActions: ListItemActionConfig[];
 }
 
 export interface ShowPageConfig {
@@ -225,16 +227,23 @@ export interface ConfigContext {
   associationRecordByName: AssociationRecordByName;
 }
 
-export type ListActionConfig = ExportActionConfig | ImportActionConfig;
-export enum ListActionConfigTypes {
+export type ListActionConfig =
+  | ExportActionConfig
+  | ImportActionConfig
+  | LinkActionConfig;
+export type ListItemActionConfig = LinkActionConfig;
+export enum ActionConfigTypes {
   Export = 'Export',
   Import = 'Import',
+  Link = 'Link',
 
-  // TODO (Steven-Chan):
-  // Add list action type `New`
+  // Default actions
+  AddButton = 'AddButton',
+  ShowButton = 'ShowButton',
+  EditButton = 'EditButton',
 }
 export interface ExportActionConfig {
-  type: ListActionConfigTypes.Export;
+  type: ActionConfigTypes.Export;
   name: string;
   label: string | undefined;
 
@@ -242,12 +251,18 @@ export interface ExportActionConfig {
   // client side only need name for calling export API
 }
 export interface ImportActionConfig {
-  type: ListActionConfigTypes.Import;
+  type: ActionConfigTypes.Import;
   name: string;
   label: string | undefined;
 
   // ignore field config and other config
   // client side only need name for calling export API
+}
+export interface LinkActionConfig {
+  type: ActionConfigTypes.Link;
+  label: string;
+  href: string;
+  target: string;
 }
 
 // tslint:disable-next-line: no-any
@@ -395,16 +410,104 @@ function parseListPageConfig(
     // tslint:disable-next-line: no-any
     (input.filters as any[]).map(f => parseFilterConfig(f, context));
 
-  const { actions = [] } = input;
+  const actions = parseListActions(input.actions);
+  const itemActions = parseListItemActions(input.item_actions);
 
   return {
     actions,
     cmsRecord,
     fields: compactFields,
     filters,
+    itemActions,
     label,
     perPage,
     references: filterReferences(compactFields),
+  };
+}
+
+// tslint:disable-next-line: no-any
+function parseListActions(input: any): ListActionConfig[] {
+  const itemActionTypes = [
+    ActionConfigTypes.Export,
+    ActionConfigTypes.Import,
+    ActionConfigTypes.Link,
+    ActionConfigTypes.AddButton,
+  ];
+
+  const defaultActions = [
+    {
+      type: ActionConfigTypes.AddButton,
+    },
+  ];
+
+  if (input == null) {
+    input = defaultActions;
+  }
+
+  return (
+    input
+      // tslint:disable-next-line: no-any
+      .filter((item: any) => itemActionTypes.indexOf(item.type) !== -1)
+      .map(mapDefaultActionToAction)
+      // tslint:disable-next-line: no-any
+      .map((item: any) => {
+        switch (item.type) {
+          case ActionConfigTypes.Export:
+            return item;
+          case ActionConfigTypes.Import:
+            return item;
+          case ActionConfigTypes.Link:
+            return parseLinkAction(item);
+        }
+      })
+  );
+}
+
+// tslint:disable-next-line: no-any
+function parseListItemActions(input: any): ListItemActionConfig[] {
+  const itemActionTypes = [
+    ActionConfigTypes.Link,
+    ActionConfigTypes.ShowButton,
+    ActionConfigTypes.EditButton,
+  ];
+
+  const defaultActions = [
+    {
+      type: ActionConfigTypes.ShowButton,
+    },
+    {
+      type: ActionConfigTypes.EditButton,
+    },
+  ];
+
+  if (input == null) {
+    input = defaultActions;
+  }
+
+  return (
+    input
+      // tslint:disable-next-line: no-any
+      .filter((item: any) => itemActionTypes.indexOf(item.type) !== -1)
+      .map(mapDefaultActionToAction)
+      // tslint:disable-next-line: no-any
+      .map((item: any) => {
+        switch (item.type) {
+          case ActionConfigTypes.Link:
+            return parseLinkAction(item);
+          default:
+            throw new Error(`Unexpected list item action types: ${item.type}`);
+        }
+      })
+  );
+}
+
+// tslint:disable-next-line: no-any
+function parseLinkAction(input: any): LinkActionConfig {
+  return {
+    href: parseOptionalString(input, 'href', 'list:item_actions') || '#',
+    label: parseString(input, 'label', 'list:item_actions'),
+    target: parseOptionalString(input, 'target', 'list:item_actions') || '',
+    type: input.type,
   };
 }
 
