@@ -22,10 +22,12 @@ export interface CmsConfig {
 export type SiteConfig = SiteItemConfig[];
 export type SiteItemConfig =
   | RecordSiteItemConfig
-  | UserManagementSiteItemConfig;
+  | UserManagementSiteItemConfig
+  | PushNotificationsSiteItemConfig;
 export enum SiteItemConfigTypes {
   Record = 'Record',
   UserManagement = 'UserManagement',
+  PushNotifications = 'PushNotifications',
 }
 
 export interface SiteItemConfigAttrs {
@@ -40,6 +42,10 @@ export interface RecordSiteItemConfig extends SiteItemConfigAttrs {
 
 export interface UserManagementSiteItemConfig extends SiteItemConfigAttrs {
   type: SiteItemConfigTypes.UserManagement;
+}
+
+export interface PushNotificationsSiteItemConfig extends SiteItemConfigAttrs {
+  type: SiteItemConfigTypes.PushNotifications;
 }
 
 export interface RecordConfigMap {
@@ -242,25 +248,19 @@ export enum ActionConfigTypes {
   ShowButton = 'ShowButton',
   EditButton = 'EditButton',
 }
-export interface ExportActionConfig {
+export interface ActionConfigAttrs {
+  label: string;
+}
+export interface ExportActionConfig extends ActionConfigAttrs {
   type: ActionConfigTypes.Export;
   name: string;
-  label: string | undefined;
-
-  // ignore field config
-  // client side only need name for calling export API
 }
-export interface ImportActionConfig {
+export interface ImportActionConfig extends ActionConfigAttrs {
   type: ActionConfigTypes.Import;
   name: string;
-  label: string | undefined;
-
-  // ignore field config and other config
-  // client side only need name for calling export API
 }
-export interface LinkActionConfig {
+export interface LinkActionConfig extends ActionConfigAttrs {
   type: ActionConfigTypes.Link;
-  label: string;
   href: string;
   target: string;
 }
@@ -312,6 +312,8 @@ function parseSiteConfig(siteConfig: any): SiteItemConfig {
       return parseSiteRecordConfig(siteConfig);
     case SiteItemConfigTypes.UserManagement:
       return parseSiteUserManagementConfig(siteConfig);
+    case SiteItemConfigTypes.PushNotifications:
+      return parseSitePushNotificationsConfig(siteConfig);
     default:
       throw new Error(`Received unknown site config type: ${siteConfig.type}`);
   }
@@ -335,12 +337,23 @@ function parseSiteUserManagementConfig(
   return { type, label };
 }
 
+function parseSitePushNotificationsConfig(
+  // tslint:disable-next-line: no-any
+  input: any
+): PushNotificationsSiteItemConfig {
+  const { type } = input;
+  const label =
+    parseOptionalString(input, 'label', 'PushNotifications') ||
+    'Push Notifications';
+  return { type, label };
+}
+
 // tslint:disable-next-line: no-any
 function preparseRecordConfigs(records: any): CmsRecordByName {
   const cmsRecordByName = objectFrom(
     Object.entries(records).map(([recordName, value]) => {
       const recordType =
-        parseOptionalString(value, 'recordType', recordName) || recordName;
+        parseOptionalString(value, 'record_type', recordName) || recordName;
       const cmsRecord = CmsRecord(recordName, recordType);
       return [recordName, cmsRecord] as [string, CmsRecord];
     })
@@ -358,7 +371,7 @@ function parseRecordConfig(
   const newConfig = input.new;
 
   const recordType =
-    parseOptionalString(input, 'recordType', recordName) || recordName;
+    parseOptionalString(input, 'record_type', recordName) || recordName;
   const cmsRecord = CmsRecord(recordName, recordType);
 
   return {
@@ -453,11 +466,13 @@ function parseListActions(input: any): ListActionConfig[] {
       .map((item: any) => {
         switch (item.type) {
           case ActionConfigTypes.Export:
-            return item;
+            return parseExportAction(item);
           case ActionConfigTypes.Import:
-            return item;
+            return parseImportAction(item);
           case ActionConfigTypes.Link:
             return parseLinkAction(item);
+          default:
+            throw new Error(`Unexpected list action types: ${item.type}`);
         }
       })
   );
@@ -499,6 +514,26 @@ function parseListItemActions(input: any): ListItemActionConfig[] {
         }
       })
   );
+}
+
+// tslint:disable-next-line: no-any
+function parseImportAction(input: any): ImportActionConfig {
+  const name = parseString(input, 'name', 'Import');
+  return {
+    label: parseOptionalString(input, 'label', 'Import') || name,
+    name,
+    type: input.type,
+  };
+}
+
+// tslint:disable-next-line: no-any
+function parseExportAction(input: any): ExportActionConfig {
+  const name = parseString(input, 'name', 'Export');
+  return {
+    label: parseOptionalString(input, 'label', 'Export') || name,
+    name,
+    type: input.type,
+  };
 }
 
 // tslint:disable-next-line: no-any
@@ -589,7 +624,7 @@ export function parseFieldConfig(context: ConfigContext, a: any): FieldConfig {
     case 'Integer':
       return parseIntegerFieldConfig(a);
     case 'Reference':
-      if (a.via_association_record) {
+      if (a.reference_via_association_record) {
         return parseAssociationReferenceFieldConfig(context, a);
       } else {
         return parseReferenceFieldConfig(context, a);
@@ -693,14 +728,14 @@ function parseReferenceFieldConfig(
   context: RecordTypeContext,
   input: FieldConfigInput
 ): ReferenceFieldConfig {
-  const targetRecordName = parseString(input, 'target', 'Reference');
+  const targetRecordName = parseString(input, 'reference_target', 'Reference');
   const displayFieldName =
-    parseOptionalString(input, 'displayFieldName', 'Reference') || '_id';
+    parseOptionalString(input, 'reference_field_name', 'Reference') || '_id';
 
   const targetCmsRecord = context.cmsRecordByName[targetRecordName];
   if (targetCmsRecord === undefined) {
     throw new Error(
-      `Couldn't find configuration of Reference.target = ${targetRecordName}`
+      `Couldn't find configuration of Reference.reference_target = ${targetRecordName}`
     );
   }
 
@@ -716,12 +751,16 @@ function parseAssociationReferenceFieldConfig(
   context: ConfigContext,
   input: FieldConfigInput
 ): AssociationReferenceFieldConfig {
-  const targetRecordName = parseString(input, 'target', 'Reference');
-  const displayFieldName = parseString(input, 'displayFieldName', 'Reference');
+  const targetRecordName = parseString(input, 'reference_target', 'Reference');
+  const displayFieldName = parseString(
+    input,
+    'reference_field_name',
+    'Reference'
+  );
 
   const associationRecordName = parseString(
     input,
-    'via_association_record',
+    'reference_via_association_record',
     'Reference'
   );
   const associationRecordConfig =
@@ -861,7 +900,7 @@ function parseAssociationRecord(
   input: any
 ): AssociationRecordConfig {
   const recordType =
-    parseOptionalString(input, 'recordType', 'association_record') ||
+    parseOptionalString(input, 'record_type', 'association_record') ||
     recordName;
 
   const fields = input.fields;

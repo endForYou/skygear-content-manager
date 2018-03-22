@@ -30,6 +30,69 @@ site:
   - type: Record
     name: welcome_message
     label: Welcome Message
+  - type: PushNotifications
+imports:
+  import-user:
+    record_type: user
+    fields:
+      - name: _id
+      - name: email
+  import-user-with-name:
+    record_type: user
+    identifier: name
+    duplicate_reference_handling: use-first
+    fields:
+      - name: name
+      - name: email
+  import-user-with-name-strict:
+    record_type: user
+    identifier: name
+    duplicate_reference_handling: throw-error
+    fields:
+      - name: name
+      - name: email
+  import-user-country:
+    record_type: user
+    identifier: name
+    fields:
+      - name: name
+      - name: email
+      - name: country
+        reference_target: country
+        reference_field_name: display_name
+exports:
+  export-user:
+    record_type: user
+    fields:
+      - name: _id
+        label: id
+      - name: name
+      - name: _created_at
+      - name: _updated_at
+      - name: email
+        label: Email
+      - name: city
+        label: City
+        reference_target: city
+        reference_field_name: _id
+      - name: country
+        label: Country
+        reference_target: country
+        reference_field_name: display_name
+      - name: has_skills
+        label: Has skills
+        reference_target: skill
+        reference_field_name: _id
+        reference_via_association_record: user_has_skill
+      - name: has_skills
+        label: Has skills (name)
+        reference_target: skill
+        reference_field_name: display_name
+        reference_via_association_record: user_has_skill
+      - name: json
+        label: Data
+      - name: location
+        label: Location
 records:
   user:
     list:
@@ -46,78 +109,28 @@ records:
         - name: city
           type: Reference
           label: City
-          target: city
-          displayFieldName: _id
+          reference_target: city
+          reference_field_name: _id
         - name: country
           type: Reference
           label: Country
-          target: country
-          displayFieldName: _id
+          reference_target: country
+          reference_field_name: _id
       actions:
         - type: Import
           name: import-user
           label: Import user
-          fields:
-            - name: _id
-            - name: email
         - type: Import
           name: import-user-with-name
           label: Import user with name
-          identifier: name
-          duplicate_reference_handling: use-first
-          fields:
-            - name: name
-            - name: email
         - type: Import
           name: import-user-with-name-strict
           label: Import user with name (Strict)
-          identifier: name
-          duplicate_reference_handling: throw-error
-          fields:
-            - name: name
-            - name: email
         - type: Import
           name: import-user-country
           label: Import user country
-          identifier: name
-          fields:
-            - name: name
-            - name: email
-            - name: country
-              reference_target: country
-              reference_field_name: display_name
         - type: Export
           name: export-user
-          fields:
-            - name: _id
-              label: id
-            - name: name
-            - name: _created_at
-            - name: _updated_at
-            - name: email
-              label: Email
-            - name: city
-              label: City
-              reference_target: city
-              reference_field_name: _id
-            - name: country
-              label: Country
-              reference_target: country
-              reference_field_name: display_name
-            - name: has_skills
-              label: Has skills
-              reference_target: skill
-              reference_field_name: _id
-              reference_via_association_record: user_has_skill
-            - name: has_skills
-              label: Has skills (name)
-              reference_target: skill
-              reference_field_name: display_name
-              reference_via_association_record: user_has_skill
-            - name: json
-              label: Data
-            - name: location
-              label: Location
     show:
       fields:
         - type: _id
@@ -132,44 +145,44 @@ records:
         - name: city
           type: Reference
           label: City
-          target: city
-          displayFieldName: _id
+          reference_target: city
+          reference_field_name: _id
         - name: country
           type: Reference
           label: Country
-          target: country
-          displayFieldName: _id
+          reference_target: country
+          reference_field_name: _id
           # reminder: name field is useless in many-to-many relation, but required
         - name: has_skills
           label: Has skills
           type: Reference
-          target: skill
-          displayFieldName: _id
-          via_association_record: user_has_skill
+          reference_target: skill
+          reference_field_name: _id
+          reference_via_association_record: user_has_skill
         - name: wants_skills
           label: Wants skills
           type: Reference
-          target: skill
-          displayFieldName: _id
-          via_association_record: user_wants_skill
+          reference_target: skill
+          reference_field_name: _id
+          reference_via_association_record: user_wants_skill
         - name: has_cfunctions
           label: Has cfunctions
           type: Reference
-          target: cfunction
-          displayFieldName: _id
-          via_association_record: user_has_cfunction
+          reference_target: cfunction
+          reference_field_name: _id
+          reference_via_association_record: user_has_cfunction
         - name: wants_cfunctions
           label: Wants cfunctions
           type: Reference
-          target: cfunction
-          displayFieldName: _id
-          via_association_record: user_wants_cfunction
+          reference_target: cfunction
+          reference_field_name: _id
+          reference_via_association_record: user_wants_cfunction
         - name: applications
           type: Reference
           label: Applications
-          target: joblisting
-          displayFieldName: proj_name
-          via_association_record: job_application
+          reference_target: joblisting
+          reference_field_name: proj_name
+          reference_via_association_record: job_application
     edit:
       fields:
         - name: name
@@ -177,38 +190,38 @@ records:
         - name: city
           type: Reference
           label: City
-          target: city
-          displayFieldName: _id
+          reference_target: city
+          reference_field_name: _id
         - name: country
           type: Reference
           label: Country
-          target: country
-          displayFieldName: _id
+          reference_target: country
+          reference_field_name: _id
           # reminder: name field is useless in many-to-many relation, but required
         - name: has_skills
           label: Has skills
           type: Reference
-          target: skill
-          displayFieldName: _id
-          via_association_record: user_has_skill
+          reference_target: skill
+          reference_field_name: _id
+          reference_via_association_record: user_has_skill
         - name: wants_skills
           label: Wants skills
           type: Reference
-          target: skill
-          displayFieldName: _id
-          via_association_record: user_wants_skill
+          reference_target: skill
+          reference_field_name: _id
+          reference_via_association_record: user_wants_skill
         - name: has_cfunctions
           label: Has cfunctions
           type: Reference
-          target: cfunction
-          displayFieldName: _id
-          via_association_record: user_has_cfunction
+          reference_target: cfunction
+          reference_field_name: _id
+          reference_via_association_record: user_has_cfunction
         - name: wants_cfunctions
           label: Wants cfunctions
           type: Reference
-          target: cfunction
-          displayFieldName: _id
-          via_association_record: user_wants_cfunction
+          reference_target: cfunction
+          reference_field_name: _id
+          reference_via_association_record: user_wants_cfunction
     new:
       fields:
         - name: name
@@ -216,38 +229,38 @@ records:
         - name: city
           type: Reference
           label: City
-          target: city
-          displayFieldName: _id
+          reference_target: city
+          reference_field_name: _id
         - name: country
           type: Reference
           label: Country
-          target: country
-          displayFieldName: _id
+          reference_target: country
+          reference_field_name: _id
           # reminder: name field is useless in many-to-many relation, but required
         - name: has_skills
           label: Has skills
           type: Reference
-          target: skill
-          displayFieldName: _id
-          via_association_record: user_has_skill
+          reference_target: skill
+          reference_field_name: _id
+          reference_via_association_record: user_has_skill
         - name: wants_skills
           label: Wants skills
           type: Reference
-          target: skill
-          displayFieldName: _id
-          via_association_record: user_wants_skill
+          reference_target: skill
+          reference_field_name: _id
+          reference_via_association_record: user_wants_skill
         - name: has_cfunctions
           label: Has cfunctions
           type: Reference
-          target: cfunction
-          displayFieldName: _id
-          via_association_record: user_has_cfunction
+          reference_target: cfunction
+          reference_field_name: _id
+          reference_via_association_record: user_has_cfunction
         - name: wants_cfunctions
           label: Wants cfunctions
           type: Reference
-          target: cfunction
-          displayFieldName: _id
-          via_association_record: user_wants_cfunction
+          reference_target: cfunction
+          reference_field_name: _id
+          reference_via_association_record: user_wants_cfunction
   skill:
     list:
       fields:
@@ -411,13 +424,13 @@ records:
         - name: applicant_id
           type: Reference
           label: Applicant
-          target: user
-          displayFieldName: name
+          reference_target: user
+          reference_field_name: name
         - name: joblisting_id
           type: Reference
           label: Job
-          target: joblisting
-          displayFieldName: proj_name
+          reference_target: joblisting
+          reference_field_name: proj_name
     show:
       fields:
         - type: _id
@@ -436,13 +449,13 @@ records:
         - name: applicant_id
           type: Reference
           label: Applicant
-          target: user
-          displayFieldName: name
+          reference_target: user
+          reference_field_name: name
         - name: joblisting_id
           type: Reference
           label: Job
-          target: joblisting
-          displayFieldName: proj_name
+          reference_target: joblisting
+          reference_field_name: proj_name
   joblisting:
     list:
       fields:
@@ -460,25 +473,25 @@ records:
         - name: manager_id
           type: Reference
           label: Manager
-          target: user
-          displayFieldName: name
+          reference_target: user
+          reference_field_name: name
         - name: role_description
           type: String
         - name: cfunction_id
           type: Reference
           label: Cfunction
-          target: cfunction
-          displayFieldName: _id
+          reference_target: cfunction
+          reference_field_name: _id
         - name: city
           type: Reference
           label: City
-          target: city
-          displayFieldName: _id
+          reference_target: city
+          reference_field_name: _id
         - name: country
           type: Reference
           label: Country
-          target: country
-          displayFieldName: _id
+          reference_target: country
+          reference_field_name: _id
         - name: proj_start_date
           type: DateTime
           label: Project Start Date
@@ -494,21 +507,21 @@ records:
         - name: offers_skill
           type: Reference
           label: Offers skills
-          target: skill
-          displayFieldName: _id
-          via_association_record: joblisting_offers_skill
+          reference_target: skill
+          reference_field_name: _id
+          reference_via_association_record: joblisting_offers_skill
         - name: requires_skill
           type: Reference
           label: Requires skills
-          target: skill
-          displayFieldName: _id
-          via_association_record: joblisting_requires_skill
+          reference_target: skill
+          reference_field_name: _id
+          reference_via_association_record: joblisting_requires_skill
         - name: applicants
           type: Reference
           label: Appplicants
-          target: user
-          displayFieldName: name
-          via_association_record: job_application
+          reference_target: user
+          reference_field_name: name
+          reference_via_association_record: job_application
     show:
       fields:
         - type: _id
@@ -525,25 +538,25 @@ records:
         - name: manager_id
           type: Reference
           label: Manager
-          target: user
-          displayFieldName: name
+          reference_target: user
+          reference_field_name: name
         - name: role_description
           type: String
         - name: cfunction_id
           type: Reference
           label: Cfunction
-          target: cfunction
-          displayFieldName: _id
+          reference_target: cfunction
+          reference_field_name: _id
         - name: city
           type: Reference
           label: City
-          target: city
-          displayFieldName: _id
+          reference_target: city
+          reference_field_name: _id
         - name: country
           type: Reference
           label: Country
-          target: country
-          displayFieldName: _id
+          reference_target: country
+          reference_field_name: _id
         - name: proj_start_date
           type: DateTime
           label: Project Start Date
@@ -559,21 +572,21 @@ records:
         - name: offers_skill
           type: Reference
           label: Offers skills
-          target: skill
-          displayFieldName: _id
-          via_association_record: joblisting_offers_skill
+          reference_target: skill
+          reference_field_name: _id
+          reference_via_association_record: joblisting_offers_skill
         - name: requires_skill
           type: Reference
           label: Requires skills
-          target: skill
-          displayFieldName: _id
-          via_association_record: joblisting_requires_skill
+          reference_target: skill
+          reference_field_name: _id
+          reference_via_association_record: joblisting_requires_skill
         - name: applicants
           type: Reference
           label: Appplicants
-          target: user
-          displayFieldName: name
-          via_association_record: job_application
+          reference_target: user
+          reference_field_name: name
+          reference_via_association_record: job_application
     edit:
       fields:
         - name: proj_name
@@ -586,33 +599,33 @@ records:
         - name: cfunction_id
           type: Reference
           label: Cfunction
-          target: cfunction
-          displayFieldName: _id
+          reference_target: cfunction
+          reference_field_name: _id
         - name: city
           type: Reference
           label: City
-          target: city
-          displayFieldName: _id
+          reference_target: city
+          reference_field_name: _id
         - name: country
           type: Reference
           label: Country
-          target: country
-          displayFieldName: _id
+          reference_target: country
+          reference_field_name: _id
         - name: required_availability
           type: Integer
           label: Required availability
         - name: offers_skill
           type: Reference
           label: Offers skills
-          target: skill
-          displayFieldName: _id
-          via_association_record: joblisting_offers_skill
+          reference_target: skill
+          reference_field_name: _id
+          reference_via_association_record: joblisting_offers_skill
         - name: requires_skill
           type: Reference
           label: Requires skills
-          target: skill
-          displayFieldName: _id
-          via_association_record: joblisting_requires_skill
+          reference_target: skill
+          reference_field_name: _id
+          reference_via_association_record: joblisting_requires_skill
     new:
       fields:
         - name: proj_name
@@ -625,33 +638,33 @@ records:
         - name: cfunction_id
           type: Reference
           label: Cfunction
-          target: cfunction
-          displayFieldName: _id
+          reference_target: cfunction
+          reference_field_name: _id
         - name: city
           type: Reference
           label: City
-          target: city
-          displayFieldName: _id
+          reference_target: city
+          reference_field_name: _id
         - name: country
           type: Reference
           label: Country
-          target: country
-          displayFieldName: _id
+          reference_target: country
+          reference_field_name: _id
         - name: required_availability
           type: Integer
           label: Required availability
         - name: offers_skill
           type: Reference
           label: Offers skills
-          target: skill
-          displayFieldName: _id
-          via_association_record: joblisting_offers_skill
+          reference_target: skill
+          reference_field_name: _id
+          reference_via_association_record: joblisting_offers_skill
         - name: requires_skill
           type: Reference
           label: Requires skills
-          target: skill
-          displayFieldName: _id
-          via_association_record: joblisting_requires_skill
+          reference_target: skill
+          reference_field_name: _id
+          reference_via_association_record: joblisting_requires_skill
   job_suggestion:
     list:
       fields:
@@ -659,13 +672,13 @@ records:
         - name: joblisting_id
           type: Reference
           label: Joblisting
-          target: joblisting
-          displayFieldName: proj_name
+          reference_target: joblisting
+          reference_field_name: proj_name
         - name: applicant_id
           type: Reference
           label: Applicant
-          target: user
-          displayFieldName: name
+          reference_target: user
+          reference_field_name: name
         - name: show_in_suggested_tab
           type: Boolean
     show:
@@ -676,13 +689,13 @@ records:
         - name: joblisting_id
           type: Reference
           label: Joblisting
-          target: joblisting
-          displayFieldName: proj_name
+          reference_target: joblisting
+          reference_field_name: proj_name
         - name: applicant_id
           type: Reference
           label: Applicant
-          target: user
-          displayFieldName: name
+          reference_target: user
+          reference_field_name: name
         - name: show_in_suggested_tab
           type: Boolean
   imported_user:
@@ -703,58 +716,58 @@ association_records:
     fields:
       - name: user_id
         type: Reference
-        target: user
+        reference_target: user
       - name: skill_id
         type: Reference
-        target: skill
+        reference_target: skill
   user_wants_skill:
     fields:
       - name: user_id
         type: Reference
-        target: user
+        reference_target: user
       - name: skill_id
         type: Reference
-        target: skill
+        reference_target: skill
   user_has_cfunction:
     fields:
       - name: user_id
         type: Reference
-        target: user
+        reference_target: user
       - name: cfunction_id
         type: Reference
-        target: cfunction
+        reference_target: cfunction
   user_wants_cfunction:
     fields:
       - name: user_id
         type: Reference
-        target: user
+        reference_target: user
       - name: cfunction_id
         type: Reference
-        target: cfunction
+        reference_target: cfunction
   joblisting_offers_skill:
     fields:
       - name: joblisting_id
         type: Reference
-        target: joblisting
+        reference_target: joblisting
       - name: skill_id
         type: Reference
-        target: skill
+        reference_target: skill
   joblisting_requires_skill:
     fields:
       - name: joblisting_id
         type: Reference
-        target: joblisting
+        reference_target: joblisting
       - name: skill_id
         type: Reference
-        target: skill
+        reference_target: skill
   job_application:
     fields:
       - name: joblisting_id
         type: Reference
-        target: joblisting
+        reference_target: joblisting
       - name: applicant_id
         type: Reference
-        target: user
+        reference_target: user
 push_notifications:
   enabled: true
   filters:

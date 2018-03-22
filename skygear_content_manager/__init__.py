@@ -46,7 +46,7 @@ def includeme(settings):
         try:
             cms_config = parse_cms_config()
         except Exception as e:
-            logger.error(e)
+            logger.exception(e)
 
         set_cms_config(cms_config)
 
@@ -57,7 +57,7 @@ def includeme(settings):
         try:
             cms_config = parse_cms_config()
         except Exception as e:
-            logger.error(e)
+            logger.exception(e)
 
         set_cms_config(cms_config)
 
@@ -333,10 +333,10 @@ def transient_foreign_records(record, export_config, association_records):
         if reference.is_via_association_record:
             foreign_field = \
                 [f for f in association_records[reference.name].fields
-                 if f.target == reference.target][0]
+                 if f.reference_target == reference.target][0]
             self_field = \
                 [f for f in association_records[reference.name].fields
-                 if f.target != reference.target][0]
+                 if f.reference_target != reference.target][0]
 
             predicate = eq_predicate(self_field.name, record_id)
             foreign_records = fetch_records(reference.name,
