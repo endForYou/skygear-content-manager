@@ -37,14 +37,13 @@ class CMSRecordExport:
         self.name = name
         self.fields = fields
 
-    def get_reference_targets(self):
+    def get_direct_reference_fields(self):
         fields = [f for f in self.fields
-                  if f.reference and f.reference.is_direct]
+                  if f.reference and not f.reference.is_many]
         targets = set()
 
         for field in fields:
-            reference = field.reference
-            targets.add(reference.name)
+            targets.add(field.name)
 
         return list(targets)
 
@@ -63,47 +62,75 @@ class CMSRecordExportField:
         self.reference = reference
 
 
-class CMSRecordExportReference:
+class CMSRecordReference:
 
-    REF_TYPE_DIRECT = ''
-    REF_TYPE_VIA_BACK_REF = 'via_back_reference'
-    REF_TYPE_VIA_ASSOCIATION_RECORD = 'via_association_record'
-
-    def __init__(self, ref_type, name, target_cms_record, target_field):
-        self.ref_type = ref_type
-        self.name = name
+    def __init__(self, target_cms_record, target_field):
         self.target_cms_record = target_cms_record
         self.target_field = target_field
 
     @property
-    def is_direct(self):
-        return self.ref_type == CMSRecordExportReference.REF_TYPE_DIRECT
-
-    @property
-    def is_via_back_ref(self):
-        return self.ref_type == CMSRecordExportReference.REF_TYPE_VIA_BACK_REF
-
-    @property
-    def is_via_association_record(self):
-        return self.ref_type == \
-            CMSRecordExportReference.REF_TYPE_VIA_ASSOCIATION_RECORD
+    def target_record_type(self):
+        return self.target_cms_record.record_type
 
     @property
     def is_many(self):
-        return not self.is_direct
+        raise NotImplementedError('is_many not implemented.')
+
+
+class CMSRecordDirectReference(CMSRecordReference):
 
     @property
-    def identifier(self):
-        if self.is_direct:
-            return self.name
+    def is_many(self):
+        return False
 
-        return self.name + '.' + self.target_cms_record.name
+
+class CMSRecordBackReference(CMSRecordReference):
+    """
+    e.g.
+    One parent user has many children user, user.parent is holding the
+    reference of parent user record.
+    If you want to display children user records of a user record,
+
+    source_reference: "parent"
+    """
+
+    def __init__(self, source_reference, target_cms_record, target_field):
+        super(CMSRecordBackReference, self)\
+            .__init__(target_cms_record, target_field)
+        self.source_reference = source_reference
+
+    @property
+    def is_many(self):
+        return True
+
+
+class CMSRecordAssociationReference(CMSRecordReference):
+    """
+    e.g.
+    parent_to_child has a parent (user) field and a child (user) field.
+    If you want to display the parents of a user record,
+
+    association_record: parent_to_child CMSAssociationRecord
+    target_reference: "parent"
+    """
+
+    def __init__(self, association_record, target_reference, target_cms_record,
+                 target_field):
+        super(CMSRecordAssociationReference, self)\
+            .__init__(target_cms_record, target_field)
+        self.association_record = association_record
+        self.target_reference = target_reference
+
+    @property
+    def is_many(self):
+        return True
 
 
 class CMSAssociationRecord:
 
-    def __init__(self, name, fields):
+    def __init__(self, name, record_type, fields):
         self.name = name
+        self.record_type = record_type
         self.fields = fields
 
 

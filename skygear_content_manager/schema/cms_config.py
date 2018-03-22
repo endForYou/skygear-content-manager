@@ -6,11 +6,12 @@ from marshmallow import (Schema, fields, post_load, pre_load, validates,
 from .nested_dict import NestedDict
 from ..models.cms_config import (CMSConfig,
                                  CMSRecordExport, CMSRecordExportField,
-                                 CMSRecordExportReference,
                                  CMSAssociationRecord,
                                  CMSAssociationRecordField,
                                  CMSRecordImport, CMSRecordImportField,
-                                 CMSRecordImportReference)
+                                 CMSRecordDirectReference,
+                                 CMSRecordBackReference,
+                                 CMSRecordAssociationReference)
 
 
 class CMSConfigSchema(Schema):
@@ -71,6 +72,7 @@ class CMSRecordExportFieldSchema(Schema):
 
         # find field type from schema
         cms_records = self.context['cms_records']
+        association_records = self.context['association_records']
         schema = self.context['schema']
         field = schema.field_of(data['record_type'], data['name'])
 
@@ -88,11 +90,9 @@ class CMSRecordExportFieldSchema(Schema):
                     'not found in schema.'
                 ).format(cms_record.record_type, field_name))
 
-            reference = CMSRecordExportReference(
-                ref_type=CMSRecordExportReference.REF_TYPE_DIRECT,
-                name=field.name,
+            reference = CMSRecordDirectReference(
                 target_cms_record=cms_record,
-                target_field=foreign_field,
+                target_field=foreign_field
             )
         elif field:
             type = field.type
@@ -110,23 +110,24 @@ class CMSRecordExportFieldSchema(Schema):
             ref_type = None
             ref_name = None
             if 'reference_via_back_reference' in data:
-                ref_type = CMSRecordExportReference.REF_TYPE_VIA_BACK_REF
-                ref_name = data['reference_via_back_reference']
+                cms_record = cms_records[data['reference_via_back_reference']]
+                target_field = schema.field_of(cms_record.record_type,
+                                               data['reference_field_name'])
+                reference = CMSRecordBackReference(
+                    source_reference=data['reference_target'],
+                    target_cms_record=cms_record,
+                    target_field=target_field
+                )
             else:
-                ref_type =\
-                    CMSRecordExportReference.REF_TYPE_VIA_ASSOCIATION_RECORD
-                ref_name = data['reference_via_association_record']
-
-            cms_record = cms_records[data['reference_target']]
-            target_field = schema.field_of(cms_record.record_type,
-                                            data['reference_field_name'])
-
-            reference = CMSRecordExportReference(
-                ref_type=ref_type,
-                name=ref_name,
-                target_cms_record=cms_record,
-                target_field=target_field,
-            )
+                cms_record = cms_records[data['reference_target']]
+                target_field = schema.field_of(cms_record.record_type,
+                                               data['reference_field_name'])
+                reference = CMSRecordAssociationReference(
+                    association_record=association_records[data['reference_via_association_record']],
+                    target_reference=data['reference_target'],
+                    target_cms_record=cms_record,
+                    target_field=target_field
+                )
 
         data['type'] = type
         if reference:
@@ -142,11 +143,15 @@ class CMSRecordExportFieldSchema(Schema):
 
 class CMSAssociationRecordSchema(Schema):
 
+    record_type = fields.String(required=False)
     fields = fields.Nested('CMSAssociationRecordFieldSchema', many=True)
 
     @post_load
     def make_object(self, data):
         data['name'] = self.context['name']
+        if 'record_type' not in data:
+            data['record_type'] = data['name']
+
         return CMSAssociationRecord(**data)
 
 
@@ -227,14 +232,13 @@ class CMSRecordImportFieldSchema(Schema):
             foreign_field = schema.field_of(cms_record.record_type, field_name)
             if not foreign_field:
                 raise Exception((
-                    'field name "{reference_target}.{reference_field_name}" ' +
+                    'field name "{}.{}" ' +
                     'not found in schema.'
-                ).format(**data))
+                ).format(cms_record.record_type, field_name))
 
-            reference = CMSRecordImportReference(
-                name=field.name,
+            reference = CMSRecordDirectReference(
                 target_cms_record=cms_record,
-                target_field=foreign_field,
+                target_field=foreign_field
             )
         elif field:
             type = field.type

@@ -14,7 +14,9 @@ from .import_export import (RecordSerializer, RecordDeserializer,
                             RecordIdentifierMap, render_records,
                             prepare_import_records, import_records)
 from .import_export import prepare_response as prepare_export_response
-from .models.cms_config import CMSConfig, CMSRecord
+from .models.cms_config import (CMSConfig, CMSRecord,
+                                CMSRecordBackReference,
+                                CMSRecordAssociationReference)
 from .push_notifications import cms_push_notification_db_init
 from .push_notifications import register_lambda as register_push_notifications_lambda
 from .schema.cms_config import CMSAssociationRecordSchema, CMSConfigSchema
@@ -131,7 +133,7 @@ def includeme(settings):
             return skygear.Response('Export config not found', 404)
 
         record_type = export_config.record_type
-        includes = export_config.get_reference_targets()
+        includes = export_config.get_direct_reference_fields()
 
         predicate = None
         if predicate_string:
@@ -353,31 +355,31 @@ def transient_foreign_records(record, export_config, association_records):
         reference = field.reference
         records = None
 
-        if reference.identifier in record['_transient']:
-            continue
-
-        if reference.is_via_association_record:
-            association_record = association_records[reference.name]
+        if isinstance(reference, CMSRecordAssociationReference):
+            association_record = association_records[reference.association_record.name]
 
             foreign_field = \
                 [f for f in association_record.fields
-                 if f.target_cms_record.name == reference.target_cms_record.name][0]
+                 if f.target_cms_record.name == reference.target_reference][0]
 
             self_field = \
                 [f for f in association_record.fields
-                 if f.target_cms_record.name != reference.target_cms_record.name][0]
+                 if f.target_cms_record.name != reference.target_reference][0]
 
             predicate = eq_predicate(self_field.name, record_id)
-            foreign_records = fetch_records(reference.name,
+            foreign_records = fetch_records(reference.association_record.record_type,
                                             predicate=predicate,
                                             includes=[foreign_field.name])
             records = \
                 [r['_transient'][foreign_field.name] for r in foreign_records]
-        else:
+        elif isinstance(reference, CMSRecordBackReference):
             # TODO
             pass
+        else:
+            # skip for direct reference
+            continue
 
-        record['_transient'][reference.name] = records
+        record['_transient'][field.name] = records
 
 
 INDEX_HTML_FORMAT = """<!doctype html>
