@@ -347,6 +347,14 @@ records:
         - type: _id
         - type: _created_at
         - type: _updated_at
+        - name: display_name
+          type: String
+        - name: users
+          type: Reference
+          label: users
+          reference_from_field: city
+          reference_field_name: name
+          reference_via_back_reference: user
     edit:
       fields:
         - name: display_name

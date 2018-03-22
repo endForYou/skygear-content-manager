@@ -5,6 +5,7 @@ import { FieldConfig, FieldConfigTypes } from '../cmsConfig';
 import { Effect } from '../components/RecordFormPage';
 
 import { AssociationReferenceField } from './AssociationReferenceField';
+import { BackReferenceField } from './BackReferenceField';
 import { BooleanField } from './BooleanField';
 import { DateTimeField } from './DateTimeField';
 import { DropdownField } from './DropdownField';
@@ -68,6 +69,8 @@ export class Field extends React.PureComponent<FieldProps> {
         return <IntegerField {...rest} config={config} />;
       case FieldConfigTypes.Reference:
         return <ReferenceField {...rest} config={config} />;
+      case FieldConfigTypes.BackReference:
+        return <BackReferenceField {...rest} config={config} />;
       case FieldConfigTypes.AssociationReference:
         return <AssociationReferenceField {...rest} config={config} />;
       case FieldConfigTypes.ImageAsset:

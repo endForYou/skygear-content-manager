@@ -104,6 +104,7 @@ enum RecordFormPageConfigType {
 
 export type ReferenceConfig =
   | ReferenceFieldConfig
+  | BackReferenceFieldConfig
   | AssociationReferenceFieldConfig;
 
 export type FieldConfig =
@@ -115,6 +116,7 @@ export type FieldConfig =
   | BooleanFieldConfig
   | IntegerFieldConfig
   | ReferenceFieldConfig
+  | BackReferenceFieldConfig
   | AssociationReferenceFieldConfig
   | ImageAssetFieldConfig;
 export enum FieldConfigTypes {
@@ -126,6 +128,7 @@ export enum FieldConfigTypes {
   Boolean = 'Boolean',
   Integer = 'Integer',
   Reference = 'Reference',
+  BackReference = 'BackReference',
   AssociationReference = 'AssociationReference',
   ImageAsset = 'ImageAsset',
 }
@@ -179,6 +182,13 @@ export interface IntegerFieldConfig extends FieldConfigAttrs {
 
 export interface ReferenceFieldConfig extends FieldConfigAttrs {
   type: FieldConfigTypes.Reference;
+  targetCmsRecord: CmsRecord;
+  displayFieldName: string;
+}
+
+export interface BackReferenceFieldConfig extends FieldConfigAttrs {
+  type: FieldConfigTypes.BackReference;
+  sourceFieldName: string;
   targetCmsRecord: CmsRecord;
   displayFieldName: string;
 }
@@ -634,6 +644,8 @@ export function parseFieldConfig(context: ConfigContext, a: any): FieldConfig {
     case 'Reference':
       if (a.reference_via_association_record) {
         return parseAssociationReferenceFieldConfig(context, a);
+      } else if (a.reference_via_back_reference) {
+        return parseBackReferenceFieldConfig(context, a);
       } else {
         return parseReferenceFieldConfig(context, a);
       }
@@ -759,6 +771,42 @@ function parseReferenceFieldConfig(
     displayFieldName,
     targetCmsRecord,
     type: FieldConfigTypes.Reference,
+  };
+}
+
+function parseBackReferenceFieldConfig(
+  context: RecordTypeContext,
+  input: FieldConfigInput
+): BackReferenceFieldConfig {
+  const targetRecordName = parseString(
+    input,
+    'reference_via_back_reference',
+    'Reference'
+  );
+  const sourceFieldName = parseString(
+    input,
+    'reference_from_field',
+    'Reference'
+  );
+  const displayFieldName = parseString(
+    input,
+    'reference_field_name',
+    'Reference'
+  );
+
+  const targetCmsRecord = context.cmsRecordByName[targetRecordName];
+  if (targetCmsRecord === undefined) {
+    throw new Error(
+      `Couldn't find configuration of Reference.reference_from_field = ${targetRecordName}`
+    );
+  }
+
+  return {
+    ...parseFieldConfigAttrs(input, 'Reference'),
+    displayFieldName,
+    sourceFieldName,
+    targetCmsRecord,
+    type: FieldConfigTypes.BackReference,
   };
 }
 
@@ -956,6 +1004,8 @@ function filterReferences(fieldConfigs: FieldConfig[]): ReferenceConfig[] {
     (refs, config) => {
       switch (config.type) {
         case FieldConfigTypes.Reference:
+          return [...refs, config];
+        case FieldConfigTypes.BackReference:
           return [...refs, config];
         case FieldConfigTypes.AssociationReference:
           return [...refs, config];

@@ -10,6 +10,7 @@ import skygear, {
 
 import {
   AssociationReferenceFieldConfig,
+  BackReferenceFieldConfig,
   BooleanFilter,
   BooleanFilterQueryType,
   CmsRecord,
@@ -513,35 +514,86 @@ function queryWithTarget(
   query: Query,
   references: ReferenceConfig[]
 ): Promise<QueryResult<Record>> {
-  const [refs, assoRefs] = separateReferenceConfigs(references);
+  const [refs, backRefs, assoRefs] = separateReferenceConfigs(references);
 
   refs.forEach(config => {
     query.transientInclude(config.name);
   });
 
+  let queryResult: QueryResult<Record>;
+  let sources: Record[];
+
   return skygear.publicDB
     .query(query)
-    .then((queryResult: QueryResult<Record>) => {
-      const sources = queryResult.map(r => r);
+    .then((qr: QueryResult<Record>) => {
+      queryResult = qr;
+      sources = qr.map(r => r);
 
-      return fetchAllAssociationRecordsWithTarget(
-        sources,
-        assoRefs
-      ).then(refAssoRecordsPairs => {
-        // mutate queryResult s.t. it has target records and association
-        // records in $transient
+      return Promise.all([
+        fetchAllReferentsWithTarget(sources, backRefs),
+        fetchAllAssociationRecordsWithTarget(sources, assoRefs),
+      ]);
+    })
+    .then(([refReferentsPair, refAssoRecordsPairs]) => {
+      const sourceById = new Map(
+        sources.map(r => [r._id, r] as [string, Record])
+      );
 
-        refAssoRecordsPairs.forEach(([ref, assoRecords]) => {
-          const sourceById = new Map(
-            sources.map(r => [r._id, r] as [string, Record])
-          );
-
-          distributeAssociationRecords(sourceById, ref, assoRecords);
-        });
-
-        return queryResult;
+      // mutate queryResult s.t. it has target records and association
+      // records in $transient
+      refReferentsPair.forEach(([ref, referents]) => {
+        distributeReferents(sourceById, ref, referents);
       });
+      refAssoRecordsPairs.forEach(([ref, assoRecords]) => {
+        distributeAssociationRecords(sourceById, ref, assoRecords);
+      });
+
+      return queryResult;
     });
+}
+
+function fetchAllReferentsWithTarget(
+  sources: Record[],
+  refs: BackReferenceFieldConfig[]
+): Promise<Array<[BackReferenceFieldConfig, Record[]]>> {
+  if (refs.length === 0) {
+    return Promise.resolve([]);
+  }
+
+  const sourceIds = sources.map(r => r._id);
+
+  const referentPromises = refs.map(ref => {
+    return fetchReferentsWithTarget(sourceIds, ref).then(
+      referents => [ref, referents] as [BackReferenceFieldConfig, Record[]]
+    );
+  });
+
+  return Promise.all(referentPromises);
+}
+
+function distributeReferents(
+  sourceById: Map<string, Record>,
+  ref: BackReferenceFieldConfig,
+  referents: Record[]
+): void {
+  const referentsBySourceId = groupBy(referents, referent => {
+    const sourceRef: Reference = referent[ref.sourceFieldName];
+    return parseReference(sourceRef).recordId;
+  });
+  sourceById.forEach((source, sourceId) => {
+    source.$transient[ref.name] = referentsBySourceId.get(sourceId) || [];
+  });
+}
+
+function fetchReferentsWithTarget(
+  sourceIds: string[],
+  backRefConfig: BackReferenceFieldConfig
+): Promise<Record[]> {
+  return fetchReferentRecords(
+    sourceIds,
+    backRefConfig.targetCmsRecord.recordType,
+    backRefConfig.sourceFieldName
+  );
 }
 
 function fetchAllAssociationRecordsWithTarget(
@@ -590,21 +642,28 @@ function fetchAssociationRecordsWithTarget(
   sourceIds: string[],
   assoRefConfig: AssociationReferenceFieldConfig
 ): Promise<Record[]> {
-  const {
-    associationRecordConfig: assoRecordConfig,
-    sourceReference: sourceRef,
-    targetReference: targetRef,
-  } = assoRefConfig;
-
-  const associationRecordCls = Record.extend(
-    assoRecordConfig.cmsRecord.recordType
+  return fetchReferentRecords(
+    sourceIds,
+    assoRefConfig.associationRecordConfig.cmsRecord.recordType,
+    assoRefConfig.sourceReference.name,
+    assoRefConfig.targetReference.name
   );
-  const query = new Query(associationRecordCls);
+}
+
+function fetchReferentRecords(
+  sourceIds: string[],
+  recordType: string,
+  sourceFieldName: string,
+  transientIncludeFieldName?: string
+): Promise<Record[]> {
+  const query = new Query(Record.extend(recordType));
   query.limit = 1024;
   query.addDescending('_created_at');
 
-  query.contains(sourceRef.name, sourceIds);
-  query.transientInclude(targetRef.name);
+  query.contains(sourceFieldName, sourceIds);
+  if (transientIncludeFieldName) {
+    query.transientInclude(transientIncludeFieldName);
+  }
 
   return skygear.publicDB
     .query(query)
@@ -613,8 +672,13 @@ function fetchAssociationRecordsWithTarget(
 
 function separateReferenceConfigs(
   configs: ReferenceConfig[]
-): [ReferenceFieldConfig[], AssociationReferenceFieldConfig[]] {
+): [
+  ReferenceFieldConfig[],
+  BackReferenceFieldConfig[],
+  AssociationReferenceFieldConfig[]
+] {
   const refs: ReferenceFieldConfig[] = [];
+  const backRefs: BackReferenceFieldConfig[] = [];
   const assoRefs: AssociationReferenceFieldConfig[] = [];
 
   configs.forEach(config => {
@@ -622,13 +686,16 @@ function separateReferenceConfigs(
       case FieldConfigTypes.Reference:
         refs.push(config);
         break;
+      case FieldConfigTypes.BackReference:
+        backRefs.push(config);
+        break;
       case FieldConfigTypes.AssociationReference:
         assoRefs.push(config);
         break;
     }
   });
 
-  return [refs, assoRefs];
+  return [refs, backRefs, assoRefs];
 }
 
 export class RecordActionDispatcher {
