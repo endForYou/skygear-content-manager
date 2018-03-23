@@ -57,7 +57,10 @@ class CMSRecordExportFieldSchema(Schema):
 
     reference_target = fields.String(required=False)
     reference_field_name = fields.String(required=False)
-    reference_back_reference = fields.String(required=False)
+
+    reference_via_back_reference = fields.String(required=False)
+    reference_from_field = fields.String(required=False)
+
     reference_via_association_record = fields.String(required=False)
 
     @pre_load
@@ -114,7 +117,7 @@ class CMSRecordExportFieldSchema(Schema):
                 target_field = schema.field_of(cms_record.record_type,
                                                data['reference_field_name'])
                 reference = CMSRecordBackReference(
-                    source_reference=data['reference_target'],
+                    source_reference=data['reference_from_field'],
                     target_cms_record=cms_record,
                     target_field=target_field
                 )
@@ -134,6 +137,7 @@ class CMSRecordExportFieldSchema(Schema):
             data['reference'] = reference
 
         data.pop('reference_target', None)
+        data.pop('reference_from_field', None)
         data.pop('reference_field_name', None)
         data.pop('reference_via_back_reference', None)
         data.pop('reference_via_association_record', None)
