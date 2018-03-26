@@ -14,10 +14,12 @@ from .import_export import (RecordSerializer, RecordDeserializer,
                             RecordIdentifierMap, render_records,
                             prepare_import_records, import_records)
 from .import_export import prepare_response as prepare_export_response
-from .models.cms_config import CMSConfig
+from .models.cms_config import (CMSConfig, CMSRecord,
+                                CMSRecordBackReference,
+                                CMSRecordAssociationReference)
 from .push_notifications import cms_push_notification_db_init
 from .push_notifications import register_lambda as register_push_notifications_lambda
-from .schema.cms_config import CMSConfigSchema
+from .schema.cms_config import CMSAssociationRecordSchema, CMSConfigSchema
 from .schema.skygear_schema import SkygearSchemaSchema
 from .settings import (CMS_USER_PERMITTED_ROLE, CMS_SKYGEAR_ENDPOINT,
                        CMS_SKYGEAR_API_KEY, CMS_PUBLIC_URL, CMS_STATIC_URL,
@@ -131,7 +133,7 @@ def includeme(settings):
             return skygear.Response('Export config not found', 404)
 
         record_type = export_config.record_type
-        includes = export_config.get_reference_targets()
+        includes = export_config.get_direct_reference_fields()
 
         predicate = None
         if predicate_string:
@@ -291,13 +293,39 @@ def parse_cms_config():
 
     config = yaml.load(r.text)
 
+    association_records_data = config['association_records'] \
+                               if 'association_records' in config \
+                               else {}
+    cms_records_data = config['records'] if 'records' in config else {}
+
+    cms_records = {}
+    for key, value in cms_records_data.items():
+        record_type = value.get('record_type', key)
+        cms_records[key] = CMSRecord(name=key, record_type=record_type)
+
+    association_records = {}
+    association_record_schema = CMSAssociationRecordSchema()
+    for key, value in association_records_data.items():
+        association_record_schema.context = {
+            'name': key,
+            'cms_records': cms_records,
+        }
+        association_records[key] = association_record_schema.load(value).data
+
     config_schema = CMSConfigSchema()
-    config_schema.context = {'schema': schema}
+    config_schema.context = {
+        'schema': schema,
+        'association_records': association_records,
+        'cms_records': cms_records,
+    }
     result = config_schema.load(config)
     if result.errors:
         raise ValidationError(result.errors)
 
-    return result.data
+    cms_config = result.data
+    cms_config.association_records = association_records
+    cms_config.cms_records = cms_records
+    return cms_config
 
 
 def set_cms_config(_cms_config):
@@ -327,28 +355,31 @@ def transient_foreign_records(record, export_config, association_records):
         reference = field.reference
         records = None
 
-        if reference.name in record['_transient']:
-            continue
+        if isinstance(reference, CMSRecordAssociationReference):
+            association_record = association_records[reference.association_record.name]
 
-        if reference.is_via_association_record:
             foreign_field = \
-                [f for f in association_records[reference.name].fields
-                 if f.reference_target == reference.target][0]
+                [f for f in association_record.fields
+                 if f.target_cms_record.name == reference.target_reference][0]
+
             self_field = \
-                [f for f in association_records[reference.name].fields
-                 if f.reference_target != reference.target][0]
+                [f for f in association_record.fields
+                 if f.target_cms_record.name != reference.target_reference][0]
 
             predicate = eq_predicate(self_field.name, record_id)
-            foreign_records = fetch_records(reference.name,
+            foreign_records = fetch_records(reference.association_record.record_type,
                                             predicate=predicate,
                                             includes=[foreign_field.name])
             records = \
                 [r['_transient'][foreign_field.name] for r in foreign_records]
-        else:
+        elif isinstance(reference, CMSRecordBackReference):
             # TODO
             pass
+        else:
+            # skip for direct reference
+            continue
 
-        record['_transient'][reference.name] = records
+        record['_transient'][field.name] = records
 
 
 INDEX_HTML_FORMAT = """<!doctype html>

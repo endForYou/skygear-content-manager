@@ -4,13 +4,14 @@ from marshmallow import (Schema, fields, post_load, pre_load, validates,
                          ValidationError)
 
 from .nested_dict import NestedDict
-from ..models.cms_config import (CMSConfig, CMSRecordExport,
-                                 CMSRecordExportField,
-                                 CMSRecordExportReference,
+from ..models.cms_config import (CMSConfig,
+                                 CMSRecordExport, CMSRecordExportField,
                                  CMSAssociationRecord,
                                  CMSAssociationRecordField,
                                  CMSRecordImport, CMSRecordImportField,
-                                 CMSRecordImportReference)
+                                 CMSRecordDirectReference,
+                                 CMSRecordBackReference,
+                                 CMSRecordAssociationReference)
 
 
 class CMSConfigSchema(Schema):
@@ -19,8 +20,6 @@ class CMSConfigSchema(Schema):
                          required=False)
     exports = NestedDict('CMSRecordExportSchema', key='name',
                          required=False)
-    association_records = NestedDict('CMSAssociationRecordSchema', key='name',
-                                     required=False)
 
     @pre_load
     def pre_load(self, data):
@@ -58,7 +57,10 @@ class CMSRecordExportFieldSchema(Schema):
 
     reference_target = fields.String(required=False)
     reference_field_name = fields.String(required=False)
-    reference_back_reference = fields.String(required=False)
+
+    reference_via_back_reference = fields.String(required=False)
+    reference_from_field = fields.String(required=False)
+
     reference_via_association_record = fields.String(required=False)
 
     @pre_load
@@ -72,6 +74,8 @@ class CMSRecordExportFieldSchema(Schema):
             data['label'] = data['name']
 
         # find field type from schema
+        cms_records = self.context['cms_records']
+        association_records = self.context['association_records']
         schema = self.context['schema']
         field = schema.field_of(data['record_type'], data['name'])
 
@@ -79,20 +83,19 @@ class CMSRecordExportFieldSchema(Schema):
         reference = None
         if field and field.is_ref:
             type = 'reference'
-            foreign_field = schema.field_of(data['reference_target'],
-                                            data['reference_field_name'])
+
+            cms_record = cms_records[data['reference_target']]
+            field_name = data['reference_field_name']
+            foreign_field = schema.field_of(cms_record.record_type, field_name)
             if not foreign_field:
                 raise Exception((
-                    'field name "{reference_target}.{reference_field_name}" ' +
+                    'field name "{}.{}" ' +
                     'not found in schema.'
-                ).format(**data))
+                ).format(cms_record.record_type, field_name))
 
-            reference = CMSRecordExportReference(
-                ref_type=CMSRecordExportReference.REF_TYPE_DIRECT,
-                name=field.name,
-                target=field.ref_target,
-                field_name=data['reference_field_name'],
-                field_type=foreign_field.type,
+            reference = CMSRecordDirectReference(
+                target_cms_record=cms_record,
+                target_field=foreign_field
             )
         elif field:
             type = field.type
@@ -110,29 +113,31 @@ class CMSRecordExportFieldSchema(Schema):
             ref_type = None
             ref_name = None
             if 'reference_via_back_reference' in data:
-                ref_type = CMSRecordExportReference.REF_TYPE_VIA_BACK_REF
-                ref_name = data['reference_via_back_reference']
+                cms_record = cms_records[data['reference_via_back_reference']]
+                target_field = schema.field_of(cms_record.record_type,
+                                               data['reference_field_name'])
+                reference = CMSRecordBackReference(
+                    source_reference=data['reference_from_field'],
+                    target_cms_record=cms_record,
+                    target_field=target_field
+                )
             else:
-                ref_type =\
-                    CMSRecordExportReference.REF_TYPE_VIA_ASSOCIATION_RECORD
-                ref_name = data['reference_via_association_record']
-
-            foreign_field = schema.field_of(data['reference_target'],
-                                            data['reference_field_name'])
-
-            reference = CMSRecordExportReference(
-                ref_type=ref_type,
-                name=ref_name,
-                target=data['reference_target'],
-                field_name=data['reference_field_name'],
-                field_type=foreign_field.type,
-            )
+                cms_record = cms_records[data['reference_target']]
+                target_field = schema.field_of(cms_record.record_type,
+                                               data['reference_field_name'])
+                reference = CMSRecordAssociationReference(
+                    association_record=association_records[data['reference_via_association_record']],
+                    target_reference=data['reference_target'],
+                    target_cms_record=cms_record,
+                    target_field=target_field
+                )
 
         data['type'] = type
         if reference:
             data['reference'] = reference
 
         data.pop('reference_target', None)
+        data.pop('reference_from_field', None)
         data.pop('reference_field_name', None)
         data.pop('reference_via_back_reference', None)
         data.pop('reference_via_association_record', None)
@@ -142,11 +147,15 @@ class CMSRecordExportFieldSchema(Schema):
 
 class CMSAssociationRecordSchema(Schema):
 
-    name = fields.String()
+    record_type = fields.String(required=False)
     fields = fields.Nested('CMSAssociationRecordFieldSchema', many=True)
 
     @post_load
     def make_object(self, data):
+        data['name'] = self.context['name']
+        if 'record_type' not in data:
+            data['record_type'] = data['name']
+
         return CMSAssociationRecord(**data)
 
 
@@ -157,6 +166,10 @@ class CMSAssociationRecordFieldSchema(Schema):
 
     @post_load
     def make_object(self, data):
+        cms_records = self.context['cms_records']
+        data['target_cms_record'] = cms_records[data['reference_target']]
+
+        data.pop('reference_target')
         return CMSAssociationRecordField(**data)
 
 
@@ -209,6 +222,7 @@ class CMSRecordImportFieldSchema(Schema):
             data['label'] = data['name']
 
         # find field type from schema
+        cms_records = self.context['cms_records']
         schema = self.context['schema']
         field = schema.field_of(data['record_type'], data['name'])
 
@@ -216,19 +230,19 @@ class CMSRecordImportFieldSchema(Schema):
         reference = None
         if field and field.is_ref:
             type = 'reference'
-            foreign_field = schema.field_of(data['reference_target'],
-                                            data['reference_field_name'])
+
+            cms_record = cms_records[data['reference_target']]
+            field_name = data['reference_field_name']
+            foreign_field = schema.field_of(cms_record.record_type, field_name)
             if not foreign_field:
                 raise Exception((
-                    'field name "{reference_target}.{reference_field_name}" ' +
+                    'field name "{}.{}" ' +
                     'not found in schema.'
-                ).format(**data))
+                ).format(cms_record.record_type, field_name))
 
-            reference = CMSRecordImportReference(
-                name=field.name,
-                target=field.ref_target,
-                field_name=data['reference_field_name'],
-                field_type=foreign_field.type,
+            reference = CMSRecordDirectReference(
+                target_cms_record=cms_record,
+                target_field=foreign_field
             )
         elif field:
             type = field.type

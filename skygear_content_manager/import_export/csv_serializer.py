@@ -1,6 +1,10 @@
 import arrow
 import json
 
+from ..models.cms_config import (CMSRecordReference,
+                                 CMSRecordBackReference,
+                                 CMSRecordAssociationReference)
+
 
 class RecordSerializer:
 
@@ -14,15 +18,16 @@ class RecordSerializer:
             key = field_config.name
             value = None
 
-            if field_config.reference:
-                reference = field_config.reference
-                transient = record['_transient'].get(reference.name)
-                if isinstance(transient, list):
-                    value = [t.get(reference.field_name) for t in transient]
-                elif transient != None:
-                    value = transient.get(reference.field_name)
-            else:
+            if not field_config.reference:
                 value = record.get(key)
+            elif isinstance(field_config.reference, CMSRecordBackReference) or\
+                 isinstance(field_config.reference, CMSRecordAssociationReference):
+                transient = record['_transient'].get(field_config.name)
+                value = [t.get(field_config.reference.target_field.name) for t in transient]
+            else:
+                transient = record['_transient'].get(field_config.name)
+                if transient != None:
+                    value = transient.get(field_config.reference.target_field.name)
 
             serializer = FieldSerializer(field_config)
             result[field_config.label] = serializer.serialize(value)
@@ -39,7 +44,17 @@ class FieldSerializer:
         if value == None:
             return ''
 
-        serializer = self.get_serializer(value)
+        serializer = None
+        if isinstance(self.field_config.reference, CMSRecordBackReference) or\
+           isinstance(self.field_config.reference, CMSRecordAssociationReference):
+            serializer = ListSerializer()
+            target_field = self.field_config.reference.target_field
+            serializer.field_serializer = self.get_serializer(target_field.type)
+        elif not self.field_config.reference == None:
+            target_field = self.field_config.reference.target_field
+            serializer = self.get_serializer(target_field.type)
+        else:
+            serializer = self.get_serializer(self.field_config.type)
 
         if not serializer:
             field_name = self.field_config.name \
@@ -52,30 +67,22 @@ class FieldSerializer:
 
         return serializer.serialize(value)
 
-    def get_serializer(self, value):
+    def get_serializer(self, field_type):
         serializer = None
-        type = self.field_config.type \
-               if not self.field_config.reference \
-               else self.field_config.reference.field_type
 
-        if self.field_config.reference and \
-           self.field_config.reference.is_many and \
-           isinstance(value, list):
-            serializer = ListSerializer()
-            serializer.field_serializer = self
-        elif type == 'string':
+        if field_type == 'string':
             serializer = StringSerializer()
-        elif type in 'number':
+        elif field_type in 'number':
             serializer = StringSerializer()
-        elif type == 'boolean':
+        elif field_type == 'boolean':
             serializer = BooleanSerializer()
-        elif type == 'json':
+        elif field_type == 'json':
             serializer = JSONSerializer()
-        elif type == 'location':
+        elif field_type == 'location':
             serializer = LocationSerializer()
-        elif type == 'datetime':
+        elif field_type == 'datetime':
             serializer = DatetimeSerializer()
-        elif type == 'integer':
+        elif field_type == 'integer':
             serializer = StringSerializer()
 
         return serializer
