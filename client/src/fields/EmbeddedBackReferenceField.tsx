@@ -9,6 +9,7 @@ import {
   RecordChange,
   RecordChangeHandler,
 } from '../components/RecordFormPage';
+import { deleteRecordsProperly } from '../recordUtil';
 
 import {
   Field,
@@ -22,7 +23,8 @@ export type EmbeddedBackReferenceFieldProps = RequiredFieldProps<
 >;
 
 interface State {
-  embeddedRecordChange: RecordChange[];
+  embeddedRecordUpdate: RecordChange[];
+  embeddedRecordDelete: Record[];
   embeddedRecords: Record[];
 }
 
@@ -35,16 +37,22 @@ export class EmbeddedBackReferenceField extends React.PureComponent<
   constructor(props: EmbeddedBackReferenceFieldProps) {
     super(props);
 
-    const embeddedRecords = this.embeddedRecords(props);
+    const { context, config } = props;
+    const $transient = context.record.$transient;
+    const embeddedRecords = $transient[config.name] as Record[];
 
     this.state = {
-      embeddedRecordChange: embeddedRecords.map(() => ({})),
+      embeddedRecordDelete: [],
+      embeddedRecordUpdate: embeddedRecords.map(() => ({})),
       embeddedRecords: [...embeddedRecords],
     };
 
     this.embeddedRecordEffects = [];
 
     this.handleEmbeddedRecordChange = this.handleEmbeddedRecordChange.bind(
+      this
+    );
+    this.handleEmbeddedRecordRemove = this.handleEmbeddedRecordRemove.bind(
       this
     );
   }
@@ -57,7 +65,7 @@ export class EmbeddedBackReferenceField extends React.PureComponent<
     effect?: Effect
   ) {
     this.setState(prevState => {
-      prevState.embeddedRecordChange[index][name] = value;
+      prevState.embeddedRecordUpdate[index][name] = value;
       prevState.embeddedRecords[index][name] = value;
       return prevState;
     });
@@ -68,6 +76,19 @@ export class EmbeddedBackReferenceField extends React.PureComponent<
     }
 
     this.embeddedRecordEffects[index] = embeddedRecordEffect;
+
+    this.applyEmbeddedRecordChange();
+  }
+
+  public handleEmbeddedRecordRemove(index: number) {
+    this.setState(prevState => {
+      prevState.embeddedRecordDelete.push(prevState.embeddedRecords[index]);
+      prevState.embeddedRecordUpdate.splice(index, 1);
+      prevState.embeddedRecords.splice(index, 1);
+      return prevState;
+    });
+
+    this.embeddedRecordEffects.splice(index, 1);
 
     this.applyEmbeddedRecordChange();
   }
@@ -86,19 +107,14 @@ export class EmbeddedBackReferenceField extends React.PureComponent<
           onRecordChange={(name: string, value: any, effect?: Effect) => {
             this.handleEmbeddedRecordChange(index, name, value, effect);
           }}
+          onRecordRemove={() => this.handleEmbeddedRecordRemove(index)}
           record={r}
+          removable={config.editable || false}
         />
       );
     });
 
     return <div className="embedded-back-reference-field">{items}</div>;
-  }
-
-  private embeddedRecords(props: EmbeddedBackReferenceFieldProps): Record[] {
-    const { context, config } = props;
-    const $transient = context.record.$transient;
-    const targetRecords = $transient[config.name] as Record[];
-    return targetRecords;
   }
 
   private applyEmbeddedRecordChange() {
@@ -116,21 +132,30 @@ export class EmbeddedBackReferenceField extends React.PureComponent<
           })
         );
 
-        // apply record update
-        const changes = this.state.embeddedRecordChange;
         const RecordCls = Record.extend(config.targetCmsRecord.recordType);
-        const recordsToSave = this.embeddedRecords(
-          this.props
-        ).map((record, index) => {
+
+        // apply record update
+        const updates = this.state.embeddedRecordUpdate;
+        const recordsToSave = updates.map((change, index) => {
+          const recordId = this.state.embeddedRecords[index].id;
           return new RecordCls({
-            _id: record.id,
-            ...changes[index],
+            _id: recordId,
+            ...updates[index],
           });
         });
-
         const saveRecord = skygear.publicDB.save(recordsToSave);
 
-        return Promise.all([...effects, saveRecord]);
+        // apply record delete
+        const deletes = this.state.embeddedRecordDelete;
+        const recordsToDelete = deletes.map(
+          record => new RecordCls({ _id: record.id })
+        );
+        const deleteRecord = deleteRecordsProperly(
+          skygear.publicDB,
+          recordsToDelete
+        );
+
+        return Promise.all([...effects, saveRecord, deleteRecord]);
       });
     }
   }
@@ -140,14 +165,18 @@ interface EmbeddedRecordViewProps {
   className: string;
   fieldConfigs: FieldConfig[];
   onRecordChange: RecordChangeHandler;
+  onRecordRemove: () => void;
   record: Record;
+  removable: boolean;
 }
 
 function EmbeddedRecordView({
   className,
   fieldConfigs,
   onRecordChange,
+  onRecordRemove,
   record,
+  removable,
 }: EmbeddedRecordViewProps): JSX.Element {
   const formGroups = fieldConfigs.map((fieldConfig, index) => {
     return (
@@ -160,7 +189,21 @@ function EmbeddedRecordView({
       />
     );
   });
-  return <form className={className}>{formGroups}</form>;
+  return (
+    <form className={className}>
+      {removable && (
+        <button
+          type="button"
+          className="close"
+          aria-label="Close"
+          onClick={onRecordRemove}
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      )}
+      {formGroups}
+    </form>
+  );
 }
 
 interface FieldProps {
