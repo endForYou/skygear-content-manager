@@ -658,6 +658,13 @@ function parseShowActions(input: any): ShowActionConfig[] {
   );
 }
 
+function makeEditableField(config: FieldConfig): FieldConfig {
+  return {
+    editable: true,
+    ...config,
+  };
+}
+
 function parseRecordFormPageConfig(
   context: ConfigContext,
   cmsRecord: CmsRecord,
@@ -680,7 +687,15 @@ function parseRecordFormPageConfig(
   const fields = input.fields.map((f: any) =>
     parseFieldConfig(context, f)
   ) as FieldConfig[];
-  const editableFields = fields.map(config => ({ editable: true, ...config }));
+  const editableFields = fields.map(config => {
+    if (config.type === FieldConfigTypes.EmbeddedBackReference) {
+      config = {
+        ...config,
+        displayFields: config.displayFields.map(makeEditableField),
+      };
+    }
+    return makeEditableField(config);
+  });
 
   return {
     actions: parseRecordFormActions(input.actions),

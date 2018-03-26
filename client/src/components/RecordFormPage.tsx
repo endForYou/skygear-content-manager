@@ -36,7 +36,7 @@ interface State {
   effectChange: RecordEffect;
 }
 
-interface RecordChange {
+export interface RecordChange {
   // tslint:disable-next-line: no-any
   [key: string]: any;
 }
@@ -47,8 +47,12 @@ interface RecordEffect {
 
 // Handle change propagated from Field. A undefined value would yield no changes
 // on State.recordChange[name].
-// tslint:disable-next-line: no-any
-type RecordChangeHandler = (name: string, value: any, effect?: Effect) => void;
+export type RecordChangeHandler = (
+  name: string,
+  // tslint:disable-next-line: no-any
+  value: any,
+  effect?: Effect
+) => void;
 
 class RecordFormPageImpl extends React.PureComponent<
   RecordFormPageProps,

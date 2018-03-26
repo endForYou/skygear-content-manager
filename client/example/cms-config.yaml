@@ -355,27 +355,51 @@ records:
           type: String
         - name: users
           type: EmbeddedReference
-          label: users
+          label: Users
           reference_from_field: city
           reference_via_back_reference: user
           reference_fields:
             - type: _id
             - name: name
               type: String
+            - name: last_login_at
+              type: DateTime
+            - name: boolean
+              type: Boolean
     edit:
       fields:
         - name: display_name
           type: String
         - name: users
-          type: Reference
-          label: users
+          type: EmbeddedReference
+          label: Users
           reference_from_field: city
-          reference_field_name: name
           reference_via_back_reference: user
+          reference_fields:
+            - type: _id
+            - name: name
+              type: String
+            - name: last_login_at
+              type: DateTime
+            - name: boolean
+              type: Boolean
     new:
       fields:
         - name: display_name
           type: String
+        - name: users
+          type: EmbeddedReference
+          label: Users
+          reference_from_field: city
+          reference_via_back_reference: user
+          reference_fields:
+            - type: _id
+            - name: name
+              type: String
+            - name: last_login_at
+              type: DateTime
+            - name: boolean
+              type: Boolean
   country:
     list:
       fields:
