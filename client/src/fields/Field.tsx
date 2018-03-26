@@ -9,6 +9,7 @@ import { BackReferenceField } from './BackReferenceField';
 import { BooleanField } from './BooleanField';
 import { DateTimeField } from './DateTimeField';
 import { DropdownField } from './DropdownField';
+import { EmbeddedBackReferenceField } from './EmbeddedBackReferenceField';
 import { ImageAssetField } from './ImageAssetField';
 import { IntegerField } from './IntegerField';
 import { ReferenceField } from './ReferenceField';
@@ -73,6 +74,8 @@ export class Field extends React.PureComponent<FieldProps> {
         return <BackReferenceField {...rest} config={config} />;
       case FieldConfigTypes.AssociationReference:
         return <AssociationReferenceField {...rest} config={config} />;
+      case FieldConfigTypes.EmbeddedBackReference:
+        return <EmbeddedBackReferenceField {...rest} config={config} />;
       case FieldConfigTypes.ImageAsset:
         return <ImageAssetField {...rest} config={config} />;
     }

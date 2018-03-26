@@ -1,0 +1,11 @@
+.embedded-record-view {
+  margin-bottom: 1rem;
+  padding: 1rem;
+  border-color: rgba(0, 0, 0, .15);
+  border-width: 1px;
+  border-style: solid;
+}
+
+.embedded-back-reference-field > .embedded-record-view:not(:first-child) {
+  margin-top: 1rem;
+}

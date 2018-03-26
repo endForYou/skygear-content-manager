@@ -354,11 +354,14 @@ records:
         - name: display_name
           type: String
         - name: users
-          type: Reference
+          type: EmbeddedReference
           label: users
           reference_from_field: city
-          reference_field_name: name
           reference_via_back_reference: user
+          reference_fields:
+            - type: _id
+            - name: name
+              type: String
     edit:
       fields:
         - name: display_name
