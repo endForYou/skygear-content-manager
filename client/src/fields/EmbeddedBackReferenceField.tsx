@@ -1,7 +1,7 @@
 import './EmbeddedBackReferenceField.css';
 
 import * as React from 'react';
-import skygear, { Record } from 'skygear';
+import skygear, { Record, Reference } from 'skygear';
 
 import { EmbeddedBackReferenceFieldConfig, FieldConfig } from '../cmsConfig';
 import {
@@ -47,12 +47,15 @@ export class EmbeddedBackReferenceField extends React.PureComponent<
       embeddedRecords: [...embeddedRecords],
     };
 
-    this.embeddedRecordEffects = [];
+    this.embeddedRecordEffects = embeddedRecords.map(() => ({}));
 
     this.handleEmbeddedRecordChange = this.handleEmbeddedRecordChange.bind(
       this
     );
     this.handleEmbeddedRecordRemove = this.handleEmbeddedRecordRemove.bind(
+      this
+    );
+    this.handleEmbeddedRecordCreate = this.handleEmbeddedRecordCreate.bind(
       this
     );
   }
@@ -70,12 +73,9 @@ export class EmbeddedBackReferenceField extends React.PureComponent<
       return prevState;
     });
 
-    const embeddedRecordEffect = this.embeddedRecordEffects[index] || {};
     if (effect) {
-      embeddedRecordEffect[name] = effect;
+      this.embeddedRecordEffects[index][name] = effect;
     }
-
-    this.embeddedRecordEffects[index] = embeddedRecordEffect;
 
     this.applyEmbeddedRecordChange();
   }
@@ -89,6 +89,22 @@ export class EmbeddedBackReferenceField extends React.PureComponent<
     });
 
     this.embeddedRecordEffects.splice(index, 1);
+
+    this.applyEmbeddedRecordChange();
+  }
+
+  public handleEmbeddedRecordCreate() {
+    const { config, context } = this.props;
+    const RecordCls = Record.extend(config.targetCmsRecord.recordType);
+    this.setState(prevState => {
+      prevState.embeddedRecordUpdate.push({
+        [config.sourceFieldName]: new Reference(context.record),
+      });
+      prevState.embeddedRecords.push(new RecordCls());
+      return prevState;
+    });
+
+    this.embeddedRecordEffects.push({});
 
     this.applyEmbeddedRecordChange();
   }
@@ -114,7 +130,20 @@ export class EmbeddedBackReferenceField extends React.PureComponent<
       );
     });
 
-    return <div className="embedded-back-reference-field">{items}</div>;
+    return (
+      <div>
+        <div className="embedded-back-reference-field">{items}</div>
+        {config.editable && (
+          <button
+            type="button"
+            className="btn btn-link"
+            onClick={this.handleEmbeddedRecordCreate}
+          >
+            + Add New {config.label}
+          </button>
+        )}
+      </div>
+    );
   }
 
   private applyEmbeddedRecordChange() {
@@ -122,6 +151,9 @@ export class EmbeddedBackReferenceField extends React.PureComponent<
 
     if (onFieldChange) {
       onFieldChange(undefined, () => {
+        // tslint:disable-next-line: no-any
+        const promises: Array<Promise<any>> = [];
+
         // apply effects
         const effects = [].concat.apply(
           [],
@@ -131,31 +163,38 @@ export class EmbeddedBackReferenceField extends React.PureComponent<
               .map(eff => eff());
           })
         );
+        promises.concat(effects);
 
         const RecordCls = Record.extend(config.targetCmsRecord.recordType);
 
         // apply record update
         const updates = this.state.embeddedRecordUpdate;
-        const recordsToSave = updates.map((change, index) => {
-          const recordId = this.state.embeddedRecords[index].id;
-          return new RecordCls({
-            _id: recordId,
-            ...updates[index],
+        if (updates.length > 0) {
+          const recordsToSave = updates.map((change, index) => {
+            const recordId = this.state.embeddedRecords[index].id;
+            return new RecordCls({
+              _id: recordId,
+              ...updates[index],
+            });
           });
-        });
-        const saveRecord = skygear.publicDB.save(recordsToSave);
+          const saveRecord = skygear.publicDB.save(recordsToSave);
+          promises.push(saveRecord);
+        }
 
         // apply record delete
         const deletes = this.state.embeddedRecordDelete;
-        const recordsToDelete = deletes.map(
-          record => new RecordCls({ _id: record.id })
-        );
-        const deleteRecord = deleteRecordsProperly(
-          skygear.publicDB,
-          recordsToDelete
-        );
+        if (deletes.length > 0) {
+          const recordsToDelete = deletes.map(
+            record => new RecordCls({ _id: record.id })
+          );
+          const deleteRecord = deleteRecordsProperly(
+            skygear.publicDB,
+            recordsToDelete
+          );
+          promises.push(deleteRecord);
+        }
 
-        return Promise.all([...effects, saveRecord, deleteRecord]);
+        return Promise.all(promises);
       });
     }
   }
