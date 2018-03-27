@@ -401,6 +401,16 @@ records:
         - type: _id
         - type: _created_at
         - type: _updated_at
+        - name: cities
+          type: EmbeddedReference
+          label: Cities
+          reference_from_field: country
+          reference_via_back_reference: city
+          reference_position_field: position
+          reference_position_ascending: false
+          reference_fields:
+            - name: display_name
+              type: String
     edit:
       fields:
         - name: display_name
