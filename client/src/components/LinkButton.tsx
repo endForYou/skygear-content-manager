@@ -30,10 +30,27 @@ function applyContext(href: string, context: any): string {
 
 export const LinkButton: React.SFC<LinkButtonProps> = props => {
   const { actionConfig: { href, label, target }, context } = props;
+  const formattedHref = applyContext(href, context);
+
+  // string starts with {scheme}:// or // are external link
+  // where {scheme} does not contain '?' or '#'
+  const isAbsolute = RegExp('^([^?#]*?:)?//').test(formattedHref);
+  if (isAbsolute) {
+    return (
+      <a
+        href={formattedHref}
+        target={target === '' ? undefined : target}
+        role="button"
+        className="btn btn-light"
+      >
+        {label}
+      </a>
+    );
+  }
 
   return (
     <Link
-      to={applyContext(href, context)}
+      to={formattedHref}
       target={target === '' ? undefined : target}
       role="button"
       className="btn btn-light"
