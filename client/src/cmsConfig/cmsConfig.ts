@@ -138,6 +138,11 @@ export enum FieldConfigTypes {
   ImageAsset = 'ImageAsset',
 }
 
+export enum SortOrder {
+  Asc = 'Asc',
+  Desc = 'Desc',
+}
+
 export interface FieldConfigAttrs {
   name: string;
   label: string;
@@ -223,6 +228,8 @@ export interface EmbeddedBackReferenceFieldConfig extends FieldConfigAttrs {
   sourceFieldName: string;
   targetCmsRecord: CmsRecord;
   displayFields: FieldConfig[];
+  positionFieldName?: string;
+  sortOrder?: SortOrder;
 }
 
 export interface ImageAssetFieldConfig extends FieldConfigAttrs {
@@ -937,10 +944,25 @@ function parseEmbeddedBackReferenceFieldConfig(
     parseNonReferenceFieldConfig(context, f)
   ) as FieldConfig[];
 
+  const positionFieldName = parseOptionalString(
+    input,
+    'reference_position_field',
+    'Reference'
+  );
+
+  let sortOrder: SortOrder | undefined;
+  if (input.reference_position_ascending === true) {
+    sortOrder = SortOrder.Asc;
+  } else if (input.reference_position_ascending === false) {
+    sortOrder = SortOrder.Desc;
+  }
+
   return {
     ...parseFieldConfigAttrs(input, 'EmbeddedReference'),
     ...parseBackReferenceFieldConfigAttrs(context, input),
     displayFields,
+    positionFieldName,
+    sortOrder,
     type: FieldConfigTypes.EmbeddedBackReference,
   };
 }

@@ -4,6 +4,7 @@ import * as React from 'react';
 import skygear, { Record, Reference } from 'skygear';
 
 import { EmbeddedBackReferenceFieldConfig, FieldConfig } from '../cmsConfig';
+import { Arrow, ArrowDirection } from '../components/Arrow';
 import {
   Effect,
   RecordChange,
@@ -57,6 +58,7 @@ export class EmbeddedBackReferenceField extends React.PureComponent<
     this.handleEmbeddedRecordCreate = this.handleEmbeddedRecordCreate.bind(
       this
     );
+    this.handleEmbeddedRecordMove = this.handleEmbeddedRecordMove.bind(this);
   }
 
   public handleEmbeddedRecordChange(
@@ -108,6 +110,10 @@ export class EmbeddedBackReferenceField extends React.PureComponent<
     this.applyEmbeddedRecordChange();
   }
 
+  public handleEmbeddedRecordMove(from: number, to: number) {
+    console.log('handleEmbeddedRecordMove', from, to);
+  }
+
   public render() {
     const { config } = this.props;
     const { embeddedRecords } = this.state;
@@ -122,8 +128,15 @@ export class EmbeddedBackReferenceField extends React.PureComponent<
           onRecordChange={(name: string, value: any, effect?: Effect) => {
             this.handleEmbeddedRecordChange(index, name, value, effect);
           }}
+          onRecordMoveDown={() =>
+            this.handleEmbeddedRecordMove(index, index + 1)}
+          onRecordMoveUp={() => this.handleEmbeddedRecordMove(index, index - 1)}
           onRecordRemove={() => this.handleEmbeddedRecordRemove(index)}
           record={r}
+          upMovable={!!(config.editable && index > 0)}
+          downMovable={
+            !!(config.editable && index < embeddedRecords.length - 1)
+          }
           removable={config.editable || false}
         />
       );
@@ -202,18 +215,26 @@ interface EmbeddedRecordViewProps {
   className: string;
   fieldConfigs: FieldConfig[];
   onRecordChange: RecordChangeHandler;
+  onRecordMoveDown: () => void;
+  onRecordMoveUp: () => void;
   onRecordRemove: () => void;
   record: Record;
   removable: boolean;
+  upMovable: boolean;
+  downMovable: boolean;
 }
 
 function EmbeddedRecordView({
   className,
+  downMovable,
   fieldConfigs,
   onRecordChange,
+  onRecordMoveDown,
+  onRecordMoveUp,
   onRecordRemove,
   record,
   removable,
+  upMovable,
 }: EmbeddedRecordViewProps): JSX.Element {
   const formGroups = fieldConfigs.map((fieldConfig, index) => {
     return (
@@ -231,12 +252,26 @@ function EmbeddedRecordView({
       {removable && (
         <button
           type="button"
-          className="close"
+          className="embedded-record-button close"
           aria-label="Close"
           onClick={onRecordRemove}
         >
           <span aria-hidden="true">&times;</span>
         </button>
+      )}
+      {downMovable && (
+        <Arrow
+          className="embedded-record-button sort-button float-right"
+          direction={ArrowDirection.Down}
+          onClick={onRecordMoveDown}
+        />
+      )}
+      {upMovable && (
+        <Arrow
+          className="embedded-record-button sort-button float-right"
+          direction={ArrowDirection.Up}
+          onClick={onRecordMoveUp}
+        />
       )}
       {formGroups}
     </div>

@@ -1,3 +1,12 @@
+.sort-button {
+  opacity: .5;
+  cursor: pointer;
+}
+
+.sort-button:hover {
+  opacity: .75;
+}
+
 .embedded-record-view {
   margin-bottom: 1rem;
   padding-left: 15px;
@@ -11,4 +20,13 @@
 
 .embedded-back-reference-field > .embedded-record-view:not(:first-child) {
   margin-top: 1rem;
+}
+
+.embedded-record-view > .embedded-record-button:first-child {
+  margin-left: 0.5rem;
+}
+
+.embedded-record-view > .embedded-record-button:not(:first-child) {
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
 }
