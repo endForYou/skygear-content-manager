@@ -229,7 +229,7 @@ export interface EmbeddedBackReferenceFieldConfig extends FieldConfigAttrs {
   targetCmsRecord: CmsRecord;
   displayFields: FieldConfig[];
   positionFieldName?: string;
-  sortOrder?: SortOrder;
+  sortOrder: SortOrder;
 }
 
 export interface ImageAssetFieldConfig extends FieldConfigAttrs {
@@ -950,10 +950,8 @@ function parseEmbeddedBackReferenceFieldConfig(
     'Reference'
   );
 
-  let sortOrder: SortOrder | undefined;
-  if (input.reference_position_ascending === true) {
-    sortOrder = SortOrder.Asc;
-  } else if (input.reference_position_ascending === false) {
+  let sortOrder: SortOrder = SortOrder.Asc;
+  if (input.reference_position_ascending === false) {
     sortOrder = SortOrder.Desc;
   }
 

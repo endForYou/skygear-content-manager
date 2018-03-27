@@ -3,13 +3,18 @@ import './EmbeddedBackReferenceField.css';
 import * as React from 'react';
 import skygear, { Record, Reference } from 'skygear';
 
-import { EmbeddedBackReferenceFieldConfig, FieldConfig } from '../cmsConfig';
+import {
+  EmbeddedBackReferenceFieldConfig,
+  FieldConfig,
+  SortOrder,
+} from '../cmsConfig';
 import { Arrow, ArrowDirection } from '../components/Arrow';
 import {
   Effect,
   RecordChange,
   RecordChangeHandler,
 } from '../components/RecordFormPage';
+import { swap } from '../util';
 
 import {
   Field,
@@ -111,7 +116,15 @@ export class EmbeddedBackReferenceField extends React.PureComponent<
   }
 
   public handleEmbeddedRecordMove(from: number, to: number) {
-    console.log('handleEmbeddedRecordMove', from, to);
+    this.setState(prevState => {
+      swap(prevState.embeddedRecordUpdate, from, to);
+      swap(prevState.embeddedRecords, from, to);
+      return prevState;
+    });
+
+    swap(this.embeddedRecordEffects, from, to);
+
+    this.applyEmbeddedRecordChange();
   }
 
   public render() {
@@ -133,9 +146,15 @@ export class EmbeddedBackReferenceField extends React.PureComponent<
           onRecordMoveUp={() => this.handleEmbeddedRecordMove(index, index - 1)}
           onRecordRemove={() => this.handleEmbeddedRecordRemove(index)}
           record={r}
-          upMovable={!!(config.editable && index > 0)}
+          upMovable={
+            !!(config.editable && config.positionFieldName != null && index > 0)
+          }
           downMovable={
-            !!(config.editable && index < embeddedRecords.length - 1)
+            !!(
+              config.editable &&
+              config.positionFieldName != null &&
+              index < embeddedRecords.length - 1
+            )
           }
           removable={config.editable || false}
         />
@@ -184,10 +203,20 @@ export class EmbeddedBackReferenceField extends React.PureComponent<
         if (updates.length > 0) {
           const recordsToSave = updates.map((change, index) => {
             const recordId = this.state.embeddedRecords[index].id;
-            return new RecordCls({
+            const data = {
               _id: recordId,
               ...updates[index],
-            });
+            };
+
+            // Inject position data if positionFieldName given
+            if (config.positionFieldName != null) {
+              const positionIndex =
+                config.sortOrder === SortOrder.Asc
+                  ? index
+                  : updates.length - index - 1;
+              data[config.positionFieldName] = positionIndex;
+            }
+            return new RecordCls(data);
           });
           const saveRecord = skygear.publicDB.save(recordsToSave);
           promises.push(saveRecord);

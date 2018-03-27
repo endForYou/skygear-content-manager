@@ -410,6 +410,8 @@ records:
           label: Cities
           reference_from_field: country
           reference_via_back_reference: city
+          reference_position_field: position
+          reference_position_ascending: false
           reference_fields:
             - type: _id
             - name: display_name
