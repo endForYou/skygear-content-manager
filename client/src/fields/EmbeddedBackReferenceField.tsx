@@ -1,5 +1,6 @@
 import './EmbeddedBackReferenceField.css';
 
+import classnames from 'classnames';
 import * as React from 'react';
 import skygear, { Record, Reference } from 'skygear';
 
@@ -135,7 +136,9 @@ export class EmbeddedBackReferenceField extends React.PureComponent<
       return (
         <EmbeddedRecordView
           key={r._id}
-          className="embedded-record-view"
+          className={classnames('embedded-record-view', {
+            editable: config.editable,
+          })}
           fieldConfigs={config.displayFields}
           // tslint:disable-next-line: no-any
           onRecordChange={(name: string, value: any, effect?: Effect) => {

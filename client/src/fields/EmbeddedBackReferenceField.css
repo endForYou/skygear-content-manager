@@ -8,6 +8,7 @@
 }
 
 .embedded-record-view {
+  position: relative;
   margin-bottom: 1rem;
   padding-left: 15px;
   padding-right: 15px;
@@ -16,6 +17,12 @@
   border-color: rgba(0, 0, 0, .15);
   border-width: 1px;
   border-style: solid;
+  transition: box-shadow 0.3s ease-in-out;
+}
+
+form.embedded-record-view.editable:hover,
+form.embedded-record-view.editable:focus-within {
+  box-shadow: 0 1px 5px rgba(0,0,0,0.3);
 }
 
 .embedded-back-reference-field > .embedded-record-view:not(:first-child) {
