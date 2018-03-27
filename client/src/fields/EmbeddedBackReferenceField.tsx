@@ -9,7 +9,6 @@ import {
   RecordChange,
   RecordChangeHandler,
 } from '../components/RecordFormPage';
-import { deleteRecordsProperly } from '../recordUtil';
 
 import {
   Field,
@@ -163,7 +162,7 @@ export class EmbeddedBackReferenceField extends React.PureComponent<
               .map(eff => eff());
           })
         );
-        promises.concat(effects);
+        promises.push(Promise.all(effects));
 
         const RecordCls = Record.extend(config.targetCmsRecord.recordType);
 
@@ -182,15 +181,14 @@ export class EmbeddedBackReferenceField extends React.PureComponent<
         }
 
         // apply record delete
+        // set reference to null only
         const deletes = this.state.embeddedRecordDelete;
         if (deletes.length > 0) {
           const recordsToDelete = deletes.map(
-            record => new RecordCls({ _id: record.id })
+            record =>
+              new RecordCls({ _id: record.id, [config.sourceFieldName]: null })
           );
-          const deleteRecord = deleteRecordsProperly(
-            skygear.publicDB,
-            recordsToDelete
-          );
+          const deleteRecord = skygear.publicDB.save(recordsToDelete);
           promises.push(deleteRecord);
         }
 
