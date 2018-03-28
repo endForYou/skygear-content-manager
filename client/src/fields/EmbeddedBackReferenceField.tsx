@@ -74,11 +74,13 @@ export class EmbeddedBackReferenceField extends React.PureComponent<
     value: any,
     effect?: Effect
   ) {
-    this.setState(prevState => {
-      prevState.embeddedRecordUpdate[index][name] = value;
-      prevState.embeddedRecords[index][name] = value;
-      return prevState;
-    });
+    if (value !== undefined) {
+      this.setState(prevState => {
+        prevState.embeddedRecordUpdate[index][name] = value;
+        prevState.embeddedRecords[index][name] = value;
+        return prevState;
+      });
+    }
 
     if (effect) {
       this.embeddedRecordEffects[index][name] = effect;
