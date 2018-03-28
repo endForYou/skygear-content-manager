@@ -571,6 +571,9 @@ function BackReferenceAttrs(
   };
 }
 
+// This function would query records and include one layer of reference.
+// For references inside embedded reference, this function would be called
+// recursively for each layer of reference.
 function queryWithTarget(
   query: Query,
   references: ReferenceConfig[]
@@ -616,8 +619,54 @@ function queryWithTarget(
         distributeAssociationRecords(sourceById, ref, assoRecords);
       });
 
-      return queryResult;
-    });
+      // For each embedded reference,
+      // - fetch reference within embedded references
+      // - replace the original record(s) in $transient with the fetched result
+      //   which includes one more level of reference
+      //
+      // TODO (Steven-Chan):
+      // Handle EmbeddedReference for one-to-one and many-to-many
+      const nextLevelQueries = embeddedBackRefs.map(ref => {
+        // const isSingleEmbeddedRef = ref.type === FieldConfigTypes.Reference;
+        const isSingleEmbeddedRef = false;
+        const ids: string[] = [];
+        sources.forEach(r => {
+          if (isSingleEmbeddedRef) {
+            ids.push(r.$transient[ref.name]._id);
+          } else {
+            r.$transient[ref.name].forEach((tr: Record) => ids.push(tr._id));
+          }
+        });
+
+        const recordCls = Record.extend(ref.targetCmsRecord.recordType);
+        const nextLevelQuery = new Query(recordCls);
+        nextLevelQuery.contains('_id', ids);
+        nextLevelQuery.limit = ids.length;
+
+        return queryWithTarget(
+          nextLevelQuery,
+          ref.references
+        ).then(transientQueryResult => {
+          const transientQueryResultById = groupBy(
+            transientQueryResult.map(qr => qr),
+            r => r._id
+          );
+
+          // mutate the original queryResult
+          sources.forEach(r => {
+            const targetEmbeddedRecords = r.$transient[ref.name];
+            r.$transient[ref.name] = isSingleEmbeddedRef
+              ? transientQueryResultById.get(targetEmbeddedRecords._id)![0]
+              : targetEmbeddedRecords.map((embeddedRecord: Record) => {
+                  return transientQueryResultById.get(embeddedRecord._id)![0];
+                });
+          });
+        });
+      });
+
+      return Promise.all(nextLevelQueries);
+    })
+    .then(() => queryResult);
 }
 
 function fetchAllReferentsWithTarget(

@@ -230,6 +230,7 @@ export interface EmbeddedBackReferenceFieldConfig extends FieldConfigAttrs {
   displayFields: FieldConfig[];
   positionFieldName?: string;
   sortOrder: SortOrder;
+  references: ReferenceConfig[];
 }
 
 export interface ImageAssetFieldConfig extends FieldConfigAttrs {
@@ -961,6 +962,7 @@ function parseEmbeddedBackReferenceFieldConfig(
     ...parseBackReferenceFieldConfigAttrs(context, input),
     displayFields,
     positionFieldName,
+    references: filterReferences(displayFields),
     sortOrder,
     type: FieldConfigTypes.EmbeddedBackReference,
   };
