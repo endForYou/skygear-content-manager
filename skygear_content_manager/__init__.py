@@ -237,7 +237,7 @@ def intercept_asset_put(req):
         return resp
 
     resp.body.data['result']['post-request']['action'] = \
-        CMS_SKYGEAR_ENDPOINT + action_url[1:]
+        options.skygear_endpoint + action_url[1:]
 
     return resp
 
