@@ -5,6 +5,8 @@ import { Record } from 'skygear';
 
 import { RecordActionDispatcher } from '../actions/record';
 import { FieldConfig, RecordFormPageConfig } from '../cmsConfig';
+import { LinkButton } from '../components/LinkButton';
+import { SpaceSeperatedList } from '../components/SpaceSeperatedList';
 import { Field, FieldContext } from '../fields';
 import { errorMessageFromError } from '../recordUtil';
 import { RootState } from '../states';
@@ -88,6 +90,17 @@ class RecordFormPageImpl extends React.PureComponent<
     return (
       <form onSubmit={this.handleSubmit}>
         <h1 className="display-4">{config.label}</h1>
+        <div className="float-right">
+          <SpaceSeperatedList>
+            {config.actions.map((action, index) => (
+              <LinkButton
+                key={index}
+                actionConfig={action}
+                context={{ record }}
+              />
+            ))}
+          </SpaceSeperatedList>
+        </div>
         {formGroups}
         {errorMessage}
         <SubmitButton savingRecord={savingRecord} />

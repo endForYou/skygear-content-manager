@@ -1,8 +1,9 @@
 import * as React from 'react';
-import { Link } from 'react-router-dom';
 import { Record } from 'skygear';
 
 import { CmsRecord, FieldConfig, ShowPageConfig } from '../cmsConfig';
+import { LinkButton } from '../components/LinkButton';
+import { SpaceSeperatedList } from '../components/SpaceSeperatedList';
 import { Field, FieldContext } from '../fields';
 import { Remote, RemoteType } from '../types';
 
@@ -47,12 +48,17 @@ function RecordView({ config, record }: RecordViewProps): JSX.Element {
   return (
     <form>
       <h1 className="display-4 d-inline-block">{config.label}</h1>
-      <Link
-        className="btn btn-light float-right"
-        to={`/record/${record.id}/edit`}
-      >
-        Edit
-      </Link>
+      <div className="float-right">
+        <SpaceSeperatedList>
+          {config.actions.map((action, index) => (
+            <LinkButton
+              key={index}
+              actionConfig={action}
+              context={{ record }}
+            />
+          ))}
+        </SpaceSeperatedList>
+      </div>
       {formGroups}
     </form>
   );
