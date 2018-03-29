@@ -53,7 +53,7 @@ function joinElements(els: any[]) {
 
   return els.reduce((prev: any, current: any, index: number): any => [
     prev,
-    <span key={index}>&nbsp;</span>,
+    <span key={`${index}-space`}>&nbsp;</span>,
     current,
   ]);
 }
