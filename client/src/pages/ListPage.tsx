@@ -2,6 +2,7 @@ import classNames from 'classnames';
 import * as qs from 'query-string';
 import * as React from 'react';
 import { connect } from 'react-redux';
+import { push } from 'react-router-redux';
 import { Dispatch } from 'redux';
 import { Record } from 'skygear';
 
@@ -218,6 +219,29 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
     const { page, pageConfig } = this.props;
     const { filters } = this.state;
     this.fetchList(page, pageConfig.perPage, filters);
+  }
+
+  public componentDidUpdate(prevProps: StateProps, prevState: State) {
+    const { dispatch, page } = this.props;
+    const { filters } = this.state;
+    if (prevState.filters !== filters) {
+      const filterObj = filters.map(oldFilter => {
+        const { name, query } = oldFilter;
+        // tslint:disable: no-any
+        const filter: any = { name, query };
+        if (oldFilter.type === FilterType.ReferenceFilterType) {
+          filter.value = oldFilter.values;
+        } else if (oldFilter.type !== FilterType.BooleanFilterType) {
+          filter.value = oldFilter.value;
+        }
+        return filter;
+      });
+      dispatch(
+        push({
+          search: `page=${page}&filter=${JSON.stringify(filterObj)}`,
+        })
+      );
+    }
   }
 
   public componentWillReceiveProps(nextProps: ListPageProps) {
