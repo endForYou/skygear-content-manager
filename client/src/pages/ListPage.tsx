@@ -43,7 +43,7 @@ import Pagination from '../components/Pagination';
 import { Field, FieldContext } from '../fields';
 import { getCmsConfig, ImportState, RootState } from '../states';
 import { RemoteType } from '../types';
-import { debounce } from '../util';
+import { debounce, isObject } from '../util';
 
 // tslint:disable: no-any
 function joinElements(els: any[]) {
@@ -168,6 +168,7 @@ const ListTable: React.SFC<ListTableProps> = ({
 export type ListPageProps = StateProps & DispatchProps;
 
 export interface StateProps {
+  filters: Filter[];
   import: ImportState;
   recordName: string;
   pageConfig: ListPageConfig;
@@ -194,11 +195,10 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
     super(props);
 
     const { dispatch, pageConfig: { cmsRecord, references } } = this.props;
-    const filters: Filter[] = [];
 
     this.state = {
       exporting: undefined,
-      filters,
+      filters: props.filters,
       showfilterMenu: false,
     };
 
@@ -558,7 +558,9 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
 function ListPageFactory(recordName: string) {
   function mapStateToProps(state: RootState): StateProps {
     const { location } = state.router;
-    const { page: pageStr = '1' } = qs.parse(location ? location.search : '');
+    const { page: pageStr = '1', filter: filterStr = '[]' } = qs.parse(
+      location ? location.search : ''
+    );
     const page = parseInt(pageStr, 10);
 
     const recordConfig = getCmsConfig(state).records[recordName];
@@ -573,6 +575,36 @@ function ListPageFactory(recordName: string) {
       throw new Error(`Couldn't find PageConfig of list view`);
     }
 
+    const filters: Filter[] = [];
+    try {
+      const rawFilters = JSON.parse(filterStr);
+      if (Array.isArray(rawFilters)) {
+        rawFilters.forEach((filter: object) => {
+          if (isObject(filter)) {
+            const { name, query, value } = filter;
+            if (name) {
+              const filterConfig = pageConfig.filters.find(
+                pFilter => name === pFilter.name
+              );
+              if (filterConfig) {
+                const newFilter = filterFactory(filterConfig);
+                if (newFilter.type === FilterType.ReferenceFilterType) {
+                  filters.push({ ...newFilter, query, values: value });
+                } else if (newFilter.type === FilterType.BooleanFilterType) {
+                  filters.push({ ...newFilter, query });
+                } else {
+                  filters.push({ ...newFilter, query, value });
+                }
+              }
+            }
+          }
+          return filter;
+        });
+      }
+    } catch (e) {
+      throw new Error('Cannot parse filter from URL');
+    }
+
     const { isLoading, records, totalCount } = state.recordViewsByName[
       recordName
     ].list;
@@ -580,6 +612,7 @@ function ListPageFactory(recordName: string) {
     const maxPage = Math.ceil(totalCount / pageConfig.perPage);
 
     return {
+      filters,
       import: state.import,
       isLoading,
       maxPage,

@@ -257,6 +257,7 @@ export interface DateTimeFilter extends FilterAttrs {
 export interface GeneralFilter extends FilterAttrs {
   type: FilterType.GeneralFilterType;
   query: GeneralFilterQueryType;
+  name: string;
   names: string[];
   value: string;
 }
@@ -317,6 +318,7 @@ export function filterFactory(filterConfig: FilterConfig): Filter {
       return {
         id: uuid(),
         label: filterConfig.label,
+        name: filterConfig.names.join(','),
         names: filterConfig.names,
         query: GeneralFilterQueryType.Contains,
         type: FilterType.GeneralFilterType,
