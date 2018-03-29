@@ -9,7 +9,7 @@ import {
   parseUserManagementConfig,
   UserManagementConfig,
 } from './userManagementConfig';
-import { parseOptionalString, parseString } from './util';
+import { parseOptionalBoolean, parseOptionalString, parseString } from './util';
 
 export interface CmsConfig {
   site: SiteConfig;
@@ -110,6 +110,7 @@ export type FieldConfig =
   | StringFieldConfig
   | TextAreaFieldConfig
   | DropdownFieldConfig
+  | WYSIWYGFieldConfig
   | DateTimeFieldConfig
   | BooleanFieldConfig
   | IntegerFieldConfig
@@ -120,6 +121,7 @@ export enum FieldConfigTypes {
   String = 'String',
   TextArea = 'TextArea',
   Dropdown = 'Dropdown',
+  WYSIWYG = 'WYSIWYG',
   DateTime = 'DateTime',
   Boolean = 'Boolean',
   Integer = 'Integer',
@@ -157,6 +159,10 @@ export interface DropdownFieldConfig extends FieldConfigAttrs {
     label: string;
   };
   options: DropdownOption[];
+}
+
+export interface WYSIWYGFieldConfig extends FieldConfigAttrs {
+  type: FieldConfigTypes.WYSIWYG;
 }
 
 export interface DateTimeFieldConfig extends FieldConfigAttrs {
@@ -617,6 +623,8 @@ export function parseFieldConfig(context: ConfigContext, a: any): FieldConfig {
       return parseTextAreaFieldConfig(a);
     case 'Dropdown':
       return parseDropdownFieldConfig(a);
+    case 'WYSIWYG':
+      return parseWYSIWYGFieldConfig(a);
     case 'DateTime':
       return parseDateTimeFieldConfig(a);
     case 'Boolean':
@@ -698,6 +706,13 @@ function parseDropdownFieldConfig(
     nullOption,
     options,
     type: FieldConfigTypes.Dropdown,
+  };
+}
+
+function parseWYSIWYGFieldConfig(input: FieldConfigInput): WYSIWYGFieldConfig {
+  return {
+    ...parseFieldConfigAttrs(input, 'WYSIWYG'),
+    type: FieldConfigTypes.WYSIWYG,
   };
 }
 
@@ -823,7 +838,14 @@ function parseFieldConfigAttrs(
   const label =
     parseOptionalString(input, 'label', fieldType) || humanize(name);
 
-  return { compact: false, name, label };
+  const optionalAttrs: { editable?: boolean } = {};
+
+  const maybeEditable = parseOptionalBoolean(input, 'editable', fieldType);
+  if (maybeEditable !== undefined) {
+    optionalAttrs.editable = maybeEditable;
+  }
+
+  return { compact: false, name, label, ...optionalAttrs };
 }
 
 function parseIdFieldConfig(input: FieldConfigInput): StringFieldConfig {
