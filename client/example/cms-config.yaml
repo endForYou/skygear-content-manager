@@ -287,6 +287,9 @@ records:
         - type: _updated_at
         - name: display_name
           type: String
+        - name: description
+          type: WYSIWYG
+          editable: false
     edit:
       fields:
         - name: display_name
@@ -306,10 +309,14 @@ records:
               value: B
             - label: Class S
               value: S
+        - name: description
+          type: WYSIWYG
     new:
       fields:
         - name: display_name
           type: String
+        - name: description
+          type: WYSIWYG
   cfunction:
     list:
       fields:
