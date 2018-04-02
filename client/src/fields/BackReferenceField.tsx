@@ -5,6 +5,7 @@ import { BackReferenceFieldConfig } from '../cmsConfig';
 import { ReferenceLink } from '../components/ReferenceLink';
 import { join } from '../util';
 
+import { BackReferenceSelect } from './BackReferenceSelect';
 import { RequiredFieldProps } from './Field';
 
 export type BackReferenceFieldProps = RequiredFieldProps<
@@ -26,9 +27,7 @@ export class BackReferenceField extends React.PureComponent<
     const $transient = context.record.$transient;
 
     if (config.editable) {
-      // TODO (Steven-Chan):
-      // back reference editable component
-      return null;
+      return <BackReferenceSelect {...this.props} />;
     }
 
     const targetFieldName = config.name;
