@@ -141,7 +141,7 @@ function parseGeneralFilterConfig(
   const names = parseStringArray(input, 'name', 'General');
   return {
     label,
-    name: 'general',
+    name: names.join(','),
     names,
     type: FilterConfigTypes.General,
   };
@@ -225,39 +225,35 @@ export interface FilterAttrs {
   id: string;
   query: FilterQueryType;
   label: string;
+  name: string;
 }
 
 export interface StringFilter extends FilterAttrs {
   type: FilterType.StringFilterType;
   query: StringFilterQueryType;
   value: string;
-  name: string;
 }
 
 export interface IntegerFilter extends FilterAttrs {
   type: FilterType.IntegerFilterType;
   query: IntegerFilterQueryType;
   value: number;
-  name: string;
 }
 
 export interface BooleanFilter extends FilterAttrs {
   type: FilterType.BooleanFilterType;
   query: BooleanFilterQueryType;
-  name: string;
 }
 
 export interface DateTimeFilter extends FilterAttrs {
   type: FilterType.DateTimeFilterType;
   query: DateTimeFilterQueryType;
   value: Date;
-  name: string;
 }
 
 export interface GeneralFilter extends FilterAttrs {
   type: FilterType.GeneralFilterType;
   query: GeneralFilterQueryType;
-  name: string;
   names: string[];
   value: string;
 }
@@ -266,7 +262,6 @@ export interface ReferenceFilter extends FilterAttrs {
   type: FilterType.ReferenceFilterType;
   query: ReferenceFilterQueryType;
   values: string[];
-  name: string;
 }
 
 export type FilterQueryType =
@@ -318,7 +313,7 @@ export function filterFactory(filterConfig: FilterConfig): Filter {
       return {
         id: uuid(),
         label: filterConfig.label,
-        name: filterConfig.names.join(','),
+        name: filterConfig.name,
         names: filterConfig.names,
         query: GeneralFilterQueryType.Contains,
         type: FilterType.GeneralFilterType,

@@ -222,25 +222,9 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
   }
 
   public componentDidUpdate(prevProps: StateProps, prevState: State) {
-    const { dispatch, page } = this.props;
     const { filters } = this.state;
     if (prevState.filters !== filters) {
-      const filterObj = filters.map(oldFilter => {
-        const { name, query } = oldFilter;
-        // tslint:disable: no-any
-        const filter: any = { name, query };
-        if (oldFilter.type === FilterType.ReferenceFilterType) {
-          filter.value = oldFilter.values;
-        } else if (oldFilter.type !== FilterType.BooleanFilterType) {
-          filter.value = oldFilter.value;
-        }
-        return filter;
-      });
-      dispatch(
-        push({
-          search: `page=${page}&filter=${JSON.stringify(filterObj)}`,
-        })
-      );
+      this.pushFiltersToUrl();
     }
   }
 
@@ -379,6 +363,29 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
   public onImportFileSelected(actionConfig: ImportActionConfig, file: File) {
     const { dispatch } = this.props;
     dispatch(importRecords(actionConfig.name, file));
+  }
+
+  public pushFiltersToUrl() {
+    const { dispatch, page } = this.props;
+    const { filters } = this.state;
+    const filterObj = filters.map(oldFilter => {
+      const { name, query } = oldFilter;
+      // tslint:disable-next-line: no-any
+      const filter: any = { name, query };
+      if (oldFilter.type === FilterType.ReferenceFilterType) {
+        filter.value = oldFilter.values;
+      } else if (oldFilter.type !== FilterType.BooleanFilterType) {
+        filter.value = oldFilter.value;
+      }
+      return filter;
+    });
+    dispatch(
+      push({
+        search: `page=${page}&filter=${encodeURIComponent(
+          JSON.stringify(filterObj)
+        )}`,
+      })
+    );
   }
 
   public renderActionButton(
@@ -580,6 +587,42 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
 }
 
 function ListPageFactory(recordName: string) {
+  function parseFiltersFromUrl(filterStr: string, pageConfig: ListPageConfig) {
+    // filterStr is either '[]' or user specify filters in this format:
+    // [{ name: '', query: '', value?: '' }]
+    let filters: Filter[] = [];
+    let rawFilters = [];
+    try {
+      rawFilters = JSON.parse(filterStr);
+      if (!Array.isArray(rawFilters)) {
+        throw new Error();
+      }
+    } catch (e) {
+      throw new Error('Cannot parse filter from URL');
+    }
+    filters = rawFilters
+      .filter((filter: object) => filter && isObject(filter) && filter.name)
+      // tslint:disable-next-line: no-any
+      .map((filter: any) => {
+        const { name, query, value } = filter;
+        const filterConfig = pageConfig.filters.find(
+          pFilter => name === pFilter.name
+        );
+        if (!filterConfig) {
+          throw new Error(`Cannot find filter '${name}' in page config`);
+        }
+        // Get filter label & type from config and create filter
+        const newFilter = filterFactory(filterConfig);
+        if (newFilter.type === FilterType.ReferenceFilterType) {
+          return { ...newFilter, query, values: value };
+        } else if (newFilter.type === FilterType.BooleanFilterType) {
+          return { ...newFilter, query };
+        }
+        return { ...newFilter, query, value };
+      });
+    return filters;
+  }
+
   function mapStateToProps(state: RootState): StateProps {
     const { location } = state.router;
     const { page: pageStr = '1', filter: filterStr = '[]' } = qs.parse(
@@ -599,36 +642,6 @@ function ListPageFactory(recordName: string) {
       throw new Error(`Couldn't find PageConfig of list view`);
     }
 
-    const filters: Filter[] = [];
-    try {
-      const rawFilters = JSON.parse(filterStr);
-      if (Array.isArray(rawFilters)) {
-        rawFilters.forEach((filter: object) => {
-          if (isObject(filter)) {
-            const { name, query, value } = filter;
-            if (name) {
-              const filterConfig = pageConfig.filters.find(
-                pFilter => name === pFilter.name
-              );
-              if (filterConfig) {
-                const newFilter = filterFactory(filterConfig);
-                if (newFilter.type === FilterType.ReferenceFilterType) {
-                  filters.push({ ...newFilter, query, values: value });
-                } else if (newFilter.type === FilterType.BooleanFilterType) {
-                  filters.push({ ...newFilter, query });
-                } else {
-                  filters.push({ ...newFilter, query, value });
-                }
-              }
-            }
-          }
-          return filter;
-        });
-      }
-    } catch (e) {
-      throw new Error('Cannot parse filter from URL');
-    }
-
     const { isLoading, records, totalCount } = state.recordViewsByName[
       recordName
     ].list;
@@ -636,7 +649,7 @@ function ListPageFactory(recordName: string) {
     const maxPage = Math.ceil(totalCount / pageConfig.perPage);
 
     return {
-      filters,
+      filters: parseFiltersFromUrl(filterStr, pageConfig),
       import: state.import,
       isLoading,
       maxPage,
