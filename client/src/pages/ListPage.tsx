@@ -42,6 +42,10 @@ import {
 } from '../components/ImportModal';
 import { LinkButton } from '../components/LinkButton';
 import Pagination from '../components/Pagination';
+import {
+  SortButton,
+  SortOrder,
+} from '../components/SortButton';
 import { SpaceSeperatedList } from '../components/SpaceSeperatedList';
 import SyncUrl, { InjectedProps } from '../components/SyncUrl';
 import { Field, FieldContext } from '../fields';
@@ -55,7 +59,16 @@ interface TableHeaderProps {
 
 const TableHeader: React.SFC<TableHeaderProps> = ({ fieldConfigs }) => {
   const columns = fieldConfigs.map((fieldConfig, index) => {
-    return <th key={index}>{fieldConfig.label}</th>;
+    return (
+      <th key={index}>
+        {fieldConfig.label}
+        <SortButton
+          className="d-inline-block mx-1"
+          sortOrder={SortOrder.Undefined}
+          onClick={() => console.log('click')}
+        />
+      </th>
+    );
   });
   return (
     <thead className="thead-light">
