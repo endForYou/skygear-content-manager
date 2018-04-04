@@ -53,19 +53,71 @@ import { getCmsConfig, ImportState, RootState, RouteProps } from '../states';
 import { RemoteType } from '../types';
 import { debounce } from '../util';
 
-interface TableHeaderProps {
-  fieldConfigs: FieldConfig[];
+type SortButtonClickHandler = (name: string) => void;
+
+interface SortState {
+  fieldName: string | undefined;
+  order: SortOrder;
 }
 
-const TableHeader: React.SFC<TableHeaderProps> = ({ fieldConfigs }) => {
+function SortState() {
+  return {
+    fieldName: undefined,
+    order: SortOrder.Undefined,
+  };
+}
+
+function nextSortState(
+  sortState: SortState,
+  selectedFieldName: string
+): SortState {
+  if (sortState.fieldName !== selectedFieldName) {
+    return { fieldName: selectedFieldName, order: SortOrder.Ascending };
+  }
+
+  // derive next sort order
+  let order: SortOrder = SortOrder.Undefined;
+  switch (sortState.order) {
+    case SortOrder.Undefined:
+      order = SortOrder.Ascending;
+      break;
+    case SortOrder.Ascending:
+      order = SortOrder.Descending;
+      break;
+    case SortOrder.Descending:
+      order = SortOrder.Undefined;
+      break;
+  }
+
+  return {
+    fieldName: order === SortOrder.Undefined ? undefined : sortState.fieldName,
+    order,
+  };
+}
+
+interface TableHeaderProps {
+  fieldConfigs: FieldConfig[];
+  sortState: SortState;
+  onSortButtonClick: SortButtonClickHandler;
+}
+
+const TableHeader: React.SFC<TableHeaderProps> = ({
+  fieldConfigs,
+  sortState,
+  onSortButtonClick,
+}) => {
   const columns = fieldConfigs.map((fieldConfig, index) => {
+    const sortOrder =
+      fieldConfig.name === sortState.fieldName
+        ? sortState.order
+        : SortOrder.Undefined;
     return (
       <th key={index}>
         {fieldConfig.label}
         <SortButton
           className="d-inline-block mx-1"
-          sortOrder={SortOrder.Undefined}
-          onClick={() => console.log('click')}
+          sortOrder={sortOrder}
+          onClick={() => onSortButtonClick(fieldConfig.name)}
         />
       </th>
     );
@@ -148,17 +200,25 @@ const TableBody: React.SFC<TableBodyProps> = ({
 interface ListTableProps {
   fieldConfigs: FieldConfig[];
   itemActions: ListItemActionConfig[];
+  sortState: SortState;
+  onSortButtonClick: SortButtonClickHandler;
   records: Record[];
 }
 
 const ListTable: React.SFC<ListTableProps> = ({
   fieldConfigs,
   itemActions,
+  onSortButtonClick,
   records,
+  sortState,
 }) => {
   return (
     <table key="table" className="table table-sm table-hover table-responsive">
-      <TableHeader fieldConfigs={fieldConfigs} />
+      <TableHeader
+        fieldConfigs={fieldConfigs}
+        sortState={sortState}
+        onSortButtonClick={onSortButtonClick}
+      />
       <TableBody
         fieldConfigs={fieldConfigs}
         itemActions={itemActions}
@@ -185,6 +245,7 @@ export interface StateProps {
 interface State {
   exporting?: ExportActionConfig;
   showfilterMenu: boolean;
+  sortState: SortState;
 }
 
 export interface DispatchProps {
@@ -202,6 +263,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
     this.state = {
       exporting: undefined,
       showfilterMenu: false,
+      sortState: SortState(),
     };
 
     this.recordActionCreator = new RecordActionDispatcher(
@@ -214,6 +276,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
     this.fetchList = debounce(this.fetchList.bind(this), 200);
 
     this.onImportFileSelected = this.onImportFileSelected.bind(this);
+    this.onSortButtonClick = this.onSortButtonClick.bind(this);
   }
 
   public componentDidMount() {
@@ -359,6 +422,13 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
     dispatch(importRecords(actionConfig.name, file));
   }
 
+  public onSortButtonClick(name: string) {
+    this.setState(prevState => ({
+      ...prevState,
+      sortState: nextSortState(prevState.sortState, name),
+    }));
+  }
+
   public renderActionButton(
     recordName: string,
     actionConfig: ListActionConfig,
@@ -461,7 +531,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
       records,
     } = this.props;
 
-    const { showfilterMenu } = this.state;
+    const { showfilterMenu, sortState } = this.state;
 
     return (
       <div>
@@ -530,6 +600,8 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
                     fieldConfigs={pageConfig.fields}
                     itemActions={pageConfig.itemActions}
                     records={records}
+                    sortState={sortState}
+                    onSortButtonClick={this.onSortButtonClick}
                   />
                 );
               }
