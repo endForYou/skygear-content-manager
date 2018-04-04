@@ -181,7 +181,6 @@ class UserListPageImpl extends React.PureComponent<UserListPageProps> {
               pathname="/user-management"
               currentPage={page}
               maxPage={maxPage}
-              onItemClicked={this.onPageItemClicked}
             />
           ) : null}
         </div>

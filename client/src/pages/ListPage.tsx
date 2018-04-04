@@ -525,18 +525,12 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
               pathname={pathname}
               currentPage={page}
               maxPage={maxPage}
-              onItemClicked={this.onPageItemClicked}
             />
           ) : null}
         </div>
       </div>
     );
   }
-
-  public onPageItemClicked = (page: number) => {
-    const { filters, pageConfig } = this.props;
-    this.fetchList(page, pageConfig.perPage, filters);
-  };
 
   public fetchList(page: number, perPage: number, filters: Filter[]) {
     this.recordActionCreator.fetchList(page, perPage, filters);
