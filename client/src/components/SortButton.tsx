@@ -22,13 +22,13 @@ export const SortButton: React.SFC<SortButtonProps> = ({
     <div className={classnames(className, 'sort-button')} {...props}>
       <div
         className={classnames('up', {
-          'up-active': sortOrder === SortOrder.Ascending,
+          active: sortOrder === SortOrder.Ascending,
         })}
       />
       <div className="mid" />
       <div
         className={classnames('down', {
-          'down-active': sortOrder === SortOrder.Descending,
+          active: sortOrder === SortOrder.Descending,
         })}
       />
     </div>

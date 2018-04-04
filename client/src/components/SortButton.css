@@ -11,7 +11,7 @@
     border-top: none;
 }
 
-.sort-button .up-active {
+.sort-button .up.active {
     border-bottom: 5px solid black;
 }
 
@@ -29,6 +29,6 @@
     border-bottom: none;
 }
 
-.sort-button .down-active {
+.sort-button .down.active {
     border-top: 5px solid black;
 }
