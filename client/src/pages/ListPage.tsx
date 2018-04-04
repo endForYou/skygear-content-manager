@@ -2,7 +2,6 @@ import classNames from 'classnames';
 import * as qs from 'query-string';
 import * as React from 'react';
 import { connect } from 'react-redux';
-import { push } from 'react-router-redux';
 import { Dispatch } from 'redux';
 import { Record } from 'skygear';
 
@@ -41,10 +40,11 @@ import {
 } from '../components/ImportModal';
 import { LinkButton } from '../components/LinkButton';
 import Pagination from '../components/Pagination';
+import SyncUrl from '../components/SyncUrl';
 import { Field, FieldContext } from '../fields';
 import { getCmsConfig, ImportState, RootState } from '../states';
 import { RemoteType } from '../types';
-import { debounce, isObject } from '../util';
+import { debounce } from '../util';
 
 // tslint:disable: no-any
 function joinElements(els: any[]) {
@@ -170,12 +170,14 @@ export type ListPageProps = StateProps & DispatchProps;
 
 export interface StateProps {
   filters: Filter[];
+  filterStr: string;
   import: ImportState;
-  recordName: string;
-  pageConfig: ListPageConfig;
-  page: number;
-  maxPage: number;
   isLoading: boolean;
+  maxPage: number;
+  onChangeFilter: (filters: Filter[]) => void;
+  page: number;
+  pageConfig: ListPageConfig;
+  recordName: string;
   records: Record[];
 }
 
@@ -221,24 +223,20 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
     this.fetchList(page, pageConfig.perPage, filters);
   }
 
-  public componentDidUpdate(prevProps: StateProps, prevState: State) {
-    const { filters } = this.state;
-    if (prevState.filters !== filters) {
-      this.pushFiltersToUrl();
-    }
-  }
-
   public componentWillReceiveProps(nextProps: ListPageProps) {
+    const { import: { importResult }, page } = this.props;
     // Refresh list after import success
     if (
-      this.props.import.importResult &&
-      this.props.import.importResult.type === RemoteType.Loading &&
+      importResult &&
+      importResult.type === RemoteType.Loading &&
       nextProps.import.importResult &&
       nextProps.import.importResult.type === RemoteType.Success
     ) {
-      const { page, pageConfig } = this.props;
-      const { filters } = this.state;
-      this.fetchList(page, pageConfig.perPage, filters);
+      this.reloadList();
+    }
+    // Handle filters & page change by browser navigation
+    if (this.state.filters !== nextProps.filters || page !== nextProps.page) {
+      this.setState({ filters: nextProps.filters }, this.reloadList);
     }
   }
 
@@ -250,8 +248,6 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
     filter: Filter,
     event: React.ChangeEvent<HTMLSelectElement>
   ) {
-    const { page, pageConfig } = this.props;
-
     const filters = this.state.filters.map(f => {
       if (f.id === filter.id) {
         switch (filter.type) {
@@ -284,15 +280,14 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
       return f;
     });
 
-    this.setState({ filters });
-    this.fetchList(page, pageConfig.perPage, filters);
+    this.setState({ filters }, this.reloadList);
+    this.props.onChangeFilter(filters);
   }
 
   public handleFilterValueChange(
     filter: Filter,
     event: React.ChangeEvent<HTMLInputElement>
   ) {
-    const { page, pageConfig } = this.props;
     const filters = this.state.filters.map(f => {
       if (f.id === filter.id) {
         switch (filter.type) {
@@ -317,12 +312,11 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
       return f;
     });
 
-    this.setState({ filters });
-    this.fetchList(page, pageConfig.perPage, filters);
+    this.setState({ filters }, this.reloadList);
+    this.props.onChangeFilter(filters);
   }
 
   public handleDateTimeValueChange(filter: Filter, datetime: Date) {
-    const { page, pageConfig } = this.props;
     const filters = this.state.filters.map(f => {
       if (f.id === filter.id) {
         return { ...(f as DateTimeFilter), value: datetime };
@@ -330,12 +324,11 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
         return f;
       }
     });
-    this.setState({ filters });
-    this.fetchList(page, pageConfig.perPage, filters);
+    this.setState({ filters }, this.reloadList);
+    this.props.onChangeFilter(filters);
   }
 
   public onFilterItemClicked(filterConfig: FilterConfig) {
-    const { page, pageConfig } = this.props;
     const newFilter = filterFactory(filterConfig);
 
     const filters =
@@ -348,44 +341,20 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
             newFilter,
           ];
 
-    this.setState({ filters });
-    this.fetchList(page, pageConfig.perPage, filters);
+    this.setState({ filters }, this.reloadList);
+    this.props.onChangeFilter(filters);
     this.toggleFilterMenu();
   }
 
   public onCloseFilterClicked(filter: Filter) {
-    const { page, pageConfig } = this.props;
     const filters = this.state.filters.filter(f => f.id !== filter.id);
-    this.setState({ filters });
-    this.fetchList(page, pageConfig.perPage, filters);
+    this.setState({ filters }, this.reloadList);
+    this.props.onChangeFilter(filters);
   }
 
   public onImportFileSelected(actionConfig: ImportActionConfig, file: File) {
     const { dispatch } = this.props;
     dispatch(importRecords(actionConfig.name, file));
-  }
-
-  public pushFiltersToUrl() {
-    const { dispatch, page } = this.props;
-    const { filters } = this.state;
-    const filterObj = filters.map(oldFilter => {
-      const { name, query } = oldFilter;
-      // tslint:disable-next-line: no-any
-      const filter: any = { name, query };
-      if (oldFilter.type === FilterType.ReferenceFilterType) {
-        filter.value = oldFilter.values;
-      } else if (oldFilter.type !== FilterType.BooleanFilterType) {
-        filter.value = oldFilter.value;
-      }
-      return filter;
-    });
-    dispatch(
-      push({
-        search: `page=${page}&filter=${encodeURIComponent(
-          JSON.stringify(filterObj)
-        )}`,
-      })
-    );
   }
 
   public renderActionButton(
@@ -584,45 +553,15 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
   public fetchList(page: number, perPage: number, filters: Filter[]) {
     this.recordActionCreator.fetchList(page, perPage, filters);
   }
+
+  public reloadList = () => {
+    const { page, pageConfig } = this.props;
+    const { filters } = this.state;
+    this.fetchList(page, pageConfig.perPage, filters);
+  };
 }
 
 function ListPageFactory(recordName: string) {
-  function parseFiltersFromUrl(filterStr: string, pageConfig: ListPageConfig) {
-    // filterStr is either '[]' or user specify filters in this format:
-    // [{ name: '', query: '', value?: '' }]
-    let filters: Filter[] = [];
-    let rawFilters = [];
-    try {
-      rawFilters = JSON.parse(filterStr);
-      if (!Array.isArray(rawFilters)) {
-        throw new Error();
-      }
-    } catch (e) {
-      throw new Error('Cannot parse filter from URL');
-    }
-    filters = rawFilters
-      .filter((filter: object) => filter && isObject(filter) && filter.name)
-      // tslint:disable-next-line: no-any
-      .map((filter: any) => {
-        const { name, query, value } = filter;
-        const filterConfig = pageConfig.filters.find(
-          pFilter => name === pFilter.name
-        );
-        if (!filterConfig) {
-          throw new Error(`Cannot find filter '${name}' in page config`);
-        }
-        // Get filter label & type from config and create filter
-        const newFilter = filterFactory(filterConfig);
-        if (newFilter.type === FilterType.ReferenceFilterType) {
-          return { ...newFilter, query, values: value };
-        } else if (newFilter.type === FilterType.BooleanFilterType) {
-          return { ...newFilter, query };
-        }
-        return { ...newFilter, query, value };
-      });
-    return filters;
-  }
-
   function mapStateToProps(state: RootState): StateProps {
     const { location } = state.router;
     const { page: pageStr = '1', filter: filterStr = '[]' } = qs.parse(
@@ -649,10 +588,12 @@ function ListPageFactory(recordName: string) {
     const maxPage = Math.ceil(totalCount / pageConfig.perPage);
 
     return {
-      filters: parseFiltersFromUrl(filterStr, pageConfig),
+      filterStr,
+      filters: [],
       import: state.import,
       isLoading,
       maxPage,
+      onChangeFilter: (filters: Filter[]) => {}, // tslint:disable-line: no-empty
       page,
       pageConfig,
       recordName,
@@ -664,7 +605,8 @@ function ListPageFactory(recordName: string) {
     return { dispatch };
   }
 
-  return connect(mapStateToProps, mapDispatchToProps)(ListPageImpl);
+  const SyncedListPage = SyncUrl(ListPageImpl);
+  return connect(mapStateToProps, mapDispatchToProps)(SyncedListPage);
 }
 
 export const ListPage: React.ComponentClass<ListPageProps> = ListPageImpl;
