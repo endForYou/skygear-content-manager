@@ -80,6 +80,7 @@ export function fetchCmsConfig(
         dispatch(fetchSuccess(cmsConfig));
       })
       .catch((error: Error) => {
+        console.error('Failed to parse cms config: ', error);
         dispatch(fetchFailure(error));
       });
   };
