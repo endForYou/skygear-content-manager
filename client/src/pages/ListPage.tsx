@@ -392,6 +392,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
         return f;
       }
     });
+
     this.props.onChangeFilter(filters);
   }
 
@@ -423,10 +424,8 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
   }
 
   public onSortButtonClick(name: string) {
-    this.setState(prevState => ({
-      ...prevState,
-      sortState: nextSortState(prevState.sortState, name),
-    }));
+    const sortState = nextSortState(this.state.sortState, name);
+    this.setState({ sortState }, () => this.reloadList(this.props));
   }
 
   public renderActionButton(
@@ -620,13 +619,25 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
     );
   }
 
-  public fetchList(page: number, perPage: number, filters: Filter[]) {
-    this.recordActionCreator.fetchList(page, perPage, filters);
+  public fetchList(
+    page: number,
+    perPage: number,
+    filters: Filter[],
+    sortState: SortState
+  ) {
+    this.recordActionCreator.fetchList(
+      page,
+      perPage,
+      filters,
+      sortState.fieldName,
+      sortState.order === SortOrder.Ascending
+    );
   }
 
   public reloadList(props: ListPageProps) {
     const { filters, page, pageConfig } = props;
-    this.fetchList(page, pageConfig.perPage, filters);
+    const { sortState } = this.state;
+    this.fetchList(page, pageConfig.perPage, filters, sortState);
   }
 }
 
