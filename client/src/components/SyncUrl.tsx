@@ -1,28 +1,34 @@
+import { Location } from 'history';
+import * as qs from 'query-string';
 import * as React from 'react';
 import { push } from 'react-router-redux';
 import { Dispatch } from 'redux';
 
-import {
-  Filter,
-  filterFactory,
-  FilterType,
-  ListPageConfig,
-} from '../cmsConfig';
-import { StateProps } from '../pages/ListPage';
+import { Filter, FilterConfig, filterFactory, FilterType } from '../cmsConfig';
 import { RootState } from '../states';
 import { isObject } from '../util';
 
-type Props = StateProps & DispatchProps;
+type Diff<T extends string, U extends string> = ({ [P in T]: P } &
+  { [P in U]: never } & { [x: string]: never })[T];
+type Omit<T, K extends keyof T> = Pick<T, Diff<keyof T, K>>;
 
-interface State {
+export interface InjectedProps {
   filters: Filter[];
+  onChangeFilter: (filters: Filter[]) => void;
 }
 
-interface DispatchProps {
+export interface OwnProps {
+  filterConfigs: FilterConfig[];
+  location: Location | null;
   dispatch: Dispatch<RootState>;
 }
 
-function parseFiltersFromUrl(filterStr: string, pageConfig: ListPageConfig) {
+interface State {
+  filters: Filter[];
+  filterStr: string;
+}
+
+function parseFiltersFromUrl(filterStr: string, filterConfigs: FilterConfig[]) {
   // filterStr is either '[]' or user specify filters in this format:
   // [{ name: '', query: '', value?: '' }]
   let filters: Filter[] = [];
@@ -40,9 +46,7 @@ function parseFiltersFromUrl(filterStr: string, pageConfig: ListPageConfig) {
     // tslint:disable-next-line: no-any
     .map((filter: any) => {
       const { name, query, value } = filter;
-      const filterConfig = pageConfig.filters.find(
-        pFilter => name === pFilter.name
-      );
+      const filterConfig = filterConfigs.find(pFilter => name === pFilter.name);
       if (!filterConfig) {
         throw new Error(`Cannot find filter '${name}' in page config`);
       }
@@ -58,29 +62,40 @@ function parseFiltersFromUrl(filterStr: string, pageConfig: ListPageConfig) {
   return filters;
 }
 
-function SyncUrl(WrappedComponent: React.ComponentClass<Props>) {
+function SyncUrl<P extends InjectedProps>(
+  WrappedComponent: React.ComponentType<P>
+): React.ComponentType<Omit<P, keyof InjectedProps> & OwnProps> {
+  type Props = Omit<P, keyof InjectedProps> & OwnProps;
   return class extends React.PureComponent<Props, State> {
     constructor(props: Props) {
       super(props);
+      const filterStr = this.getFilterStr(props);
       this.state = {
-        filters: parseFiltersFromUrl(props.filterStr, props.pageConfig),
+        filterStr,
+        filters: parseFiltersFromUrl(filterStr, props.filterConfigs),
       };
     }
 
     public componentWillReceiveProps(nextProps: Props) {
-      const { filterStr } = this.props;
-      if (filterStr !== nextProps.filterStr) {
+      const filterStr = this.getFilterStr(nextProps);
+      if (this.state.filterStr !== filterStr) {
         this.setState({
-          filters: parseFiltersFromUrl(
-            nextProps.filterStr,
-            nextProps.pageConfig
-          ),
+          filterStr,
+          filters: parseFiltersFromUrl(filterStr, nextProps.filterConfigs),
         });
       }
     }
 
+    public getFilterStr(props: Props) {
+      const { filter: filterStr = '[]' } = qs.parse(
+        props.location ? props.location.search : ''
+      );
+      return filterStr;
+    }
+
     public onChange = (filters: Filter[]) => {
-      const { dispatch, page } = this.props;
+      const { dispatch, location } = this.props;
+      const search = qs.parse(location ? location.search : '');
       let filterStr = '';
       if (filters.length) {
         const filterObj = filters.map(oldFilter => {
@@ -94,17 +109,18 @@ function SyncUrl(WrappedComponent: React.ComponentClass<Props>) {
           }
           return filter;
         });
-        filterStr = `&filter=${encodeURIComponent(JSON.stringify(filterObj))}`;
+        filterStr = JSON.stringify(filterObj);
       }
-      dispatch(push({ search: `page=${page}${filterStr}` }));
+      search.filter = filterStr;
+      dispatch(push({ search: qs.stringify(search) }));
     };
 
     public render() {
       return (
         <WrappedComponent
           {...this.props}
-          {...this.state}
           onChangeFilter={this.onChange}
+          filters={this.state.filters}
         />
       );
     }

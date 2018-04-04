@@ -1,4 +1,5 @@
 import classNames from 'classnames';
+import { Location } from 'history';
 import * as qs from 'query-string';
 import * as React from 'react';
 import { connect } from 'react-redux';
@@ -40,7 +41,7 @@ import {
 } from '../components/ImportModal';
 import { LinkButton } from '../components/LinkButton';
 import Pagination from '../components/Pagination';
-import SyncUrl from '../components/SyncUrl';
+import SyncUrl, { InjectedProps } from '../components/SyncUrl';
 import { Field, FieldContext } from '../fields';
 import { getCmsConfig, ImportState, RootState } from '../states';
 import { RemoteType } from '../types';
@@ -166,15 +167,14 @@ const ListTable: React.SFC<ListTableProps> = ({
   );
 };
 
-export type ListPageProps = StateProps & DispatchProps;
+export type ListPageProps = StateProps & DispatchProps & InjectedProps;
 
 export interface StateProps {
-  filters: Filter[];
-  filterStr: string;
+  filterConfigs: FilterConfig[];
   import: ImportState;
   isLoading: boolean;
+  location: Location | null;
   maxPage: number;
-  onChangeFilter: (filters: Filter[]) => void;
   page: number;
   pageConfig: ListPageConfig;
   recordName: string;
@@ -564,9 +564,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
 function ListPageFactory(recordName: string) {
   function mapStateToProps(state: RootState): StateProps {
     const { location } = state.router;
-    const { page: pageStr = '1', filter: filterStr = '[]' } = qs.parse(
-      location ? location.search : ''
-    );
+    const { page: pageStr = '1' } = qs.parse(location ? location.search : '');
     const page = parseInt(pageStr, 10);
 
     const recordConfig = getCmsConfig(state).records[recordName];
@@ -588,12 +586,11 @@ function ListPageFactory(recordName: string) {
     const maxPage = Math.ceil(totalCount / pageConfig.perPage);
 
     return {
-      filterStr,
-      filters: [],
+      filterConfigs: pageConfig.filters,
       import: state.import,
       isLoading,
+      location,
       maxPage,
-      onChangeFilter: (filters: Filter[]) => {}, // tslint:disable-line: no-empty
       page,
       pageConfig,
       recordName,
