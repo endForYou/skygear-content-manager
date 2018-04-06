@@ -64,7 +64,7 @@ function parseFiltersFromUrl(filterStr: string, filterConfigs: FilterConfig[]) {
 
 function SyncUrl<P extends InjectedProps>(
   WrappedComponent: React.ComponentType<P>
-): React.ComponentType<Omit<P, keyof InjectedProps> & OwnProps> {
+) {
   type Props = Omit<P, keyof InjectedProps> & OwnProps;
   return class extends React.PureComponent<Props, State> {
     constructor(props: Props) {
@@ -111,7 +111,11 @@ function SyncUrl<P extends InjectedProps>(
         });
         filterStr = JSON.stringify(filterObj);
       }
-      search.filter = filterStr;
+      if (filterStr.length) {
+        search.filter = filterStr;
+      } else {
+        delete search.filter;
+      }
       dispatch(push({ search: qs.stringify(search) }));
     };
 
@@ -124,7 +128,7 @@ function SyncUrl<P extends InjectedProps>(
         />
       );
     }
-  };
+  } as React.ComponentType<Props>;
 }
 
 export default SyncUrl;
