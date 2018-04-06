@@ -216,7 +216,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
   }
 
   public componentDidMount() {
-    this.reloadList();
+    this.reloadList(this.props);
   }
 
   public componentWillReceiveProps(nextProps: ListPageProps) {
@@ -230,7 +230,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
       // Handle filters & page change by browser navigation
       (filters !== nextProps.filters || page !== nextProps.page)
     ) {
-      this.reloadList();
+      this.reloadList(nextProps);
     }
   }
 
@@ -536,10 +536,10 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
     this.recordActionCreator.fetchList(page, perPage, filters);
   }
 
-  public reloadList = () => {
-    const { filters, page, pageConfig } = this.props;
+  public reloadList(props: ListPageProps) {
+    const { filters, page, pageConfig } = props;
     this.fetchList(page, pageConfig.perPage, filters);
-  };
+  }
 }
 
 function ListPageFactory(recordName: string) {
