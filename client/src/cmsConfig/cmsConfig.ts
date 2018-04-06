@@ -480,7 +480,13 @@ function parseListActions(input: any): ListActionConfig[] {
   return (
     input
       // tslint:disable-next-line: no-any
-      .filter((item: any) => itemActionTypes.indexOf(item.type) !== -1)
+      .map((item: any) => {
+        if (itemActionTypes.indexOf(item.type) === -1) {
+          throw new Error(`Unexpected list action types: ${item.type}`);
+        }
+
+        return item;
+      })
       .map(mapDefaultActionToAction)
       // tslint:disable-next-line: no-any
       .map((item: any) => {
@@ -522,7 +528,13 @@ function parseListItemActions(input: any): ListItemActionConfig[] {
   return (
     input
       // tslint:disable-next-line: no-any
-      .filter((item: any) => itemActionTypes.indexOf(item.type) !== -1)
+      .map((item: any) => {
+        if (itemActionTypes.indexOf(item.type) === -1) {
+          throw new Error(`Unexpected list item action types: ${item.type}`);
+        }
+
+        return item;
+      })
       .map(mapDefaultActionToAction)
       // tslint:disable-next-line: no-any
       .map((item: any) => {
@@ -617,7 +629,13 @@ function parseShowActions(input: any): ShowActionConfig[] {
   return (
     input
       // tslint:disable-next-line: no-any
-      .filter((item: any) => itemActionTypes.indexOf(item.type) !== -1)
+      .map((item: any) => {
+        if (itemActionTypes.indexOf(item.type) === -1) {
+          throw new Error(`Unexpected show action types: ${item.type}`);
+        }
+
+        return item;
+      })
       .map(mapDefaultActionToAction)
       // tslint:disable-next-line: no-any
       .map((item: any) => {
@@ -625,7 +643,7 @@ function parseShowActions(input: any): ShowActionConfig[] {
           case ActionConfigTypes.Link:
             return parseLinkAction(item);
           default:
-            throw new Error(`Unexpected list action types: ${item.type}`);
+            throw new Error(`Unexpected show action types: ${item.type}`);
         }
       })
   );
@@ -677,7 +695,13 @@ function parseRecordFormActions(input: any): RecordFormActionConfig[] {
   return (
     input
       // tslint:disable-next-line: no-any
-      .filter((item: any) => itemActionTypes.indexOf(item.type) !== -1)
+      .map((item: any) => {
+        if (itemActionTypes.indexOf(item.type) === -1) {
+          throw new Error(`Unexpected form action types: ${item.type}`);
+        }
+
+        return item;
+      })
       .map(mapDefaultActionToAction)
       // tslint:disable-next-line: no-any
       .map((item: any) => {
@@ -685,7 +709,7 @@ function parseRecordFormActions(input: any): RecordFormActionConfig[] {
           case ActionConfigTypes.Link:
             return parseLinkAction(item);
           default:
-            throw new Error(`Unexpected list action types: ${item.type}`);
+            throw new Error(`Unexpected form action types: ${item.type}`);
         }
       })
   );
