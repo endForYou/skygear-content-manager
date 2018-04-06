@@ -31,7 +31,12 @@ const App: React.StatelessComponent<AppProps> = ({ cmsConfig, isLoggedIn }) => {
       case RemoteType.Loading:
         return <img className="img-config-loading" src={loading} />;
       case RemoteType.Failure:
-        return <h4 className="m-1">Failed to load configuration file.</h4>;
+        return (
+          <div>
+            <h4 className="m-1">Failed to load configuration file.</h4>
+            <p className="m-1 text-danger">{`${cmsConfig.error}`}</p>
+          </div>
+        );
       case RemoteType.Success:
         return <MainPage />;
     }
