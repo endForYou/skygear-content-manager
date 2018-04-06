@@ -317,6 +317,8 @@ export function fetchRecord(
         },
         error => {
           dispatch(fetchRecordFailure(cmsRecord, id, error, context));
+
+          throw error;
         }
       );
   };
@@ -335,6 +337,8 @@ function saveRecord(
       },
       (error: Error) => {
         dispatch(saveRecordFailure(cmsRecord, record, error, context));
+
+        throw error;
       }
     );
   };
@@ -366,6 +370,8 @@ function fetchRecordList(
       },
       error => {
         dispatch(fetchRecordListFailure(cmsRecord, error, context));
+
+        throw error;
       }
     );
   };
