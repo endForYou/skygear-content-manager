@@ -38,7 +38,7 @@ interface State {
 }
 
 // tslint:disable max-line-length
-const EditorInitObj = {
+const defaultEditorInitObj = {
   height: 480,
   plugins:
     'anchor charmap code colorpicker contextmenu fullscreen hr image imagetools link lists nonbreaking paste tabfocus table textcolor',
@@ -73,11 +73,18 @@ export class WYSIWYGEditor extends React.PureComponent<
     const editable = this.props.config.editable;
     const { value } = this.state;
 
-    const disabled = editable === undefined ? false : !editable;
+    // tslint:disable-next-line: no-any
+    const editorEditInitObj: any = { ...defaultEditorInitObj };
+    if (!editable) {
+      editorEditInitObj.readonly = true;
+      editorEditInitObj.menubar = false;
+      editorEditInitObj.toolbar = false;
+      editorEditInitObj.object_resizing = false;
+    }
 
     return (
       <Editor
-        init={{ ...EditorInitObj, readonly: disabled }}
+        init={editorEditInitObj}
         value={value}
         onEditorChange={this.handleEditorChange}
       />
