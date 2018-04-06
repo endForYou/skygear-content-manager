@@ -41,25 +41,12 @@ import {
 } from '../components/ImportModal';
 import { LinkButton } from '../components/LinkButton';
 import Pagination from '../components/Pagination';
+import { SpaceSeperatedList } from '../components/SpaceSeperatedList';
 import SyncUrl, { InjectedProps } from '../components/SyncUrl';
 import { Field, FieldContext } from '../fields';
 import { getCmsConfig, ImportState, RootState } from '../states';
 import { RemoteType } from '../types';
 import { debounce } from '../util';
-
-// tslint:disable: no-any
-function joinElements(els: any[]) {
-  if (els.length === 0) {
-    return els;
-  }
-
-  return els.reduce((prev: any, current: any, index: number): any => [
-    prev,
-    <span key={`${index}-space`}>&nbsp;</span>,
-    current,
-  ]);
-}
-// tslint:enable: no-any
 
 interface TableHeaderProps {
   fieldConfigs: FieldConfig[];
@@ -106,15 +93,15 @@ const TableRow: React.SFC<TableRowProps> = ({
     <tr>
       {columns}
       <td>
-        {joinElements(
-          itemActions.map((action, index) => (
+        <SpaceSeperatedList>
+          {itemActions.map((action, index) => (
             <LinkButton
               key={index}
               actionConfig={action}
               context={{ record }}
             />
-          ))
-        )}
+          ))}
+        </SpaceSeperatedList>
       </td>
     </tr>
   );
@@ -348,12 +335,14 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
 
   public renderActionButton(
     recordName: string,
-    actionConfig: ListActionConfig
+    actionConfig: ListActionConfig,
+    index: number
   ) {
     switch (actionConfig.type) {
       case ActionConfigTypes.Export:
         return (
           <ExportButton
+            key={index}
             actionConfig={actionConfig}
             onClick={() => this.setState({ exporting: actionConfig })}
           />
@@ -361,6 +350,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
       case ActionConfigTypes.Import:
         return (
           <ImportButton
+            key={index}
             actionConfig={actionConfig}
             onFileSelected={this.onImportFileSelected}
           />
@@ -368,6 +358,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
       case ActionConfigTypes.Link:
         return (
           <LinkButton
+            key={index}
             actionConfig={actionConfig}
             context={{
               record_type: recordName,
@@ -381,10 +372,10 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
 
   public renderActionButtons() {
     const { recordName, pageConfig: { actions } } = this.props;
-    const actionsButtons = actions.map(action =>
-      this.renderActionButton(recordName, action)
+    const actionsButtons = actions.map((action, index) =>
+      this.renderActionButton(recordName, action, index)
     );
-    return joinElements(actionsButtons);
+    return <SpaceSeperatedList>{actionsButtons}</SpaceSeperatedList>;
   }
 
   public renderImportModal() {

@@ -88,6 +88,7 @@ export interface ShowPageConfig {
   label: string;
   fields: FieldConfig[];
   references: ReferenceConfig[];
+  actions: ShowActionConfig[];
 }
 
 export interface RecordFormPageConfig {
@@ -95,6 +96,7 @@ export interface RecordFormPageConfig {
   label: string;
   fields: FieldConfig[];
   references: ReferenceConfig[];
+  actions: RecordFormActionConfig[];
 }
 
 enum RecordFormPageConfigType {
@@ -254,6 +256,8 @@ export type ListActionConfig =
   | ImportActionConfig
   | LinkActionConfig;
 export type ListItemActionConfig = LinkActionConfig;
+export type ShowActionConfig = LinkActionConfig;
+export type RecordFormActionConfig = LinkActionConfig;
 export enum ActionConfigTypes {
   Export = 'Export',
   Import = 'Import',
@@ -476,7 +480,13 @@ function parseListActions(input: any): ListActionConfig[] {
   return (
     input
       // tslint:disable-next-line: no-any
-      .filter((item: any) => itemActionTypes.indexOf(item.type) !== -1)
+      .map((item: any) => {
+        if (itemActionTypes.indexOf(item.type) === -1) {
+          throw new Error(`Unexpected list action types: ${item.type}`);
+        }
+
+        return item;
+      })
       .map(mapDefaultActionToAction)
       // tslint:disable-next-line: no-any
       .map((item: any) => {
@@ -518,7 +528,13 @@ function parseListItemActions(input: any): ListItemActionConfig[] {
   return (
     input
       // tslint:disable-next-line: no-any
-      .filter((item: any) => itemActionTypes.indexOf(item.type) !== -1)
+      .map((item: any) => {
+        if (itemActionTypes.indexOf(item.type) === -1) {
+          throw new Error(`Unexpected list item action types: ${item.type}`);
+        }
+
+        return item;
+      })
       .map(mapDefaultActionToAction)
       // tslint:disable-next-line: no-any
       .map((item: any) => {
@@ -585,11 +601,52 @@ function parseShowPageConfig(
   ) as FieldConfig[];
 
   return {
+    actions: parseShowActions(input.actions),
     cmsRecord,
     fields,
     label,
     references: filterReferences(fields),
   };
+}
+
+// tslint:disable-next-line: no-any
+function parseShowActions(input: any): ShowActionConfig[] {
+  const itemActionTypes = [
+    ActionConfigTypes.Link,
+    ActionConfigTypes.EditButton,
+  ];
+
+  const defaultActions = [
+    {
+      type: ActionConfigTypes.EditButton,
+    },
+  ];
+
+  if (input == null) {
+    input = defaultActions;
+  }
+
+  return (
+    input
+      // tslint:disable-next-line: no-any
+      .map((item: any) => {
+        if (itemActionTypes.indexOf(item.type) === -1) {
+          throw new Error(`Unexpected show action types: ${item.type}`);
+        }
+
+        return item;
+      })
+      .map(mapDefaultActionToAction)
+      // tslint:disable-next-line: no-any
+      .map((item: any) => {
+        switch (item.type) {
+          case ActionConfigTypes.Link:
+            return parseLinkAction(item);
+          default:
+            throw new Error(`Unexpected show action types: ${item.type}`);
+        }
+      })
+  );
 }
 
 function parseRecordFormPageConfig(
@@ -617,11 +674,45 @@ function parseRecordFormPageConfig(
   const editableFields = fields.map(config => ({ editable: true, ...config }));
 
   return {
+    actions: parseRecordFormActions(input.actions),
     cmsRecord,
     fields: editableFields,
     label,
     references: filterReferences(fields),
   };
+}
+
+// tslint:disable-next-line: no-any
+function parseRecordFormActions(input: any): RecordFormActionConfig[] {
+  const itemActionTypes = [ActionConfigTypes.Link];
+
+  const defaultActions = [] as RecordFormActionConfig[];
+
+  if (input == null) {
+    input = defaultActions;
+  }
+
+  return (
+    input
+      // tslint:disable-next-line: no-any
+      .map((item: any) => {
+        if (itemActionTypes.indexOf(item.type) === -1) {
+          throw new Error(`Unexpected form action types: ${item.type}`);
+        }
+
+        return item;
+      })
+      .map(mapDefaultActionToAction)
+      // tslint:disable-next-line: no-any
+      .map((item: any) => {
+        switch (item.type) {
+          case ActionConfigTypes.Link:
+            return parseLinkAction(item);
+          default:
+            throw new Error(`Unexpected form action types: ${item.type}`);
+        }
+      })
+  );
 }
 
 // tslint:disable-next-line: no-any
