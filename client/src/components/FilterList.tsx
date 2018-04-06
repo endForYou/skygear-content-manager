@@ -35,10 +35,10 @@ const DATE_FORMAT = 'YYYY-MM-DD';
 const TIME_FORMAT = 'HH:mm:ss[Z]';
 
 export class FilterList extends React.PureComponent<FilterListProps> {
-  public renderFilter(filter: Filter) {
+  public renderFilter(filter: Filter, index: number) {
     const { onCloseFilterClicked } = this.props;
     return (
-      <div key={filter.id} className="form-inline mb-2">
+      <div key={index} className="form-inline mb-2">
         <div className="form-group mr-2">
           <label>{filter.label}</label>
         </div>
@@ -214,7 +214,7 @@ export class FilterList extends React.PureComponent<FilterListProps> {
 
   public render() {
     const { filters } = this.props;
-    return filters.map(filter => this.renderFilter(filter));
+    return filters.map((filter, index) => this.renderFilter(filter, index));
   }
 
   public handleDateTimeChange(

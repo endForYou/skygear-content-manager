@@ -135,7 +135,6 @@ class PushNotificationListPageImpl extends React.PureComponent<
               pathname="/notification"
               currentPage={page}
               maxPage={maxPage}
-              onItemClicked={this.onPageItemClicked}
             />
           ) : null}
         </div>

@@ -1,4 +1,5 @@
 import classNames from 'classnames';
+import { Location } from 'history';
 import * as qs from 'query-string';
 import * as React from 'react';
 import { connect } from 'react-redux';
@@ -40,6 +41,7 @@ import {
 } from '../components/ImportModal';
 import { LinkButton } from '../components/LinkButton';
 import Pagination from '../components/Pagination';
+import SyncUrl, { InjectedProps } from '../components/SyncUrl';
 import { Field, FieldContext } from '../fields';
 import { getCmsConfig, ImportState, RootState } from '../states';
 import { RemoteType } from '../types';
@@ -53,7 +55,7 @@ function joinElements(els: any[]) {
 
   return els.reduce((prev: any, current: any, index: number): any => [
     prev,
-    <span key={index}>&nbsp;</span>,
+    <span key={`${index}-space`}>&nbsp;</span>,
     current,
   ]);
 }
@@ -165,22 +167,23 @@ const ListTable: React.SFC<ListTableProps> = ({
   );
 };
 
-export type ListPageProps = StateProps & DispatchProps;
+export type ListPageProps = StateProps & DispatchProps & InjectedProps;
 
 export interface StateProps {
+  filterConfigs: FilterConfig[];
   import: ImportState;
-  recordName: string;
-  pageConfig: ListPageConfig;
-  page: number;
-  maxPage: number;
   isLoading: boolean;
+  location: Location | null;
+  maxPage: number;
+  page: number;
+  pageConfig: ListPageConfig;
+  recordName: string;
   records: Record[];
 }
 
 interface State {
   exporting?: ExportActionConfig;
   showfilterMenu: boolean;
-  filters: Filter[];
 }
 
 export interface DispatchProps {
@@ -194,11 +197,9 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
     super(props);
 
     const { dispatch, pageConfig: { cmsRecord, references } } = this.props;
-    const filters: Filter[] = [];
 
     this.state = {
       exporting: undefined,
-      filters,
       showfilterMenu: false,
     };
 
@@ -215,22 +216,21 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
   }
 
   public componentDidMount() {
-    const { page, pageConfig } = this.props;
-    const { filters } = this.state;
-    this.fetchList(page, pageConfig.perPage, filters);
+    this.reloadList(this.props);
   }
 
   public componentWillReceiveProps(nextProps: ListPageProps) {
+    const { filters, import: { importResult }, page } = this.props;
     // Refresh list after import success
     if (
-      this.props.import.importResult &&
-      this.props.import.importResult.type === RemoteType.Loading &&
-      nextProps.import.importResult &&
-      nextProps.import.importResult.type === RemoteType.Success
+      (importResult &&
+        importResult.type === RemoteType.Loading &&
+        nextProps.import.importResult &&
+        nextProps.import.importResult.type === RemoteType.Success) ||
+      // Handle filters & page change by browser navigation
+      (filters !== nextProps.filters || page !== nextProps.page)
     ) {
-      const { page, pageConfig } = this.props;
-      const { filters } = this.state;
-      this.fetchList(page, pageConfig.perPage, filters);
+      this.reloadList(nextProps);
     }
   }
 
@@ -242,9 +242,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
     filter: Filter,
     event: React.ChangeEvent<HTMLSelectElement>
   ) {
-    const { page, pageConfig } = this.props;
-
-    const filters = this.state.filters.map(f => {
+    const filters = this.props.filters.map(f => {
       if (f.id === filter.id) {
         switch (filter.type) {
           case FilterType.StringFilterType:
@@ -276,16 +274,14 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
       return f;
     });
 
-    this.setState({ filters });
-    this.fetchList(page, pageConfig.perPage, filters);
+    this.props.onChangeFilter(filters);
   }
 
   public handleFilterValueChange(
     filter: Filter,
     event: React.ChangeEvent<HTMLInputElement>
   ) {
-    const { page, pageConfig } = this.props;
-    const filters = this.state.filters.map(f => {
+    const filters = this.props.filters.map(f => {
       if (f.id === filter.id) {
         switch (filter.type) {
           case FilterType.StringFilterType:
@@ -309,47 +305,40 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
       return f;
     });
 
-    this.setState({ filters });
-    this.fetchList(page, pageConfig.perPage, filters);
+    this.props.onChangeFilter(filters);
   }
 
   public handleDateTimeValueChange(filter: Filter, datetime: Date) {
-    const { page, pageConfig } = this.props;
-    const filters = this.state.filters.map(f => {
+    const filters = this.props.filters.map(f => {
       if (f.id === filter.id) {
         return { ...(f as DateTimeFilter), value: datetime };
       } else {
         return f;
       }
     });
-    this.setState({ filters });
-    this.fetchList(page, pageConfig.perPage, filters);
+    this.props.onChangeFilter(filters);
   }
 
   public onFilterItemClicked(filterConfig: FilterConfig) {
-    const { page, pageConfig } = this.props;
     const newFilter = filterFactory(filterConfig);
 
     const filters =
       filterConfig.type === FilterConfigTypes.General
         ? [newFilter]
         : [
-            ...this.state.filters.filter(
+            ...this.props.filters.filter(
               f => f.type !== FilterType.GeneralFilterType
             ),
             newFilter,
           ];
 
-    this.setState({ filters });
-    this.fetchList(page, pageConfig.perPage, filters);
+    this.props.onChangeFilter(filters);
     this.toggleFilterMenu();
   }
 
   public onCloseFilterClicked(filter: Filter) {
-    const { page, pageConfig } = this.props;
-    const filters = this.state.filters.filter(f => f.id !== filter.id);
-    this.setState({ filters });
-    this.fetchList(page, pageConfig.perPage, filters);
+    const filters = this.props.filters.filter(f => f.id !== filter.id);
+    this.props.onChangeFilter(filters);
   }
 
   public onImportFileSelected(actionConfig: ImportActionConfig, file: File) {
@@ -432,8 +421,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
       return undefined;
     }
 
-    const recordType = this.props.recordName;
-    const filters = this.state.filters;
+    const { filters, recordName: recordType } = this.props;
     const query = queryWithFilters(filters, Record.extend(recordType));
 
     return (
@@ -447,6 +435,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
 
   public render() {
     const {
+      filters,
       recordName,
       pageConfig,
       page,
@@ -455,7 +444,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
       records,
     } = this.props;
 
-    const { showfilterMenu, filters } = this.state;
+    const { showfilterMenu } = this.state;
     const pathname = `/records/${recordName}`;
 
     return (
@@ -536,7 +525,6 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
               pathname={pathname}
               currentPage={page}
               maxPage={maxPage}
-              onItemClicked={this.onPageItemClicked}
             />
           ) : null}
         </div>
@@ -544,14 +532,13 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
     );
   }
 
-  public onPageItemClicked = (page: number) => {
-    const { pageConfig } = this.props;
-    const { filters } = this.state;
-    this.fetchList(page, pageConfig.perPage, filters);
-  };
-
   public fetchList(page: number, perPage: number, filters: Filter[]) {
     this.recordActionCreator.fetchList(page, perPage, filters);
+  }
+
+  public reloadList(props: ListPageProps) {
+    const { filters, page, pageConfig } = props;
+    this.fetchList(page, pageConfig.perPage, filters);
   }
 }
 
@@ -580,8 +567,10 @@ function ListPageFactory(recordName: string) {
     const maxPage = Math.ceil(totalCount / pageConfig.perPage);
 
     return {
+      filterConfigs: pageConfig.filters,
       import: state.import,
       isLoading,
+      location,
       maxPage,
       page,
       pageConfig,
@@ -594,7 +583,8 @@ function ListPageFactory(recordName: string) {
     return { dispatch };
   }
 
-  return connect(mapStateToProps, mapDispatchToProps)(ListPageImpl);
+  const SyncedListPage = SyncUrl(ListPageImpl);
+  return connect(mapStateToProps, mapDispatchToProps)(SyncedListPage);
 }
 
 export const ListPage: React.ComponentClass<ListPageProps> = ListPageImpl;

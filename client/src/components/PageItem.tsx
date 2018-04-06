@@ -5,7 +5,6 @@ import { Link } from 'react-router-dom';
 export interface PageItemProps {
   pathname: string;
   page: number;
-  onClick: OnPageItemClickedType;
   isDisabled?: boolean;
   isActive?: boolean;
 }
@@ -18,7 +17,6 @@ export class PageItem extends React.PureComponent<PageItemProps> {
       children,
       pathname,
       page,
-      onClick,
       isDisabled = false,
       isActive = false,
     } = this.props;
@@ -35,11 +33,7 @@ export class PageItem extends React.PureComponent<PageItemProps> {
       });
       return (
         <li className={itemClassName}>
-          <Link
-            className="page-link"
-            to={`${pathname}?page=${page}`}
-            onClick={() => onClick(page)}
-          >
+          <Link className="page-link" to={`${pathname}?page=${page}`}>
             {children}
           </Link>
         </li>
