@@ -11,6 +11,7 @@ import skygear, {
 import {
   AssociationReferenceFieldConfig,
   BackReferenceFieldConfig,
+  BaseFilterQueryType,
   BooleanFilter,
   BooleanFilterQueryType,
   CmsRecord,
@@ -391,6 +392,14 @@ export function queryWithFilters(
 }
 
 function addFilterToQuery(query: Query, filter: Filter, recordCls: RecordCls) {
+  switch (filter.query) {
+    case BaseFilterQueryType.IsNull:
+      query.equalTo(filter.name, null);
+      return;
+    case BaseFilterQueryType.IsNotNull:
+      query.notEqualTo(filter.name, null);
+      return;
+  }
   switch (filter.type) {
     case FilterType.StringFilterType:
       addStringFilterToQuery(query, filter);

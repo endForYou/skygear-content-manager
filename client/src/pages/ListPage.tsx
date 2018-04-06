@@ -10,6 +10,7 @@ import { dismissImport, importRecords } from '../actions/import';
 import { queryWithFilters, RecordActionDispatcher } from '../actions/record';
 import {
   ActionConfigTypes,
+  BaseFilterQueryType,
   BooleanFilterQueryType,
   DateTimeFilter,
   DateTimeFilterQueryType,
@@ -229,8 +230,20 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
     filter: Filter,
     event: React.ChangeEvent<HTMLSelectElement>
   ) {
+    if (!event.target.value.length) {
+      return;
+    }
     const filters = this.props.filters.map(f => {
       if (f.id === filter.id) {
+        switch (event.target.value) {
+          case BaseFilterQueryType.IsNull:
+          case BaseFilterQueryType.IsNotNull:
+            return {
+              ...f,
+              query: BaseFilterQueryType[event.target.value],
+            };
+          default:
+        }
         switch (filter.type) {
           case FilterType.StringFilterType:
             return {

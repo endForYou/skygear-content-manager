@@ -180,6 +180,11 @@ function parseReferenceFilterConfig(
   };
 }
 
+export enum BaseFilterQueryType {
+  IsNull = 'IsNull',
+  IsNotNull = 'IsNotNull',
+}
+
 export enum StringFilterQueryType {
   EqualTo = 'EqualTo',
   NotEqualTo = 'NotEqualTo',
@@ -241,41 +246,42 @@ export interface FilterAttrs {
 
 export interface StringFilter extends FilterAttrs {
   type: FilterType.StringFilterType;
-  query: StringFilterQueryType;
+  query: BaseFilterQueryType | StringFilterQueryType;
   value: string;
 }
 
 export interface IntegerFilter extends FilterAttrs {
   type: FilterType.IntegerFilterType;
-  query: IntegerFilterQueryType;
+  query: BaseFilterQueryType | IntegerFilterQueryType;
   value: number;
 }
 
 export interface BooleanFilter extends FilterAttrs {
   type: FilterType.BooleanFilterType;
-  query: BooleanFilterQueryType;
+  query: BaseFilterQueryType | BooleanFilterQueryType;
 }
 
 export interface DateTimeFilter extends FilterAttrs {
   type: FilterType.DateTimeFilterType;
-  query: DateTimeFilterQueryType;
+  query: BaseFilterQueryType | DateTimeFilterQueryType;
   value: Date;
 }
 
 export interface GeneralFilter extends FilterAttrs {
   type: FilterType.GeneralFilterType;
-  query: GeneralFilterQueryType;
+  query: BaseFilterQueryType | GeneralFilterQueryType;
   names: string[];
   value: string;
 }
 
 export interface ReferenceFilter extends FilterAttrs {
   type: FilterType.ReferenceFilterType;
-  query: ReferenceFilterQueryType;
+  query: BaseFilterQueryType | ReferenceFilterQueryType;
   values: string[];
 }
 
 export type FilterQueryType =
+  | BaseFilterQueryType
   | StringFilterQueryType
   | IntegerFilterQueryType
   | BooleanFilterQueryType
