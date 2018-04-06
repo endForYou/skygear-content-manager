@@ -341,6 +341,11 @@ records:
     list:
       fields:
         - type: _id
+      filters:
+        - name: display_name
+          type: String
+          label: Name
+          nullable: true
     show:
       fields:
         - type: _id

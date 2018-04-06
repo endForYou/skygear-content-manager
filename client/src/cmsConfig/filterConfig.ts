@@ -1,6 +1,11 @@
 import uuid from 'uuid';
 import { humanize } from '.././util';
-import { parseOptionalString, parseString, parseStringArray } from './util';
+import {
+  parseOptionalBoolean,
+  parseOptionalString,
+  parseString,
+  parseStringArray,
+} from './util';
 
 import { CmsRecord, ConfigContext } from './cmsConfig';
 
@@ -24,11 +29,13 @@ export enum FilterConfigTypes {
 export interface FilterConfigAttrs {
   label: string;
   name: string;
+  nullable: boolean;
 }
 
 interface FilterConfigInput {
   type: string;
   label: string;
+  nullable: boolean;
 }
 
 export interface StringFilterConfig extends FilterConfigInput {
@@ -95,8 +102,9 @@ function parseFilterConfigAttrs(
   const name = parseString(input, 'name', fieldType);
   const label =
     parseOptionalString(input, 'label', fieldType) || humanize(name);
+  const nullable = parseOptionalBoolean(input, 'nullable', fieldType) || false;
 
-  return { name, label };
+  return { name, label, nullable };
 }
 
 function parseStringFilterConfig(input: FilterConfigInput): StringFilterConfig {
@@ -139,10 +147,12 @@ function parseGeneralFilterConfig(
   const label =
     parseOptionalString(input, 'label', 'General') || humanize(name);
   const names = parseStringArray(input, 'name', 'General');
+  const nullable = parseOptionalBoolean(input, 'nullable', 'General') || false;
   return {
     label,
     name: names.join(','),
     names,
+    nullable,
     type: FilterConfigTypes.General,
   };
 }
@@ -168,6 +178,11 @@ function parseReferenceFilterConfig(
     targetCmsRecord,
     type: FilterConfigTypes.Reference,
   };
+}
+
+export enum BaseFilterQueryType {
+  IsNull = 'IsNull',
+  IsNotNull = 'IsNotNull',
 }
 
 export enum StringFilterQueryType {
@@ -226,45 +241,47 @@ export interface FilterAttrs {
   query: FilterQueryType;
   label: string;
   name: string;
+  nullable: boolean;
 }
 
 export interface StringFilter extends FilterAttrs {
   type: FilterType.StringFilterType;
-  query: StringFilterQueryType;
+  query: BaseFilterQueryType | StringFilterQueryType;
   value: string;
 }
 
 export interface IntegerFilter extends FilterAttrs {
   type: FilterType.IntegerFilterType;
-  query: IntegerFilterQueryType;
+  query: BaseFilterQueryType | IntegerFilterQueryType;
   value: number;
 }
 
 export interface BooleanFilter extends FilterAttrs {
   type: FilterType.BooleanFilterType;
-  query: BooleanFilterQueryType;
+  query: BaseFilterQueryType | BooleanFilterQueryType;
 }
 
 export interface DateTimeFilter extends FilterAttrs {
   type: FilterType.DateTimeFilterType;
-  query: DateTimeFilterQueryType;
+  query: BaseFilterQueryType | DateTimeFilterQueryType;
   value: Date;
 }
 
 export interface GeneralFilter extends FilterAttrs {
   type: FilterType.GeneralFilterType;
-  query: GeneralFilterQueryType;
+  query: BaseFilterQueryType | GeneralFilterQueryType;
   names: string[];
   value: string;
 }
 
 export interface ReferenceFilter extends FilterAttrs {
   type: FilterType.ReferenceFilterType;
-  query: ReferenceFilterQueryType;
+  query: BaseFilterQueryType | ReferenceFilterQueryType;
   values: string[];
 }
 
 export type FilterQueryType =
+  | BaseFilterQueryType
   | StringFilterQueryType
   | IntegerFilterQueryType
   | BooleanFilterQueryType
@@ -279,6 +296,7 @@ export function filterFactory(filterConfig: FilterConfig): Filter {
         id: uuid(),
         label: filterConfig.label,
         name: filterConfig.name,
+        nullable: filterConfig.nullable,
         query: StringFilterQueryType.EqualTo,
         type: FilterType.StringFilterType,
         value: '',
@@ -288,6 +306,7 @@ export function filterFactory(filterConfig: FilterConfig): Filter {
         id: uuid(),
         label: filterConfig.label,
         name: filterConfig.name,
+        nullable: filterConfig.nullable,
         query: IntegerFilterQueryType.EqualTo,
         type: FilterType.IntegerFilterType,
         value: 0,
@@ -297,6 +316,7 @@ export function filterFactory(filterConfig: FilterConfig): Filter {
         id: uuid(),
         label: filterConfig.label,
         name: filterConfig.name,
+        nullable: filterConfig.nullable,
         query: BooleanFilterQueryType.True,
         type: FilterType.BooleanFilterType,
       };
@@ -305,6 +325,7 @@ export function filterFactory(filterConfig: FilterConfig): Filter {
         id: uuid(),
         label: filterConfig.label,
         name: filterConfig.name,
+        nullable: filterConfig.nullable,
         query: DateTimeFilterQueryType.Before,
         type: FilterType.DateTimeFilterType,
         value: new Date(),
@@ -315,6 +336,7 @@ export function filterFactory(filterConfig: FilterConfig): Filter {
         label: filterConfig.label,
         name: filterConfig.name,
         names: filterConfig.names,
+        nullable: filterConfig.nullable,
         query: GeneralFilterQueryType.Contains,
         type: FilterType.GeneralFilterType,
         value: '',
@@ -324,6 +346,7 @@ export function filterFactory(filterConfig: FilterConfig): Filter {
         id: uuid(),
         label: filterConfig.label,
         name: filterConfig.name,
+        nullable: filterConfig.nullable,
         query: ReferenceFilterQueryType.Contains,
         type: FilterType.ReferenceFilterType,
         values: [],

@@ -5,6 +5,7 @@ import * as Datetime from 'react-datetime';
 import 'react-datetime/css/react-datetime.css';
 
 import {
+  BaseFilterQueryType,
   BooleanFilterQueryType,
   DateTimeFilter,
   DateTimeFilterQueryType,
@@ -74,6 +75,18 @@ export class FilterList extends React.PureComponent<FilterListProps> {
     }
   }
 
+  public renderNullFilterSelect(filter: Filter) {
+    if (!filter.nullable) {
+      return null;
+    }
+    const { IsNull, IsNotNull } = BaseFilterQueryType;
+    return [
+      <option key="separator" value="">{` ------ `}</option>,
+      <option key="isNull" value={IsNull}>{`Is NULL`}</option>,
+      <option key="isNotNull" value={IsNotNull}>{`Is Not NULL`}</option>,
+    ];
+  }
+
   public renderStringFilterSelect(filter: Filter) {
     const { handleQueryTypeChange } = this.props;
     return (
@@ -86,6 +99,7 @@ export class FilterList extends React.PureComponent<FilterListProps> {
         <option value={StringFilterQueryType.NotEqualTo}>Not equal to</option>
         <option value={StringFilterQueryType.Like}>Like</option>
         <option value={StringFilterQueryType.NotLike}>Not like</option>
+        {this.renderNullFilterSelect(filter)}
       </select>
     );
   }
@@ -108,6 +122,7 @@ export class FilterList extends React.PureComponent<FilterListProps> {
         <option value={IntegerFilterQueryType.GreaterThanOrEqualTo}>
           Greater than or equal to
         </option>
+        {this.renderNullFilterSelect(filter)}
       </select>
     );
   }
@@ -123,6 +138,7 @@ export class FilterList extends React.PureComponent<FilterListProps> {
       >
         <option value={BooleanFilterQueryType.True}>True</option>
         <option value={BooleanFilterQueryType.False}>False</option>
+        {this.renderNullFilterSelect(filter)}
       </select>
     );
   }
@@ -138,11 +154,18 @@ export class FilterList extends React.PureComponent<FilterListProps> {
       >
         <option value={DateTimeFilterQueryType.Before}>Before</option>
         <option value={DateTimeFilterQueryType.After}>After</option>
+        {this.renderNullFilterSelect(filter)}
       </select>
     );
   }
 
   public renderInput(filter: Filter) {
+    switch (filter.query) {
+      case BaseFilterQueryType.IsNull:
+      case BaseFilterQueryType.IsNotNull:
+        return <div />;
+      default:
+    }
     switch (filter.type) {
       case FilterType.StringFilterType:
         return this.renderStringInput(filter);
