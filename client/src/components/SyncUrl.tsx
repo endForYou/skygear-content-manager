@@ -19,7 +19,7 @@ export interface InjectedProps {
 
 export interface OwnProps {
   filterConfigs: FilterConfig[];
-  location: Location | null;
+  location: Location;
   dispatch: Dispatch<RootState>;
 }
 
@@ -87,15 +87,13 @@ function SyncUrl<P extends InjectedProps>(
     }
 
     public getFilterStr(props: Props) {
-      const { filter: filterStr = '[]' } = qs.parse(
-        props.location ? props.location.search : ''
-      );
+      const { filter: filterStr = '[]' } = qs.parse(props.location.search);
       return filterStr;
     }
 
     public onChange = (filters: Filter[]) => {
       const { dispatch, location } = this.props;
-      const search = qs.parse(location ? location.search : '');
+      const search = qs.parse(location.search);
       let filterStr = '';
       if (filters.length) {
         const filterObj = filters.map(oldFilter => {

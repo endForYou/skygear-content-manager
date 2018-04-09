@@ -1,3 +1,4 @@
+import { Location } from 'history';
 import * as qs from 'query-string';
 import * as React from 'react';
 import { connect } from 'react-redux';
@@ -6,7 +7,7 @@ import { Dispatch } from 'redux';
 
 import { PushCampaignActionDispatcher } from '../actions/pushCampaign';
 import Pagination from '../components/Pagination';
-import { RootState } from '../states';
+import { RootState, RouteProps } from '../states';
 import { PushCampaign } from '../types';
 
 const pageSize: number = 25;
@@ -76,6 +77,7 @@ const ListTable: React.SFC<ListTableProps> = ({ pushCampaigns }) => {
 export type PushNotificationListPageProps = StateProps & DispatchProps;
 
 export interface StateProps {
+  location: Location;
   page: number;
   maxPage: number;
   isLoading: boolean;
@@ -107,7 +109,7 @@ class PushNotificationListPageImpl extends React.PureComponent<
   }
 
   public render() {
-    const { page, maxPage, isLoading, pushCampaigns } = this.props;
+    const { location, page, maxPage, isLoading, pushCampaigns } = this.props;
 
     return (
       <div>
@@ -132,7 +134,7 @@ class PushNotificationListPageImpl extends React.PureComponent<
           {maxPage > 0 ? (
             <Pagination
               key="pagination"
-              pathname="/notification"
+              location={location}
               currentPage={page}
               maxPage={maxPage}
             />
@@ -148,9 +150,9 @@ class PushNotificationListPageImpl extends React.PureComponent<
 }
 
 function PushNotificationListPageFactory() {
-  function mapStateToProps(state: RootState): StateProps {
-    const { location } = state.router;
-    const { page: pageStr = '1' } = qs.parse(location ? location.search : '');
+  function mapStateToProps(state: RootState, props: RouteProps): StateProps {
+    const { location } = props;
+    const { page: pageStr = '1' } = qs.parse(location.search);
     const page = parseInt(pageStr, 10);
     const { isLoading, pushCampaigns, totalCount } = state.pushCampaign.list;
 
@@ -158,6 +160,7 @@ function PushNotificationListPageFactory() {
 
     return {
       isLoading,
+      location,
       maxPage,
       page,
       pushCampaigns,

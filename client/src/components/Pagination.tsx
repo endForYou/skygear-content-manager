@@ -1,9 +1,10 @@
+import { Location } from 'history';
 import * as React from 'react';
 
 import { PageItem } from './PageItem';
 
 export interface PaginationProps {
-  pathname: string;
+  location: Location;
   currentPage: number;
   maxPage: number;
 }
@@ -20,13 +21,13 @@ export default class Pagination extends React.PureComponent<PaginationProps> {
   }
 
   protected renderPaginationItems() {
-    const { pathname, currentPage, maxPage } = this.props;
+    const { location, currentPage, maxPage } = this.props;
 
     const middleItems = getPages(currentPage, maxPage).map(page => {
       return (
         <PageItem
           key={page}
-          pathname={pathname}
+          location={location}
           page={page}
           isActive={currentPage === page}
         >
@@ -38,7 +39,7 @@ export default class Pagination extends React.PureComponent<PaginationProps> {
     const prevItem = (
       <PageItem
         key="prev"
-        pathname={pathname}
+        location={location}
         page={currentPage - 1}
         isDisabled={currentPage <= 1}
       >
@@ -49,7 +50,7 @@ export default class Pagination extends React.PureComponent<PaginationProps> {
     const nextItem = (
       <PageItem
         key="next"
-        pathname={pathname}
+        location={location}
         page={currentPage + 1}
         isDisabled={currentPage >= maxPage}
       >

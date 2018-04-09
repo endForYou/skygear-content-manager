@@ -1,9 +1,11 @@
 import classNames from 'classnames';
+import { Location } from 'history';
+import * as qs from 'query-string';
 import * as React from 'react';
 import { Link } from 'react-router-dom';
 
 export interface PageItemProps {
-  pathname: string;
+  location: Location;
   page: number;
   isDisabled?: boolean;
   isActive?: boolean;
@@ -15,11 +17,12 @@ export class PageItem extends React.PureComponent<PageItemProps> {
   public render() {
     const {
       children,
-      pathname,
+      location,
       page,
       isDisabled = false,
       isActive = false,
     } = this.props;
+    const { pathname } = location;
 
     if (isDisabled) {
       return (
@@ -31,9 +34,14 @@ export class PageItem extends React.PureComponent<PageItemProps> {
       const itemClassName = classNames('page-item', {
         active: isActive,
       });
+      const search = qs.parse(location.search);
+      search.page = page;
       return (
         <li className={itemClassName}>
-          <Link className="page-link" to={`${pathname}?page=${page}`}>
+          <Link
+            className="page-link"
+            to={`${pathname}?${qs.stringify(search)}`}
+          >
             {children}
           </Link>
         </li>

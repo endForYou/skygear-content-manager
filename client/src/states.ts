@@ -1,3 +1,4 @@
+import { RouteComponentProps } from 'react-router';
 import { RouterState } from 'react-router-redux';
 import { Record } from 'skygear';
 
@@ -24,6 +25,8 @@ export interface RootState {
   router: RouterState;
   user: UserState;
 }
+
+export type RouteProps = RouteComponentProps<any>; // tslint:disable-line: no-any
 
 export interface AuthState {
   user?: Record;

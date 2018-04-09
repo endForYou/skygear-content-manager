@@ -1,3 +1,4 @@
+import { Location } from 'history';
 import * as qs from 'query-string';
 import * as React from 'react';
 import { connect } from 'react-redux';
@@ -11,7 +12,7 @@ import { Role } from 'skygear';
 import { UserActionDispatcher } from '../../actions/user';
 import { LoadingSpinner } from '../../components/LoadingSpinner';
 import Pagination from '../../components/Pagination';
-import { RootState } from '../../states';
+import { RootState, RouteProps } from '../../states';
 import { SkygearUser } from '../../types';
 import { debounce } from '../../util';
 
@@ -120,6 +121,7 @@ type UserListPageProps = StateProps & DispatchProps;
 
 interface StateProps {
   adminRole: string;
+  location: Location;
   page: number;
   maxPage: number;
   isLoading: boolean;
@@ -151,7 +153,7 @@ class UserListPageImpl extends React.PureComponent<UserListPageProps> {
   }
 
   public render() {
-    const { adminRole, isLoading, maxPage, page, users } = this.props;
+    const { adminRole, isLoading, location, maxPage, page, users } = this.props;
 
     return (
       <div>
@@ -178,7 +180,7 @@ class UserListPageImpl extends React.PureComponent<UserListPageProps> {
           })()}
           {maxPage > 0 ? (
             <Pagination
-              pathname="/user-management"
+              location={location}
               currentPage={page}
               maxPage={maxPage}
             />
@@ -203,9 +205,9 @@ class UserListPageImpl extends React.PureComponent<UserListPageProps> {
 }
 
 function UserListPageFactory() {
-  function mapStateToProps(state: RootState): StateProps {
-    const { location } = state.router;
-    const { page: pageStr = '1' } = qs.parse(location ? location.search : '');
+  function mapStateToProps(state: RootState, props: RouteProps): StateProps {
+    const { location } = props;
+    const { page: pageStr = '1' } = qs.parse(location.search);
     const page = parseInt(pageStr, 10);
 
     const adminRole = state.adminRole;
@@ -216,6 +218,7 @@ function UserListPageFactory() {
     return {
       adminRole,
       isLoading,
+      location,
       maxPage,
       page,
       users,

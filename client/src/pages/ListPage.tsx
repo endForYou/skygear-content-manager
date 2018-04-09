@@ -45,7 +45,7 @@ import Pagination from '../components/Pagination';
 import { SpaceSeperatedList } from '../components/SpaceSeperatedList';
 import SyncUrl, { InjectedProps } from '../components/SyncUrl';
 import { Field, FieldContext } from '../fields';
-import { getCmsConfig, ImportState, RootState } from '../states';
+import { getCmsConfig, ImportState, RootState, RouteProps } from '../states';
 import { RemoteType } from '../types';
 import { debounce } from '../util';
 
@@ -161,7 +161,7 @@ export interface StateProps {
   filterConfigs: FilterConfig[];
   import: ImportState;
   isLoading: boolean;
-  location: Location | null;
+  location: Location;
   maxPage: number;
   page: number;
   pageConfig: ListPageConfig;
@@ -440,7 +440,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
   public render() {
     const {
       filters,
-      recordName,
+      location,
       pageConfig,
       page,
       maxPage,
@@ -449,7 +449,6 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
     } = this.props;
 
     const { showfilterMenu } = this.state;
-    const pathname = `/records/${recordName}`;
 
     return (
       <div>
@@ -526,7 +525,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
           {maxPage > 0 ? (
             <Pagination
               key="pagination"
-              pathname={pathname}
+              location={location}
               currentPage={page}
               maxPage={maxPage}
             />
@@ -547,9 +546,9 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
 }
 
 function ListPageFactory(recordName: string) {
-  function mapStateToProps(state: RootState): StateProps {
-    const { location } = state.router;
-    const { page: pageStr = '1' } = qs.parse(location ? location.search : '');
+  function mapStateToProps(state: RootState, props: RouteProps): StateProps {
+    const { location } = props;
+    const { page: pageStr = '1' } = qs.parse(location.search);
     const page = parseInt(pageStr, 10);
 
     const recordConfig = getCmsConfig(state).records[recordName];
