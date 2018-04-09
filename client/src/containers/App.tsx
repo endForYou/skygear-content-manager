@@ -1,7 +1,10 @@
+import './App.css';
+
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { Redirect, Route, Switch } from 'react-router-dom';
 
+import * as loading from '../assets/loading.gif';
 import { CmsConfigState, RootState } from '../states';
 import { RemoteType } from '../types';
 
@@ -23,12 +26,22 @@ const App: React.StatelessComponent<AppProps> = ({ cmsConfig, isLoggedIn }) => {
     );
   }
 
-  if (cmsConfig && cmsConfig.type === RemoteType.Success) {
-    return <MainPage />;
+  if (cmsConfig) {
+    switch (cmsConfig.type) {
+      case RemoteType.Loading:
+        return <img className="img-config-loading" src={loading} />;
+      case RemoteType.Failure:
+        return (
+          <div>
+            <h4 className="m-1">Failed to load configuration file.</h4>
+            <p className="m-1 text-danger">{`${cmsConfig.error}`}</p>
+          </div>
+        );
+      case RemoteType.Success:
+        return <MainPage />;
+    }
   }
 
-  // TODO (Steven-Chan):
-  // render cms loading page
   return null;
 };
 
