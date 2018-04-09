@@ -42,7 +42,6 @@ const defaultEditorInitObj = {
   height: 480,
   plugins:
     'anchor charmap code colorpicker contextmenu fullscreen hr image imagetools link lists nonbreaking paste tabfocus table textcolor',
-  selector: 'textarea',
   skin_url:
     (config.staticUrl === '.' ? '/' : config.staticUrl) +
     'tinymce/skins/lightgray',
