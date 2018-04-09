@@ -58,6 +58,26 @@ export function join<V, S>(xs: V[], sep: S): Array<V | S> {
   );
 }
 
+// tslint:disable:no-any
+// True for same shallow value, otherwise false.
+export function shallowCompare(
+  a: { [key: string]: any },
+  b: { [key: string]: any }
+) {
+  for (const i in a) {
+    if (!(i in b)) {
+      return false;
+    }
+  }
+  for (const i in b) {
+    if (a[i] !== b[i]) {
+      return false;
+    }
+  }
+  return true;
+}
+// tslint:enable:no-any
+
 export function capitalize(str: string): string {
   return str.charAt(0).toUpperCase() + str.substring(1);
 }

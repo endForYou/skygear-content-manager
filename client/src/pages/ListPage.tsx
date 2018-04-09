@@ -42,12 +42,12 @@ import {
 } from '../components/ImportModal';
 import { LinkButton } from '../components/LinkButton';
 import Pagination from '../components/Pagination';
-import {
-  SortButton,
-  SortOrder,
-} from '../components/SortButton';
+import { SortButton, SortOrder } from '../components/SortButton';
 import { SpaceSeperatedList } from '../components/SpaceSeperatedList';
-import SyncUrl, { InjectedProps } from '../components/SyncUrl';
+import {
+  InjectedProps as SyncFilterProps,
+  syncFilterWithUrl,
+} from '../components/SyncUrl/SyncUrlFilter';
 import { Field, FieldContext } from '../fields';
 import { getCmsConfig, ImportState, RootState, RouteProps } from '../states';
 import { RemoteType } from '../types';
@@ -228,7 +228,7 @@ const ListTable: React.SFC<ListTableProps> = ({
   );
 };
 
-export type ListPageProps = StateProps & DispatchProps & InjectedProps;
+export type ListPageProps = StateProps & DispatchProps & SyncFilterProps;
 
 export interface StateProps {
   filterConfigs: FilterConfig[];
@@ -682,7 +682,7 @@ function ListPageFactory(recordName: string) {
     return { dispatch };
   }
 
-  const SyncedListPage = SyncUrl(ListPageImpl);
+  const SyncedListPage = syncFilterWithUrl(ListPageImpl);
   return connect(mapStateToProps, mapDispatchToProps)(SyncedListPage);
 }
 
