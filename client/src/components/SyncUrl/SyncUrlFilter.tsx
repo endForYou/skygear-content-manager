@@ -105,15 +105,9 @@ export function syncFilterWithUrl<P extends InjectedProps>(
 
     // tslint:disable:jsx-wrap-multiline
     public render() {
-      const {
-        dispatch,
-        filterConfigs,
-        location,
-      } = this.props;
+      const { dispatch, filterConfigs, location } = this.props;
 
-      const {
-        filters,
-      } = this.state;
+      const { filters } = this.state;
 
       return [
         <SyncToUrl

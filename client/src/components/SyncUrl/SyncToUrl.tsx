@@ -49,7 +49,11 @@ export class SyncToUrl extends React.PureComponent<
     return null;
   }
 
-  private mergeLocationSearch(location: Location, keys: string[], searchToMerge: SearchParams) {
+  private mergeLocationSearch(
+    location: Location,
+    keys: string[],
+    searchToMerge: SearchParams
+  ) {
     const search = qs.parse(location ? location.search : '');
     return keys.reduce((acc: SearchParams, key: string) => {
       if (!(key in searchToMerge) || searchToMerge[key] === '') {

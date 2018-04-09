@@ -42,32 +42,24 @@ import {
 } from '../components/ImportModal';
 import { LinkButton } from '../components/LinkButton';
 import Pagination from '../components/Pagination';
-import { SortButton, SortOrder } from '../components/SortButton';
+import { SortButton } from '../components/SortButton';
 import { SpaceSeperatedList } from '../components/SpaceSeperatedList';
 import {
   InjectedProps as SyncFilterProps,
   syncFilterWithUrl,
 } from '../components/SyncUrl/SyncUrlFilter';
+import {
+  InjectedProps as SyncSortProps,
+  syncSortWithUrl,
+} from '../components/SyncUrl/SyncUrlSort';
 import { Field, FieldContext } from '../fields';
 import { getCmsConfig, ImportState, RootState, RouteProps } from '../states';
-import { RemoteType } from '../types';
+import { RemoteType, SortOrder, SortState } from '../types';
 import { debounce } from '../util';
 
 type SortButtonClickHandler = (name: string) => void;
 
-interface SortState {
-  fieldName: string | undefined;
-  order: SortOrder;
-}
-
-function SortState() {
-  return {
-    fieldName: undefined,
-    order: SortOrder.Undefined,
-  };
-}
-
-function nextSortState(
+export function nextSortState(
   sortState: SortState,
   selectedFieldName: string
 ): SortState {
@@ -228,7 +220,10 @@ const ListTable: React.SFC<ListTableProps> = ({
   );
 };
 
-export type ListPageProps = StateProps & DispatchProps & SyncFilterProps;
+export type ListPageProps = StateProps &
+  DispatchProps &
+  SyncFilterProps &
+  SyncSortProps;
 
 export interface StateProps {
   filterConfigs: FilterConfig[];
@@ -245,7 +240,6 @@ export interface StateProps {
 interface State {
   exporting?: ExportActionConfig;
   showfilterMenu: boolean;
-  sortState: SortState;
 }
 
 export interface DispatchProps {
@@ -263,7 +257,6 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
     this.state = {
       exporting: undefined,
       showfilterMenu: false,
-      sortState: SortState(),
     };
 
     this.recordActionCreator = new RecordActionDispatcher(
@@ -424,8 +417,8 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
   }
 
   public onSortButtonClick(name: string) {
-    const sortState = nextSortState(this.state.sortState, name);
-    this.setState({ sortState }, () => this.reloadList(this.props));
+    const sortState = nextSortState(this.props.sortState, name);
+    this.props.onChangeSort(sortState);
   }
 
   public renderActionButton(
@@ -528,9 +521,10 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
       maxPage,
       isLoading,
       records,
+      sortState,
     } = this.props;
 
-    const { showfilterMenu, sortState } = this.state;
+    const { showfilterMenu } = this.state;
 
     return (
       <div>
@@ -635,8 +629,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
   }
 
   public reloadList(props: ListPageProps) {
-    const { filters, page, pageConfig } = props;
-    const { sortState } = this.state;
+    const { filters, page, pageConfig, sortState } = props;
     this.fetchList(page, pageConfig.perPage, filters, sortState);
   }
 }
@@ -682,7 +675,7 @@ function ListPageFactory(recordName: string) {
     return { dispatch };
   }
 
-  const SyncedListPage = syncFilterWithUrl(ListPageImpl);
+  const SyncedListPage = syncSortWithUrl(syncFilterWithUrl(ListPageImpl));
   return connect(mapStateToProps, mapDispatchToProps)(SyncedListPage);
 }
 

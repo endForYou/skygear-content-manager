@@ -3,11 +3,7 @@ import './SortButton.css';
 import classnames from 'classnames';
 import * as React from 'react';
 
-export enum SortOrder {
-  Undefined = 'undefined',
-  Ascending = 'ascending',
-  Descending = 'descending',
-}
+import { SortOrder } from '../types';
 
 interface SortButtonProps extends React.AnchorHTMLAttributes<HTMLDivElement> {
   sortOrder: SortOrder;
