@@ -38,7 +38,7 @@ export class EmbeddedBackReferenceField extends React.PureComponent<
 
     const { context, config } = props;
     const $transient = context.record.$transient;
-    const embeddedRecords = $transient[config.name] as Record[];
+    const embeddedRecords = ($transient[config.name] as Record[]) || [];
 
     this.state = {
       embeddedRecordDelete: [],
