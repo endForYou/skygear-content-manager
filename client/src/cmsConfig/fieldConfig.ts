@@ -46,6 +46,11 @@ export enum SortOrder {
   Desc = 'Desc',
 }
 
+export enum DeleteAction {
+  NullifyReference = 'NullifyReference',
+  DeleteRecord = 'DeleteRecord',
+}
+
 export interface FieldConfigAttrs {
   name: string;
   label: string;
@@ -134,6 +139,7 @@ export interface EmbeddedBackReferenceFieldConfig extends FieldConfigAttrs {
   positionFieldName?: string;
   sortOrder: SortOrder;
   references: ReferenceConfig[];
+  referenceDeleteAction: DeleteAction;
 }
 
 export interface ImageAssetFieldConfig extends FieldConfigAttrs {
@@ -359,11 +365,26 @@ function parseEmbeddedBackReferenceFieldConfig(
     sortOrder = SortOrder.Desc;
   }
 
+  let referenceDeleteAction: DeleteAction;
+  if (
+    input.reference_delete_action == null ||
+    input.reference_delete_action === 'nullify-reference'
+  ) {
+    referenceDeleteAction = DeleteAction.NullifyReference;
+  } else if (input.reference_delete_action === 'delete-record') {
+    referenceDeleteAction = DeleteAction.DeleteRecord;
+  } else {
+    throw new Error(
+      `Unexpected delete_action value: ${input.reference_delete_action}`
+    );
+  }
+
   return {
     ...parseFieldConfigAttrs(input, 'EmbeddedReference'),
     ...parseBackReferenceFieldConfigAttrs(context, input),
     displayFields,
     positionFieldName,
+    referenceDeleteAction,
     references: filterReferences(displayFields),
     sortOrder,
     type: FieldConfigTypes.EmbeddedBackReference,
