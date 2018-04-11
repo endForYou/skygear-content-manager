@@ -5,31 +5,6 @@ import { WYSIWYGFieldConfig } from '../cmsConfig';
 import config from '../config';
 import { RequiredFieldProps } from './Field';
 
-// tslint:disable no-submodule-imports ordered-imports
-import 'tinymce/tinymce';
-import 'tinymce/themes/modern/theme';
-// tslint:enable no-submodule-imports ordered-imports
-
-// this list of imports should match EditorInitObj.plugins
-// tslint:disable no-submodule-imports
-import 'tinymce/plugins/anchor';
-import 'tinymce/plugins/charmap';
-import 'tinymce/plugins/code';
-import 'tinymce/plugins/colorpicker';
-import 'tinymce/plugins/contextmenu';
-import 'tinymce/plugins/fullscreen';
-import 'tinymce/plugins/hr';
-import 'tinymce/plugins/image';
-import 'tinymce/plugins/imagetools';
-import 'tinymce/plugins/link';
-import 'tinymce/plugins/lists';
-import 'tinymce/plugins/nonbreaking';
-import 'tinymce/plugins/paste';
-import 'tinymce/plugins/tabfocus';
-import 'tinymce/plugins/table';
-import 'tinymce/plugins/textcolor';
-// tslint:enable no-submodule-imports
-
 export type WYSIWYGEditorProps = RequiredFieldProps<WYSIWYGFieldConfig>;
 
 interface State {

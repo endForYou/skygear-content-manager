@@ -398,6 +398,7 @@ INDEX_HTML_FORMAT = """<!doctype html>
       You need to enable JavaScript to run this app.
     </noscript>
     <div id="root"></div>
+    <script type="text/javascript" src="{CMS_STATIC_URL}tinymce/tinymce.min.js"></script>
     <script type="text/javascript" src="{CMS_STATIC_URL}static/js/main.js"></script>
     <script type="text/javascript">
       skygearCMS.start({{
