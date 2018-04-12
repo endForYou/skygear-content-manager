@@ -230,6 +230,7 @@ export interface EmbeddedBackReferenceFieldConfig extends FieldConfigAttrs {
   displayFields: FieldConfig[];
   positionFieldName?: string;
   sortOrder: SortOrder;
+  references: ReferenceConfig[];
 }
 
 export interface ImageAssetFieldConfig extends FieldConfigAttrs {
@@ -695,15 +696,16 @@ function parseRecordFormPageConfig(
   const fields = input.fields.map((f: any) =>
     parseFieldConfig(context, f)
   ) as FieldConfig[];
-  const editableFields = fields.map(config => {
+  const recursivelyMakeEditableField = (config: FieldConfig): FieldConfig => {
     if (config.type === FieldConfigTypes.EmbeddedBackReference) {
       config = {
         ...config,
-        displayFields: config.displayFields.map(makeEditableField),
+        displayFields: config.displayFields.map(recursivelyMakeEditableField),
       };
     }
     return makeEditableField(config);
-  });
+  };
+  const editableFields = fields.map(recursivelyMakeEditableField);
 
   return {
     actions: parseRecordFormActions(input.actions),
@@ -936,12 +938,12 @@ function parseBackReferenceFieldConfig(
 }
 
 function parseEmbeddedBackReferenceFieldConfig(
-  context: RecordTypeContext,
+  context: ConfigContext,
   input: FieldConfigInput
 ): EmbeddedBackReferenceFieldConfig {
   // tslint:disable-next-line: no-any
   const displayFields = input.reference_fields.map((f: any) =>
-    parseNonReferenceFieldConfig(context, f)
+    parseFieldConfig(context, f)
   ) as FieldConfig[];
 
   const positionFieldName = parseOptionalString(
@@ -960,6 +962,7 @@ function parseEmbeddedBackReferenceFieldConfig(
     ...parseBackReferenceFieldConfigAttrs(context, input),
     displayFields,
     positionFieldName,
+    references: filterReferences(displayFields),
     sortOrder,
     type: FieldConfigTypes.EmbeddedBackReference,
   };
