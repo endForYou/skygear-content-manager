@@ -351,6 +351,8 @@ function fetchRecordList(
   filters: Filter[],
   page: number = 1,
   perPage: number = 25,
+  sortByName: string | undefined,
+  isAscending: boolean,
   context: string
 ): ThunkAction<Promise<void>, {}, {}> {
   return dispatch => {
@@ -360,7 +362,15 @@ function fetchRecordList(
     query.overallCount = true;
     query.limit = perPage;
     query.offset = (page - 1) * perPage;
-    query.addDescending('_created_at');
+
+    if (!sortByName) {
+      // default sorting
+      query.addDescending('_created_at');
+    } else if (isAscending) {
+      query.addAscending(sortByName);
+    } else {
+      query.addDescending(sortByName);
+    }
 
     dispatch(fetchRecordListRequest(cmsRecord, page, context));
     return queryWithTarget(query, references).then(
@@ -771,8 +781,18 @@ export class RecordActionDispatcher {
   public fetchList(
     page: number,
     perPage: number,
-    filters: Filter[] = []
+    filters: Filter[] = [],
+    sortByName: string | undefined,
+    isAscending: boolean
   ): Promise<void> {
+    // TODO (Steven-Chan):
+    // Handle reserved field sorting in a better way
+    if (sortByName === 'createdAt') {
+      sortByName = '_created_at';
+    } else if (sortByName === 'updatedAt') {
+      sortByName = '_updated_at';
+    }
+
     return this.dispatch(
       fetchRecordList(
         this.cmsRecord,
@@ -780,6 +800,8 @@ export class RecordActionDispatcher {
         filters,
         page,
         perPage,
+        sortByName,
+        isAscending,
         this.context
       )
     );

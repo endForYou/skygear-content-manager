@@ -116,6 +116,9 @@ records:
           label: Country
           reference_target: country
           reference_field_name: _id
+      filters:
+        - name: name
+          type: String
       actions:
         - type: Import
           name: import-user

@@ -42,20 +42,77 @@ import {
 } from '../components/ImportModal';
 import { LinkButton } from '../components/LinkButton';
 import Pagination from '../components/Pagination';
+import { SortButton } from '../components/SortButton';
 import { SpaceSeperatedList } from '../components/SpaceSeperatedList';
-import SyncUrl, { InjectedProps } from '../components/SyncUrl';
+import {
+  InjectedProps as SyncFilterProps,
+  syncFilterWithUrl,
+} from '../components/SyncUrl/SyncUrlFilter';
+import {
+  InjectedProps as SyncSortProps,
+  syncSortWithUrl,
+} from '../components/SyncUrl/SyncUrlSort';
 import { Field, FieldContext } from '../fields';
 import { getCmsConfig, ImportState, RootState, RouteProps } from '../states';
-import { RemoteType } from '../types';
+import { RemoteType, SortOrder, SortState } from '../types';
 import { debounce } from '../util';
+
+type SortButtonClickHandler = (name: string) => void;
+
+export function nextSortState(
+  sortState: SortState,
+  selectedFieldName: string
+): SortState {
+  if (sortState.fieldName !== selectedFieldName) {
+    return { fieldName: selectedFieldName, order: SortOrder.Ascending };
+  }
+
+  // derive next sort order
+  let order: SortOrder = SortOrder.Undefined;
+  switch (sortState.order) {
+    case SortOrder.Undefined:
+      order = SortOrder.Ascending;
+      break;
+    case SortOrder.Ascending:
+      order = SortOrder.Descending;
+      break;
+    case SortOrder.Descending:
+      order = SortOrder.Undefined;
+      break;
+  }
+
+  return {
+    fieldName: order === SortOrder.Undefined ? undefined : sortState.fieldName,
+    order,
+  };
+}
 
 interface TableHeaderProps {
   fieldConfigs: FieldConfig[];
+  sortState: SortState;
+  onSortButtonClick: SortButtonClickHandler;
 }
 
-const TableHeader: React.SFC<TableHeaderProps> = ({ fieldConfigs }) => {
+const TableHeader: React.SFC<TableHeaderProps> = ({
+  fieldConfigs,
+  sortState,
+  onSortButtonClick,
+}) => {
   const columns = fieldConfigs.map((fieldConfig, index) => {
-    return <th key={index}>{fieldConfig.label}</th>;
+    const sortOrder =
+      fieldConfig.name === sortState.fieldName
+        ? sortState.order
+        : SortOrder.Undefined;
+    return (
+      <th key={index}>
+        {fieldConfig.label}
+        <SortButton
+          className="d-inline-block mx-1"
+          sortOrder={sortOrder}
+          onClick={() => onSortButtonClick(fieldConfig.name)}
+        />
+      </th>
+    );
   });
   return (
     <thead className="thead-light">
@@ -135,17 +192,25 @@ const TableBody: React.SFC<TableBodyProps> = ({
 interface ListTableProps {
   fieldConfigs: FieldConfig[];
   itemActions: ListItemActionConfig[];
+  sortState: SortState;
+  onSortButtonClick: SortButtonClickHandler;
   records: Record[];
 }
 
 const ListTable: React.SFC<ListTableProps> = ({
   fieldConfigs,
   itemActions,
+  onSortButtonClick,
   records,
+  sortState,
 }) => {
   return (
     <table key="table" className="table table-sm table-hover table-responsive">
-      <TableHeader fieldConfigs={fieldConfigs} />
+      <TableHeader
+        fieldConfigs={fieldConfigs}
+        sortState={sortState}
+        onSortButtonClick={onSortButtonClick}
+      />
       <TableBody
         fieldConfigs={fieldConfigs}
         itemActions={itemActions}
@@ -155,7 +220,10 @@ const ListTable: React.SFC<ListTableProps> = ({
   );
 };
 
-export type ListPageProps = StateProps & DispatchProps & InjectedProps;
+export type ListPageProps = StateProps &
+  DispatchProps &
+  SyncFilterProps &
+  SyncSortProps;
 
 export interface StateProps {
   filterConfigs: FilterConfig[];
@@ -201,6 +269,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
     this.fetchList = debounce(this.fetchList.bind(this), 200);
 
     this.onImportFileSelected = this.onImportFileSelected.bind(this);
+    this.onSortButtonClick = this.onSortButtonClick.bind(this);
   }
 
   public componentDidMount() {
@@ -316,6 +385,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
         return f;
       }
     });
+
     this.props.onChangeFilter(filters);
   }
 
@@ -344,6 +414,11 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
   public onImportFileSelected(actionConfig: ImportActionConfig, file: File) {
     const { dispatch } = this.props;
     dispatch(importRecords(actionConfig.name, file));
+  }
+
+  public onSortButtonClick(name: string) {
+    const sortState = nextSortState(this.props.sortState, name);
+    this.props.onChangeSort(sortState);
   }
 
   public renderActionButton(
@@ -446,6 +521,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
       maxPage,
       isLoading,
       records,
+      sortState,
     } = this.props;
 
     const { showfilterMenu } = this.state;
@@ -517,6 +593,8 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
                     fieldConfigs={pageConfig.fields}
                     itemActions={pageConfig.itemActions}
                     records={records}
+                    sortState={sortState}
+                    onSortButtonClick={this.onSortButtonClick}
                   />
                 );
               }
@@ -535,13 +613,24 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
     );
   }
 
-  public fetchList(page: number, perPage: number, filters: Filter[]) {
-    this.recordActionCreator.fetchList(page, perPage, filters);
+  public fetchList(
+    page: number,
+    perPage: number,
+    filters: Filter[],
+    sortState: SortState
+  ) {
+    this.recordActionCreator.fetchList(
+      page,
+      perPage,
+      filters,
+      sortState.fieldName,
+      sortState.order === SortOrder.Ascending
+    );
   }
 
   public reloadList(props: ListPageProps) {
-    const { filters, page, pageConfig } = props;
-    this.fetchList(page, pageConfig.perPage, filters);
+    const { filters, page, pageConfig, sortState } = props;
+    this.fetchList(page, pageConfig.perPage, filters, sortState);
   }
 }
 
@@ -586,7 +675,7 @@ function ListPageFactory(recordName: string) {
     return { dispatch };
   }
 
-  const SyncedListPage = SyncUrl(ListPageImpl);
+  const SyncedListPage = syncSortWithUrl(syncFilterWithUrl(ListPageImpl));
   return connect(mapStateToProps, mapDispatchToProps)(SyncedListPage);
 }
 
