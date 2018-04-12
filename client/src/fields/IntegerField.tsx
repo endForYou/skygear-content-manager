@@ -1,7 +1,4 @@
 import * as React from 'react';
-import * as NumericInput from 'react-numeric-input';
-// tslint:disable-next-line: no-submodule-imports
-import 'react-toggle/style.css';
 
 import { IntegerFieldConfig } from '../cmsConfig';
 import { RequiredFieldProps } from './Field';
@@ -10,6 +7,7 @@ export type IntegerFieldProps = RequiredFieldProps<IntegerFieldConfig>;
 
 interface State {
   value: number;
+  stringValue: string;
 }
 
 class IntegerFieldImpl extends React.PureComponent<IntegerFieldProps, State> {
@@ -17,12 +15,19 @@ class IntegerFieldImpl extends React.PureComponent<IntegerFieldProps, State> {
     super(props);
 
     this.state = {
-      value: this.props.value,
+      stringValue: props.value == null ? '' : `${props.value}`,
+      value: props.value,
     };
   }
 
   public componentWillReceiveProps(nextProps: IntegerFieldProps) {
-    this.setState({ ...this.state, value: nextProps.value });
+    if (nextProps.value !== this.state.value) {
+      this.setState({
+        ...this.state,
+        stringValue: nextProps.value == null ? '' : `${nextProps.value}`,
+        value: nextProps.value,
+      });
+    }
   }
 
   public render() {
@@ -35,10 +40,10 @@ class IntegerFieldImpl extends React.PureComponent<IntegerFieldProps, State> {
 
     if (editable) {
       return (
-        <NumericInput
+        <input
           {...rest}
-          step={1}
-          value={this.state.value}
+          type="text"
+          value={this.state.stringValue}
           onChange={this.handleChange}
         />
       );
@@ -47,15 +52,23 @@ class IntegerFieldImpl extends React.PureComponent<IntegerFieldProps, State> {
     }
   }
 
-  public handleChange = (num: number | null, str: string): void => {
-    if (num === null) {
+  public handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    let value = event.target.value.trim();
+    if (value === '' || value === '-') {
+      value = '0';
+    }
+
+    const isValid = /^-?\d+$/.test(value);
+    if (!isValid) {
       return;
     }
 
-    this.setState({ ...this.state, value: num });
-    if (this.props.onFieldChange) {
-      this.props.onFieldChange(num);
-    }
+    const num = parseInt(value, 10);
+    this.setState({ ...this.state, stringValue: value, value: num }, () => {
+      if (this.props.onFieldChange) {
+        this.props.onFieldChange(num);
+      }
+    });
   };
 }
 
