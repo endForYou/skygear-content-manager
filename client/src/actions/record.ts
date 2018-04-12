@@ -27,6 +27,7 @@ import {
   IntegerFilterQueryType,
   ReferenceConfig,
   ReferenceFieldConfig,
+  SortOrder,
   StringFilter,
   StringFilterQueryType,
 } from '../cmsConfig';
@@ -538,6 +539,8 @@ function createGeneralFilterQuery(filter: GeneralFilter, recordCls: RecordCls) {
 
 interface BackReferenceAttrs {
   name: string;
+  positionFieldName: string;
+  sortOrder: SortOrder;
   sourceFieldName: string;
   targetCmsRecord: CmsRecord;
 }
@@ -547,8 +550,22 @@ interface BackReferenceAttrs {
 function BackReferenceAttrs(
   a: BackReferenceFieldConfig | EmbeddedBackReferenceFieldConfig
 ): BackReferenceAttrs {
+  let positionFieldName: string;
+  let sortOrder: SortOrder;
+  if (a.type === FieldConfigTypes.BackReference) {
+    positionFieldName = '_created_at';
+    sortOrder = SortOrder.Desc;
+  } else {
+    // since EmbeddedBackReference would create new child record
+    // to display the new child record at last, the default sorting is asc for _created_at
+    positionFieldName = a.positionFieldName || '_created_at';
+    sortOrder = a.positionFieldName != null ? a.sortOrder : SortOrder.Asc;
+  }
+
   return {
     name: a.name,
+    positionFieldName,
+    sortOrder,
     sourceFieldName: a.sourceFieldName,
     targetCmsRecord: a.targetCmsRecord,
   };
@@ -643,7 +660,11 @@ function fetchReferentsWithTarget(
   return fetchReferentRecords(
     sourceIds,
     backRefConfig.targetCmsRecord.recordType,
-    backRefConfig.sourceFieldName
+    backRefConfig.sourceFieldName,
+    {
+      sortAscending: backRefConfig.sortOrder === SortOrder.Asc,
+      sortByField: backRefConfig.positionFieldName,
+    }
   );
 }
 
@@ -697,7 +718,9 @@ function fetchAssociationRecordsWithTarget(
     sourceIds,
     assoRefConfig.associationRecordConfig.cmsRecord.recordType,
     assoRefConfig.sourceReference.name,
-    assoRefConfig.targetReference.name
+    {
+      transientIncludeFieldName: assoRefConfig.targetReference.name,
+    }
   );
 }
 
@@ -705,15 +728,27 @@ function fetchReferentRecords(
   sourceIds: string[],
   recordType: string,
   sourceFieldName: string,
-  transientIncludeFieldName?: string
+  option?: {
+    transientIncludeFieldName?: string;
+    sortByField?: string;
+    sortAscending?: boolean;
+  }
 ): Promise<Record[]> {
   const query = new Query(Record.extend(recordType));
   query.limit = 1024;
-  query.addDescending('_created_at');
+
+  const sortByField =
+    option && option.sortByField ? option.sortByField : '_created_at';
+  const sortAscending = !!(option && option.sortAscending);
+  if (sortAscending) {
+    query.addAscending(sortByField);
+  } else {
+    query.addDescending(sortByField);
+  }
 
   query.contains(sourceFieldName, sourceIds);
-  if (transientIncludeFieldName) {
-    query.transientInclude(transientIncludeFieldName);
+  if (option && option.transientIncludeFieldName) {
+    query.transientInclude(option.transientIncludeFieldName);
   }
 
   return skygear.publicDB

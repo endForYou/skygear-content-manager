@@ -25,6 +25,10 @@ export function get(o: any, keypath: string[] | string): any {
   );
 }
 
+export function swap<T>(a: T[], from: number, to: number): void {
+  [a[from], a[to]] = [a[to], a[from]];
+}
+
 export function makeArray<T>(value: T | T[] | null | undefined): T[] {
   if (Array.isArray(value)) {
     return value;

@@ -1,0 +1,28 @@
+.arrow-button {
+    background: 0 0;
+    border: 0;
+    padding: 0;
+}
+
+.arrow {
+    border: solid black;
+    display: inline-block;
+    border-width: 0 0.25rem 0.25rem 0;
+    padding: 0.25rem;
+}
+
+.right {
+    transform: rotate(-45deg);
+}
+
+.left {
+    transform: rotate(135deg);
+}
+
+.up {
+    transform: translateY(0.125rem) rotate(-135deg);
+}
+
+.down {
+    transform: translateY(-0.125rem) rotate(45deg);
+}
