@@ -546,8 +546,10 @@ function BackReferenceAttrs(
     positionFieldName = '_created_at';
     sortOrder = SortOrder.Desc;
   } else {
+    // since EmbeddedBackReference would create new child record
+    // to display the new child record at last, the default sorting is asc for _created_at
     positionFieldName = a.positionFieldName || '_created_at';
-    sortOrder = a.positionFieldName != null ? a.sortOrder : SortOrder.Desc;
+    sortOrder = a.positionFieldName != null ? a.sortOrder : SortOrder.Asc;
   }
 
   return {
