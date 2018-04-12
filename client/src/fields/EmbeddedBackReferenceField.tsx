@@ -227,7 +227,7 @@ function EmbeddedRecordView({
     );
   });
   return (
-    <form className={className}>
+    <div className={className}>
       {removable && (
         <button
           type="button"
@@ -239,7 +239,7 @@ function EmbeddedRecordView({
         </button>
       )}
       {formGroups}
-    </form>
+    </div>
   );
 }
 
