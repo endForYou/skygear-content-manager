@@ -168,6 +168,7 @@ export interface DropdownFieldConfig extends FieldConfigAttrs {
 
 export interface WYSIWYGFieldConfig extends FieldConfigAttrs {
   type: FieldConfigTypes.WYSIWYG;
+  config?: any; // tslint:disable-line: no-any
 }
 
 export interface DateTimeFieldConfig extends FieldConfigAttrs {
@@ -815,6 +816,7 @@ function parseDropdownFieldConfig(
 function parseWYSIWYGFieldConfig(input: FieldConfigInput): WYSIWYGFieldConfig {
   return {
     ...parseFieldConfigAttrs(input, 'WYSIWYG'),
+    config: input.config,
     type: FieldConfigTypes.WYSIWYG,
   };
 }

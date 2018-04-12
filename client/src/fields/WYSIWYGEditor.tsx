@@ -44,11 +44,11 @@ export class WYSIWYGEditor extends React.PureComponent<
   }
 
   public render() {
-    const editable = this.props.config.editable;
+    const { config: userConfig, editable } = this.props.config;
     const { value } = this.state;
 
     // tslint:disable-next-line: no-any
-    const editorEditInitObj: any = { ...defaultEditorInitObj };
+    const editorEditInitObj: any = { ...defaultEditorInitObj, ...userConfig };
     if (!editable) {
       editorEditInitObj.readonly = true;
       editorEditInitObj.menubar = false;
