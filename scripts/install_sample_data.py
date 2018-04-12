@@ -58,9 +58,12 @@ def main():
     }, {
         '_id': 'city/hk',
         'display_name': 'hk',
+        'position': 1,
+        'country': {'$type': 'ref', '$id': 'country/hk'},
     }, {
         '_id': 'country/hk',
         'display_name': 'hk',
+        'creator': {'$type': 'ref', '$id': 'user/hk-creator'},
     }, {
         '_id': user_id,
         'city': {'$type': 'ref', '$id': 'city/hk'},
