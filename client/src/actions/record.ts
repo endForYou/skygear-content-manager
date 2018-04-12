@@ -17,6 +17,7 @@ import {
   CmsRecord,
   DateTimeFilter,
   DateTimeFilterQueryType,
+  EmbeddedBackReferenceFieldConfig,
   FieldConfigTypes,
   Filter,
   FilterType,
@@ -525,11 +526,31 @@ function createGeneralFilterQuery(filter: GeneralFilter, recordCls: RecordCls) {
   }
 }
 
+interface BackReferenceAttrs {
+  name: string;
+  sourceFieldName: string;
+  targetCmsRecord: CmsRecord;
+}
+
+// BackReferenceFieldConfig and EmbeddedBackReferenceFieldConfig are using the
+// same logic to fetch the referent
+function BackReferenceAttrs(
+  a: BackReferenceFieldConfig | EmbeddedBackReferenceFieldConfig
+): BackReferenceAttrs {
+  return {
+    name: a.name,
+    sourceFieldName: a.sourceFieldName,
+    targetCmsRecord: a.targetCmsRecord,
+  };
+}
+
 function queryWithTarget(
   query: Query,
   references: ReferenceConfig[]
 ): Promise<QueryResult<Record>> {
-  const [refs, backRefs, assoRefs] = separateReferenceConfigs(references);
+  const [refs, backRefs, assoRefs, embeddedBackRefs] = separateReferenceConfigs(
+    references
+  );
 
   refs.forEach(config => {
     query.transientInclude(config.name);
@@ -544,8 +565,13 @@ function queryWithTarget(
       queryResult = qr;
       sources = qr.map(r => r);
 
+      // group back reference and embedded back reference
+      const backRefsAttrs = [...backRefs, ...embeddedBackRefs].map(
+        BackReferenceAttrs
+      );
+
       return Promise.all([
-        fetchAllReferentsWithTarget(sources, backRefs),
+        fetchAllReferentsWithTarget(sources, backRefsAttrs),
         fetchAllAssociationRecordsWithTarget(sources, assoRefs),
       ]);
     })
@@ -569,8 +595,8 @@ function queryWithTarget(
 
 function fetchAllReferentsWithTarget(
   sources: Record[],
-  refs: BackReferenceFieldConfig[]
-): Promise<Array<[BackReferenceFieldConfig, Record[]]>> {
+  refs: BackReferenceAttrs[]
+): Promise<Array<[BackReferenceAttrs, Record[]]>> {
   if (refs.length === 0) {
     return Promise.resolve([]);
   }
@@ -579,7 +605,7 @@ function fetchAllReferentsWithTarget(
 
   const referentPromises = refs.map(ref => {
     return fetchReferentsWithTarget(sourceIds, ref).then(
-      referents => [ref, referents] as [BackReferenceFieldConfig, Record[]]
+      referents => [ref, referents] as [BackReferenceAttrs, Record[]]
     );
   });
 
@@ -588,7 +614,7 @@ function fetchAllReferentsWithTarget(
 
 function distributeReferents(
   sourceById: Map<string, Record>,
-  ref: BackReferenceFieldConfig,
+  ref: BackReferenceAttrs,
   referents: Record[]
 ): void {
   const referentsBySourceId = groupBy(referents, referent => {
@@ -602,7 +628,7 @@ function distributeReferents(
 
 function fetchReferentsWithTarget(
   sourceIds: string[],
-  backRefConfig: BackReferenceFieldConfig
+  backRefConfig: BackReferenceAttrs
 ): Promise<Record[]> {
   return fetchReferentRecords(
     sourceIds,
@@ -690,11 +716,13 @@ function separateReferenceConfigs(
 ): [
   ReferenceFieldConfig[],
   BackReferenceFieldConfig[],
-  AssociationReferenceFieldConfig[]
+  AssociationReferenceFieldConfig[],
+  EmbeddedBackReferenceFieldConfig[]
 ] {
   const refs: ReferenceFieldConfig[] = [];
   const backRefs: BackReferenceFieldConfig[] = [];
   const assoRefs: AssociationReferenceFieldConfig[] = [];
+  const embeddedBackRefs: EmbeddedBackReferenceFieldConfig[] = [];
 
   configs.forEach(config => {
     switch (config.type) {
@@ -707,10 +735,13 @@ function separateReferenceConfigs(
       case FieldConfigTypes.AssociationReference:
         assoRefs.push(config);
         break;
+      case FieldConfigTypes.EmbeddedBackReference:
+        embeddedBackRefs.push(config);
+        break;
     }
   });
 
-  return [refs, backRefs, assoRefs];
+  return [refs, backRefs, assoRefs, embeddedBackRefs];
 }
 
 export class RecordActionDispatcher {

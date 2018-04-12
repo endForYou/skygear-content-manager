@@ -107,7 +107,8 @@ enum RecordFormPageConfigType {
 export type ReferenceConfig =
   | ReferenceFieldConfig
   | BackReferenceFieldConfig
-  | AssociationReferenceFieldConfig;
+  | AssociationReferenceFieldConfig
+  | EmbeddedBackReferenceFieldConfig;
 
 export type FieldConfig =
   | StringFieldConfig
@@ -120,6 +121,7 @@ export type FieldConfig =
   | ReferenceFieldConfig
   | BackReferenceFieldConfig
   | AssociationReferenceFieldConfig
+  | EmbeddedBackReferenceFieldConfig
   | ImageAssetFieldConfig;
 export enum FieldConfigTypes {
   String = 'String',
@@ -132,6 +134,7 @@ export enum FieldConfigTypes {
   Reference = 'Reference',
   BackReference = 'BackReference',
   AssociationReference = 'AssociationReference',
+  EmbeddedBackReference = 'EmbeddedBackReference',
   ImageAsset = 'ImageAsset',
 }
 
@@ -215,6 +218,13 @@ export interface AssociationReferenceFieldConfig extends FieldConfigAttrs {
   displayFieldName: string;
 }
 
+export interface EmbeddedBackReferenceFieldConfig extends FieldConfigAttrs {
+  type: FieldConfigTypes.EmbeddedBackReference;
+  sourceFieldName: string;
+  targetCmsRecord: CmsRecord;
+  displayFields: FieldConfig[];
+}
+
 export interface ImageAssetFieldConfig extends FieldConfigAttrs {
   type: FieldConfigTypes.ImageAsset;
 }
@@ -247,8 +257,7 @@ interface RecordTypeContext {
   cmsRecordByName: CmsRecordByName;
 }
 
-export interface ConfigContext {
-  cmsRecordByName: CmsRecordByName;
+export interface ConfigContext extends RecordTypeContext {
   associationRecordByName: AssociationRecordByName;
 }
 
@@ -650,6 +659,13 @@ function parseShowActions(input: any): ShowActionConfig[] {
   );
 }
 
+function makeEditableField(config: FieldConfig): FieldConfig {
+  return {
+    editable: true,
+    ...config,
+  };
+}
+
 function parseRecordFormPageConfig(
   context: ConfigContext,
   cmsRecord: CmsRecord,
@@ -672,7 +688,15 @@ function parseRecordFormPageConfig(
   const fields = input.fields.map((f: any) =>
     parseFieldConfig(context, f)
   ) as FieldConfig[];
-  const editableFields = fields.map(config => ({ editable: true, ...config }));
+  const editableFields = fields.map(config => {
+    if (config.type === FieldConfigTypes.EmbeddedBackReference) {
+      config = {
+        ...config,
+        displayFields: config.displayFields.map(makeEditableField),
+      };
+    }
+    return makeEditableField(config);
+  });
 
   return {
     actions: parseRecordFormActions(input.actions),
@@ -719,6 +743,33 @@ function parseRecordFormActions(input: any): RecordFormActionConfig[] {
 // tslint:disable-next-line: no-any
 export function parseFieldConfig(context: ConfigContext, a: any): FieldConfig {
   switch (a.type) {
+    case 'Reference':
+      if (a.reference_via_association_record) {
+        return parseAssociationReferenceFieldConfig(context, a);
+      } else if (a.reference_via_back_reference) {
+        return parseBackReferenceFieldConfig(context, a);
+      } else {
+        return parseReferenceFieldConfig(context, a);
+      }
+    case 'EmbeddedReference':
+      if (a.reference_via_back_reference) {
+        return parseEmbeddedBackReferenceFieldConfig(context, a);
+      } else {
+        throw new Error(
+          'Only back reference is supported for type EmbeddedReference now'
+        );
+      }
+    default:
+      return parseNonReferenceFieldConfig(context, a);
+  }
+}
+
+export function parseNonReferenceFieldConfig(
+  context: RecordTypeContext,
+  // tslint:disable-next-line: no-any
+  a: any
+): FieldConfig {
+  switch (a.type) {
     case 'String':
       return parseStringFieldConfig(a);
     case 'TextArea':
@@ -733,14 +784,6 @@ export function parseFieldConfig(context: ConfigContext, a: any): FieldConfig {
       return parseBooleanFieldConfig(a);
     case 'Integer':
       return parseIntegerFieldConfig(a);
-    case 'Reference':
-      if (a.reference_via_association_record) {
-        return parseAssociationReferenceFieldConfig(context, a);
-      } else if (a.reference_via_back_reference) {
-        return parseBackReferenceFieldConfig(context, a);
-      } else {
-        return parseReferenceFieldConfig(context, a);
-      }
     case 'ImageAsset':
       return parseImageAssetFieldConfig(a);
 
@@ -871,22 +914,46 @@ function parseBackReferenceFieldConfig(
   context: RecordTypeContext,
   input: FieldConfigInput
 ): BackReferenceFieldConfig {
-  const targetRecordName = parseString(
-    input,
-    'reference_via_back_reference',
-    'Reference'
-  );
-  const sourceFieldName = parseString(
-    input,
-    'reference_from_field',
-    'Reference'
-  );
   const displayFieldName = parseString(
     input,
     'reference_field_name',
     'Reference'
   );
 
+  return {
+    ...parseFieldConfigAttrs(input, 'Reference'),
+    ...parseBackReferenceFieldConfigAttrs(context, input),
+    displayFieldName,
+    type: FieldConfigTypes.BackReference,
+  };
+}
+
+function parseEmbeddedBackReferenceFieldConfig(
+  context: RecordTypeContext,
+  input: FieldConfigInput
+): EmbeddedBackReferenceFieldConfig {
+  // tslint:disable-next-line: no-any
+  const displayFields = input.reference_fields.map((f: any) =>
+    parseNonReferenceFieldConfig(context, f)
+  ) as FieldConfig[];
+
+  return {
+    ...parseFieldConfigAttrs(input, 'EmbeddedReference'),
+    ...parseBackReferenceFieldConfigAttrs(context, input),
+    displayFields,
+    type: FieldConfigTypes.EmbeddedBackReference,
+  };
+}
+
+function parseBackReferenceFieldConfigAttrs(
+  context: RecordTypeContext,
+  input: FieldConfigInput
+): { sourceFieldName: string; targetCmsRecord: CmsRecord } {
+  const targetRecordName = parseString(
+    input,
+    'reference_via_back_reference',
+    'Reference'
+  );
   const targetCmsRecord = context.cmsRecordByName[targetRecordName];
   if (targetCmsRecord === undefined) {
     throw new Error(
@@ -894,12 +961,15 @@ function parseBackReferenceFieldConfig(
     );
   }
 
+  const sourceFieldName = parseString(
+    input,
+    'reference_from_field',
+    'Reference'
+  );
+
   return {
-    ...parseFieldConfigAttrs(input, 'Reference'),
-    displayFieldName,
     sourceFieldName,
     targetCmsRecord,
-    type: FieldConfigTypes.BackReference,
   };
 }
 
@@ -1101,6 +1171,8 @@ function filterReferences(fieldConfigs: FieldConfig[]): ReferenceConfig[] {
         case FieldConfigTypes.BackReference:
           return [...refs, config];
         case FieldConfigTypes.AssociationReference:
+          return [...refs, config];
+        case FieldConfigTypes.EmbeddedBackReference:
           return [...refs, config];
         default:
           return refs;

@@ -354,21 +354,35 @@ records:
         - name: display_name
           type: String
         - name: users
-          type: Reference
-          label: users
+          type: EmbeddedReference
+          label: Users
           reference_from_field: city
-          reference_field_name: name
           reference_via_back_reference: user
+          reference_fields:
+            - type: _id
+            - name: name
+              type: String
+            - name: last_login_at
+              type: DateTime
+            - name: boolean
+              type: Boolean
     edit:
       fields:
         - name: display_name
           type: String
         - name: users
-          type: Reference
-          label: users
+          type: EmbeddedReference
+          label: Users
           reference_from_field: city
-          reference_field_name: name
           reference_via_back_reference: user
+          reference_fields:
+            - type: _id
+            - name: name
+              type: String
+            - name: last_login_at
+              type: DateTime
+            - name: boolean
+              type: Boolean
     new:
       fields:
         - name: display_name
@@ -382,7 +396,6 @@ records:
           name: import-country
           fields:
               - name: display_name
-      item_actions: []
     show:
       fields:
         - type: _id
@@ -392,10 +405,28 @@ records:
       fields:
         - name: display_name
           type: String
+        - name: cities
+          type: EmbeddedReference
+          label: Cities
+          reference_from_field: country
+          reference_via_back_reference: city
+          reference_fields:
+            - type: _id
+            - name: display_name
+              type: String
     new:
       fields:
         - name: display_name
           type: String
+        - name: cities
+          type: EmbeddedReference
+          label: Cities
+          reference_from_field: country
+          reference_via_back_reference: city
+          reference_fields:
+            - type: _id
+            - name: display_name
+              type: String
   welcome_message:
     list:
       fields:
@@ -404,6 +435,7 @@ records:
         - name: text_en
           type: String
           label: English
+      item_actions: []
     show:
       fields:
         - name: ordering
