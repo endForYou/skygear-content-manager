@@ -3,7 +3,6 @@ import {
   Async as SelectAsync,
   LoadOptionsAsyncHandler,
   OnChangeHandler,
-  Option,
 } from 'react-select';
 // tslint:disable-next-line: no-submodule-imports
 import 'react-select/dist/react-select.css';
@@ -76,9 +75,12 @@ class ReferenceFilterFieldImpl extends React.PureComponent<
     }
     query.limit = 500;
     return skygear.publicDB.query(query).then(records => {
-      const options = records.map(record => {
-        return recordToOption(record, displayFieldName);
-      });
+      const values = records.map(record => record[displayFieldName]);
+      const distinctValues = Array.from(new Set(values));
+      const options = distinctValues.map(value => ({
+        label: value,
+        value,
+      }));
       return {
         complete: true,
         options,
@@ -106,15 +108,6 @@ class ReferenceFilterFieldImpl extends React.PureComponent<
     if (this.props.onFieldChange) {
       this.props.onFieldChange(values);
     }
-  };
-}
-
-function recordToOption(r: Record, fieldName: string): Option<string> {
-  return {
-    // TODO: validate r[fieldName] and make sure it's a string
-    // or convertable to string
-    label: r[fieldName],
-    value: r._id,
   };
 }
 

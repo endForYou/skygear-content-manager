@@ -5,7 +5,11 @@ import Select from 'react-select';
 import skygear, { Query, QueryResult, Record } from 'skygear';
 
 import { PushCampaignActionDispatcher } from '../../actions/pushCampaign';
-import { FilterConfig, FilterConfigTypes } from '../../cmsConfig';
+import {
+  FilterConfig,
+  FilterConfigTypes,
+  ReferenceFilterConfig,
+} from '../../cmsConfig';
 import { RootState } from '../../states';
 import { NewPushCampaign, Remote, RemoteType } from '../../types';
 import { FilterField } from './FilterField';
@@ -317,7 +321,16 @@ class NewPushNotificationPageImpl extends React.PureComponent<
       const value = filterOption.value;
       switch (filterOption.filterType) {
         case FilterConfigTypes.Reference:
-          query.contains(key, value);
+          const { filterConfigs } = this.props;
+          const filterConfig = filterConfigs.find(c => c.name === key);
+          if (filterConfig == null) {
+            break;
+          }
+          const refFilterConfig = filterConfig as ReferenceFilterConfig;
+          query.like(
+            `${key}.${refFilterConfig.displayFieldName}`,
+            `%${value}%`
+          );
           break;
         case FilterConfigTypes.String:
           query.like(key, '%' + value + '%');
