@@ -8,11 +8,11 @@ import {
 import 'react-select/dist/react-select.css';
 import skygear, { Query, Record } from 'skygear';
 
-import { ReferenceFilterConfig } from '../../cmsConfig';
-import { debouncePromise1, makeArray } from '../../util';
-import { RequiredFilterFieldProps } from './FilterField';
+import { ReferenceFilterConfig } from '../cmsConfig';
+import { debouncePromise1, makeArray } from '../util';
+import { RequiredFilterInputProps } from './FilterInput';
 
-export type ReferenceFieldProps = RequiredFilterFieldProps<
+export type ReferenceFilterInputProps = RequiredFilterInputProps<
   ReferenceFilterConfig
 >;
 
@@ -28,11 +28,11 @@ interface RefOption {
 type StringSelectAsyncCtor<T> = new () => SelectAsync<T>;
 const StringSelectAsync = SelectAsync as StringSelectAsyncCtor<string>;
 
-class ReferenceFilterFieldImpl extends React.PureComponent<
-  ReferenceFieldProps,
+class ReferenceFilterInputImpl extends React.PureComponent<
+  ReferenceFilterInputProps,
   State
 > {
-  constructor(props: ReferenceFieldProps) {
+  constructor(props: ReferenceFilterInputProps) {
     super(props);
 
     this.state = {
@@ -111,6 +111,6 @@ class ReferenceFilterFieldImpl extends React.PureComponent<
   };
 }
 
-export const ReferenceFilterField: React.ComponentClass<
-  ReferenceFieldProps
-> = ReferenceFilterFieldImpl;
+export const ReferenceFilterInput: React.ComponentClass<
+  ReferenceFilterInputProps
+> = ReferenceFilterInputImpl;

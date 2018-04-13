@@ -10,9 +10,9 @@ import {
   FilterConfigTypes,
   ReferenceFilterConfig,
 } from '../../cmsConfig';
+import { FilterInput } from '../../filters/FilterInput';
 import { RootState } from '../../states';
 import { NewPushCampaign, Remote, RemoteType } from '../../types';
-import { FilterField } from './FilterField';
 
 export interface NewPushNotificationPageProps {
   filterConfigs: FilterConfig[];
@@ -36,10 +36,6 @@ interface FilterOption {
   value: any;
 }
 
-// Effectively a Promise Factory
-// tslint:disable-next-line: no-any
-export type Effect = () => Promise<any>;
-
 interface CampaignTypeOption {
   label: string;
   value: string;
@@ -62,7 +58,6 @@ type FilterChangeHandler = (
   type: string,
   // tslint:disable-next-line: no-any
   value: any,
-  effect?: Effect
 ) => void;
 
 class NewPushNotificationPageImpl extends React.PureComponent<
@@ -227,8 +222,7 @@ class NewPushNotificationPageImpl extends React.PureComponent<
   public handleFilterChange: FilterChangeHandler = (
     name,
     filterType,
-    value,
-    effect
+    value
   ) => {
     const newFilterOptionsByName = {
       ...this.state.filterOptionsByName,
@@ -369,12 +363,12 @@ function FormField(props: FieldProps): JSX.Element {
   const fieldValue =
     filterOptionsByName[name] === undefined ? name : filterOptionsByName[name];
   return (
-    <FilterField
+    <FilterInput
       className="form-control"
       config={filterFieldConfig}
       value={fieldValue}
-      onFieldChange={(value, effect) =>
-        onFilterChange(name, filterType, value, effect)}
+      onFieldChange={value =>
+        onFilterChange(name, filterType, value)}
     />
   );
 }
