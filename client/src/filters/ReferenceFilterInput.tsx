@@ -32,24 +32,14 @@ class ReferenceFilterInputImpl extends React.PureComponent<
   ReferenceFilterInputProps,
   State
 > {
-  constructor(props: ReferenceFilterInputProps) {
-    super(props);
-
-    this.state = {
-      values: [],
-    };
-  }
-
   public render() {
     const {
       className: className,
       config: config,
       onFieldChange: _onFieldChange,
-      value: _value,
+      value,
       ...rest,
     } = this.props;
-
-    const { values } = this.state;
 
     return (
       <StringSelectAsync
@@ -57,7 +47,7 @@ class ReferenceFilterInputImpl extends React.PureComponent<
         multi={true}
         loadOptions={this.debouncedLoadOptions}
         onChange={this.onChange}
-        value={values}
+        value={value}
       />
     );
   }
@@ -95,7 +85,6 @@ class ReferenceFilterInputImpl extends React.PureComponent<
 
   public onChange: OnChangeHandler<string> = value => {
     const values = makeArray(value).map(a => a.value);
-    this.setState({ values });
 
     if (value === null) {
       if (this.props.onFieldChange) {

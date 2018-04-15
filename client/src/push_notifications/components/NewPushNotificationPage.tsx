@@ -57,7 +57,7 @@ type FilterChangeHandler = (
   name: string,
   type: string,
   // tslint:disable-next-line: no-any
-  value: any,
+  value: any
 ) => void;
 
 class NewPushNotificationPageImpl extends React.PureComponent<
@@ -367,8 +367,7 @@ function FormField(props: FieldProps): JSX.Element {
       className="form-control"
       config={filterFieldConfig}
       value={fieldValue}
-      onFieldChange={value =>
-        onFilterChange(name, filterType, value)}
+      onFieldChange={value => onFilterChange(name, filterType, value)}
     />
   );
 }

@@ -28,6 +28,8 @@ import {
   ListActionConfig,
   ListItemActionConfig,
   ListPageConfig,
+  ReferenceFilter,
+  ReferenceFilterQueryType,
   StringFilter,
   StringFilterQueryType,
 } from '../cmsConfig';
@@ -334,6 +336,11 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
               ...f,
               query: DateTimeFilterQueryType[event.target.value],
             };
+          case FilterType.ReferenceFilterType:
+            return {
+              ...f,
+              query: ReferenceFilterQueryType[event.target.value],
+            };
           default:
             throw new Error(
               `handleQueryTypeChange does not support FilterType ${f.type}`
@@ -388,6 +395,18 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
 
     this.props.onChangeFilter(filters);
   }
+
+  public handleReferenceFilterChange = (filter: Filter, value: string[]) => {
+    const filters = this.props.filters.map(f => {
+      if (f.id === filter.id) {
+        return { ...(f as ReferenceFilter), values: value };
+      } else {
+        return f;
+      }
+    });
+
+    this.props.onChangeFilter(filters);
+  };
 
   public onFilterItemClicked(filterConfig: FilterConfig) {
     const newFilter = filterFactory(filterConfig);
@@ -570,6 +589,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
         <div className="float-right">
           <FilterList
             filters={filters}
+            filterConfigs={pageConfig.filters}
             handleQueryTypeChange={(filter, evt) =>
               this.handleQueryTypeChange(filter, evt)}
             handleFilterValueChange={(filter, evt) =>
@@ -577,6 +597,8 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
             onCloseFilterClicked={filter => this.onCloseFilterClicked(filter)}
             handleDateTimeValueChange={(filter, datetime) =>
               this.handleDateTimeValueChange(filter, datetime)}
+            handleReferenceChange={(filter, value) =>
+              this.handleReferenceFilterChange(filter, value)}
           />
         </div>
 

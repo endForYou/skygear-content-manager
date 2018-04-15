@@ -27,6 +27,8 @@ import {
   IntegerFilterQueryType,
   ReferenceConfig,
   ReferenceFieldConfig,
+  ReferenceFilter,
+  ReferenceFilterQueryType,
   SortOrder,
   StringFilter,
   StringFilterQueryType,
@@ -431,6 +433,9 @@ function addFilterToQuery(query: Query, filter: Filter, recordCls: RecordCls) {
     case FilterType.DateTimeFilterType:
       addDatetimeFilterToQuery(query, filter);
       break;
+    case FilterType.ReferenceFilterType:
+      addReferenceFilterToQuery(query, filter);
+      break;
     default:
       throw new Error(
         `addFilterToQuery does not support FilterType ${filter.type}`
@@ -508,6 +513,20 @@ function addDatetimeFilterToQuery(query: Query, filter: DateTimeFilter) {
       break;
     case DateTimeFilterQueryType.After:
       query.greaterThan(filter.name, filter.value);
+      break;
+    default:
+      throw new Error(
+        `addDatetimeFilterToQuery does not support DateTimeFilterQueryType ${filter.type}`
+      );
+  }
+}
+
+function addReferenceFilterToQuery(query: Query, filter: ReferenceFilter) {
+  switch (filter.query) {
+    case ReferenceFilterQueryType.Contains:
+      filter.values.forEach(value => {
+        query.like(`${filter.name}.${filter.displayFieldName}`, `%${value}%`);
+      });
       break;
     default:
       throw new Error(
