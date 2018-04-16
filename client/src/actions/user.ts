@@ -1,7 +1,10 @@
 import { Dispatch } from 'redux';
 import { ThunkAction } from 'redux-thunk';
-import skygear, { Query, QueryResult, Record, Role } from 'skygear';
+import skygear, { QueryResult, Record, Role } from 'skygear';
 
+import { queryWithFilters } from './record';
+
+import { Filter } from '../cmsConfig';
 import { RootState } from '../states';
 import { SkygearUser } from '../types';
 
@@ -162,10 +165,11 @@ function updateUserCMSAccessFailure(
 
 function fetchUsersImpl(
   page: number = 1,
-  perPage: number = 25
+  perPage: number = 25,
+  filters: Filter[]
 ): Promise<UserQueryResult> {
   const recordCls = skygear.UserRecord;
-  const query = new Query(recordCls);
+  const query = queryWithFilters(filters, recordCls);
 
   query.overallCount = true;
   query.limit = perPage;
@@ -192,12 +196,13 @@ function fetchUsersImpl(
 
 function fetchUsers(
   page: number,
-  perPage: number
+  perPage: number,
+  filters: Filter[]
 ): ThunkAction<Promise<void>, {}, {}> {
   return dispatch => {
     dispatch(fetchUserListRequest(page));
 
-    return fetchUsersImpl(page, perPage)
+    return fetchUsersImpl(page, perPage, filters)
       .then((result: UserQueryResult) => {
         dispatch(fetchUserListSuccess(page, perPage, result));
       })
@@ -263,8 +268,8 @@ export class UserActionDispatcher {
     this.dispatch = dispatch;
   }
 
-  public fetchList(page: number, perPage: number) {
-    this.dispatch(fetchUsers(page, perPage));
+  public fetchList(page: number, perPage: number, filters: Filter[]) {
+    this.dispatch(fetchUsers(page, perPage, filters));
   }
 
   public updateUserCMSAccess(
