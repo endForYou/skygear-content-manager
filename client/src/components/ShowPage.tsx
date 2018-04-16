@@ -47,17 +47,19 @@ function RecordView({ config, record }: RecordViewProps): JSX.Element {
   });
   return (
     <form>
-      <h1 className="display-4 d-inline-block">{config.label}</h1>
-      <div className="float-right">
-        <SpaceSeperatedList>
-          {config.actions.map((action, index) => (
-            <LinkButton
-              key={index}
-              actionConfig={action}
-              context={{ record }}
-            />
-          ))}
-        </SpaceSeperatedList>
+      <div className="navbar">
+        <h1 className="display-4">{config.label}</h1>
+        <div className="float-right">
+          <SpaceSeperatedList>
+            {config.actions.map((action, index) => (
+              <LinkButton
+                key={index}
+                actionConfig={action}
+                context={{ record }}
+              />
+            ))}
+          </SpaceSeperatedList>
+        </div>
       </div>
       {formGroups}
     </form>

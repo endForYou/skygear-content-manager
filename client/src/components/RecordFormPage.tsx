@@ -93,17 +93,19 @@ class RecordFormPageImpl extends React.PureComponent<
 
     return (
       <form onSubmit={this.handleSubmit}>
-        <h1 className="display-4">{config.label}</h1>
-        <div className="float-right">
-          <SpaceSeperatedList>
-            {config.actions.map((action, index) => (
-              <LinkButton
-                key={index}
-                actionConfig={action}
-                context={{ record }}
-              />
-            ))}
-          </SpaceSeperatedList>
+        <div className="navbar">
+          <h1 className="display-4">{config.label}</h1>
+          <div className="float-right">
+            <SpaceSeperatedList>
+              {config.actions.map((action, index) => (
+                <LinkButton
+                  key={index}
+                  actionConfig={action}
+                  context={{ record }}
+                />
+              ))}
+            </SpaceSeperatedList>
+          </div>
         </div>
         {formGroups}
         {errorMessage}
