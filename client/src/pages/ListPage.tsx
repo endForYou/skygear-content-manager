@@ -10,10 +10,6 @@ import { dismissImport, importRecords } from '../actions/import';
 import { queryWithFilters, RecordActionDispatcher } from '../actions/record';
 import {
   ActionConfigTypes,
-  BaseFilterQueryType,
-  BooleanFilterQueryType,
-  DateTimeFilter,
-  DateTimeFilterQueryType,
   ExportActionConfig,
   FieldConfig,
   Filter,
@@ -21,21 +17,15 @@ import {
   FilterConfigTypes,
   filterFactory,
   FilterType,
-  GeneralFilter,
   ImportActionConfig,
-  IntegerFilter,
-  IntegerFilterQueryType,
   ListActionConfig,
   ListItemActionConfig,
   ListPageConfig,
-  ReferenceFilter,
-  ReferenceFilterQueryType,
-  StringFilter,
-  StringFilterQueryType,
 } from '../cmsConfig';
 import { ExportButton } from '../components/ExportButton';
 import { ExportModal } from '../components/ExportModal';
 import { FilterList } from '../components/FilterList';
+import { withEventHandler as withFilterListEventHandler } from '../components/FilterListEventHandler';
 import { ImportButton } from '../components/ImportButton';
 import {
   ImportFailureModal,
@@ -60,6 +50,8 @@ import { RemoteType, SortOrder, SortState } from '../types';
 import { debounce } from '../util';
 
 type SortButtonClickHandler = (name: string) => void;
+
+const HandledFilterList = withFilterListEventHandler(FilterList);
 
 export function nextSortState(
   sortState: SortState,
@@ -297,117 +289,6 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
     this.setState({ showfilterMenu: !this.state.showfilterMenu });
   }
 
-  public handleQueryTypeChange(
-    filter: Filter,
-    event: React.ChangeEvent<HTMLSelectElement>
-  ) {
-    if (!event.target.value.length) {
-      return;
-    }
-    const filters = this.props.filters.map(f => {
-      if (f.id === filter.id) {
-        switch (event.target.value) {
-          case BaseFilterQueryType.IsNull:
-          case BaseFilterQueryType.IsNotNull:
-            return {
-              ...f,
-              query: BaseFilterQueryType[event.target.value],
-            };
-          default:
-        }
-        switch (filter.type) {
-          case FilterType.StringFilterType:
-            return {
-              ...f,
-              query: StringFilterQueryType[event.target.value],
-            };
-          case FilterType.IntegerFilterType:
-            return {
-              ...f,
-              query: IntegerFilterQueryType[event.target.value],
-            };
-          case FilterType.BooleanFilterType:
-            return {
-              ...f,
-              query: BooleanFilterQueryType[event.target.value],
-            };
-          case FilterType.DateTimeFilterType:
-            return {
-              ...f,
-              query: DateTimeFilterQueryType[event.target.value],
-            };
-          case FilterType.ReferenceFilterType:
-            return {
-              ...f,
-              query: ReferenceFilterQueryType[event.target.value],
-            };
-          default:
-            throw new Error(
-              `handleQueryTypeChange does not support FilterType ${f.type}`
-            );
-        }
-      }
-      return f;
-    });
-
-    this.props.onChangeFilter(filters);
-  }
-
-  public handleFilterValueChange(
-    filter: Filter,
-    event: React.ChangeEvent<HTMLInputElement>
-  ) {
-    const filters = this.props.filters.map(f => {
-      if (f.id === filter.id) {
-        switch (filter.type) {
-          case FilterType.StringFilterType:
-            return { ...(f as StringFilter), value: event.target.value };
-          case FilterType.IntegerFilterType:
-            return {
-              ...(f as IntegerFilter),
-              value: Number(event.target.value),
-            };
-          case FilterType.BooleanFilterType:
-          case FilterType.DateTimeFilterType:
-            return f;
-          case FilterType.GeneralFilterType:
-            return { ...(f as GeneralFilter), value: event.target.value };
-          default:
-            throw new Error(
-              `handleFilterValueChange does not support FilterType ${f.type}`
-            );
-        }
-      }
-      return f;
-    });
-
-    this.props.onChangeFilter(filters);
-  }
-
-  public handleDateTimeValueChange(filter: Filter, datetime: Date) {
-    const filters = this.props.filters.map(f => {
-      if (f.id === filter.id) {
-        return { ...(f as DateTimeFilter), value: datetime };
-      } else {
-        return f;
-      }
-    });
-
-    this.props.onChangeFilter(filters);
-  }
-
-  public handleReferenceFilterChange = (filter: Filter, value: string[]) => {
-    const filters = this.props.filters.map(f => {
-      if (f.id === filter.id) {
-        return { ...(f as ReferenceFilter), values: value };
-      } else {
-        return f;
-      }
-    });
-
-    this.props.onChangeFilter(filters);
-  };
-
   public onFilterItemClicked(filterConfig: FilterConfig) {
     const newFilter = filterFactory(filterConfig);
 
@@ -423,11 +304,6 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
 
     this.props.onChangeFilter(filters);
     this.toggleFilterMenu();
-  }
-
-  public onCloseFilterClicked(filter: Filter) {
-    const filters = this.props.filters.filter(f => f.id !== filter.id);
-    this.props.onChangeFilter(filters);
   }
 
   public onImportFileSelected(actionConfig: ImportActionConfig, file: File) {
@@ -587,18 +463,10 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
         </div>
 
         <div className="float-right">
-          <FilterList
+          <HandledFilterList
             filters={filters}
             filterConfigs={pageConfig.filters}
-            handleQueryTypeChange={(filter, evt) =>
-              this.handleQueryTypeChange(filter, evt)}
-            handleFilterValueChange={(filter, evt) =>
-              this.handleFilterValueChange(filter, evt)}
-            onCloseFilterClicked={filter => this.onCloseFilterClicked(filter)}
-            handleDateTimeValueChange={(filter, datetime) =>
-              this.handleDateTimeValueChange(filter, datetime)}
-            handleReferenceChange={(filter, value) =>
-              this.handleReferenceFilterChange(filter, value)}
+            onChangeFilter={this.props.onChangeFilter}
           />
         </div>
 
