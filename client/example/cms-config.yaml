@@ -106,6 +106,8 @@ records:
           type: String
         - name: profile_image
           type: ImageAsset
+        - name: cv
+          type: FileAsset
         - name: city
           type: Reference
           label: City
@@ -145,6 +147,8 @@ records:
           type: String
         - name: profile_image
           type: ImageAsset
+        - name: cv
+          type: FileAsset
         - name: city
           type: Reference
           label: City
@@ -190,6 +194,10 @@ records:
       fields:
         - name: name
           type: String
+        - name: profile_image
+          type: ImageAsset
+        - name: cv
+          type: FileAsset
         - name: city
           type: Reference
           label: City
@@ -229,6 +237,8 @@ records:
       fields:
         - name: name
           type: String
+        - name: cv
+          type: FileAsset
         - name: city
           type: Reference
           label: City
