@@ -460,7 +460,7 @@ function parseImageAssetFieldConfig(
   input: FieldConfigInput
 ): ImageAssetFieldConfig {
   return {
-    ...parseFieldConfigAttrs(input, 'Reference'),
+    ...parseFieldConfigAttrs(input, 'ImageAsset'),
     type: FieldConfigTypes.ImageAsset,
   };
 }
