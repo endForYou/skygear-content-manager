@@ -12,7 +12,7 @@ export enum AssetType {
 function defaultMimeTypeForAssetType(assetType: AssetType): string {
   switch (assetType) {
     case AssetType.File:
-      return '*';
+      return '';
     case AssetType.Image:
       return 'image/*';
   }
