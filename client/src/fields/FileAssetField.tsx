@@ -37,9 +37,11 @@ export class FileAssetField extends React.PureComponent<FileAssetFieldProps> {
     }
 
     return (
-      <a target="_blank" href={value.url}>
-        {value.name}
-      </a>
+      <div>
+        <a target="_blank" href={value.url}>
+          {value.name}
+        </a>
+      </div>
     );
   }
 }
