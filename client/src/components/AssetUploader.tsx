@@ -70,7 +70,7 @@ const AssetDisplay: React.SFC<{
   switch (assetType) {
     case AssetType.File:
       return (
-        <a target="_blank" href={url}>
+        <a target="_blank" href={url} onClick={evt => evt.stopPropagation()}>
           {name}
         </a>
       );
