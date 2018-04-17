@@ -5,6 +5,7 @@ import * as React from 'react';
 import skygear, { Record, Reference } from 'skygear';
 
 import {
+  DeleteAction,
   EmbeddedBackReferenceFieldConfig,
   FieldConfig,
   SortOrder,
@@ -228,15 +229,22 @@ export class EmbeddedBackReferenceField extends React.PureComponent<
         }
 
         // apply record delete
-        // set reference to null only
         const deletes = this.state.embeddedRecordDelete;
         if (deletes.length > 0) {
-          const recordsToDelete = deletes.map(
-            record =>
-              new RecordCls({ _id: record.id, [config.sourceFieldName]: null })
-          );
-          const deleteRecord = skygear.publicDB.save(recordsToDelete);
-          promises.push(deleteRecord);
+          if (config.referenceDeleteAction === DeleteAction.NullifyReference) {
+            // set reference to null only
+            const recordsToDelete = deletes.map(
+              record =>
+                new RecordCls({
+                  _id: record.id,
+                  [config.sourceFieldName]: null,
+                })
+            );
+            promises.push(skygear.publicDB.save(recordsToDelete));
+          } else {
+            // delete the child record
+            promises.push(skygear.publicDB.delete(deletes));
+          }
         }
 
         return Promise.all(promises);
