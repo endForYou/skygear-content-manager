@@ -11,18 +11,18 @@
     padding: 0.25rem;
 }
 
-.right {
+.arrow.right {
     transform: rotate(-45deg);
 }
 
-.left {
+.arrow.left {
     transform: rotate(135deg);
 }
 
-.up {
+.arrow.up {
     transform: translateY(0.125rem) rotate(-135deg);
 }
 
-.down {
+.arrow.down {
     transform: translateY(-0.125rem) rotate(45deg);
 }
