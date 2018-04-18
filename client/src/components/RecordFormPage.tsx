@@ -33,7 +33,8 @@ interface State {
 
   // Side effects produced by fields. They will get executed after record is
   // saved successfully.
-  effectChange: RecordEffect;
+  beforeEffectChange: RecordEffect;
+  afterEffectChange: RecordEffect;
 }
 
 export interface RecordChange {
@@ -51,7 +52,8 @@ export type RecordChangeHandler = (
   name: string,
   // tslint:disable-next-line: no-any
   value: any,
-  effect?: Effect
+  beforeEffect?: Effect,
+  afterEffect?: Effect
 ) => void;
 
 class RecordFormPageImpl extends React.PureComponent<
@@ -62,7 +64,8 @@ class RecordFormPageImpl extends React.PureComponent<
     super(props);
 
     this.state = {
-      effectChange: {},
+      afterEffectChange: {},
+      beforeEffectChange: {},
       recordChange: {},
     };
   }
@@ -114,7 +117,12 @@ class RecordFormPageImpl extends React.PureComponent<
     );
   }
 
-  public handleRecordChange: RecordChangeHandler = (name, value, effect) => {
+  public handleRecordChange: RecordChangeHandler = (
+    name,
+    value,
+    beforeEffect,
+    afterEffect
+  ) => {
     if (value !== undefined) {
       this.setState(prevState => {
         return {
@@ -125,7 +133,14 @@ class RecordFormPageImpl extends React.PureComponent<
 
     this.setState(prevState => {
       return {
-        effectChange: { ...prevState.effectChange, [name]: effect },
+        afterEffectChange: {
+          ...prevState.afterEffectChange,
+          [name]: afterEffect,
+        },
+        beforeEffectChange: {
+          ...prevState.beforeEffectChange,
+          [name]: beforeEffect,
+        },
       };
     });
   };
@@ -135,18 +150,14 @@ class RecordFormPageImpl extends React.PureComponent<
 
     // better clone the record if possible
     const { record, recordDispatcher } = this.props;
-    const { recordChange, effectChange } = this.state;
+    const { recordChange, beforeEffectChange, afterEffectChange } = this.state;
 
     mergeRecordChange(record, recordChange);
 
-    recordDispatcher
-      .save(record)
-      .then(() => {
-        const effects = Object.values(effectChange).filter(
-          eff => eff !== undefined
-        ) as Effect[];
-        return Promise.all(effects.map(eff => eff()));
-      })
+    Promise.resolve()
+      .then(() => flatMapEffect(Object.values(beforeEffectChange)))
+      .then(() => recordDispatcher.save(record))
+      .then(() => flatMapEffect(Object.values(afterEffectChange)))
       .then(() => {
         const { config: { cmsRecord }, dispatch } = this.props;
         dispatch(push(`/record/${cmsRecord.name}/${record._id}`));
@@ -183,7 +194,8 @@ function FormField(props: FieldProps): JSX.Element {
       config={fieldConfig}
       value={fieldValue}
       context={FieldContext(record)}
-      onFieldChange={(value, effect) => onRecordChange(name, value, effect)}
+      onFieldChange={(value, beforeEffect, afterEffect) =>
+        onRecordChange(name, value, beforeEffect, afterEffect)}
     />
   );
 }
@@ -213,6 +225,13 @@ function mergeRecordChange(record: Record, change: RecordChange) {
   Object.entries(change).forEach(([key, value]) => {
     record[key] = value;
   });
+}
+
+export function flatMapEffect<T>(
+  effects: Array<Effect | undefined>
+): Promise<T[]> {
+  const es = effects.filter(eff => eff != null) as Effect[];
+  return Promise.all(es.map(eff => eff()));
 }
 
 export const RecordFormPage: React.ComponentClass<

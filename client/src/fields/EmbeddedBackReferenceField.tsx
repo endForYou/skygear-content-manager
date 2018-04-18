@@ -13,6 +13,7 @@ import {
 import { Arrow, ArrowDirection } from '../components/Arrow';
 import {
   Effect,
+  flatMapEffect,
   RecordChange,
   RecordChangeHandler,
 } from '../components/RecordFormPage';
@@ -39,7 +40,8 @@ export class EmbeddedBackReferenceField extends React.PureComponent<
   EmbeddedBackReferenceFieldProps,
   State
 > {
-  private embeddedRecordEffects: Array<{ [key: string]: Effect }>;
+  private embeddedRecordBeforeEffects: Array<{ [key: string]: Effect }>;
+  private embeddedRecordAfterEffects: Array<{ [key: string]: Effect }>;
 
   constructor(props: EmbeddedBackReferenceFieldProps) {
     super(props);
@@ -54,7 +56,8 @@ export class EmbeddedBackReferenceField extends React.PureComponent<
       embeddedRecords: [...embeddedRecords],
     };
 
-    this.embeddedRecordEffects = embeddedRecords.map(() => ({}));
+    this.embeddedRecordBeforeEffects = embeddedRecords.map(() => ({}));
+    this.embeddedRecordAfterEffects = embeddedRecords.map(() => ({}));
 
     this.handleEmbeddedRecordChange = this.handleEmbeddedRecordChange.bind(
       this
@@ -73,7 +76,8 @@ export class EmbeddedBackReferenceField extends React.PureComponent<
     name: string,
     // tslint:disable-next-line: no-any
     value: any,
-    effect?: Effect
+    beforeEffect?: Effect,
+    afterEffect?: Effect
   ) {
     if (value !== undefined) {
       this.setState(prevState => {
@@ -83,8 +87,12 @@ export class EmbeddedBackReferenceField extends React.PureComponent<
       });
     }
 
-    if (effect) {
-      this.embeddedRecordEffects[index][name] = effect;
+    if (beforeEffect) {
+      this.embeddedRecordBeforeEffects[index][name] = beforeEffect;
+    }
+
+    if (afterEffect) {
+      this.embeddedRecordAfterEffects[index][name] = afterEffect;
     }
 
     this.applyEmbeddedRecordChange();
@@ -98,7 +106,8 @@ export class EmbeddedBackReferenceField extends React.PureComponent<
       return prevState;
     });
 
-    this.embeddedRecordEffects.splice(index, 1);
+    this.embeddedRecordBeforeEffects.splice(index, 1);
+    this.embeddedRecordAfterEffects.splice(index, 1);
 
     this.applyEmbeddedRecordChange();
   }
@@ -114,7 +123,8 @@ export class EmbeddedBackReferenceField extends React.PureComponent<
       return prevState;
     });
 
-    this.embeddedRecordEffects.push({});
+    this.embeddedRecordBeforeEffects.push({});
+    this.embeddedRecordAfterEffects.push({});
 
     this.applyEmbeddedRecordChange();
   }
@@ -126,7 +136,8 @@ export class EmbeddedBackReferenceField extends React.PureComponent<
       return prevState;
     });
 
-    swap(this.embeddedRecordEffects, from, to);
+    swap(this.embeddedRecordBeforeEffects, from, to);
+    swap(this.embeddedRecordAfterEffects, from, to);
 
     this.applyEmbeddedRecordChange();
   }
@@ -143,9 +154,20 @@ export class EmbeddedBackReferenceField extends React.PureComponent<
             editable: config.editable,
           })}
           fieldConfigs={config.displayFields}
-          // tslint:disable-next-line: no-any
-          onRecordChange={(name: string, value: any, effect?: Effect) => {
-            this.handleEmbeddedRecordChange(index, name, value, effect);
+          onRecordChange={(
+            name: string,
+            // tslint:disable-next-line: no-any
+            value: any,
+            beforeEffect?: Effect,
+            afterEffect?: Effect
+          ) => {
+            this.handleEmbeddedRecordChange(
+              index,
+              name,
+              value,
+              beforeEffect,
+              afterEffect
+            );
           }}
           onRecordMoveDown={() =>
             this.handleEmbeddedRecordMove(index, index + 1)}
@@ -187,21 +209,9 @@ export class EmbeddedBackReferenceField extends React.PureComponent<
     const { config, onFieldChange } = this.props;
 
     if (onFieldChange) {
-      onFieldChange(undefined, () => {
+      onFieldChange(undefined, undefined, () => {
         // tslint:disable-next-line: no-any
         const promises: Array<Promise<any>> = [];
-
-        // apply effects
-        const effects = [].concat.apply(
-          [],
-          this.embeddedRecordEffects.map(effectsByName => {
-            return Object.values(effectsByName)
-              .filter(eff => eff !== undefined)
-              .map(eff => eff());
-          })
-        );
-        promises.push(Promise.all(effects));
-
         const RecordCls = Record.extend(config.targetCmsRecord.recordType);
 
         // apply record update
@@ -247,7 +257,22 @@ export class EmbeddedBackReferenceField extends React.PureComponent<
           }
         }
 
-        return Promise.all(promises);
+        return Promise.resolve()
+          .then(() =>
+            Promise.all(
+              this.embeddedRecordBeforeEffects.map(effectsByName => {
+                return flatMapEffect(Object.values(effectsByName));
+              })
+            )
+          )
+          .then(() => Promise.all(promises))
+          .then(() =>
+            Promise.all(
+              this.embeddedRecordAfterEffects.map(effectsByName => {
+                return flatMapEffect(Object.values(effectsByName));
+              })
+            )
+          );
       });
     }
   }
@@ -283,8 +308,8 @@ function EmbeddedRecordView({
       <FormGroup
         key={index}
         fieldConfig={fieldConfig}
-        onFieldChange={(value, effect) =>
-          onRecordChange(fieldConfig.name, value, effect)}
+        onFieldChange={(value, beforeEffect, affterEffect) =>
+          onRecordChange(fieldConfig.name, value, beforeEffect, affterEffect)}
         record={record}
       />
     );
