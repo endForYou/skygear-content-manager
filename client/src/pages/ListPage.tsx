@@ -633,12 +633,15 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
 
   public reloadList(props: ListPageProps) {
     const { filters, page, pageConfig, sortState } = props;
+    const derivedSortState =
+      sortState.fieldName === undefined ? pageConfig.defaultSort : sortState;
+
     this.fetchList(
       page,
       pageConfig.perPage,
       filters,
       pageConfig.predicates,
-      sortState
+      derivedSortState
     );
   }
 }
