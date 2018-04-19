@@ -9,7 +9,7 @@ export interface SortState {
   order: SortOrder;
 }
 
-export function SortState() {
+export function SortState(): SortState {
   return {
     fieldName: undefined,
     order: SortOrder.Undefined,
