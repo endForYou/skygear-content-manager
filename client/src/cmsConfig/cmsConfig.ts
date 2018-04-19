@@ -339,7 +339,7 @@ function parseListPageConfig(
     itemActions,
     label,
     perPage,
-    predicates: parsePredicateConfig(input.predicates) || [],
+    predicates: parsePredicateConfig(input.predicates, context) || [],
     references: filterReferences(compactFields),
   };
 }

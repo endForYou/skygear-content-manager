@@ -31,7 +31,11 @@ import {
   StringFilter,
   StringFilterQueryType,
 } from '../cmsConfig';
-import { Predicate, PredicateTypes } from '../cmsConfig/predicateConfig';
+import {
+  Predicate,
+  PredicateTypes,
+  PredicateValueTypes,
+} from '../cmsConfig/predicateConfig';
 import { parseReference } from '../recordUtil';
 import { RootState } from '../states';
 import { groupBy } from '../util';
@@ -591,7 +595,20 @@ function applyPredicatesToQuery(query: Query, predicates: Predicate[]) {
         throw new Error(`Unexpected predicate type: ${predicate.type}`);
     }
 
-    query = func(predicate.name, predicate.value);
+    // tslint:disable-next-line: no-any
+    let value: any;
+    switch (predicate.valueType) {
+      case PredicateValueTypes.JSONValue:
+        value = predicate.value;
+        break;
+      case PredicateValueTypes.Reference:
+        const refValue = predicate.value;
+        value = new Reference(
+          `${refValue.targetCmsRecord.recordType}/${refValue.id}`
+        );
+    }
+
+    query = func(predicate.name, value);
   });
 }
 
