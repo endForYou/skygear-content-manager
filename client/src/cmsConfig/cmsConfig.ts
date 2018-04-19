@@ -10,6 +10,7 @@ import {
   ReferenceFieldConfig,
 } from './fieldConfig';
 import { FilterConfig, parseFilterConfig } from './filterConfig';
+import { parsePredicateConfig, PredicateValue } from './predicateConfig';
 import {
   parsePushNotificationConfig,
   PushNotificationsConfig,
@@ -87,6 +88,7 @@ export interface ListPageConfig {
   perPage: number;
   fields: FieldConfig[];
   filters: FilterConfig[];
+  predicates: PredicateValue;
   references: ReferenceConfig[];
   actions: ListActionConfig[];
   itemActions: ListItemActionConfig[];
@@ -337,6 +339,7 @@ function parseListPageConfig(
     itemActions,
     label,
     perPage,
+    predicates: parsePredicateConfig(input.predicates) || [],
     references: filterReferences(compactFields),
   };
 }
