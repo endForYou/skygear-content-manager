@@ -31,6 +31,7 @@ import {
   StringFilter,
   StringFilterQueryType,
 } from '../cmsConfig';
+import { Predicate } from '../cmsConfig/predicateConfig';
 import { ExportButton } from '../components/ExportButton';
 import { ExportModal } from '../components/ExportModal';
 import { FilterList } from '../components/FilterList';
@@ -617,12 +618,14 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
     page: number,
     perPage: number,
     filters: Filter[],
+    predicates: Predicate[],
     sortState: SortState
   ) {
     this.recordActionCreator.fetchList(
       page,
       perPage,
       filters,
+      predicates,
       sortState.fieldName,
       sortState.order === SortOrder.Ascending
     );
@@ -630,7 +633,13 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
 
   public reloadList(props: ListPageProps) {
     const { filters, page, pageConfig, sortState } = props;
-    this.fetchList(page, pageConfig.perPage, filters, sortState);
+    this.fetchList(
+      page,
+      pageConfig.perPage,
+      filters,
+      pageConfig.predicates,
+      sortState
+    );
   }
 }
 
