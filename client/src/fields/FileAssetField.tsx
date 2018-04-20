@@ -9,6 +9,14 @@ import { NullField } from './NullField';
 export type FileAssetFieldProps = RequiredFieldProps<FileAssetFieldConfig>;
 
 export class FileAssetField extends React.PureComponent<FileAssetFieldProps> {
+  public renderClearButton() {
+    return (
+      <button className="btn btn-light mt-2" onClick={this.onClearClick}>
+        Clear File
+      </button>
+    );
+  }
+
   public render() {
     const {
       config: { editable },
@@ -20,16 +28,19 @@ export class FileAssetField extends React.PureComponent<FileAssetFieldProps> {
 
     if (editable) {
       return (
-        <AssetUploader
-          {...rest}
-          value={value}
-          assetType={AssetType.File}
-          onChange={onFieldChange}
-          style={{
-            height: 155,
-            width: 232,
-          }}
-        />
+        <div>
+          <AssetUploader
+            {...rest}
+            value={value}
+            assetType={AssetType.File}
+            onChange={onFieldChange}
+            style={{
+              height: 155,
+              width: 232,
+            }}
+          />
+          {this.renderClearButton()}
+        </div>
       );
     }
 
@@ -45,4 +56,12 @@ export class FileAssetField extends React.PureComponent<FileAssetFieldProps> {
       </div>
     );
   }
+
+  private onClearClick = (event: React.MouseEvent<HTMLElement>) => {
+    event.preventDefault();
+
+    if (this.props.onFieldChange) {
+      this.props.onFieldChange(null);
+    }
+  };
 }
