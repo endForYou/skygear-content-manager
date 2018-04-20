@@ -1,3 +1,4 @@
+import classNames from 'classnames';
 import { Location } from 'history';
 import * as qs from 'query-string';
 import * as React from 'react';
@@ -10,14 +11,52 @@ import { Dispatch } from 'redux';
 import { Role } from 'skygear';
 
 import { UserActionDispatcher } from '../../actions/user';
+import {
+  Filter,
+  FilterConfig,
+  FilterConfigTypes,
+  filterFactory,
+  FilterType,
+} from '../../cmsConfig';
+import { FilterList } from '../../components/FilterList';
+import { withEventHandler as withFilterListEventHandler } from '../../components/FilterListEventHandler';
 import { LoadingSpinner } from '../../components/LoadingSpinner';
 import Pagination from '../../components/Pagination';
+import {
+  InjectedProps as SyncFilterProps,
+  syncFilterWithUrl,
+} from '../../components/SyncUrl/SyncUrlFilter';
 import { RootState, RouteProps } from '../../states';
 import { SkygearUser } from '../../types';
 import { debounce } from '../../util';
 
+const HandledFilterList = withFilterListEventHandler(FilterList);
+
 // constants
 const UserListPerPageCount = 20;
+
+// TODO (Steven-Chan):
+// Allow custom filter configuration
+const filterConfigs: FilterConfig[] = [
+  {
+    label: '_id',
+    name: '_id',
+    nullable: false,
+    type: FilterConfigTypes.String,
+  },
+  {
+    label: 'Username',
+    name: 'username',
+    nullable: true,
+    type: FilterConfigTypes.String,
+  },
+  {
+    label: 'Email',
+    name: 'email',
+    nullable: true,
+    type: FilterConfigTypes.String,
+  },
+];
 
 const TableHeader: React.SFC = () => {
   return (
@@ -117,10 +156,11 @@ const ListTable: React.SFC<ListTableProps> = ({ users, ...rest }) => {
   );
 };
 
-type UserListPageProps = StateProps & DispatchProps;
+type UserListPageProps = StateProps & DispatchProps & SyncFilterProps;
 
 interface StateProps {
   adminRole: string;
+  filterConfigs: FilterConfig[];
   location: Location;
   page: number;
   maxPage: number;
@@ -131,8 +171,11 @@ interface StateProps {
 interface DispatchProps {
   dispatch: Dispatch<RootState>;
 }
+interface State {
+  showfilterMenu: boolean;
+}
 
-class UserListPageImpl extends React.PureComponent<UserListPageProps> {
+class UserListPageImpl extends React.PureComponent<UserListPageProps, State> {
   public userActionCreator: UserActionDispatcher;
 
   constructor(props: UserListPageProps) {
@@ -140,25 +183,102 @@ class UserListPageImpl extends React.PureComponent<UserListPageProps> {
 
     const { dispatch } = props;
 
+    this.state = {
+      showfilterMenu: false,
+    };
+
     this.userActionCreator = new UserActionDispatcher(dispatch);
     this.fetchList = debounce(this.fetchList.bind(this), 200);
 
-    this.onPageItemClicked = this.onPageItemClicked.bind(this);
     this.onCMSAccessChange = this.onCMSAccessChange.bind(this);
   }
 
   public componentDidMount() {
-    const { page } = this.props;
-    this.fetchList(page, UserListPerPageCount);
+    this.reloadList(this.props);
+  }
+
+  public componentWillReceiveProps(nextProps: UserListPageProps) {
+    const { filters, page } = this.props;
+
+    if (filters !== nextProps.filters || page !== nextProps.page) {
+      this.reloadList(nextProps);
+    }
+  }
+
+  public toggleFilterMenu() {
+    this.setState({ showfilterMenu: !this.state.showfilterMenu });
+  }
+
+  public onFilterItemClicked(filterConfig: FilterConfig) {
+    const newFilter = filterFactory(filterConfig);
+
+    const filters =
+      filterConfig.type === FilterConfigTypes.General
+        ? [newFilter]
+        : [
+            ...this.props.filters.filter(
+              f => f.type !== FilterType.GeneralFilterType
+            ),
+            newFilter,
+          ];
+
+    this.props.onChangeFilter(filters);
+    this.toggleFilterMenu();
   }
 
   public render() {
-    const { adminRole, isLoading, location, maxPage, page, users } = this.props;
+    const {
+      adminRole,
+      filters,
+      isLoading,
+      location,
+      maxPage,
+      page,
+      users,
+    } = this.props;
+    const { showfilterMenu } = this.state;
 
     return (
       <div>
         <div className="navbar">
           <h1 className="display-4">User Management</h1>
+          <div className="float-right">
+            <div className="dropdown float-right ml-2">
+              <button
+                type="button"
+                className="btn btn-primary dropdown-toggle"
+                onClick={() => this.toggleFilterMenu()}
+              >
+                Add Filter <span className="caret" />
+              </button>
+
+              <div
+                style={{ right: 0, left: 'unset' }}
+                className={classNames(
+                  'dropdown-menu-right',
+                  'dropdown-menu',
+                  showfilterMenu ? 'show' : ''
+                )}
+              >
+                {this.props.filterConfigs.map(filterConfig => (
+                  <a
+                    key={filterConfig.label}
+                    className="dropdown-item"
+                    onClick={() => this.onFilterItemClicked(filterConfig)}
+                  >
+                    {filterConfig.label}
+                  </a>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="float-right">
+          <HandledFilterList
+            filters={filters}
+            filterConfigs={this.props.filterConfigs}
+            onChangeFilter={this.props.onChangeFilter}
+          />
         </div>
         <div className="table-responsive">
           {(() => {
@@ -190,12 +310,13 @@ class UserListPageImpl extends React.PureComponent<UserListPageProps> {
     );
   }
 
-  public onPageItemClicked = (page: number) => {
-    this.fetchList(page, UserListPerPageCount);
-  };
+  public reloadList(props: UserListPageProps) {
+    const { filters, page } = props;
+    this.fetchList(page, UserListPerPageCount, filters);
+  }
 
-  public fetchList(page: number, perPage: number) {
-    this.userActionCreator.fetchList(page, perPage);
+  public fetchList(page: number, perPage: number, filters: Filter[]) {
+    this.userActionCreator.fetchList(page, perPage, filters);
   }
 
   public onCMSAccessChange(user: SkygearUser, hasAccess: boolean) {
@@ -217,6 +338,7 @@ function UserListPageFactory() {
 
     return {
       adminRole,
+      filterConfigs,
       isLoading,
       location,
       maxPage,
@@ -229,7 +351,8 @@ function UserListPageFactory() {
     return { dispatch };
   }
 
-  return connect(mapStateToProps, mapDispatchToProps)(UserListPageImpl);
+  const SyncedListPage = syncFilterWithUrl(UserListPageImpl);
+  return connect(mapStateToProps, mapDispatchToProps)(SyncedListPage);
 }
 
 export { UserListPageFactory };
