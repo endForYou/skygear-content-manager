@@ -22,6 +22,7 @@ export class FileAssetField extends React.PureComponent<FileAssetFieldProps> {
       return (
         <AssetUploader
           {...rest}
+          value={value}
           assetType={AssetType.File}
           onChange={onFieldChange}
           style={{
