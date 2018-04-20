@@ -116,6 +116,8 @@ records:
           label: Country
           reference_target: country
           reference_field_name: _id
+        - name: score
+          type: Number
       filters:
         - name: name
           type: String
@@ -186,6 +188,8 @@ records:
           reference_target: joblisting
           reference_field_name: proj_name
           reference_via_association_record: job_application
+        - name: score
+          type: Number
     edit:
       fields:
         - name: name
@@ -225,6 +229,8 @@ records:
           reference_target: cfunction
           reference_field_name: _id
           reference_via_association_record: user_wants_cfunction
+        - name: score
+          type: Number
     new:
       fields:
         - name: name
@@ -264,6 +270,8 @@ records:
           reference_target: cfunction
           reference_field_name: _id
           reference_via_association_record: user_wants_cfunction
+        - name: score
+          type: Number
   skill:
     list:
       fields:

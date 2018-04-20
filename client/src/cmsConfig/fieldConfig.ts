@@ -21,6 +21,7 @@ export type FieldConfig =
   | DateTimeFieldConfig
   | BooleanFieldConfig
   | IntegerFieldConfig
+  | NumberFieldConfig
   | ReferenceFieldConfig
   | BackReferenceFieldConfig
   | AssociationReferenceFieldConfig
@@ -34,6 +35,7 @@ export enum FieldConfigTypes {
   DateTime = 'DateTime',
   Boolean = 'Boolean',
   Integer = 'Integer',
+  Number = 'Number',
   Reference = 'Reference',
   BackReference = 'BackReference',
   AssociationReference = 'AssociationReference',
@@ -97,6 +99,10 @@ export interface BooleanFieldConfig extends FieldConfigAttrs {
 
 export interface IntegerFieldConfig extends FieldConfigAttrs {
   type: FieldConfigTypes.Integer;
+}
+
+export interface NumberFieldConfig extends FieldConfigAttrs {
+  type: FieldConfigTypes.Number;
 }
 
 export interface ReferenceFieldConfig extends FieldConfigAttrs {
@@ -201,6 +207,8 @@ export function parseNonReferenceFieldConfig(
       return parseBooleanFieldConfig(a);
     case 'Integer':
       return parseIntegerFieldConfig(a);
+    case 'Number':
+      return parseNumberFieldConfig(a);
     case 'ImageAsset':
       return parseImageAssetFieldConfig(a);
 
@@ -301,6 +309,13 @@ function parseIntegerFieldConfig(input: FieldConfigInput): IntegerFieldConfig {
   return {
     ...parseFieldConfigAttrs(input, 'Integer'),
     type: FieldConfigTypes.Integer,
+  };
+}
+
+function parseNumberFieldConfig(input: FieldConfigInput): NumberFieldConfig {
+  return {
+    ...parseFieldConfigAttrs(input, 'Number'),
+    type: FieldConfigTypes.Number,
   };
 }
 

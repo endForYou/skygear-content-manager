@@ -1,17 +1,17 @@
 import * as React from 'react';
 
-import { IntegerFieldConfig } from '../cmsConfig';
+import { NumberFieldConfig } from '../cmsConfig';
 import { RequiredFieldProps } from './Field';
 
-export type IntegerFieldProps = RequiredFieldProps<IntegerFieldConfig>;
+export type NumberFieldProps = RequiredFieldProps<NumberFieldConfig>;
 
 interface State {
   value: number;
   stringValue: string;
 }
 
-class IntegerFieldImpl extends React.PureComponent<IntegerFieldProps, State> {
-  constructor(props: IntegerFieldProps) {
+class NumberFieldImpl extends React.PureComponent<NumberFieldProps, State> {
+  constructor(props: NumberFieldProps) {
     super(props);
 
     this.state = {
@@ -20,7 +20,7 @@ class IntegerFieldImpl extends React.PureComponent<IntegerFieldProps, State> {
     };
   }
 
-  public componentWillReceiveProps(nextProps: IntegerFieldProps) {
+  public componentWillReceiveProps(nextProps: NumberFieldProps) {
     if (nextProps.value !== this.state.value) {
       this.setState({
         ...this.state,
@@ -48,7 +48,7 @@ class IntegerFieldImpl extends React.PureComponent<IntegerFieldProps, State> {
         />
       );
     } else {
-      return <span {...rest}>{this.state.value}</span>;
+      return <span {...rest}>{this.state.stringValue}</span>;
     }
   }
 
@@ -58,12 +58,12 @@ class IntegerFieldImpl extends React.PureComponent<IntegerFieldProps, State> {
       value = '0';
     }
 
-    const isValid = /^-?\d+$/.test(value);
+    const isValid = /^-?\d+(\.)?\d*$/.test(value);
     if (!isValid) {
       return;
     }
 
-    const num = parseInt(value, 10);
+    const num = parseFloat(value);
     this.setState({ ...this.state, stringValue: value, value: num }, () => {
       if (this.props.onFieldChange) {
         this.props.onFieldChange(num);
@@ -72,6 +72,6 @@ class IntegerFieldImpl extends React.PureComponent<IntegerFieldProps, State> {
   };
 }
 
-export const IntegerField: React.ComponentClass<
-  IntegerFieldProps
-> = IntegerFieldImpl;
+export const NumberField: React.ComponentClass<
+  NumberFieldProps
+> = NumberFieldImpl;
