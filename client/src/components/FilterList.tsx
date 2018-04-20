@@ -10,16 +10,22 @@ import {
   DateTimeFilter,
   DateTimeFilterQueryType,
   Filter,
+  FilterConfig,
   FilterType,
   GeneralFilter,
   IntegerFilter,
   IntegerFilterQueryType,
+  ReferenceFilter,
+  ReferenceFilterConfig,
+  ReferenceFilterQueryType,
   StringFilter,
   StringFilterQueryType,
 } from '../cmsConfig';
+import { ReferenceFilterInput } from '../filters/ReferenceFilterInput';
 
 interface FilterListProps {
   filters: Filter[];
+  filterConfigs: FilterConfig[];
   handleQueryTypeChange: (
     filter: Filter,
     event: React.ChangeEvent<HTMLSelectElement>
@@ -28,6 +34,7 @@ interface FilterListProps {
     filter: Filter,
     event: React.ChangeEvent<HTMLInputElement>
   ) => void;
+  handleReferenceChange: (filter: Filter, value: string[]) => void;
   onCloseFilterClicked: (filter: Filter) => void;
   handleDateTimeValueChange: (filter: Filter, datetime: Date) => void;
 }
@@ -37,14 +44,21 @@ const TIME_FORMAT = 'HH:mm:ss[Z]';
 
 export class FilterList extends React.PureComponent<FilterListProps> {
   public renderFilter(filter: Filter, index: number) {
-    const { onCloseFilterClicked } = this.props;
+    const { filterConfigs, onCloseFilterClicked } = this.props;
+    const config = filterConfigs.find(c => c.name === filter.name);
+    if (config == null) {
+      return null;
+    }
+
     return (
       <div key={index} className="form-inline mb-2">
         <div className="form-group mr-2">
           <label>{filter.label}</label>
         </div>
         <div className="form-group mr-2">{this.renderFilterSelect(filter)}</div>
-        <div className="form-group mr-4">{this.renderInput(filter)}</div>
+        <div className="form-group mr-4">
+          {this.renderInput(filter, config)}
+        </div>
         <div className="form-group">
           <button
             onClick={() => onCloseFilterClicked(filter)}
@@ -70,6 +84,8 @@ export class FilterList extends React.PureComponent<FilterListProps> {
         return this.renderDateTimeFilterSelect(filter);
       case FilterType.GeneralFilterType:
         return <div />;
+      case FilterType.ReferenceFilterType:
+        return this.renderReferenceFilterSelect(filter);
       default:
         throw new Error('unsupported FilterType in renderFilterSelect');
     }
@@ -159,7 +175,22 @@ export class FilterList extends React.PureComponent<FilterListProps> {
     );
   }
 
-  public renderInput(filter: Filter) {
+  public renderReferenceFilterSelect(filter: Filter) {
+    const { handleQueryTypeChange } = this.props;
+
+    return (
+      <select
+        className="form-control"
+        value={filter.query}
+        onChange={event => handleQueryTypeChange(filter, event)}
+      >
+        <option value={ReferenceFilterQueryType.Contains}>Contains</option>
+        {this.renderNullFilterSelect(filter)}
+      </select>
+    );
+  }
+
+  public renderInput(filter: Filter, config: FilterConfig) {
     switch (filter.query) {
       case BaseFilterQueryType.IsNull:
       case BaseFilterQueryType.IsNotNull:
@@ -177,6 +208,11 @@ export class FilterList extends React.PureComponent<FilterListProps> {
         return this.renderDateTimeInput(filter);
       case FilterType.GeneralFilterType:
         return this.renderGeneralInput(filter);
+      case FilterType.ReferenceFilterType:
+        return this.renderReferenceInput(
+          filter,
+          config as ReferenceFilterConfig
+        );
       default:
         throw new Error('unsupported FilterType in renderInput');
     }
@@ -231,6 +267,21 @@ export class FilterList extends React.PureComponent<FilterListProps> {
         autoFocus={true}
         onChange={event => handleFilterValueChange(filter, event)}
         value={filter.value}
+      />
+    );
+  }
+
+  public renderReferenceInput(
+    filter: ReferenceFilter,
+    config: ReferenceFilterConfig
+  ) {
+    const { handleReferenceChange } = this.props;
+    return (
+      <ReferenceFilterInput
+        className="form-control"
+        config={config}
+        onFieldChange={value => handleReferenceChange(filter, value)}
+        value={filter.values}
       />
     );
   }

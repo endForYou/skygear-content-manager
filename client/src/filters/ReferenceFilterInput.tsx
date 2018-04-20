@@ -3,17 +3,16 @@ import {
   Async as SelectAsync,
   LoadOptionsAsyncHandler,
   OnChangeHandler,
-  Option,
 } from 'react-select';
 // tslint:disable-next-line: no-submodule-imports
 import 'react-select/dist/react-select.css';
 import skygear, { Query, Record } from 'skygear';
 
-import { ReferenceFilterConfig } from '../../cmsConfig';
-import { debouncePromise1, makeArray } from '../../util';
-import { RequiredFilterFieldProps } from './FilterField';
+import { ReferenceFilterConfig } from '../cmsConfig';
+import { debouncePromise1, makeArray } from '../util';
+import { RequiredFilterInputProps } from './FilterInput';
 
-export type ReferenceFieldProps = RequiredFilterFieldProps<
+export type ReferenceFilterInputProps = RequiredFilterInputProps<
   ReferenceFilterConfig
 >;
 
@@ -29,36 +28,26 @@ interface RefOption {
 type StringSelectAsyncCtor<T> = new () => SelectAsync<T>;
 const StringSelectAsync = SelectAsync as StringSelectAsyncCtor<string>;
 
-class ReferenceFilterFieldImpl extends React.PureComponent<
-  ReferenceFieldProps,
+class ReferenceFilterInputImpl extends React.PureComponent<
+  ReferenceFilterInputProps,
   State
 > {
-  constructor(props: ReferenceFieldProps) {
-    super(props);
-
-    this.state = {
-      values: [],
-    };
-  }
-
   public render() {
     const {
       className: className,
       config: config,
       onFieldChange: _onFieldChange,
-      value: _value,
+      value,
       ...rest,
     } = this.props;
-
-    const { values } = this.state;
 
     return (
       <StringSelectAsync
         {...rest}
-        multi={true}
+        multi={false}
         loadOptions={this.debouncedLoadOptions}
         onChange={this.onChange}
-        value={values}
+        value={value != null && value.length > 0 ? value[0] : null}
       />
     );
   }
@@ -76,9 +65,12 @@ class ReferenceFilterFieldImpl extends React.PureComponent<
     }
     query.limit = 500;
     return skygear.publicDB.query(query).then(records => {
-      const options = records.map(record => {
-        return recordToOption(record, displayFieldName);
-      });
+      const values = records.map(record => record[displayFieldName]);
+      const distinctValues = Array.from(new Set(values));
+      const options = distinctValues.map(value => ({
+        label: value,
+        value,
+      }));
       return {
         complete: true,
         options,
@@ -93,11 +85,10 @@ class ReferenceFilterFieldImpl extends React.PureComponent<
 
   public onChange: OnChangeHandler<string> = value => {
     const values = makeArray(value).map(a => a.value);
-    this.setState({ values });
 
-    if (value === null) {
+    if (value == null) {
       if (this.props.onFieldChange) {
-        this.props.onFieldChange(null);
+        this.props.onFieldChange([]);
       }
 
       return;
@@ -109,15 +100,6 @@ class ReferenceFilterFieldImpl extends React.PureComponent<
   };
 }
 
-function recordToOption(r: Record, fieldName: string): Option<string> {
-  return {
-    // TODO: validate r[fieldName] and make sure it's a string
-    // or convertable to string
-    label: r[fieldName],
-    value: r._id,
-  };
-}
-
-export const ReferenceFilterField: React.ComponentClass<
-  ReferenceFieldProps
-> = ReferenceFilterFieldImpl;
+export const ReferenceFilterInput: React.ComponentClass<
+  ReferenceFilterInputProps
+> = ReferenceFilterInputImpl;

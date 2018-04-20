@@ -5,10 +5,14 @@ import Select from 'react-select';
 import skygear, { Query, QueryResult, Record } from 'skygear';
 
 import { PushCampaignActionDispatcher } from '../../actions/pushCampaign';
-import { FilterConfig, FilterConfigTypes } from '../../cmsConfig';
+import {
+  FilterConfig,
+  FilterConfigTypes,
+  ReferenceFilterConfig,
+} from '../../cmsConfig';
+import { FilterInput } from '../../filters/FilterInput';
 import { RootState } from '../../states';
 import { NewPushCampaign, Remote, RemoteType } from '../../types';
-import { FilterField } from './FilterField';
 
 export interface NewPushNotificationPageProps {
   filterConfigs: FilterConfig[];
@@ -32,10 +36,6 @@ interface FilterOption {
   value: any;
 }
 
-// Effectively a Promise Factory
-// tslint:disable-next-line: no-any
-export type Effect = () => Promise<any>;
-
 interface CampaignTypeOption {
   label: string;
   value: string;
@@ -57,8 +57,7 @@ type FilterChangeHandler = (
   name: string,
   type: string,
   // tslint:disable-next-line: no-any
-  value: any,
-  effect?: Effect
+  value: any
 ) => void;
 
 class NewPushNotificationPageImpl extends React.PureComponent<
@@ -223,8 +222,7 @@ class NewPushNotificationPageImpl extends React.PureComponent<
   public handleFilterChange: FilterChangeHandler = (
     name,
     filterType,
-    value,
-    effect
+    value
   ) => {
     const newFilterOptionsByName = {
       ...this.state.filterOptionsByName,
@@ -317,7 +315,16 @@ class NewPushNotificationPageImpl extends React.PureComponent<
       const value = filterOption.value;
       switch (filterOption.filterType) {
         case FilterConfigTypes.Reference:
-          query.contains(key, value);
+          const { filterConfigs } = this.props;
+          const filterConfig = filterConfigs.find(c => c.name === key);
+          if (filterConfig == null) {
+            break;
+          }
+          const refFilterConfig = filterConfig as ReferenceFilterConfig;
+          query.like(
+            `${key}.${refFilterConfig.displayFieldName}`,
+            `%${value}%`
+          );
           break;
         case FilterConfigTypes.String:
           query.like(key, '%' + value + '%');
@@ -354,14 +361,15 @@ function FormField(props: FieldProps): JSX.Element {
   const { name, type: filterType } = filterFieldConfig;
 
   const fieldValue =
-    filterOptionsByName[name] === undefined ? name : filterOptionsByName[name];
+    filterOptionsByName[name] === undefined
+      ? name
+      : filterOptionsByName[name].value;
   return (
-    <FilterField
+    <FilterInput
       className="form-control"
       config={filterFieldConfig}
       value={fieldValue}
-      onFieldChange={(value, effect) =>
-        onFilterChange(name, filterType, value, effect)}
+      onFieldChange={value => onFilterChange(name, filterType, value)}
     />
   );
 }

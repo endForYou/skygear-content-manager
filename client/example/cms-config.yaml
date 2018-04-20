@@ -121,6 +121,12 @@ records:
       filters:
         - name: name
           type: String
+        - name: city
+          type: Reference
+          label: City
+          reference_target: city
+          reference_field_name: display_name
+          nullable: true
       actions:
         - type: Import
           name: import-user
@@ -876,5 +882,9 @@ push_notifications:
     - name: name
       type: String
       label: Name
+    - name: city
+      type: Reference
+      reference_target: city
+      reference_field_name: display_name
 user_management:
   enabled: true

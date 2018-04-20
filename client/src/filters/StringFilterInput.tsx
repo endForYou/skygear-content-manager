@@ -1,23 +1,23 @@
 import * as React from 'react';
 
-import { StringFilterConfig } from '../../cmsConfig';
-import { debounce } from '../../util';
-import { FieldChangeHandler, RequiredFilterFieldProps } from './FilterField';
+import { StringFilterConfig } from '../cmsConfig';
+import { debounce } from '../util';
+import { FieldChangeHandler, RequiredFilterInputProps } from './FilterInput';
 
-export interface StringFilterFieldState {
+export interface StringFilterInputState {
   value: string;
 }
 
-export type StringFilterFieldProps = RequiredFilterFieldProps<
+export type StringFilterInputProps = RequiredFilterInputProps<
   StringFilterConfig
 >;
 
-export class StringFilterField extends React.PureComponent<
-  StringFilterFieldProps,
-  StringFilterFieldState
+export class StringFilterInput extends React.PureComponent<
+  StringFilterInputProps,
+  StringFilterInputState
 > {
   public onFieldChange: FieldChangeHandler | undefined;
-  constructor(props: StringFilterFieldProps) {
+  constructor(props: StringFilterInputProps) {
     super(props);
 
     if (this.props.onFieldChange) {

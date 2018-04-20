@@ -278,6 +278,7 @@ export interface ReferenceFilter extends FilterAttrs {
   type: FilterType.ReferenceFilterType;
   query: BaseFilterQueryType | ReferenceFilterQueryType;
   values: string[];
+  displayFieldName: string;
 }
 
 export type FilterQueryType =
@@ -343,6 +344,7 @@ export function filterFactory(filterConfig: FilterConfig): Filter {
       };
     case FilterConfigTypes.Reference:
       return {
+        displayFieldName: filterConfig.displayFieldName,
         id: uuid(),
         label: filterConfig.label,
         name: filterConfig.name,
