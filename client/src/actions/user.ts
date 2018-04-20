@@ -183,6 +183,10 @@ function fetchUsersImpl(
     .query(query)
     .then((queryResult: QueryResult<Record>) => {
       userRecords = queryResult.map((r: Record) => r);
+      if (userRecords.length === 0) {
+        return Promise.resolve({});
+      }
+
       overallCount = queryResult.overallCount;
       return skygear.auth.fetchUserRole(userRecords);
     })
