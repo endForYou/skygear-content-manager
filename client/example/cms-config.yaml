@@ -96,6 +96,22 @@ exports:
 records:
   user:
     list:
+      predicates:
+        - name: name
+          predicate: NotLike
+          value: '%admin%'
+        - name: _created_at
+          predicate: GreaterThan
+          value: 2018-01-01
+        - name: city
+          predicate: NotEqualTo
+          valueType: Reference
+          value:
+            reference_target: city
+            reference_id: hk
+      default_sort:
+        name: name
+        ascending: false
       fields:
         - type: _id
         - name: name

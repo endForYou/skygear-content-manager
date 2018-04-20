@@ -33,6 +33,11 @@ import {
   StringFilter,
   StringFilterQueryType,
 } from '../cmsConfig';
+import {
+  Predicate,
+  PredicateTypes,
+  PredicateValueTypes,
+} from '../cmsConfig/predicateConfig';
 import { parseReference } from '../recordUtil';
 import { RootState } from '../states';
 import { groupBy } from '../util';
@@ -352,6 +357,7 @@ function fetchRecordList(
   cmsRecord: CmsRecord,
   references: ReferenceConfig[],
   filters: Filter[],
+  predicates: Predicate[],
   page: number = 1,
   perPage: number = 25,
   sortByName: string | undefined,
@@ -361,6 +367,7 @@ function fetchRecordList(
   return dispatch => {
     const recordCls = Record.extend(cmsRecord.recordType);
     const query = queryWithFilters(filters, recordCls);
+    applyPredicatesToQuery(query, predicates);
 
     query.overallCount = true;
     query.limit = perPage;
@@ -554,6 +561,74 @@ function createGeneralFilterQuery(filter: GeneralFilter, recordCls: RecordCls) {
         `createGeneralFilterQuery does not support GeneralFilterQueryType ${filter.query}`
       );
   }
+}
+
+function applyPredicatesToQuery(query: Query, predicates: Predicate[]) {
+  predicates.forEach(predicate => {
+    // tslint:disable-next-line: no-any
+    let func: (key: string, value: any) => Query;
+    switch (predicate.type) {
+      case PredicateTypes.Like:
+        func = query.like.bind(query);
+        break;
+      case PredicateTypes.NotLike:
+        func = query.notLike.bind(query);
+        break;
+      case PredicateTypes.CaseInsensitiveLike:
+        func = query.caseInsensitiveLike.bind(query);
+        break;
+      case PredicateTypes.CaseInsensitiveNotLike:
+        func = query.caseInsensitiveNotLike.bind(query);
+        break;
+      case PredicateTypes.EqualTo:
+        func = query.equalTo.bind(query);
+        break;
+      case PredicateTypes.NotEqualTo:
+        func = query.notEqualTo.bind(query);
+        break;
+      case PredicateTypes.GreaterThan:
+        func = query.greaterThan.bind(query);
+        break;
+      case PredicateTypes.GreaterThanOrEqualTo:
+        func = query.greaterThanOrEqualTo.bind(query);
+        break;
+      case PredicateTypes.LessThan:
+        func = query.lessThan.bind(query);
+        break;
+      case PredicateTypes.LessThanOrEqualTo:
+        func = query.lessThanOrEqualTo.bind(query);
+        break;
+      case PredicateTypes.Contains:
+        func = query.contains.bind(query);
+        break;
+      case PredicateTypes.NotContains:
+        func = query.notContains.bind(query);
+        break;
+      case PredicateTypes.ContainsValue:
+        func = query.containsValue.bind(query);
+        break;
+      case PredicateTypes.NotContainsValue:
+        func = query.notContainsValue.bind(query);
+        break;
+      default:
+        throw new Error(`Unexpected predicate type: ${predicate.type}`);
+    }
+
+    // tslint:disable-next-line: no-any
+    let value: any;
+    switch (predicate.valueType) {
+      case PredicateValueTypes.JSONValue:
+        value = predicate.value;
+        break;
+      case PredicateValueTypes.Reference:
+        const refValue = predicate.value;
+        value = new Reference(
+          `${refValue.targetCmsRecord.recordType}/${refValue.id}`
+        );
+    }
+
+    query = func(predicate.name, value);
+  });
 }
 
 interface BackReferenceAttrs {
@@ -885,6 +960,7 @@ export class RecordActionDispatcher {
     page: number,
     perPage: number,
     filters: Filter[] = [],
+    predicates: Predicate[] = [],
     sortByName: string | undefined,
     isAscending: boolean
   ): Promise<void> {
@@ -901,6 +977,7 @@ export class RecordActionDispatcher {
         this.cmsRecord,
         this.references,
         filters,
+        predicates,
         page,
         perPage,
         sortByName,

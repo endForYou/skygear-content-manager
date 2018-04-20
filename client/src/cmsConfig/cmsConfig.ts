@@ -1,3 +1,4 @@
+import { SortOrder, SortState } from '../types';
 import { humanize, isObject, objectFrom } from './../util';
 import { mapDefaultActionToAction } from './defaultActions';
 import {
@@ -10,6 +11,7 @@ import {
   ReferenceFieldConfig,
 } from './fieldConfig';
 import { FilterConfig, parseFilterConfig } from './filterConfig';
+import { parsePredicateConfig, PredicateValue } from './predicateConfig';
 import {
   parsePushNotificationConfig,
   PushNotificationsConfig,
@@ -18,7 +20,7 @@ import {
   parseUserManagementConfig,
   UserManagementConfig,
 } from './userManagementConfig';
-import { parseOptionalString, parseString } from './util';
+import { parseBoolean, parseOptionalString, parseString } from './util';
 
 export interface CmsConfig {
   site: SiteConfig;
@@ -87,6 +89,8 @@ export interface ListPageConfig {
   perPage: number;
   fields: FieldConfig[];
   filters: FilterConfig[];
+  predicates: PredicateValue;
+  defaultSort: SortState;
   references: ReferenceConfig[];
   actions: ListActionConfig[];
   itemActions: ListItemActionConfig[];
@@ -329,14 +333,32 @@ function parseListPageConfig(
   const actions = parseListActions(input.actions);
   const itemActions = parseListItemActions(input.item_actions);
 
+  const defaultSort = SortState();
+  if (input.default_sort) {
+    defaultSort.fieldName = parseString(
+      input.default_sort,
+      'name',
+      'List.DefaultSort'
+    );
+    defaultSort.order = parseBoolean(
+      input.default_sort,
+      'ascending',
+      'List.DefaultSort'
+    )
+      ? SortOrder.Ascending
+      : SortOrder.Descending;
+  }
+
   return {
     actions,
     cmsRecord,
+    defaultSort,
     fields: compactFields,
     filters,
     itemActions,
     label,
     perPage,
+    predicates: parsePredicateConfig(input.predicates, context) || [],
     references: filterReferences(compactFields),
   };
 }

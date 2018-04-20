@@ -12,6 +12,20 @@ export function parseString(
   return optionalString;
 }
 
+export function parseBoolean(
+  // tslint:disable-next-line: no-any
+  a: any,
+  fieldName: string,
+  context: string
+): boolean {
+  const optionalBoolean = parseOptionalBoolean(a, fieldName, context);
+  if (optionalBoolean === undefined) {
+    throw new Error(`${context}.${fieldName} want a boolean, got undefined`);
+  }
+
+  return optionalBoolean;
+}
+
 export function parseOptionalString(
   // tslint:disable-next-line: no-any
   a: any,
