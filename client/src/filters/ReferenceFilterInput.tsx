@@ -44,10 +44,10 @@ class ReferenceFilterInputImpl extends React.PureComponent<
     return (
       <StringSelectAsync
         {...rest}
-        multi={true}
+        multi={false}
         loadOptions={this.debouncedLoadOptions}
         onChange={this.onChange}
-        value={value}
+        value={value != null && value.length > 0 ? value[0] : null}
       />
     );
   }
@@ -86,9 +86,9 @@ class ReferenceFilterInputImpl extends React.PureComponent<
   public onChange: OnChangeHandler<string> = value => {
     const values = makeArray(value).map(a => a.value);
 
-    if (value === null) {
+    if (value == null) {
       if (this.props.onFieldChange) {
-        this.props.onFieldChange(null);
+        this.props.onFieldChange([]);
       }
 
       return;
