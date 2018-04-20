@@ -7,6 +7,7 @@ from marshmallow import ValidationError
 import requests
 import skygear
 from skygear import static_assets
+from skygear.options import options
 from skygear.utils.assets import directory_assets
 from urllib.parse import parse_qs
 

@@ -26,7 +26,8 @@ export type FieldConfig =
   | BackReferenceFieldConfig
   | AssociationReferenceFieldConfig
   | EmbeddedBackReferenceFieldConfig
-  | ImageAssetFieldConfig;
+  | ImageAssetFieldConfig
+  | FileAssetFieldConfig;
 export enum FieldConfigTypes {
   String = 'String',
   TextArea = 'TextArea',
@@ -41,6 +42,7 @@ export enum FieldConfigTypes {
   AssociationReference = 'AssociationReference',
   EmbeddedBackReference = 'EmbeddedBackReference',
   ImageAsset = 'ImageAsset',
+  FileAsset = 'FileAsset',
 }
 
 export enum SortOrder {
@@ -152,6 +154,10 @@ export interface ImageAssetFieldConfig extends FieldConfigAttrs {
   type: FieldConfigTypes.ImageAsset;
 }
 
+export interface FileAssetFieldConfig extends FieldConfigAttrs {
+  type: FieldConfigTypes.FileAsset;
+}
+
 interface DropdownOption {
   label: string;
   value: string;
@@ -211,6 +217,8 @@ export function parseNonReferenceFieldConfig(
       return parseNumberFieldConfig(a);
     case 'ImageAsset':
       return parseImageAssetFieldConfig(a);
+    case 'FileAsset':
+      return parseFileAssetFieldConfig(a);
 
     // built-in fields
     case '_id':
@@ -496,8 +504,17 @@ function parseImageAssetFieldConfig(
   input: FieldConfigInput
 ): ImageAssetFieldConfig {
   return {
-    ...parseFieldConfigAttrs(input, 'Reference'),
+    ...parseFieldConfigAttrs(input, 'ImageAsset'),
     type: FieldConfigTypes.ImageAsset,
+  };
+}
+
+function parseFileAssetFieldConfig(
+  input: FieldConfigInput
+): FileAssetFieldConfig {
+  return {
+    ...parseFieldConfigAttrs(input, 'FileAsset'),
+    type: FieldConfigTypes.FileAsset,
   };
 }
 

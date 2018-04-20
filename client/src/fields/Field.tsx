@@ -10,6 +10,7 @@ import { BooleanField } from './BooleanField';
 import { DateTimeField } from './DateTimeField';
 import { DropdownField } from './DropdownField';
 import { EmbeddedBackReferenceField } from './EmbeddedBackReferenceField';
+import { FileAssetField } from './FileAssetField';
 import { ImageAssetField } from './ImageAssetField';
 import { IntegerField } from './IntegerField';
 import { NumberField } from './NumberField';
@@ -81,6 +82,8 @@ export class Field extends React.PureComponent<FieldProps> {
         return <EmbeddedBackReferenceField {...rest} config={config} />;
       case FieldConfigTypes.ImageAsset:
         return <ImageAssetField {...rest} config={config} />;
+      case FieldConfigTypes.FileAsset:
+        return <FileAssetField {...rest} config={config} />;
     }
   }
 }
