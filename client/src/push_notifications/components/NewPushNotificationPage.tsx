@@ -361,7 +361,9 @@ function FormField(props: FieldProps): JSX.Element {
   const { name, type: filterType } = filterFieldConfig;
 
   const fieldValue =
-    filterOptionsByName[name] === undefined ? name : filterOptionsByName[name];
+    filterOptionsByName[name] === undefined
+      ? name
+      : filterOptionsByName[name].value;
   return (
     <FilterInput
       className="form-control"
