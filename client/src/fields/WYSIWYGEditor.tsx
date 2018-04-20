@@ -1,11 +1,16 @@
 import { Editor } from '@tinymce/tinymce-react';
 import * as React from 'react';
 
+import { connect } from 'react-redux';
 import { WYSIWYGFieldConfig } from '../cmsConfig';
-import config from '../config';
+import { AppConfig } from '../config';
+import { RootState } from '../states';
 import { RequiredFieldProps } from './Field';
 
-export type WYSIWYGEditorProps = RequiredFieldProps<WYSIWYGFieldConfig>;
+export interface WYSIWYGEditorProps
+  extends RequiredFieldProps<WYSIWYGFieldConfig> {
+  appConfig: AppConfig;
+}
 
 interface State {
   // editorState: EditorState;
@@ -13,7 +18,7 @@ interface State {
 }
 
 // tslint:disable max-line-length
-const defaultEditorInitObj = {
+const makeDefaultEditorInitObj = (config: AppConfig) => ({
   height: 480,
   plugins:
     'anchor charmap code colorpicker contextmenu fullscreen hr image imagetools link lists nonbreaking paste tabfocus table textcolor',
@@ -22,13 +27,10 @@ const defaultEditorInitObj = {
     'tinymce/skins/lightgray',
   toolbar1:
     'bold italic strikethrough forecolor backcolor | link image | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent  | removeformat',
-};
+});
 // tslint:enable max-line-length
 
-export class WYSIWYGEditor extends React.PureComponent<
-  WYSIWYGEditorProps,
-  State
-> {
+class WYSIWYGEditorImpl extends React.PureComponent<WYSIWYGEditorProps, State> {
   constructor(props: WYSIWYGEditorProps) {
     super(props);
 
@@ -48,7 +50,10 @@ export class WYSIWYGEditor extends React.PureComponent<
     const { value } = this.state;
 
     // tslint:disable-next-line: no-any
-    const editorEditInitObj: any = { ...defaultEditorInitObj, ...userConfig };
+    const editorEditInitObj: any = {
+      ...this.defaultEditorInitObj,
+      ...userConfig,
+    };
     if (!editable) {
       editorEditInitObj.readonly = true;
       editorEditInitObj.menubar = false;
@@ -73,4 +78,12 @@ export class WYSIWYGEditor extends React.PureComponent<
       onFieldChange(content);
     }
   };
+
+  private get defaultEditorInitObj() {
+    return makeDefaultEditorInitObj(this.props.appConfig);
+  }
 }
+
+export const WYSIWYGEditor = connect((state: RootState) => ({
+  appConfig: state.appConfig,
+}))(WYSIWYGEditorImpl);
