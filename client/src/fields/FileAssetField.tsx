@@ -19,7 +19,7 @@ export class FileAssetField extends React.PureComponent<FileAssetFieldProps> {
 
   public render() {
     const {
-      config: { editable },
+      config: { editable, nullable },
       context: _context,
       onFieldChange,
       value: value,
@@ -39,7 +39,7 @@ export class FileAssetField extends React.PureComponent<FileAssetFieldProps> {
               width: 232,
             }}
           />
-          {this.renderClearButton()}
+          {nullable && this.renderClearButton()}
         </div>
       );
     }

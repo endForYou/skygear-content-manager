@@ -21,7 +21,7 @@ export class ImageAssetField extends React.PureComponent<ImageAssetFieldProps> {
 
   public render() {
     const {
-      config: { editable },
+      config: { editable, nullable },
       context: _context,
       onFieldChange: _onFieldChange,
       value: value,
@@ -32,7 +32,7 @@ export class ImageAssetField extends React.PureComponent<ImageAssetFieldProps> {
       return (
         <div>
           <ImageAssetUploader {...this.props} />
-          {this.renderClearButton()}
+          {nullable && this.renderClearButton()}
         </div>
       );
     }
