@@ -14,6 +14,7 @@ class ImageAssetUploaderImpl extends React.PureComponent<
     return (
       <AssetUploader
         {...rest}
+        accept="image/*"
         assetType={AssetType.Image}
         onChange={onFieldChange}
         style={{
