@@ -146,6 +146,7 @@ export interface ImageAssetFieldConfig extends FieldConfigAttrs {
 export interface FileAssetFieldConfig extends FieldConfigAttrs {
   type: FieldConfigTypes.FileAsset;
   nullable: boolean;
+  accept: string;
 }
 
 interface DropdownOption {
@@ -485,6 +486,7 @@ function parseFileAssetFieldConfig(
 
   return {
     ...parseFieldConfigAttrs(input, 'FileAsset'),
+    accept: parseOptionalString(input, 'accept', 'FileAsset') || '',
     nullable: nullable == null ? true : nullable,
     type: FieldConfigTypes.FileAsset,
   };
