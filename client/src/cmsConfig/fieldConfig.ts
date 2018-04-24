@@ -152,10 +152,12 @@ export interface EmbeddedBackReferenceFieldConfig extends FieldConfigAttrs {
 
 export interface ImageAssetFieldConfig extends FieldConfigAttrs {
   type: FieldConfigTypes.ImageAsset;
+  nullable: boolean;
 }
 
 export interface FileAssetFieldConfig extends FieldConfigAttrs {
   type: FieldConfigTypes.FileAsset;
+  nullable: boolean;
 }
 
 interface DropdownOption {
@@ -503,8 +505,11 @@ function deriveReferencesByTargetName(
 function parseImageAssetFieldConfig(
   input: FieldConfigInput
 ): ImageAssetFieldConfig {
+  const nullable = parseOptionalBoolean(input, 'nullable', 'ImageAsset');
+
   return {
     ...parseFieldConfigAttrs(input, 'ImageAsset'),
+    nullable: nullable == null ? true : nullable,
     type: FieldConfigTypes.ImageAsset,
   };
 }
@@ -512,8 +517,11 @@ function parseImageAssetFieldConfig(
 function parseFileAssetFieldConfig(
   input: FieldConfigInput
 ): FileAssetFieldConfig {
+  const nullable = parseOptionalBoolean(input, 'nullable', 'FileAsset');
+
   return {
     ...parseFieldConfigAttrs(input, 'FileAsset'),
+    nullable: nullable == null ? true : nullable,
     type: FieldConfigTypes.FileAsset,
   };
 }

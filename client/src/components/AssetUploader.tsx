@@ -32,11 +32,6 @@ interface Props {
   onChange?: (asset: Asset) => void;
 }
 
-interface State {
-  value?: Asset;
-  droppedFile?: DroppedFile;
-}
-
 function DroppedFile(file: File, previewURL: string): DroppedFile {
   return {
     file,
@@ -79,25 +74,15 @@ const AssetDisplay: React.SFC<{
   }
 };
 
-interface DropAreaProps extends State {
+interface DropAreaProps {
+  value?: Asset;
   assetType: AssetType;
   previewStyle?: object;
 }
 
 const DropArea: React.SFC<DropAreaProps> = props => {
-  const { value, droppedFile, assetType, previewStyle } = props;
-  if (droppedFile !== undefined) {
-    return (
-      <AssetDisplay
-        url={droppedFile.previewURL}
-        name={droppedFile.file.name}
-        assetType={assetType}
-        previewStyle={previewStyle}
-      />
-    );
-  }
-
-  if (value === undefined || value.url === undefined) {
+  const { value, assetType, previewStyle } = props;
+  if (value == null || value.url == null) {
     return <div>Drop {assetType} here or click to upload.</div>;
   }
 
@@ -111,17 +96,28 @@ const DropArea: React.SFC<DropAreaProps> = props => {
   );
 };
 
-export class AssetUploader extends React.PureComponent<Props, State> {
+export class AssetUploader extends React.PureComponent<Props> {
+  private droppedFile?: DroppedFile;
+
   constructor(props: Props) {
     super(props);
-
-    this.state = {
-      value: this.props.value,
-    };
   }
 
   public componentWillReceiveProps(nextProps: Props) {
-    this.setState({ value: nextProps.value });
+    if (nextProps.value == null) {
+      if (this.droppedFile) {
+        releaseDroppedFile(this.droppedFile);
+      }
+
+      return;
+    }
+
+    if (
+      this.droppedFile &&
+      this.droppedFile.previewURL !== nextProps.value.url
+    ) {
+      releaseDroppedFile(this.droppedFile);
+    }
   }
 
   public render() {
@@ -130,7 +126,7 @@ export class AssetUploader extends React.PureComponent<Props, State> {
       onChange,
       previewStyle,
       style,
-      value: _value,
+      value,
       ...rest,
     } = this.props;
 
@@ -147,7 +143,7 @@ export class AssetUploader extends React.PureComponent<Props, State> {
         style={style}
       >
         <DropArea
-          {...this.state}
+          value={value}
           assetType={assetType}
           previewStyle={previewStyle}
         />
@@ -161,16 +157,24 @@ export class AssetUploader extends React.PureComponent<Props, State> {
       return;
     }
 
-    if (this.state.droppedFile !== undefined) {
-      releaseDroppedFile(this.state.droppedFile);
+    if (this.droppedFile !== undefined) {
+      releaseDroppedFile(this.droppedFile);
     }
 
     const previewURL = URL.createObjectURL(file);
-
-    this.setState({ droppedFile: DroppedFile(file, previewURL) });
+    this.droppedFile = DroppedFile(file, previewURL);
 
     if (this.props.onChange) {
-      this.props.onChange(fileToAsset(file));
+      this.props.onChange(
+        new Asset({
+          file,
+          name: file.name,
+
+          // this makes use of the fact that skygear Asset for upload ignores
+          // this url field, so the field is used by this AssetUploader only
+          url: previewURL,
+        })
+      );
     }
   };
 }
@@ -179,11 +183,4 @@ function releaseDroppedFile(droppedFile: DroppedFile): void {
   if (droppedFile.previewURL != null) {
     URL.revokeObjectURL(droppedFile.previewURL);
   }
-}
-
-function fileToAsset(file: File): Asset {
-  return new Asset({
-    file,
-    name: file.name,
-  });
 }

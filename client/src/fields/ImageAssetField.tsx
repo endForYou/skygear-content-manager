@@ -11,9 +11,17 @@ import './ImageAssetField.css';
 export type ImageAssetFieldProps = RequiredFieldProps<ImageAssetFieldConfig>;
 
 export class ImageAssetField extends React.PureComponent<ImageAssetFieldProps> {
+  public renderClearButton() {
+    return (
+      <button className="btn btn-light mt-2" onClick={this.onClearClick}>
+        Clear Image
+      </button>
+    );
+  }
+
   public render() {
     const {
-      config: { editable },
+      config: { editable, nullable },
       context: _context,
       onFieldChange: _onFieldChange,
       value: value,
@@ -21,10 +29,15 @@ export class ImageAssetField extends React.PureComponent<ImageAssetFieldProps> {
     } = this.props;
 
     if (editable) {
-      return <ImageAssetUploader {...this.props} />;
+      return (
+        <div>
+          <ImageAssetUploader {...this.props} />
+          {nullable && this.renderClearButton()}
+        </div>
+      );
     }
 
-    if (value === undefined) {
+    if (value == null) {
       return <NullField {...rest} />;
     }
 
@@ -41,4 +54,12 @@ export class ImageAssetField extends React.PureComponent<ImageAssetFieldProps> {
       </a>
     );
   }
+
+  private onClearClick = (event: React.MouseEvent<HTMLElement>) => {
+    event.preventDefault();
+
+    if (this.props.onFieldChange) {
+      this.props.onFieldChange(null);
+    }
+  };
 }

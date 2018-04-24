@@ -222,6 +222,7 @@ records:
           type: String
         - name: profile_image
           type: ImageAsset
+          nullable: false
         - name: cv
           type: FileAsset
         - name: city
