@@ -34,7 +34,6 @@ class ReferenceFilterInputImpl extends React.PureComponent<
 > {
   public render() {
     const {
-      className: className,
       config: config,
       onFieldChange: _onFieldChange,
       value,

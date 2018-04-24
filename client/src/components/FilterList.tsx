@@ -1,3 +1,5 @@
+import './FilterList.css';
+
 import moment from 'moment';
 import * as React from 'react';
 import * as Datetime from 'react-datetime';
@@ -56,7 +58,7 @@ export class FilterList extends React.PureComponent<FilterListProps> {
           <label>{filter.label}</label>
         </div>
         <div className="form-group mr-2">{this.renderFilterSelect(filter)}</div>
-        <div className="form-group mr-4">
+        <div className="form-group filter-input mr-4">
           {this.renderInput(filter, config)}
         </div>
         <div className="form-group">
@@ -278,7 +280,7 @@ export class FilterList extends React.PureComponent<FilterListProps> {
     const { handleReferenceChange } = this.props;
     return (
       <ReferenceFilterInput
-        className="form-control"
+        className="ref-input"
         config={config}
         onFieldChange={value => handleReferenceChange(filter, value)}
         value={filter.values}
