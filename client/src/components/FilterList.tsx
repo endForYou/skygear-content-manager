@@ -1,6 +1,5 @@
 import moment from 'moment';
 import * as React from 'react';
-import * as Datetime from 'react-datetime';
 // tslint:disable-next-line: no-submodule-imports
 import 'react-datetime/css/react-datetime.css';
 
@@ -8,6 +7,7 @@ import {
   BaseFilterQueryType,
   BooleanFilterQueryType,
   DateTimeFilter,
+  DateTimeFilterConfig,
   DateTimeFilterQueryType,
   Filter,
   FilterConfig,
@@ -21,6 +21,7 @@ import {
   StringFilter,
   StringFilterQueryType,
 } from '../cmsConfig';
+import { TzDatetimeInput } from '../components/TzDatetimeInput';
 import { ReferenceFilterInput } from '../filters/ReferenceFilterInput';
 
 interface FilterListProps {
@@ -40,7 +41,7 @@ interface FilterListProps {
 }
 
 const DATE_FORMAT = 'YYYY-MM-DD';
-const TIME_FORMAT = 'HH:mm:ss[Z]';
+const TIME_FORMAT = 'HH:mm:ss';
 
 export class FilterList extends React.PureComponent<FilterListProps> {
   public renderFilter(filter: Filter, index: number) {
@@ -205,7 +206,7 @@ export class FilterList extends React.PureComponent<FilterListProps> {
       case FilterType.BooleanFilterType:
         return <div />;
       case FilterType.DateTimeFilterType:
-        return this.renderDateTimeInput(filter);
+        return this.renderDateTimeInput(filter, config as DateTimeFilterConfig);
       case FilterType.GeneralFilterType:
         return this.renderGeneralInput(filter);
       case FilterType.ReferenceFilterType:
@@ -245,14 +246,19 @@ export class FilterList extends React.PureComponent<FilterListProps> {
       />
     );
   }
-  public renderDateTimeInput(filter: DateTimeFilter) {
+  public renderDateTimeInput(
+    filter: DateTimeFilter,
+    config: DateTimeFilterConfig
+  ) {
+    const timeFormat =
+      config.timezone === 'Local' ? TIME_FORMAT : `${TIME_FORMAT}Z`;
     return (
-      <Datetime
+      <TzDatetimeInput
         dateFormat={DATE_FORMAT}
-        timeFormat={TIME_FORMAT}
+        timeFormat={timeFormat}
         value={filter.value}
         onChange={event => this.handleDateTimeChange(filter, event)}
-        utc={true}
+        timezone={config.timezone}
       />
     );
   }
