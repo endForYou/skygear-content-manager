@@ -20,3 +20,9 @@
 .dropzone-image {
     background-size: cover;
 }
+
+.file-link {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

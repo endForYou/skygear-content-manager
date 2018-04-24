@@ -37,7 +37,7 @@ export class FileAssetField extends React.PureComponent<FileAssetFieldProps> {
             onChange={onFieldChange}
             style={{
               height: 155,
-              width: 232,
+              width: 348,
             }}
           />
           {nullable && this.renderClearButton()}
