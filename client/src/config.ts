@@ -9,6 +9,9 @@ export interface AppConfig {
 
 /**
  * Default App Config
+ * 
+ * Do NOT import this file to get app config, because the value of this config is set in build time
+ * You should instead get the app config from redux store
  */
 export default {
   adminRole: process.env.REACT_APP_ADMIN_ROLE || 'Admin',
