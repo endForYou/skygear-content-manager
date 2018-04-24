@@ -5,9 +5,11 @@ import {
   parseOptionalString,
   parseString,
   parseStringArray,
+  parseTimezone,
 } from './util';
 
-import { CmsRecord, ConfigContext } from './cmsConfig';
+import { TimezoneValue } from '../types';
+import { CmsRecord, ConfigContext, RecordTypeContext } from './cmsConfig';
 
 export type FilterConfig =
   | StringFilterConfig
@@ -56,6 +58,7 @@ export interface BooleanFilterConfig extends FilterConfigInput {
 export interface DateTimeFilterConfig extends FilterConfigInput {
   type: FilterConfigTypes.DateTime;
   name: string;
+  timezone: TimezoneValue;
 }
 
 export interface GeneralFilterConfig extends FilterConfigInput {
@@ -84,7 +87,7 @@ export function parseFilterConfig(
     case 'Boolean':
       return parseBooleanFilterConfig(a);
     case 'DateTime':
-      return parseDateTimeFilterConfig(a);
+      return parseDateTimeFilterConfig(a, context);
     case 'General':
       return parseGeneralFilterConfig(a);
     case 'Reference':
@@ -133,10 +136,18 @@ function parseBooleanFilterConfig(
 }
 
 function parseDateTimeFilterConfig(
-  input: FilterConfigInput
+  // tslint:disable-next-line:no-any
+  input: any,
+  context: RecordTypeContext
 ): DateTimeFilterConfig {
+  const timezone =
+    input.timezone == null
+      ? context.timezone
+      : parseTimezone(input, 'timezone');
+
   return {
     ...parseFilterConfigAttrs(input, 'DateTime'),
+    timezone,
     type: FilterConfigTypes.DateTime,
   };
 }

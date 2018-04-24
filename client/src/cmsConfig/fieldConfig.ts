@@ -1,3 +1,4 @@
+import { TimezoneValue } from '../types';
 import { humanize } from '../util';
 import {
   AssociationRecordConfig,
@@ -5,7 +6,12 @@ import {
   ConfigContext,
   RecordTypeContext,
 } from './cmsConfig';
-import { parseOptionalBoolean, parseOptionalString, parseString } from './util';
+import {
+  parseOptionalBoolean,
+  parseOptionalString,
+  parseString,
+  parseTimezone,
+} from './util';
 
 export type ReferenceConfig =
   | ReferenceFieldConfig
@@ -93,6 +99,7 @@ export interface WYSIWYGFieldConfig extends FieldConfigAttrs {
 
 export interface DateTimeFieldConfig extends FieldConfigAttrs {
   type: FieldConfigTypes.DateTime;
+  timezone: TimezoneValue;
 }
 
 export interface BooleanFieldConfig extends FieldConfigAttrs {
@@ -211,7 +218,7 @@ export function parseNonReferenceFieldConfig(
     case 'WYSIWYG':
       return parseWYSIWYGFieldConfig(a);
     case 'DateTime':
-      return parseDateTimeFieldConfig(a);
+      return parseDateTimeFieldConfig(a, context);
     case 'Boolean':
       return parseBooleanFieldConfig(a);
     case 'Integer':
@@ -227,9 +234,9 @@ export function parseNonReferenceFieldConfig(
     case '_id':
       return parseIdFieldConfig(a);
     case '_created_at':
-      return parseCreatedAtFieldConfig(a);
+      return parseCreatedAtFieldConfig(a, context);
     case '_updated_at':
-      return parseUpdatedAtFieldConfig(a);
+      return parseUpdatedAtFieldConfig(a, context);
     default:
       throw new Error(`Received unknown field config type: ${a.type}`);
   }
@@ -301,10 +308,17 @@ function parseWYSIWYGFieldConfig(input: FieldConfigInput): WYSIWYGFieldConfig {
 }
 
 function parseDateTimeFieldConfig(
-  input: FieldConfigInput
+  input: FieldConfigInput,
+  context: RecordTypeContext
 ): DateTimeFieldConfig {
+  const timezone =
+    input.timezone == null
+      ? context.timezone
+      : parseTimezone(input, 'timezone');
+
   return {
     ...parseFieldConfigAttrs(input, 'DateTime'),
+    timezone,
     type: FieldConfigTypes.DateTime,
   };
 }
@@ -558,25 +572,39 @@ function parseIdFieldConfig(input: FieldConfigInput): StringFieldConfig {
 }
 
 function parseCreatedAtFieldConfig(
-  input: FieldConfigInput
+  input: FieldConfigInput,
+  context: RecordTypeContext
 ): DateTimeFieldConfig {
+  const timezone =
+    input.timezone == null
+      ? context.timezone
+      : parseTimezone(input, 'timezone');
+
   return {
     compact: false,
     editable: false,
     label: 'Created at',
     name: 'createdAt',
+    timezone,
     type: FieldConfigTypes.DateTime,
   };
 }
 
 function parseUpdatedAtFieldConfig(
-  input: FieldConfigInput
+  input: FieldConfigInput,
+  context: RecordTypeContext
 ): DateTimeFieldConfig {
+  const timezone =
+    input.timezone == null
+      ? context.timezone
+      : parseTimezone(input, 'timezone');
+
   return {
     compact: false,
     editable: false,
     label: 'Updated at',
     name: 'updatedAt',
+    timezone,
     type: FieldConfigTypes.DateTime,
   };
 }
