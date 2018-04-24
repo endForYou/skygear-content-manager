@@ -9,21 +9,13 @@ export enum AssetType {
   Image = 'image',
 }
 
-function defaultMimeTypeForAssetType(assetType: AssetType): string {
-  switch (assetType) {
-    case AssetType.File:
-      return '';
-    case AssetType.Image:
-      return 'image/*';
-  }
-}
-
 interface DroppedFile {
   file: File;
   previewURL?: string;
 }
 
 interface Props {
+  accept: string;
   assetType: AssetType;
   name?: string;
   style?: object;
@@ -122,6 +114,7 @@ export class AssetUploader extends React.PureComponent<Props> {
 
   public render() {
     const {
+      accept,
       assetType,
       onChange,
       previewStyle,
@@ -137,7 +130,7 @@ export class AssetUploader extends React.PureComponent<Props> {
         activeClassName="dropzone-active"
         acceptClassName="dropzone-accept"
         rejectClassName="dropzone-reject"
-        accept={defaultMimeTypeForAssetType(assetType)}
+        accept={accept}
         disablePreview={true}
         onDropAccepted={this.onDropAccepted}
         style={style}

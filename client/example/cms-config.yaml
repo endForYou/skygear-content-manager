@@ -225,6 +225,7 @@ records:
           nullable: false
         - name: cv
           type: FileAsset
+          accept: application/pdf,image/*
         - name: city
           type: Reference
           label: City

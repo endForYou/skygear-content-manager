@@ -19,7 +19,7 @@ export class FileAssetField extends React.PureComponent<FileAssetFieldProps> {
 
   public render() {
     const {
-      config: { editable, nullable },
+      config: { accept, editable, nullable },
       context: _context,
       onFieldChange,
       value: value,
@@ -31,6 +31,7 @@ export class FileAssetField extends React.PureComponent<FileAssetFieldProps> {
         <div>
           <AssetUploader
             {...rest}
+            accept={accept}
             value={value}
             assetType={AssetType.File}
             onChange={onFieldChange}
