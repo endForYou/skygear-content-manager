@@ -11,6 +11,7 @@ import { Field, FieldContext } from '../fields';
 import { errorMessageFromError } from '../recordUtil';
 import { RootState } from '../states';
 import { Remote, RemoteType } from '../types';
+import { objectValues } from '../util';
 
 // TODO: Reduce reused components between edit and new page
 // in order to support future requirements such as custom input validation during
@@ -155,9 +156,9 @@ class RecordFormPageImpl extends React.PureComponent<
     mergeRecordChange(record, recordChange);
 
     Promise.resolve()
-      .then(() => flatMapEffect(Object.values(beforeEffectChange)))
+      .then(() => EffectAll(objectValues(beforeEffectChange))())
       .then(() => recordDispatcher.save(record))
-      .then(() => flatMapEffect(Object.values(afterEffectChange)))
+      .then(() => EffectAll(objectValues(afterEffectChange))())
       .then(() => {
         const { config: { cmsRecord }, dispatch } = this.props;
         dispatch(push(`/record/${cmsRecord.name}/${record._id}`));
@@ -227,11 +228,8 @@ function mergeRecordChange(record: Record, change: RecordChange) {
   });
 }
 
-export function flatMapEffect<T>(
-  effects: Array<Effect | undefined>
-): Promise<T[]> {
-  const es = effects.filter(eff => eff != null) as Effect[];
-  return Promise.all(es.map(eff => eff()));
+export function EffectAll(effects: Effect[]): Effect {
+  return () => Promise.all(effects.map(ef => ef()));
 }
 
 export const RecordFormPage: React.ComponentClass<

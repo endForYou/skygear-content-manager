@@ -13,11 +13,11 @@ import {
 import { Arrow, ArrowDirection } from '../components/Arrow';
 import {
   Effect,
-  flatMapEffect,
+  EffectAll,
   RecordChange,
   RecordChangeHandler,
 } from '../components/RecordFormPage';
-import { swap } from '../util';
+import { objectValues, swap } from '../util';
 
 import {
   Field,
@@ -259,18 +259,14 @@ export class EmbeddedBackReferenceField extends React.PureComponent<
 
         return Promise.resolve()
           .then(() =>
-            Promise.all(
-              this.embeddedRecordBeforeEffects.map(effectsByName => {
-                return flatMapEffect(Object.values(effectsByName));
-              })
+            this.embeddedRecordBeforeEffects.map(effectsByName =>
+              EffectAll(objectValues(effectsByName))()
             )
           )
           .then(() => Promise.all(promises))
           .then(() =>
-            Promise.all(
-              this.embeddedRecordAfterEffects.map(effectsByName => {
-                return flatMapEffect(Object.values(effectsByName));
-              })
+            this.embeddedRecordAfterEffects.map(effectsByName =>
+              EffectAll(objectValues(effectsByName))()
             )
           );
       });

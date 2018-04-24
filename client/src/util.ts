@@ -62,6 +62,11 @@ export function join<V, S>(xs: V[], sep: S): Array<V | S> {
   );
 }
 
+// tslint:disable-next-line:no-any
+export function objectValues<T>(object: { [key: string]: T | undefined }): T[] {
+  return Object.values(object).filter(v => v != null) as T[];
+}
+
 // tslint:disable:no-any
 // True for same shallow value, otherwise false.
 export function shallowCompare(
