@@ -210,52 +210,16 @@ export class EmbeddedBackReferenceField extends React.PureComponent<
 
     if (onFieldChange) {
       onFieldChange(undefined, undefined, () => {
-        // tslint:disable-next-line: no-any
-        const promises: Array<Promise<any>> = [];
-        const RecordCls = Record.extend(config.targetCmsRecord.recordType);
+        const {
+          embeddedRecordDelete,
+          embeddedRecords,
+          embeddedRecordUpdate,
+        } = this.state;
 
-        // apply record update
-        const updates = this.state.embeddedRecordUpdate;
-        if (updates.length > 0) {
-          const recordsToSave = updates.map((change, index) => {
-            const recordId = this.state.embeddedRecords[index].id;
-            const data = {
-              _id: recordId,
-              ...updates[index],
-            };
-
-            // Inject position data if positionFieldName given
-            if (config.positionFieldName != null) {
-              const positionIndex =
-                config.sortOrder === SortOrder.Asc
-                  ? index
-                  : updates.length - index - 1;
-              data[config.positionFieldName] = positionIndex;
-            }
-            return new RecordCls(data);
-          });
-          const saveRecord = skygear.publicDB.save(recordsToSave);
-          promises.push(saveRecord);
-        }
-
-        // apply record delete
-        const deletes = this.state.embeddedRecordDelete;
-        if (deletes.length > 0) {
-          if (config.referenceDeleteAction === DeleteAction.NullifyReference) {
-            // set reference to null only
-            const recordsToDelete = deletes.map(
-              record =>
-                new RecordCls({
-                  _id: record.id,
-                  [config.sourceFieldName]: null,
-                })
-            );
-            promises.push(skygear.publicDB.save(recordsToDelete));
-          } else {
-            // delete the child record
-            promises.push(skygear.publicDB.delete(deletes));
-          }
-        }
+        const mainEffect = EffectAll([
+          recordUpdateEffect(config, embeddedRecordUpdate, embeddedRecords),
+          recordDeleteEffect(config, embeddedRecordDelete),
+        ]);
 
         return Promise.resolve()
           .then(() =>
@@ -263,7 +227,7 @@ export class EmbeddedBackReferenceField extends React.PureComponent<
               EffectAll(objectValues(effectsByName))()
             )
           )
-          .then(() => Promise.all(promises))
+          .then(() => mainEffect())
           .then(() =>
             this.embeddedRecordAfterEffects.map(effectsByName =>
               EffectAll(objectValues(effectsByName))()
@@ -361,4 +325,60 @@ function FormGroup(props: FieldProps): JSX.Element {
       />
     </div>
   );
+}
+
+function recordUpdateEffect(
+  config: EmbeddedBackReferenceFieldConfig,
+  updates: RecordChange[],
+  embeddedRecords: Record[]
+): Effect {
+  return () => {
+    if (updates.length === 0) {
+      return Promise.resolve();
+    }
+
+    const RecordCls = Record.extend(config.targetCmsRecord.recordType);
+    const recordsToSave = updates.map((change, index) => {
+      const recordId = embeddedRecords[index].id;
+      const data = { _id: recordId, ...updates[index] };
+
+      // Inject position data if positionFieldName given
+      if (config.positionFieldName != null) {
+        const positionIndex =
+          config.sortOrder === SortOrder.Asc
+            ? index
+            : updates.length - index - 1;
+        data[config.positionFieldName] = positionIndex;
+      }
+      return new RecordCls(data);
+    });
+    return skygear.publicDB.save(recordsToSave);
+  };
+}
+
+function recordDeleteEffect(
+  config: EmbeddedBackReferenceFieldConfig,
+  deletes: Record[]
+): Effect {
+  return () => {
+    if (deletes.length === 0) {
+      return Promise.resolve();
+    }
+
+    const RecordCls = Record.extend(config.targetCmsRecord.recordType);
+    if (config.referenceDeleteAction === DeleteAction.NullifyReference) {
+      // set reference to null only
+      const recordsToDelete = deletes.map(
+        record =>
+          new RecordCls({
+            _id: record.id,
+            [config.sourceFieldName]: null,
+          })
+      );
+      return skygear.publicDB.save(recordsToDelete);
+    } else {
+      // delete the child record
+      return skygear.publicDB.delete(deletes);
+    }
+  };
 }
