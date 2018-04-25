@@ -175,11 +175,17 @@ export class EmbeddedBackReferenceField extends React.PureComponent<
           onRecordRemove={() => this.handleEmbeddedRecordRemove(index)}
           record={r}
           upMovable={
-            !!(config.editable && config.positionFieldName != null && index > 0)
+            !!(
+              config.editable &&
+              config.reorderEnabled &&
+              config.positionFieldName != null &&
+              index > 0
+            )
           }
           downMovable={
             !!(
               config.editable &&
+              config.reorderEnabled &&
               config.positionFieldName != null &&
               index < embeddedRecords.length - 1
             )
@@ -343,7 +349,7 @@ function recordUpdateEffect(
       const data = { _id: recordId, ...updates[index] };
 
       // Inject position data if positionFieldName given
-      if (config.positionFieldName != null) {
+      if (config.reorderEnabled && config.positionFieldName != null) {
         const positionIndex =
           config.sortOrder === SortOrder.Asc
             ? index
