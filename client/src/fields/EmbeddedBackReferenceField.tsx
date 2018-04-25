@@ -288,14 +288,14 @@ function EmbeddedRecordView({
       )}
       {downMovable && (
         <Arrow
-          className="embedded-record-button sort-button float-right"
+          className="embedded-record-button float-right"
           direction={ArrowDirection.Down}
           onClick={onRecordMoveDown}
         />
       )}
       {upMovable && (
         <Arrow
-          className="embedded-record-button sort-button float-right"
+          className="embedded-record-button float-right"
           direction={ArrowDirection.Up}
           onClick={onRecordMoveUp}
         />

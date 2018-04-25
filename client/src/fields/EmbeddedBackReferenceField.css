@@ -29,6 +29,10 @@ form.embedded-record-view.editable:focus-within {
   margin-top: 1rem;
 }
 
+.embedded-record-button {
+  cursor: pointer;
+}
+
 .embedded-record-view > .embedded-record-button:first-child {
   margin-left: 0.5rem;
 }
