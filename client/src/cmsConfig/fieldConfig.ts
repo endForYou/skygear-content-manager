@@ -146,6 +146,7 @@ export interface EmbeddedBackReferenceFieldConfig extends FieldConfigAttrs {
   displayFields: FieldConfig[];
   positionFieldName?: string;
   sortOrder: SortOrder;
+  reorderEnabled: boolean;
   references: ReferenceConfig[];
   referenceDeleteAction: DeleteAction;
 }
@@ -405,6 +406,12 @@ function parseEmbeddedBackReferenceFieldConfig(
     );
   }
 
+  const reorderEnabled = parseOptionalBoolean(
+    input,
+    'reference_reorder_enabled',
+    'Reference'
+  );
+
   return {
     ...parseFieldConfigAttrs(input, 'EmbeddedReference'),
     ...parseBackReferenceFieldConfigAttrs(context, input),
@@ -412,6 +419,7 @@ function parseEmbeddedBackReferenceFieldConfig(
     positionFieldName,
     referenceDeleteAction,
     references: filterReferences(displayFields),
+    reorderEnabled: reorderEnabled === undefined ? false : reorderEnabled,
     sortOrder,
     type: FieldConfigTypes.EmbeddedBackReference,
   };
