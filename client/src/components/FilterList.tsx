@@ -53,15 +53,15 @@ export class FilterList extends React.PureComponent<FilterListProps> {
     }
 
     return (
-      <div key={index} className="form-inline mb-2">
-        <div className="form-group mr-2">
-          <label>{filter.label}</label>
+      <div key={index} className="filter-item">
+        <div className="filter-name pr-2 pb-2">{filter.label}</div>
+        <div className="filter-select pr-2 pb-2">
+          {this.renderFilterSelect(filter)}
         </div>
-        <div className="form-group mr-2">{this.renderFilterSelect(filter)}</div>
-        <div className="form-group filter-input mr-4">
+        <div className="filter-input pr-4 pb-2">
           {this.renderInput(filter, config)}
         </div>
-        <div className="form-group">
+        <div className="filter-remove pb-2">
           <button
             onClick={() => onCloseFilterClicked(filter)}
             type="button"
@@ -280,7 +280,6 @@ export class FilterList extends React.PureComponent<FilterListProps> {
     const { handleReferenceChange } = this.props;
     return (
       <ReferenceFilterInput
-        className="ref-input"
         config={config}
         onFieldChange={value => handleReferenceChange(filter, value)}
         value={filter.values}
@@ -290,7 +289,11 @@ export class FilterList extends React.PureComponent<FilterListProps> {
 
   public render() {
     const { filters } = this.props;
-    return filters.map((filter, index) => this.renderFilter(filter, index));
+    return (
+      <div className="filter-list mb-2">
+        {filters.map((filter, index) => this.renderFilter(filter, index))}
+      </div>
+    );
   }
 
   public handleDateTimeChange(

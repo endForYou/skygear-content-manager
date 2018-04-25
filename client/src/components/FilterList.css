@@ -1,7 +1,10 @@
-.filter-input {
-  flex: 1 !important;
+.filter-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 }
 
-.ref-input {
-  width: 100%;
+.filter-input {
+  width: 15rem;
+  flex: 1;
 }

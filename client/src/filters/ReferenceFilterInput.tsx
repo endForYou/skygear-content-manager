@@ -43,6 +43,7 @@ class ReferenceFilterInputImpl extends React.PureComponent<
     return (
       <StringSelectAsync
         {...rest}
+        autosize={false}
         multi={false}
         loadOptions={this.debouncedLoadOptions}
         onChange={this.onChange}
