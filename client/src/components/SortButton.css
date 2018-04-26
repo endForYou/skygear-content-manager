@@ -2,7 +2,7 @@
     cursor: pointer;
 }
 
-.sort-button .up {
+.sort-button > .up {
     width: 0px;
     height: 0px;
     border-bottom: 5px solid lightgrey;
@@ -11,16 +11,16 @@
     border-top: none;
 }
 
-.sort-button .up.active {
+.sort-button > .up.active {
     border-bottom: 5px solid black;
 }
 
-.sort-button .mid {
+.sort-button > .mid {
     height: 2px;
     background-color:transparent;
 }
 
-.sort-button .down {
+.sort-button > .down {
     width: 0px;
     height: 0px;
     border-top: 5px solid lightgrey;
@@ -29,6 +29,6 @@
     border-bottom: none;
 }
 
-.sort-button .down.active {
+.sort-button > .down.active {
     border-top: 5px solid black;
 }
