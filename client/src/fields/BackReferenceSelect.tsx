@@ -138,7 +138,7 @@ class BackReferenceSelectImpl extends React.PureComponent<
     };
 
     if (this.props.onFieldChange) {
-      this.props.onFieldChange(undefined, eff);
+      this.props.onFieldChange(undefined, undefined, eff);
     }
   };
 }

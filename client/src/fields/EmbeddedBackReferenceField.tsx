@@ -13,10 +13,11 @@ import {
 import { Arrow, ArrowDirection } from '../components/Arrow';
 import {
   Effect,
+  EffectAll,
   RecordChange,
   RecordChangeHandler,
 } from '../components/RecordFormPage';
-import { swap } from '../util';
+import { objectValues, swap } from '../util';
 
 import {
   Field,
@@ -39,7 +40,8 @@ export class EmbeddedBackReferenceField extends React.PureComponent<
   EmbeddedBackReferenceFieldProps,
   State
 > {
-  private embeddedRecordEffects: Array<{ [key: string]: Effect }>;
+  private embeddedRecordBeforeEffects: Array<{ [key: string]: Effect }>;
+  private embeddedRecordAfterEffects: Array<{ [key: string]: Effect }>;
 
   constructor(props: EmbeddedBackReferenceFieldProps) {
     super(props);
@@ -54,7 +56,8 @@ export class EmbeddedBackReferenceField extends React.PureComponent<
       embeddedRecords: [...embeddedRecords],
     };
 
-    this.embeddedRecordEffects = embeddedRecords.map(() => ({}));
+    this.embeddedRecordBeforeEffects = embeddedRecords.map(() => ({}));
+    this.embeddedRecordAfterEffects = embeddedRecords.map(() => ({}));
 
     this.handleEmbeddedRecordChange = this.handleEmbeddedRecordChange.bind(
       this
@@ -73,7 +76,8 @@ export class EmbeddedBackReferenceField extends React.PureComponent<
     name: string,
     // tslint:disable-next-line: no-any
     value: any,
-    effect?: Effect
+    beforeEffect?: Effect,
+    afterEffect?: Effect
   ) {
     if (value !== undefined) {
       this.setState(prevState => {
@@ -83,8 +87,12 @@ export class EmbeddedBackReferenceField extends React.PureComponent<
       });
     }
 
-    if (effect) {
-      this.embeddedRecordEffects[index][name] = effect;
+    if (beforeEffect) {
+      this.embeddedRecordBeforeEffects[index][name] = beforeEffect;
+    }
+
+    if (afterEffect) {
+      this.embeddedRecordAfterEffects[index][name] = afterEffect;
     }
 
     this.applyEmbeddedRecordChange();
@@ -98,7 +106,8 @@ export class EmbeddedBackReferenceField extends React.PureComponent<
       return prevState;
     });
 
-    this.embeddedRecordEffects.splice(index, 1);
+    this.embeddedRecordBeforeEffects.splice(index, 1);
+    this.embeddedRecordAfterEffects.splice(index, 1);
 
     this.applyEmbeddedRecordChange();
   }
@@ -114,7 +123,8 @@ export class EmbeddedBackReferenceField extends React.PureComponent<
       return prevState;
     });
 
-    this.embeddedRecordEffects.push({});
+    this.embeddedRecordBeforeEffects.push({});
+    this.embeddedRecordAfterEffects.push({});
 
     this.applyEmbeddedRecordChange();
   }
@@ -126,7 +136,8 @@ export class EmbeddedBackReferenceField extends React.PureComponent<
       return prevState;
     });
 
-    swap(this.embeddedRecordEffects, from, to);
+    swap(this.embeddedRecordBeforeEffects, from, to);
+    swap(this.embeddedRecordAfterEffects, from, to);
 
     this.applyEmbeddedRecordChange();
   }
@@ -143,9 +154,20 @@ export class EmbeddedBackReferenceField extends React.PureComponent<
             editable: config.editable,
           })}
           fieldConfigs={config.displayFields}
-          // tslint:disable-next-line: no-any
-          onRecordChange={(name: string, value: any, effect?: Effect) => {
-            this.handleEmbeddedRecordChange(index, name, value, effect);
+          onRecordChange={(
+            name: string,
+            // tslint:disable-next-line: no-any
+            value: any,
+            beforeEffect?: Effect,
+            afterEffect?: Effect
+          ) => {
+            this.handleEmbeddedRecordChange(
+              index,
+              name,
+              value,
+              beforeEffect,
+              afterEffect
+            );
           }}
           onRecordMoveDown={() =>
             this.handleEmbeddedRecordMove(index, index + 1)}
@@ -187,67 +209,30 @@ export class EmbeddedBackReferenceField extends React.PureComponent<
     const { config, onFieldChange } = this.props;
 
     if (onFieldChange) {
-      onFieldChange(undefined, () => {
-        // tslint:disable-next-line: no-any
-        const promises: Array<Promise<any>> = [];
+      onFieldChange(undefined, undefined, () => {
+        const {
+          embeddedRecordDelete,
+          embeddedRecords,
+          embeddedRecordUpdate,
+        } = this.state;
 
-        // apply effects
-        const effects = [].concat.apply(
-          [],
-          this.embeddedRecordEffects.map(effectsByName => {
-            return Object.values(effectsByName)
-              .filter(eff => eff !== undefined)
-              .map(eff => eff());
-          })
-        );
-        promises.push(Promise.all(effects));
+        const mainEffect = EffectAll([
+          recordUpdateEffect(config, embeddedRecordUpdate, embeddedRecords),
+          recordDeleteEffect(config, embeddedRecordDelete),
+        ]);
 
-        const RecordCls = Record.extend(config.targetCmsRecord.recordType);
-
-        // apply record update
-        const updates = this.state.embeddedRecordUpdate;
-        if (updates.length > 0) {
-          const recordsToSave = updates.map((change, index) => {
-            const recordId = this.state.embeddedRecords[index].id;
-            const data = {
-              _id: recordId,
-              ...updates[index],
-            };
-
-            // Inject position data if positionFieldName given
-            if (config.positionFieldName != null) {
-              const positionIndex =
-                config.sortOrder === SortOrder.Asc
-                  ? index
-                  : updates.length - index - 1;
-              data[config.positionFieldName] = positionIndex;
-            }
-            return new RecordCls(data);
-          });
-          const saveRecord = skygear.publicDB.save(recordsToSave);
-          promises.push(saveRecord);
-        }
-
-        // apply record delete
-        const deletes = this.state.embeddedRecordDelete;
-        if (deletes.length > 0) {
-          if (config.referenceDeleteAction === DeleteAction.NullifyReference) {
-            // set reference to null only
-            const recordsToDelete = deletes.map(
-              record =>
-                new RecordCls({
-                  _id: record.id,
-                  [config.sourceFieldName]: null,
-                })
-            );
-            promises.push(skygear.publicDB.save(recordsToDelete));
-          } else {
-            // delete the child record
-            promises.push(skygear.publicDB.delete(deletes));
-          }
-        }
-
-        return Promise.all(promises);
+        return Promise.resolve()
+          .then(() =>
+            this.embeddedRecordBeforeEffects.map(effectsByName =>
+              EffectAll(objectValues(effectsByName))()
+            )
+          )
+          .then(() => mainEffect())
+          .then(() =>
+            this.embeddedRecordAfterEffects.map(effectsByName =>
+              EffectAll(objectValues(effectsByName))()
+            )
+          );
       });
     }
   }
@@ -283,8 +268,8 @@ function EmbeddedRecordView({
       <FormGroup
         key={index}
         fieldConfig={fieldConfig}
-        onFieldChange={(value, effect) =>
-          onRecordChange(fieldConfig.name, value, effect)}
+        onFieldChange={(value, beforeEffect, affterEffect) =>
+          onRecordChange(fieldConfig.name, value, beforeEffect, affterEffect)}
         record={record}
       />
     );
@@ -340,4 +325,60 @@ function FormGroup(props: FieldProps): JSX.Element {
       />
     </div>
   );
+}
+
+function recordUpdateEffect(
+  config: EmbeddedBackReferenceFieldConfig,
+  updates: RecordChange[],
+  embeddedRecords: Record[]
+): Effect {
+  return () => {
+    if (updates.length === 0) {
+      return Promise.resolve();
+    }
+
+    const RecordCls = Record.extend(config.targetCmsRecord.recordType);
+    const recordsToSave = updates.map((change, index) => {
+      const recordId = embeddedRecords[index].id;
+      const data = { _id: recordId, ...updates[index] };
+
+      // Inject position data if positionFieldName given
+      if (config.positionFieldName != null) {
+        const positionIndex =
+          config.sortOrder === SortOrder.Asc
+            ? index
+            : updates.length - index - 1;
+        data[config.positionFieldName] = positionIndex;
+      }
+      return new RecordCls(data);
+    });
+    return skygear.publicDB.save(recordsToSave);
+  };
+}
+
+function recordDeleteEffect(
+  config: EmbeddedBackReferenceFieldConfig,
+  deletes: Record[]
+): Effect {
+  return () => {
+    if (deletes.length === 0) {
+      return Promise.resolve();
+    }
+
+    const RecordCls = Record.extend(config.targetCmsRecord.recordType);
+    if (config.referenceDeleteAction === DeleteAction.NullifyReference) {
+      // set reference to null only
+      const recordsToDelete = deletes.map(
+        record =>
+          new RecordCls({
+            _id: record.id,
+            [config.sourceFieldName]: null,
+          })
+      );
+      return skygear.publicDB.save(recordsToDelete);
+    } else {
+      // delete the child record
+      return skygear.publicDB.delete(deletes);
+    }
+  };
 }

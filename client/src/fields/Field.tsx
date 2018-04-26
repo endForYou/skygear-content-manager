@@ -39,8 +39,12 @@ export interface ChildProps<C extends FieldConfig> {
   context: FieldContext;
 }
 
-// tslint:disable-next-line: no-any
-export type FieldChangeHandler = (value: any, effect?: Effect) => void;
+export type FieldChangeHandler = (
+  // tslint:disable-next-line: no-any
+  value: any,
+  beforeEffect?: Effect,
+  afterEffect?: Effect
+) => void;
 
 export interface FieldContext {
   record: Record;
