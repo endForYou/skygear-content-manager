@@ -60,6 +60,7 @@ class NumberFieldImpl extends React.PureComponent<NumberFieldProps, State> {
           this.props.onFieldChange(0);
         }
       });
+      return;
     }
 
     const isValid = /^-?\d+(\.)?\d*$/.test(value);

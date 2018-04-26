@@ -60,6 +60,7 @@ class IntegerFieldImpl extends React.PureComponent<IntegerFieldProps, State> {
           this.props.onFieldChange(0);
         }
       });
+      return;
     }
 
     const isValid = /^-?\d+$/.test(value);
