@@ -1,3 +1,7 @@
+.drop-description {
+    cursor: default;
+}
+
 .dropzone {
     border: 2px dashed silver;
     border-radius: 5px;
@@ -19,4 +23,10 @@
 
 .dropzone-image {
     background-size: cover;
+}
+
+.file-link {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

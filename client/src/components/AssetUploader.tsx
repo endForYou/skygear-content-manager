@@ -57,7 +57,12 @@ const AssetDisplay: React.SFC<{
   switch (assetType) {
     case AssetType.File:
       return (
-        <a target="_blank" href={url} onClick={evt => evt.stopPropagation()}>
+        <a
+          className="file-link"
+          target="_blank"
+          href={url}
+          onClick={evt => evt.stopPropagation()}
+        >
           {name}
         </a>
       );
@@ -75,7 +80,11 @@ interface DropAreaProps {
 const DropArea: React.SFC<DropAreaProps> = props => {
   const { value, assetType, previewStyle } = props;
   if (value == null || value.url == null) {
-    return <div>Drop {assetType} here or click to upload.</div>;
+    return (
+      <div className="drop-description">
+        Drop {assetType} here or click to upload.
+      </div>
+    );
   }
 
   return (
