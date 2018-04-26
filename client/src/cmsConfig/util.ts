@@ -1,3 +1,7 @@
+import moment from 'moment-timezone';
+
+import { TimezoneValue } from '../types';
+
 export function parseString(
   // tslint:disable-next-line: no-any
   a: any,
@@ -82,4 +86,20 @@ export function parseOptional<T>(
   }
 
   throw new Error(`${context}.${fieldName} want a ${t}, got ${typeof a}`);
+}
+
+// tslint:disable-next-line: no-any
+export function parseTimezone(a: any, fieldName: string): TimezoneValue {
+  const value = a[fieldName];
+
+  if (value == null || value === 'Local') {
+    return 'Local';
+  }
+
+  const zone = moment.tz.zone(value);
+  if (zone == null) {
+    throw new Error(`Unexpected timezone value: ${value}`);
+  }
+
+  return zone;
 }

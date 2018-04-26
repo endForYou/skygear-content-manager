@@ -1,3 +1,4 @@
+timezone: America/New_York
 site:
   - type: UserManagement
   - type: Record
@@ -409,6 +410,7 @@ records:
               type: String
             - name: last_login_at
               type: DateTime
+              timezone: Europe/London
             - name: boolean
               type: Boolean
             - name: has_skills
@@ -441,6 +443,7 @@ records:
               type: String
             - name: last_login_at
               type: DateTime
+              timezone: Local
             - name: boolean
               type: Boolean
             - name: has_skills

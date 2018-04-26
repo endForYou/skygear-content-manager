@@ -1,4 +1,4 @@
-import { SortOrder, SortState } from '../types';
+import { SortOrder, SortState, TimezoneValue } from '../types';
 import { humanize, isObject, objectFrom } from './../util';
 import { mapDefaultActionToAction } from './defaultActions';
 import {
@@ -20,9 +20,15 @@ import {
   parseUserManagementConfig,
   UserManagementConfig,
 } from './userManagementConfig';
-import { parseBoolean, parseOptionalString, parseString } from './util';
+import {
+  parseBoolean,
+  parseOptionalString,
+  parseString,
+  parseTimezone,
+} from './util';
 
 export interface CmsConfig {
+  timezone: TimezoneValue;
   site: SiteConfig;
   records: RecordConfigMap;
   associationRecordByName: AssociationRecordByName;
@@ -131,6 +137,7 @@ interface CmsRecordByName {
 }
 
 export interface RecordTypeContext {
+  timezone: TimezoneValue;
   cmsRecordByName: CmsRecordByName;
 }
 
@@ -182,15 +189,17 @@ export function parseCmsConfig(input: any): CmsConfig {
     user_management: userManagement,
   } = input;
 
+  const timezone = parseTimezone(input, 'timezone');
   const cmsRecordByName = preparseRecordConfigs(records);
   const associationRecordByName = parseAssociationRecordByName(
-    { cmsRecordByName },
+    { cmsRecordByName, timezone },
     associationRecords
   );
 
   const context = {
     associationRecordByName,
     cmsRecordByName,
+    timezone,
   };
 
   return {
@@ -203,6 +212,7 @@ export function parseCmsConfig(input: any): CmsConfig {
       return { ...obj, [name]: parseRecordConfig(context, name, recordConfig) };
     }, {}),
     site: parseSiteConfigs(site),
+    timezone,
     userManagement: parseUserManagementConfig(context, userManagement),
   };
 }
