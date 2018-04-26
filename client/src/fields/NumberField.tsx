@@ -45,6 +45,7 @@ class NumberFieldImpl extends React.PureComponent<NumberFieldProps, State> {
           type="text"
           value={this.state.stringValue}
           onChange={this.handleChange}
+          placeholder="0"
         />
       );
     } else {
@@ -53,9 +54,14 @@ class NumberFieldImpl extends React.PureComponent<NumberFieldProps, State> {
   }
 
   public handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    let value = event.target.value.trim();
+    const value = event.target.value.trim();
     if (value === '' || value === '-') {
-      value = '0';
+      this.setState({ ...this.state, stringValue: value, value: 0 }, () => {
+        if (this.props.onFieldChange) {
+          this.props.onFieldChange(0);
+        }
+      });
+      return;
     }
 
     const isValid = /^-?\d+(\.)?\d*$/.test(value);

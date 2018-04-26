@@ -45,6 +45,7 @@ class IntegerFieldImpl extends React.PureComponent<IntegerFieldProps, State> {
           type="text"
           value={this.state.stringValue}
           onChange={this.handleChange}
+          placeholder="0"
         />
       );
     } else {
@@ -53,9 +54,14 @@ class IntegerFieldImpl extends React.PureComponent<IntegerFieldProps, State> {
   }
 
   public handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    let value = event.target.value.trim();
+    const value = event.target.value.trim();
     if (value === '' || value === '-') {
-      value = '0';
+      this.setState({ ...this.state, stringValue: value, value: 0 }, () => {
+        if (this.props.onFieldChange) {
+          this.props.onFieldChange(0);
+        }
+      });
+      return;
     }
 
     const isValid = /^-?\d+$/.test(value);
