@@ -45,6 +45,7 @@ class IntegerFieldImpl extends React.PureComponent<IntegerFieldProps, State> {
           type="text"
           value={this.state.stringValue}
           onChange={this.handleChange}
+          placeholder="0"
         />
       );
     } else {

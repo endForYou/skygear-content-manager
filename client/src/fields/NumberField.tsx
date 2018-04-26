@@ -45,6 +45,7 @@ class NumberFieldImpl extends React.PureComponent<NumberFieldProps, State> {
           type="text"
           value={this.state.stringValue}
           onChange={this.handleChange}
+          placeholder="0"
         />
       );
     } else {
