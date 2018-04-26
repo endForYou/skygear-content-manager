@@ -11,7 +11,7 @@ import { Field, FieldContext } from '../fields';
 import { errorMessageFromError } from '../recordUtil';
 import { RootState } from '../states';
 import { Remote, RemoteType } from '../types';
-import { objectValues } from '../util';
+import { entriesOf, objectValues } from '../util';
 
 // TODO: Reduce reused components between edit and new page
 // in order to support future requirements such as custom input validation during
@@ -223,7 +223,7 @@ function SubmitButton(props: SubmitProps): JSX.Element {
 }
 
 function mergeRecordChange(record: Record, change: RecordChange) {
-  Object.entries(change).forEach(([key, value]) => {
+  entriesOf(change).forEach(([key, value]) => {
     record[key] = value;
   });
 }

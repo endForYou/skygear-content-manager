@@ -12,6 +12,10 @@ export function objectFrom<V>(
   }, {});
 }
 
+export function entriesOf<T>(object: { [key: string]: T }): Array<[string, T]> {
+  return Object.keys(object).map(k => [k, object[k]] as [string, T]);
+}
+
 // tslint:disable-next-line: no-any
 export function get(o: any, keypath: string[] | string): any {
   if (typeof keypath === 'string') {

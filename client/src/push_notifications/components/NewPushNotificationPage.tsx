@@ -13,6 +13,7 @@ import {
 import { FilterInput } from '../../filters/FilterInput';
 import { RootState } from '../../states';
 import { NewPushCampaign, Remote, RemoteType } from '../../types';
+import { entriesOf } from '../../util';
 
 export interface NewPushNotificationPageProps {
   filterConfigs: FilterConfig[];
@@ -311,7 +312,7 @@ class NewPushNotificationPageImpl extends React.PureComponent<
   ): Query {
     // TODO: Implement filter by primitive data types such as string or boolean.
     // And support various query type of different data types.
-    Object.entries(filterOptionsByName).forEach(([key, filterOption]) => {
+    entriesOf(filterOptionsByName).forEach(([key, filterOption]) => {
       const value = filterOption.value;
       switch (filterOption.filterType) {
         case FilterConfigTypes.Reference:

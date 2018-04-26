@@ -1,5 +1,5 @@
 import { SortOrder, SortState, TimezoneValue } from '../types';
-import { humanize, isObject, objectFrom } from './../util';
+import { entriesOf, humanize, isObject, objectFrom } from './../util';
 import { mapDefaultActionToAction } from './defaultActions';
 import {
   FieldConfig,
@@ -205,7 +205,7 @@ export function parseCmsConfig(input: any): CmsConfig {
   return {
     associationRecordByName,
     pushNotifications: parsePushNotificationConfig(context, pushNotifications),
-    records: Object.entries(
+    records: entriesOf(
       records
       // tslint:disable-next-line: no-any
     ).reduce((obj: object, [name, recordConfig]: [string, any]) => {
@@ -268,7 +268,7 @@ function parseSitePushNotificationsConfig(
 // tslint:disable-next-line: no-any
 function preparseRecordConfigs(records: any): CmsRecordByName {
   const cmsRecordByName = objectFrom(
-    Object.entries(records).map(([recordName, value]) => {
+    entriesOf(records).map(([recordName, value]) => {
       const recordType =
         parseOptionalString(value, 'record_type', recordName) || recordName;
       const cmsRecord = CmsRecord(recordName, recordType);
@@ -661,7 +661,7 @@ function parseAssociationRecordByName(
     );
   }
 
-  const recordNameConfigPairs = Object.entries(
+  const recordNameConfigPairs = entriesOf(
     input
   ).map(([recordName, recordConfig]) => {
     if (!isObject(recordConfig)) {
