@@ -8,7 +8,7 @@ import { FieldConfig, RecordFormPageConfig } from '../cmsConfig';
 import { LinkButton } from '../components/LinkButton';
 import { SpaceSeperatedList } from '../components/SpaceSeperatedList';
 import { Field, FieldContext } from '../fields';
-import { errorMessageFromError } from '../recordUtil';
+import { errorMessageFromError, isRecordsOperationError } from '../recordUtil';
 import { RootState } from '../states';
 import { Remote, RemoteType } from '../types';
 import { objectValues } from '../util';
@@ -36,6 +36,8 @@ interface State {
   // saved successfully.
   beforeEffectChange: RecordEffect;
   afterEffectChange: RecordEffect;
+
+  effectError?: Error;
 }
 
 export interface RecordChange {
@@ -71,6 +73,39 @@ class RecordFormPageImpl extends React.PureComponent<
     };
   }
 
+  public renderErrorMessage() {
+    const { savingRecord } = this.props;
+    const { effectError } = this.state;
+
+    if (effectError != null && isRecordsOperationError(effectError)) {
+      return (
+        <div className="alert alert-danger" role="alert">
+          {`${effectError}`}
+          {effectError.errors.map((err, index) => (
+            <div key={index}>- ${err.message}</div>
+          ))}
+        </div>
+      );
+    }
+
+    const errorDescription =
+      effectError != null
+        ? `${effectError}`
+        : savingRecord && savingRecord.type === RemoteType.Failure
+          ? errorMessageFromError(savingRecord.error)
+          : undefined;
+
+    if (errorDescription == null) {
+      return null;
+    }
+
+    return (
+      <div className="alert alert-danger" role="alert">
+        Failed to save record: {errorDescription}
+      </div>
+    );
+  }
+
   public render() {
     const { config, record, savingRecord } = this.props;
 
@@ -85,15 +120,6 @@ class RecordFormPageImpl extends React.PureComponent<
         />
       );
     });
-
-    const errorMessage =
-      savingRecord && savingRecord.type === RemoteType.Failure ? (
-        <div className="alert alert-danger" role="alert">
-          Failed to save record: {errorMessageFromError(savingRecord.error)}
-        </div>
-      ) : (
-        undefined
-      );
 
     return (
       <form onSubmit={this.handleSubmit}>
@@ -112,7 +138,7 @@ class RecordFormPageImpl extends React.PureComponent<
           </div>
         </div>
         {formGroups}
-        {errorMessage}
+        {this.renderErrorMessage()}
         <SubmitButton savingRecord={savingRecord} />
       </form>
     );
@@ -149,6 +175,8 @@ class RecordFormPageImpl extends React.PureComponent<
   public handleSubmit: React.FormEventHandler<HTMLFormElement> = event => {
     event.preventDefault();
 
+    this.setState({ effectError: undefined });
+
     // better clone the record if possible
     const { record, recordDispatcher } = this.props;
     const { recordChange, beforeEffectChange, afterEffectChange } = this.state;
@@ -162,7 +190,8 @@ class RecordFormPageImpl extends React.PureComponent<
       .then(() => {
         const { config: { cmsRecord }, dispatch } = this.props;
         dispatch(push(`/record/${cmsRecord.name}/${record._id}`));
-      });
+      })
+      .catch(effectError => this.setState({ effectError }));
   };
 }
 

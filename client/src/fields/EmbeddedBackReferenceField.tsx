@@ -19,6 +19,7 @@ import {
 } from '../components/RecordFormPage';
 import { objectValues, swap } from '../util';
 
+import { deleteRecordsProperly, saveRecordsProperly } from '../recordUtil';
 import {
   Field,
   FieldChangeHandler,
@@ -352,7 +353,7 @@ function recordUpdateEffect(
       }
       return new RecordCls(data);
     });
-    return skygear.publicDB.save(recordsToSave);
+    return saveRecordsProperly(skygear.publicDB, recordsToSave);
   };
 }
 
@@ -375,10 +376,10 @@ function recordDeleteEffect(
             [config.sourceFieldName]: null,
           })
       );
-      return skygear.publicDB.save(recordsToDelete);
+      return saveRecordsProperly(skygear.publicDB, recordsToDelete);
     } else {
       // delete the child record
-      return skygear.publicDB.delete(deletes);
+      return deleteRecordsProperly(skygear.publicDB, deletes);
     }
   };
 }
