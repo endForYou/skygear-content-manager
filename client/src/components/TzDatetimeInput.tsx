@@ -13,5 +13,5 @@ interface Props extends Omit<Datetime.DatetimepickerProps, 'utcOffset'> {
 export const TzDatetimeInput: React.SFC<Props> = ({ timezone, ...rest }) => {
   const utcOffset = utcOffsetOfTimezone(timezone);
 
-  return <Datetime {...rest} utcOffset={-utcOffset} />;
+  return <Datetime {...rest} utcOffset={utcOffset} />;
 };

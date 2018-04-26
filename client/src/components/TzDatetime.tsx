@@ -22,7 +22,7 @@ export const TzDatetime: React.SFC<Props> = ({
     <span {...rest}>
       {value
         ? moment(value)
-            .utcOffset(-utcOffset)
+            .utcOffset(utcOffset)
             .format(datetimeFormat)
         : undefined}
     </span>

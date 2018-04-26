@@ -5,5 +5,5 @@ export type TimezoneValue = 'Local' | MomentZone;
 export const utcOffsetOfTimezone = (timezone: TimezoneValue): number => {
   const zone =
     timezone !== 'Local' ? timezone : moment.tz.zone(moment.tz.guess());
-  return zone.utcOffset(new Date().getTime());
+  return -zone.utcOffset(new Date().getTime());
 };
