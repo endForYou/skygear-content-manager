@@ -1,3 +1,9 @@
+# Display all in one column
+DISPLAY_MODE_GROUPED = 'DISPLAY_MODE_GROUPED'
+# Display data in multiple columns
+DISPLAY_MODE_SPREAD = 'DISPLAY_MODE_SPREAD'
+
+
 class CMSConfig:
 
     def __init__(self, imports={}, exports={}, cms_records={},
@@ -64,9 +70,12 @@ class CMSRecordExportField:
 
 class CMSRecordReference:
 
-    def __init__(self, target_cms_record, target_field):
+    def __init__(self, target_cms_record, target_fields,
+                 many_fields = False, display_mode = DISPLAY_MODE_GROUPED):
         self.target_cms_record = target_cms_record
-        self.target_field = target_field
+        self.target_fields = target_fields
+        self.many_fields = many_fields
+        self.display_mode = display_mode
 
     @property
     def target_record_type(self):
@@ -94,9 +103,11 @@ class CMSRecordBackReference(CMSRecordReference):
     source_reference: "parent"
     """
 
-    def __init__(self, source_reference, target_cms_record, target_field):
+    def __init__(self, source_reference, target_cms_record, target_fields,
+                 many_fields = False, display_mode = DISPLAY_MODE_GROUPED):
         super(CMSRecordBackReference, self)\
-            .__init__(target_cms_record, target_field)
+            .__init__(target_cms_record, target_fields, many_fields,
+                      display_mode)
         self.source_reference = source_reference
 
     @property
@@ -115,9 +126,11 @@ class CMSRecordAssociationReference(CMSRecordReference):
     """
 
     def __init__(self, association_record, target_reference, target_cms_record,
-                 target_field):
+                 target_fields, many_fields = False,
+                 display_mode = DISPLAY_MODE_GROUPED):
         super(CMSRecordAssociationReference, self)\
-            .__init__(target_cms_record, target_field)
+            .__init__(target_cms_record, target_fields, many_fields,
+                      display_mode)
         self.association_record = association_record
         self.target_reference = target_reference
 
