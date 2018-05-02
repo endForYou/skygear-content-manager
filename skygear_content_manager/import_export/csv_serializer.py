@@ -3,69 +3,111 @@ import json
 
 from ..models.cms_config import (CMSRecordReference,
                                  CMSRecordBackReference,
-                                 CMSRecordAssociationReference)
+                                 CMSRecordAssociationReference,
+                                 DISPLAY_MODE_GROUPED)
 
 
+# TODO (Steven-Chan):
+# Need a better name for this class.
+# This is not working on a Record, but an array of record fields.
 class RecordSerializer:
+    """
+    Receives an array of record field value.
+    Returns an array of string value, representing a row in csv.
+    """
 
     # field_configs: []CMSRecordExportField
     def __init__(self, field_configs):
         self.field_configs = field_configs
 
-    def serialize(self, record):
-        result = {}
-        for field_config in self.field_configs:
+    def walk_through(self, csv_datas):
+        """
+        Scan through all data to get necessary information for serialization
+        e.g. number of transient reference data for reference data padding
+        """
+        self.serializers = [None] * len(self.field_configs)
+        field_counts = [0] * len(self.field_configs)
+        record_counts = [0] * len(self.field_configs)
+
+        for data in csv_datas:
+            for i in range(0, len(self.field_configs)):
+                field_config = self.field_configs[i]
+                if not field_config.reference:
+                    continue
+
+                key = field_config.name
+                field_counts[i] = len(field_config.reference.target_fields)
+                if field_config.reference.is_many:
+                    record_counts[i] = max(len(data[i]), record_counts[i])
+                else:
+                    record_counts[i] = 1
+
+        for i in range(0, len(self.field_configs)):
+            field_config = self.field_configs[i]
             key = field_config.name
-            value = None
-
-            if not field_config.reference:
-                value = record.get(key)
-            elif isinstance(field_config.reference, CMSRecordBackReference) or\
-                 isinstance(field_config.reference, CMSRecordAssociationReference):
-                transient = record['_transient'].get(field_config.name)
-                value = [t.get(field_config.reference.target_field.name) for t in transient]
-            else:
-                transient = record['_transient'].get(field_config.name)
-                if transient != None:
-                    value = transient.get(field_config.reference.target_field.name)
-
             serializer = FieldSerializer(field_config)
-            result[field_config.label] = serializer.serialize(value)
+            if field_config.reference:
+                serializer.value_serializer.field_count = field_counts[i]
+                serializer.value_serializer.record_count = record_counts[i]
+
+            self.serializers[i] = serializer
+
+    def serialize(self, csv_data):
+        result = []
+        for i in range(0, len(self.field_configs)):
+            field_config = self.field_configs[i]
+
+            key = field_config.name
+            serializer = self.serializers[i]
+            value = serializer.serialize(csv_data[i])
+            result = result + value
 
         return result
 
 
 class FieldSerializer:
+    """
+    Receives a record field value.
+    Returns a list of string value, each represents a csv column value.
+    """
 
     def __init__(self, field_config):
-        self.field_config = field_config
-
-    def serialize(self, value):
-        if value == None:
-            return ''
-
         serializer = None
-        if isinstance(self.field_config.reference, CMSRecordBackReference) or\
-           isinstance(self.field_config.reference, CMSRecordAssociationReference):
-            serializer = ListSerializer()
-            target_field = self.field_config.reference.target_field
-            serializer.field_serializer = self.get_serializer(target_field.type)
-        elif not self.field_config.reference == None:
-            target_field = self.field_config.reference.target_field
-            serializer = self.get_serializer(target_field.type)
+        if not field_config.reference:
+            serializer = self.get_serializer(field_config.type)
         else:
-            serializer = self.get_serializer(self.field_config.type)
+            # TODO (Steven-Chan):
+            # DISPLAY_MODE_GROUPED now only supports single field
+            if field_config.reference.display_mode == DISPLAY_MODE_GROUPED:
+                serializer = ListSerializer(multiple_data=field_config.reference.is_many)
+                target_field = field_config.reference.target_fields[0]
+                serializer.field_serializer = FieldSerializer(target_field)
+            else:
+                serializer = SpreadListSerializer(multiple_data=field_config.reference.is_many)
+                target_fields = field_config.reference.target_fields
+                serializer.field_serializers = [FieldSerializer(field) for field in target_fields]
 
         if not serializer:
-            field_name = self.field_config.name \
-                         if not self.field_config.reference \
-                         else self.field_config.reference.field_name
+            field_name = field_config.name \
+                         if not field_config.reference \
+                         else field_config.reference.field_name
 
             raise Exception((
                 'field "{}" has unsupported field type "{}"'
-            ).format(field_name, self.field_config.type))
+            ).format(field_name, field_config.type))
 
-        return serializer.serialize(value)
+        self.field_config = field_config
+        self.value_serializer = serializer
+
+    def serialize(self, value):
+        if value == None:
+            return ['']
+
+        serialized_value = self.value_serializer.serialize(value)
+        if not isinstance(serialized_value, list):
+            serialized_value = [serialized_value]
+
+        return serialized_value
 
     def get_serializer(self, field_type):
         serializer = None
@@ -89,6 +131,11 @@ class FieldSerializer:
 
 
 class BaseValueSerializer:
+    """
+    Class inheriting BaseValueSerializer must implement method serialize
+    which returns either a string value for a single column or
+    a list of string value for multiple columns.
+    """
 
     def __init__(self, format=None):
         self.format = format or self.default_format
@@ -101,9 +148,55 @@ class BaseValueSerializer:
         raise NotImplementedError
 
 
-class ListSerializer(BaseValueSerializer):
+class SpreadListSerializer(BaseValueSerializer):
+    """
+    Return a list of value, each occupies a column
+    """
+    def __init__(self, multiple_data = False):
+        super(BaseValueSerializer, self).__init__()
+        self.multiple_data = multiple_data
+        self.field_count = -1
+        self.record_count = -1
+
+    @property
+    def width(self):
+        if self.field_count == -1 or self.record_count == -1:
+            raise Exception('SpreadListSerializer width unintialized')
+
+        return self.field_count * self.record_count
 
     def serialize(self, value):
+        if self.width == -1:
+            raise Exception('SpreadListSerializer width unintialized')
+
+        result = []
+        if self.multiple_data:
+            for data in value:
+                result = result + self.serialize_fields(data)
+        else:
+            result = result + self.serialize_fields(value)
+
+        result = result + [''] * (self.width - len(result))
+        return result
+
+    def serialize_fields(self, data):
+        result = []
+        for i in range(0, len(self.field_serializers)):
+            field_serializer = self.field_serializers[i]
+            result.append(field_serializer.serialize(data[i]))
+        return result
+
+
+class ListSerializer(BaseValueSerializer):
+
+    def __init__(self, multiple_data = False):
+        super(BaseValueSerializer, self).__init__()
+        self.multiple_data = multiple_data
+
+    def serialize(self, value):
+        if not self.multiple_data:
+            return self.field_serializer.serialize(value[0])
+
         value = [self.field_serializer.serialize(v) for v in value]
         value = [v.replace("'", "\\'") for v in value]
         value = ["'" + v + "'" for v in value]
