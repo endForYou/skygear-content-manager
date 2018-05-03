@@ -166,9 +166,6 @@ class SpreadListSerializer(BaseValueSerializer):
         return self.field_count * self.record_count
 
     def serialize(self, value):
-        if self.width == -1:
-            raise Exception('SpreadListSerializer width unintialized')
-
         result = []
         if self.multiple_data:
             for data in value:
@@ -183,7 +180,8 @@ class SpreadListSerializer(BaseValueSerializer):
         result = []
         for i in range(0, len(self.field_serializers)):
             field_serializer = self.field_serializers[i]
-            result.append(field_serializer.serialize(data[i]))
+            # Now assume that only single-column value in serialized value
+            result.append(field_serializer.serialize(data[i])[0])
         return result
 
 
@@ -197,11 +195,13 @@ class ListSerializer(BaseValueSerializer):
         if not self.multiple_data:
             return self.field_serializer.serialize(value[0])
 
-        value = [self.field_serializer.serialize(v) for v in value]
-        value = [v.replace("'", "\\'") for v in value]
-        value = ["'" + v + "'" for v in value]
-        value = ','.join(value)
-        return value
+        flattened_value = [v[0] for v in value]
+        # Now assume that only single-column value in serialized value
+        result = [self.field_serializer.serialize(v)[0] for v in flattened_value]
+        result = [v.replace("'", "\\'") for v in result]
+        result = ["'" + v + "'" for v in result]
+        result = ','.join(result)
+        return result
 
 
 class StringSerializer(BaseValueSerializer):

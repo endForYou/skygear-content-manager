@@ -93,7 +93,7 @@ class CMSRecordExportFieldSchema(Schema):
     def make_multiple_ref_export_fields(self, data):
         return data['reference_fields']
 
-    def parse_reference_target_fields(data, target_cms_record):
+    def parse_reference_target_fields(self, data, target_cms_record):
         if 'reference_field_name' in data:
             ref_target_fields = [self.make_single_ref_export_field(target_cms_record.record_type, data)]
             ref_many_fields = False
