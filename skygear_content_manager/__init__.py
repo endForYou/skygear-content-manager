@@ -402,8 +402,9 @@ def transient_foreign_records(record, export_config, association_records):
             records = \
                 [r['_transient'][foreign_field.name] for r in foreign_records]
         elif isinstance(reference, CMSRecordBackReference):
-            # TODO
-            pass
+            predicate = eq_predicate(reference.source_reference, record_id)
+            records = fetch_records(reference.target_cms_record.record_type,
+                                    predicate=predicate)
         else:
             # skip for direct reference
             continue

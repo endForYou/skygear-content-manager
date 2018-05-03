@@ -70,7 +70,11 @@ class CMSRecordExportFieldSchema(Schema):
     def pre_load(self, data):
         if 'reference_fields' in data:
             cms_records = self.context['cms_records']
-            cms_record = cms_records[data['reference_target']]
+            if 'reference_via_back_reference' in data:
+                cms_record = cms_records[data['reference_via_back_reference']]
+            else:
+                cms_record = cms_records[data['reference_target']]
+
             for field in data['reference_fields']:
                 field['record_type'] = cms_record.record_type
         return data

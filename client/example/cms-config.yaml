@@ -85,7 +85,7 @@ exports:
         reference_target: skill
         reference_field_name: _id
         reference_via_association_record: user_has_skill
-      - name: has_skills
+      - name: has_skills_spread
         reference_target: skill
         reference_via_association_record: user_has_skill
         reference_fields:
@@ -93,6 +93,14 @@ exports:
             label: Skill {index} - ID
           - name: display_name
             label: Skill {index} - Name
+      - name: countries
+        reference_from_field: creator
+        reference_via_back_reference: country
+        reference_fields:
+          - name: _id
+            label: Country {index} - ID
+          - name: display_name
+            label: Country {index} - Name
       - name: json
         label: Data
       - name: location
