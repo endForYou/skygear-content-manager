@@ -120,7 +120,7 @@
     ],
     "globals": {
       "ts-jest": {
-        "tsConfigFile": "/Users/limouren/my-app/tsconfig.test.json"
+        "tsConfigFile": "./tsconfig.test.json"
       }
     }
   }
