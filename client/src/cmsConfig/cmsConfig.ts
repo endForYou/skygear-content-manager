@@ -196,7 +196,7 @@ export interface LinkActionConfig extends ActionConfigAttrs {
 export function parseCmsConfig(input: any): CmsConfig {
   const {
     site,
-    records,
+    records = {},
     association_records: associationRecords,
     push_notifications: pushNotifications,
     user_management: userManagement,
