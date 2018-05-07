@@ -382,6 +382,10 @@ function fetchRecordList(
       query.addDescending(sortByName);
     }
 
+    if (sortByName !== '_id') {
+      query.addAscending('_id');
+    }
+
     dispatch(fetchRecordListRequest(cmsRecord, page, context));
     return queryWithTarget(query, references).then(
       queryResult => {
@@ -887,6 +891,10 @@ function fetchReferentRecords(
     query.addAscending(sortByField);
   } else {
     query.addDescending(sortByField);
+  }
+
+  if (sortByField !== '_id') {
+    query.addAscending('_id');
   }
 
   query.contains(sourceFieldName, sourceIds);
