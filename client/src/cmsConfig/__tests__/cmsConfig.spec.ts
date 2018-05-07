@@ -1,5 +1,7 @@
 import {
+  cmsConfigWithAssociationRecord,
   cmsConfigWithPushNotificationOnly,
+  cmsConfigWithRecordTypeOnly,
   cmsConfigWithSiteItemsOnly,
 } from './cmsConfig.fixture';
 
@@ -19,6 +21,13 @@ const emptyCmsConfig = {
   userManagement: {
     enabled: false,
   },
+};
+
+const emptyRecordConfig = {
+  edit: undefined,
+  list: undefined,
+  new: undefined,
+  show: undefined,
 };
 
 describe('parseCmsConfig site', () => {
@@ -95,6 +104,89 @@ describe('parseCmsConfig push notifications', () => {
   it('should throw error for non-array push notification filter', () => {
     const config = deepCloneJSON(cmsConfigWithPushNotificationOnly);
     config.push_notifications.filters = 'filters';
+    expect(() => parseCmsConfig(config)).toThrow();
+  });
+});
+
+describe('parseCmsConfig records and association records', () => {
+  const expectedRecordsConfig = {
+    admin: {
+      ...emptyRecordConfig,
+      cmsRecord: {
+        name: 'admin',
+        recordType: 'user',
+      },
+    },
+    customer: {
+      ...emptyRecordConfig,
+      cmsRecord: {
+        name: 'customer',
+        recordType: 'user',
+      },
+    },
+    product: {
+      ...emptyRecordConfig,
+      cmsRecord: {
+        name: 'product',
+        recordType: 'product',
+      },
+    },
+  };
+
+  it('should parse record config with record_type only', () => {
+    const config = deepCloneJSON(cmsConfigWithRecordTypeOnly);
+    const result = parseCmsConfig(config);
+    expect(result).toEqual({
+      ...emptyCmsConfig,
+      records: expectedRecordsConfig,
+    });
+  });
+
+  it('should parse association reocords', () => {
+    const config = deepCloneJSON(cmsConfigWithAssociationRecord);
+    const result = parseCmsConfig(config);
+    expect(result).toEqual({
+      ...emptyCmsConfig,
+      associationRecordByName: {
+        admin_has_products: {
+          cmsRecord: {
+            name: 'admin_has_products',
+            recordType: 'admin_has_products',
+          },
+          referenceConfigPair: [
+            {
+              compact: false,
+              displayFieldName: '_id',
+              label: 'Admin id',
+              name: 'admin_id',
+              targetCmsRecord: {
+                name: 'admin',
+                recordType: 'user',
+              },
+              type: 'Reference',
+            },
+            {
+              compact: false,
+              displayFieldName: '_id',
+              label: 'Product id',
+              name: 'product_id',
+              targetCmsRecord: {
+                name: 'product',
+                recordType: 'product',
+              },
+              type: 'Reference',
+            },
+          ],
+        },
+      },
+      records: expectedRecordsConfig,
+    });
+  });
+
+  it('should throw error for association records with unknown ref', () => {
+    const config = deepCloneJSON(cmsConfigWithAssociationRecord);
+    config.association_records.admin_has_products.fields[0].reference_target =
+      'unknown';
     expect(() => parseCmsConfig(config)).toThrow();
   });
 });
