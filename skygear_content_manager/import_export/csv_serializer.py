@@ -26,8 +26,8 @@ class RecordSerializer:
         e.g. number of transient reference data for reference data padding
         """
         self.serializers = [None] * len(self.field_configs)
-        field_counts = [0] * len(self.field_configs)
-        record_counts = [0] * len(self.field_configs)
+        field_counts = [1] * len(self.field_configs)
+        record_counts = [1] * len(self.field_configs)
 
         for data in csv_datas:
             for i in range(0, len(self.field_configs)):
@@ -39,25 +39,15 @@ class RecordSerializer:
                 field_counts[i] = len(field_config.reference.target_fields)
                 if field_config.reference.is_many:
                     record_counts[i] = max(len(data[i]), record_counts[i])
-                else:
-                    record_counts[i] = 1
 
         for i in range(0, len(self.field_configs)):
-            field_config = self.field_configs[i]
-            key = field_config.name
-            serializer = FieldSerializer(field_config)
-            if field_config.reference:
-                serializer.value_serializer.field_count = field_counts[i]
-                serializer.value_serializer.record_count = record_counts[i]
-
-            self.serializers[i] = serializer
+            self.serializers[i] = FieldSerializer(self.field_configs[i],
+                                                  field_counts[i],
+                                                  record_counts[i])
 
     def serialize(self, csv_data):
         result = []
         for i in range(0, len(self.field_configs)):
-            field_config = self.field_configs[i]
-
-            key = field_config.name
             serializer = self.serializers[i]
             value = serializer.serialize(csv_data[i])
             result = result + value
@@ -71,7 +61,7 @@ class FieldSerializer:
     Returns a list of string value, each represents a csv column value.
     """
 
-    def __init__(self, field_config):
+    def __init__(self, field_config, field_count, record_count):
         serializer = None
         if not field_config.reference:
             serializer = self.get_serializer(field_config.type)
@@ -81,11 +71,17 @@ class FieldSerializer:
             if field_config.reference.display_mode == DISPLAY_MODE_GROUPED:
                 serializer = ListSerializer(multiple_data=field_config.reference.is_many)
                 target_field = field_config.reference.target_fields[0]
-                serializer.field_serializer = FieldSerializer(target_field)
+                # Does not support nested reference
+                serializer.field_serializer = FieldSerializer(target_field, 1, 1)
             else:
-                serializer = SpreadListSerializer(multiple_data=field_config.reference.is_many)
+                serializer = SpreadListSerializer(
+                    multiple_data=field_config.reference.is_many,
+                    field_count=field_count,
+                    record_count=record_count
+                )
                 target_fields = field_config.reference.target_fields
-                serializer.field_serializers = [FieldSerializer(field) for field in target_fields]
+                # Does not support nested reference
+                serializer.field_serializers = [FieldSerializer(field, 1, 1) for field in target_fields]
 
         if not serializer:
             field_name = field_config.name \
@@ -152,11 +148,12 @@ class SpreadListSerializer(BaseValueSerializer):
     """
     Return a list of value, each occupies a column
     """
-    def __init__(self, multiple_data = False):
+    def __init__(self, multiple_data = False, field_count = -1,
+                 record_count = -1):
         super(BaseValueSerializer, self).__init__()
         self.multiple_data = multiple_data
-        self.field_count = -1
-        self.record_count = -1
+        self.field_count = field_count
+        self.record_count = record_count
 
     @property
     def width(self):
