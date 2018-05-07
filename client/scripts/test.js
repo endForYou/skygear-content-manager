@@ -19,7 +19,7 @@ const jest = require('jest');
 const argv = process.argv.slice(2);
 
 // Just run *.spec.ts(x) files in __tests__ folder
-argv.unshift('.*/__tests__/.*\.spec\.ts(x)?$');
+argv.unshift('.*/__tests__/.*\.(spec|test)\.ts(x)?$');
 
 // Watch unless on CI or in coverage mode
 if (!process.env.CI && argv.indexOf('--coverage') < 0) {
