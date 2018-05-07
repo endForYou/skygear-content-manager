@@ -1,3 +1,4 @@
+import { isArray } from 'util';
 import { SortOrder, SortState, TimezoneValue } from '../types';
 import { entriesOf, humanize, isObject, objectFrom } from './../util';
 import { mapDefaultActionToAction } from './defaultActions';
@@ -232,6 +233,14 @@ export function parseCmsConfig(input: any): CmsConfig {
 
 // tslint:disable-next-line: no-any
 function parseSiteConfigs(siteConfigs: any[]): SiteConfig {
+  if (siteConfigs == null) {
+    return [];
+  }
+
+  if (!isArray(siteConfigs)) {
+    throw new Error('Expect site config to be Array');
+  }
+
   return siteConfigs.map(parseSiteConfig);
 }
 
