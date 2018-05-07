@@ -12,7 +12,8 @@ from skygear.utils.assets import directory_assets
 from urllib.parse import parse_qs
 
 from .import_export import (RecordSerializer, RecordDeserializer,
-                            RecordIdentifierMap, render_records,
+                            RecordIdentifierMap, render_header,
+                            render_data,
                             prepare_import_records, import_records)
 from .import_export import prepare_response as prepare_export_response
 from .models.cms_config import (CMSConfig, CMSRecord,
@@ -146,18 +147,24 @@ def includeme(settings):
         records = fetch_records(record_type,
                                 includes=includes,
                                 predicate=predicate)
+
+        csv_datas = []
         for record in records:
             transient_foreign_records(
                 record,
                 export_config,
                 cms_config.association_records
             )
+            csv_data = record_to_csv_data(record, export_config.fields)
+            csv_datas.append(csv_data)
 
         serializer = RecordSerializer(export_config.fields)
-        serialized_records = [serializer.serialize(r) for r in records]
+        serializer.walk_through(csv_datas)
+        serialized_data = [serializer.serialize(d) for d in csv_datas]
 
         response = prepare_export_response(name)
-        render_records(serialized_records, export_config, response.stream)
+        render_header(response.stream, export_config, serializer)
+        render_data(response.stream, serialized_data)
         return response
 
 
@@ -339,6 +346,27 @@ def get_cms_config():
     return cms_config
 
 
+def record_to_csv_data(record, fields):
+    """
+    From dictionary to array based on field config
+    """
+    data = []
+    for field in fields:
+        if field.reference:
+            if field.reference.is_many:
+                ref_record = record['_transient'].get(field.name, []) or []
+                ref_data = [record_to_csv_data(r, field.reference.target_fields) for r in ref_record]
+            else:
+                ref_record = record['_transient'].get(field.name, {}) or {}
+                ref_data = record_to_csv_data(ref_record, field.reference.target_fields)
+
+            data.append(ref_data)
+        else:
+            data.append(record.get(field.name))
+
+    return data
+
+
 def transient_foreign_records(record, export_config, association_records):
     """
     Fetch and embed foreign records, with one-to-many or many-to-many
@@ -374,8 +402,9 @@ def transient_foreign_records(record, export_config, association_records):
             records = \
                 [r['_transient'][foreign_field.name] for r in foreign_records]
         elif isinstance(reference, CMSRecordBackReference):
-            # TODO
-            pass
+            predicate = eq_predicate(reference.source_reference, record_id)
+            records = fetch_records(reference.target_cms_record.record_type,
+                                    predicate=predicate)
         else:
             # skip for direct reference
             continue
