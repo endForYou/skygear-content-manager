@@ -131,6 +131,26 @@ describe('parseFieldConfig Reference', () => {
     });
   });
 
+  it('should parse direct Reference field, and display _id by default', () => {
+    const input = {
+      name: 'A',
+      reference_target: 'RecordA',
+      type: 'Reference',
+    };
+    const result = parseFieldConfig(context, input);
+    expect(result).toEqual({
+      compact: false,
+      displayFieldName: '_id',
+      label: 'A',
+      name: 'A',
+      targetCmsRecord: {
+        name: 'RecordA',
+        recordType: 'a',
+      },
+      type: FieldConfigTypes.Reference,
+    });
+  });
+
   it('should throw error for unknown reference target', () => {
     const input = {
       name: 'A',
@@ -263,6 +283,71 @@ describe('parseFieldConfig Reference', () => {
       reference_target: 'Unknown',
       reference_via_association_record: 'a_has_b',
       type: 'Reference',
+    };
+    expect(() => parseFieldConfig(context, input)).toThrow();
+  });
+});
+
+describe('parseFieldConfig EmbeddedReference', () => {
+  it('should parse Embedded reference via back reference', () => {
+    const input = {
+      name: 'A',
+      reference_fields: [
+        {
+          name: 'name',
+          type: 'String',
+        },
+      ],
+      reference_from_field: 'a_id',
+      reference_via_back_reference: 'RecordB',
+      type: 'EmbeddedReference',
+    };
+    const result = parseFieldConfig(context, input);
+    expect(result).toEqual({
+      compact: false,
+      displayFields: [
+        {
+          compact: false,
+          label: 'Name',
+          name: 'name',
+          type: 'String',
+        },
+      ],
+      label: 'A',
+      name: 'A',
+      positionFieldName: undefined,
+      referenceDeleteAction: 'NullifyReference',
+      references: [],
+      reorderEnabled: false,
+      sortOrder: 'Asc',
+      sourceFieldName: 'a_id',
+      targetCmsRecord: {
+        name: 'RecordB',
+        recordType: 'b',
+      },
+      type: FieldConfigTypes.EmbeddedBackReference,
+    });
+  });
+
+  it('should throw error without reference fields', () => {
+    const input = {
+      name: 'A',
+      reference_delete_action: 'Unknown',
+      reference_from_field: 'a_id',
+      reference_via_back_reference: 'RecordB',
+      type: 'EmbeddedReference',
+    };
+    expect(() => parseFieldConfig(context, input)).toThrow();
+  });
+
+  it('should throw error for unknwon referenceDeleteAction', () => {
+    const input = {
+      name: 'A',
+      reference_delete_action: 'Unknown',
+      reference_fields: [],
+      reference_from_field: 'a_id',
+      reference_via_back_reference: 'RecordB',
+      type: 'EmbeddedReference',
     };
     expect(() => parseFieldConfig(context, input)).toThrow();
   });
