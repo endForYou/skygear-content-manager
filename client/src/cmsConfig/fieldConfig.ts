@@ -1,3 +1,4 @@
+import { isArray } from 'util';
 import { TimezoneValue } from '../types';
 import { humanize } from '../util';
 import {
@@ -390,6 +391,10 @@ function parseEmbeddedBackReferenceFieldConfig(
   context: ConfigContext,
   input: FieldConfigInput
 ): EmbeddedBackReferenceFieldConfig {
+  if (!isArray(input.reference_fields)) {
+    throw new Error('Expect reference_fields to be array of fields');
+  }
+
   // tslint:disable-next-line: no-any
   const displayFields = input.reference_fields.map((f: any) =>
     parseFieldConfig(context, f)
