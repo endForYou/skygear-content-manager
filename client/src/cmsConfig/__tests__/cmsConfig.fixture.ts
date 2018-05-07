@@ -13,3 +13,16 @@ export const cmsConfigWithSiteItemsOnly = {
     },
   ],
 };
+
+export const cmsConfigWithPushNotificationOnly = {
+  push_notifications: {
+    enabled: true,
+    filters: [
+      {
+        label: 'name',
+        name: 'name',
+        type: 'String',
+      },
+    ],
+  },
+};

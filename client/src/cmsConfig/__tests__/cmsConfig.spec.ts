@@ -1,17 +1,31 @@
-import { cmsConfigWithSiteItemsOnly } from './cmsConfig.fixture';
+import {
+  cmsConfigWithPushNotificationOnly,
+  cmsConfigWithSiteItemsOnly,
+} from './cmsConfig.fixture';
 
 import { parseCmsConfig } from '../cmsConfig';
 
-describe('parseCmsConfig', () => {
+const deepCloneJSON = (o: object) => JSON.parse(JSON.stringify(o));
+
+const emptyCmsConfig = {
+  associationRecordByName: {},
+  pushNotifications: {
+    enabled: false,
+    filterUserConfigs: [],
+  },
+  records: {},
+  site: [],
+  timezone: 'Local',
+  userManagement: {
+    enabled: false,
+  },
+};
+
+describe('parseCmsConfig site', () => {
   it('should parse site items', () => {
     const result = parseCmsConfig(cmsConfigWithSiteItemsOnly);
     expect(result).toEqual({
-      associationRecordByName: {},
-      pushNotifications: {
-        enabled: false,
-        filterUserConfigs: [],
-      },
-      records: {},
+      ...emptyCmsConfig,
       site: [
         {
           label: 'User Management',
@@ -28,17 +42,59 @@ describe('parseCmsConfig', () => {
           type: 'Record',
         },
       ],
-      timezone: 'Local',
-      userManagement: {
-        enabled: false,
-      },
     });
   });
 
   it('should throw error for unknown site item', () => {
-    cmsConfigWithSiteItemsOnly.site.push({
+    const config = deepCloneJSON(cmsConfigWithSiteItemsOnly);
+    config.site.push({
       type: 'Unknown type',
     });
-    expect(() => parseCmsConfig(cmsConfigWithSiteItemsOnly)).toThrow();
+    expect(() => parseCmsConfig(config)).toThrow();
+  });
+
+  it('should throw error for non-array site config', () => {
+    const config = { site: 'site' };
+    expect(() => parseCmsConfig(config)).toThrow();
+  });
+});
+
+describe('parseCmsConfig push notifications', () => {
+  it('should parse push notifications config without filters', () => {
+    const config = deepCloneJSON(cmsConfigWithPushNotificationOnly);
+    delete config.push_notifications.filters;
+    const result = parseCmsConfig(config);
+    expect(result).toEqual({
+      ...emptyCmsConfig,
+      pushNotifications: {
+        enabled: true,
+        filterUserConfigs: [],
+      },
+    });
+  });
+
+  it('should parse push notifications config with filters', () => {
+    const config = deepCloneJSON(cmsConfigWithPushNotificationOnly);
+    const result = parseCmsConfig(config);
+    expect(result).toEqual({
+      ...emptyCmsConfig,
+      pushNotifications: {
+        enabled: true,
+        filterUserConfigs: [
+          {
+            label: 'name',
+            name: 'name',
+            nullable: false,
+            type: 'String',
+          },
+        ],
+      },
+    });
+  });
+
+  it('should throw error for non-array push notification filter', () => {
+    const config = deepCloneJSON(cmsConfigWithPushNotificationOnly);
+    config.push_notifications.filters = 'filters';
+    expect(() => parseCmsConfig(config)).toThrow();
   });
 });
