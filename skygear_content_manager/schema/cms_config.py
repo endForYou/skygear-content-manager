@@ -56,6 +56,7 @@ class CMSRecordExportFieldSchema(Schema):
     record_type = fields.String()
     name = fields.String()
     label = fields.String(required=False)
+    format = fields.String(required=False)
 
     reference_target = fields.String(required=False)
     reference_field_name = fields.String(required=False)

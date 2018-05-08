@@ -64,7 +64,7 @@ class FieldSerializer:
     def __init__(self, field_config, field_count, record_count):
         serializer = None
         if not field_config.reference:
-            serializer = self.get_serializer(field_config.type)
+            serializer = self.get_serializer(field_config.type, field_config.format)
         else:
             # TODO (Steven-Chan):
             # DISPLAY_MODE_GROUPED now only supports single field
@@ -105,7 +105,7 @@ class FieldSerializer:
 
         return serialized_value
 
-    def get_serializer(self, field_type):
+    def get_serializer(self, field_type, format):
         serializer = None
 
         if field_type == 'string':
@@ -113,13 +113,13 @@ class FieldSerializer:
         elif field_type in 'number':
             serializer = StringSerializer()
         elif field_type == 'boolean':
-            serializer = BooleanSerializer()
+            serializer = BooleanSerializer(format)
         elif field_type == 'json':
             serializer = JSONSerializer()
         elif field_type == 'location':
             serializer = LocationSerializer()
         elif field_type == 'datetime':
-            serializer = DatetimeSerializer()
+            serializer = DatetimeSerializer(format)
         elif field_type == 'integer':
             serializer = StringSerializer()
 
@@ -150,7 +150,7 @@ class SpreadListSerializer(BaseValueSerializer):
     """
     def __init__(self, multiple_data = False, field_count = -1,
                  record_count = -1):
-        super(BaseValueSerializer, self).__init__()
+        super().__init__()
         self.multiple_data = multiple_data
         self.field_count = field_count
         self.record_count = record_count
@@ -185,7 +185,7 @@ class SpreadListSerializer(BaseValueSerializer):
 class ListSerializer(BaseValueSerializer):
 
     def __init__(self, multiple_data = False):
-        super(BaseValueSerializer, self).__init__()
+        super().__init__()
         self.multiple_data = multiple_data
 
     def serialize(self, value):
@@ -210,10 +210,10 @@ class StringSerializer(BaseValueSerializer):
 class BooleanSerializer(BaseValueSerializer):
 
     def __init__(self, format):
-        super(BaseValueSerializer, self).__init__(format)
+        super().__init__(format)
 
-        if format not in self.supported:
-            raise Exception('Format "%s" not supported.' % format)
+        if self.format not in self.supported_formats:
+            raise Exception('Format "%s" not supported.' % self.format)
 
     @property
     def supported_formats(self):
