@@ -1,9 +1,9 @@
-import moment, { MomentZone } from 'moment-timezone';
+import moment from 'moment-timezone';
 
-export type TimezoneValue = 'Local' | MomentZone;
+export type TimezoneValue = string;
 
 export const utcOffsetOfTimezone = (timezone: TimezoneValue): number => {
-  const zone =
-    timezone !== 'Local' ? timezone : moment.tz.zone(moment.tz.guess());
+  const tz = timezone !== 'Local' ? timezone : moment.tz.guess();
+  const zone = moment.tz.zone(tz);
   return -zone.utcOffset(new Date().getTime());
 };

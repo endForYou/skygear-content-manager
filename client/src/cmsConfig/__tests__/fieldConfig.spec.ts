@@ -94,18 +94,13 @@ describe('parseFieldConfig DateTime', () => {
       minimalContext,
       input
     ) as DateTimeFieldConfig;
-    const timezone = result.timezone;
-
-    delete result.timezone;
     expect(result).toEqual({
       compact: false,
       label: 'Datetime',
       name: 'datetime',
+      timezone: 'Asia/Hong_Kong',
       type: 'DateTime',
     });
-
-    // expecte timezone to be an object, not a string
-    expect(timezone).toBeInstanceOf(Object);
   });
 });
 
