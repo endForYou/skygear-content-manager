@@ -267,5 +267,5 @@ class DatetimeSerializer(BaseValueSerializer):
         return 'YYYY-MM-DDTHH:MM:SS.mmmmmm'
 
     def serialize(self, value):
-        datetime = arrow.get(value)
+        datetime = arrow.get(value['$date'])
         return datetime.format(self.format)

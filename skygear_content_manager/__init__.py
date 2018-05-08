@@ -361,6 +361,12 @@ def record_to_csv_data(record, fields):
                 ref_data = record_to_csv_data(ref_record, field.reference.target_fields)
 
             data.append(ref_data)
+        elif field.name == '_created_at' or field.name == '_updated_at':
+            date_data = {
+                '$type': 'date',
+                '$date': record.get(field.name),
+            }
+            data.append(date_data)
         else:
             data.append(record.get(field.name))
 
