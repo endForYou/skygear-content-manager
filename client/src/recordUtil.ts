@@ -59,6 +59,15 @@ export function saveRecordsProperly(
   database: Database,
   records: Record[]
 ): Promise<void> {
+  if (records.length === 1) {
+    return database
+      .save(records[0])
+      .then(result => undefined)
+      .catch(err => {
+        throw new RecordsOperationError('Failed to save records', [err]);
+      });
+  }
+
   return database.save(records).then(result => {
     const errors = result.errors.filter(error => error != null);
 
@@ -76,6 +85,15 @@ export function deleteRecordsProperly(
   database: Database,
   records: Record[]
 ): Promise<void> {
+  if (records.length === 1) {
+    return database
+      .delete(records[0])
+      .then(result => undefined)
+      .catch(err => {
+        throw new RecordsOperationError('Failed to save records', [err]);
+      });
+  }
+
   return database.delete(records).then(errors => {
     const filteredErrors = (errors || []).filter(
       error => error
