@@ -6,7 +6,11 @@ import { Link, NavLink, withRouter } from 'react-router-dom';
 
 import { logout } from '../actions/auth';
 import * as logo from '../assets/logo.png';
-import { SiteItemConfig, SiteItemConfigTypes } from '../cmsConfig';
+import {
+  SiteItemConfig,
+  SiteItemConfigTypes,
+  SpaceSizeType,
+} from '../cmsConfig';
 import { getCmsConfig, RootState } from '../states';
 
 export interface SidebarProps {
@@ -75,7 +79,30 @@ function Item({ item }: ItemProps): JSX.Element {
           {item.label}
         </NavLink>
       );
+    case SiteItemConfigTypes.Space:
+      return <Spacer size={item.size} />;
   }
+}
+
+interface SpacerProps {
+  size: SpaceSizeType;
+}
+
+function Spacer({ size }: SpacerProps): JSX.Element {
+  let sizeClassName;
+  switch (size) {
+    case SpaceSizeType.Small:
+      sizeClassName = 'my-2';
+      break;
+    case SpaceSizeType.Medium:
+      sizeClassName = 'my-4';
+      break;
+    case SpaceSizeType.Large:
+      sizeClassName = 'my-5';
+      break;
+  }
+
+  return <div className={sizeClassName} />;
 }
 
 interface LogoutButtonProps {
