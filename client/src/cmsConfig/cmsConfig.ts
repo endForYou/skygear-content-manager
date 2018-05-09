@@ -40,11 +40,13 @@ export type SiteConfig = SiteItemConfig[];
 export type SiteItemConfig =
   | RecordSiteItemConfig
   | UserManagementSiteItemConfig
-  | PushNotificationsSiteItemConfig;
+  | PushNotificationsSiteItemConfig
+  | SpaceSiteItemConfig;
 export enum SiteItemConfigTypes {
   Record = 'Record',
   UserManagement = 'UserManagement',
   PushNotifications = 'PushNotifications',
+  Space = 'Space',
 }
 
 export interface SiteItemConfigAttrs {
@@ -63,6 +65,17 @@ export interface UserManagementSiteItemConfig extends SiteItemConfigAttrs {
 
 export interface PushNotificationsSiteItemConfig extends SiteItemConfigAttrs {
   type: SiteItemConfigTypes.PushNotifications;
+}
+
+export enum SpaceSizeType {
+  Small = 'Small',
+  Medium = 'Medium',
+  Large = 'Large',
+}
+
+export interface SpaceSiteItemConfig {
+  type: SiteItemConfigTypes.Space;
+  size: SpaceSizeType;
 }
 
 export interface RecordConfigMap {
@@ -231,6 +244,8 @@ function parseSiteConfig(siteConfig: any): SiteItemConfig {
       return parseSiteUserManagementConfig(siteConfig);
     case SiteItemConfigTypes.PushNotifications:
       return parseSitePushNotificationsConfig(siteConfig);
+    case SiteItemConfigTypes.Space:
+      return parseSiteSpaceConfig(siteConfig);
     default:
       throw new Error(`Received unknown site config type: ${siteConfig.type}`);
   }
@@ -263,6 +278,30 @@ function parseSitePushNotificationsConfig(
     parseOptionalString(input, 'label', 'PushNotifications') ||
     'Push Notifications';
   return { type, label };
+}
+
+function parseSiteSpaceConfig(
+  // tslint:disable-next-line:no-any
+  input: any
+): SpaceSiteItemConfig {
+  const { type } = input;
+  const sizeInput = parseOptionalString(input, 'size', 'Space') || 'Medium';
+  let size: SpaceSizeType;
+  switch (sizeInput) {
+    case SpaceSizeType.Small:
+      size = SpaceSizeType.Small;
+      break;
+    case SpaceSizeType.Medium:
+      size = SpaceSizeType.Medium;
+      break;
+    case SpaceSizeType.Large:
+      size = SpaceSizeType.Large;
+      break;
+    default:
+      throw new Error(`Unexpected space size: ${sizeInput}`);
+  }
+
+  return { type, size };
 }
 
 // tslint:disable-next-line: no-any
