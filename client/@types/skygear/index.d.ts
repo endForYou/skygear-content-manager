@@ -186,7 +186,7 @@ declare module 'skygear' {
   interface DatabaseSaveOptions {
     atomic?: Boolean;
   }
-  interface DatabaseSaveBatchResult {
+  export interface DatabaseSaveBatchResult {
     savedRecords: Record[];
     errors: Error[];
   }

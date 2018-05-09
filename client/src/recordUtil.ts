@@ -5,6 +5,7 @@ import {
   Reference,
   SkygearError,
 } from 'skygear';
+import { isArray } from 'util';
 
 export interface ParsedReference {
   recordType: string;
@@ -44,10 +45,55 @@ export function errorMessageFromError(e: Error) {
   return e.message;
 }
 
+export class RecordsOperationError extends Error {
+  public errors: Error[];
+
+  constructor(message: string, errors: Error[]) {
+    super(message);
+
+    this.errors = errors;
+  }
+}
+
+export function saveRecordsProperly(
+  database: Database,
+  records: Record[]
+): Promise<void> {
+  if (records.length === 1) {
+    return database
+      .save(records[0])
+      .then(result => undefined)
+      .catch(err => {
+        throw new RecordsOperationError('Failed to save records', [err]);
+      });
+  }
+
+  return database.save(records).then(result => {
+    const errors = result.errors.filter(error => error != null);
+
+    if (errors.length) {
+      errors.forEach(error => {
+        console.log('Failed to save record:', error);
+      });
+
+      throw new RecordsOperationError('Failed to save records', errors);
+    }
+  });
+}
+
 export function deleteRecordsProperly(
   database: Database,
   records: Record[]
 ): Promise<void> {
+  if (records.length === 1) {
+    return database
+      .delete(records[0])
+      .then(result => undefined)
+      .catch(err => {
+        throw new RecordsOperationError('Failed to save records', [err]);
+      });
+  }
+
   return database.delete(records).then(errors => {
     const filteredErrors = (errors || []).filter(
       error => error
@@ -58,9 +104,22 @@ export function deleteRecordsProperly(
         console.log('Failed to delete record:', error);
       });
 
-      throw new Error(
-        'Failed to delete records, see console.error for details'
+      throw new RecordsOperationError(
+        'Failed to delete records',
+        filteredErrors
       );
     }
   });
+}
+
+export function isRecordsOperationError(
+  // tslint:disable-next-line:no-any
+  error: any
+): error is RecordsOperationError {
+  if (error == null) {
+    return false;
+  }
+
+  const errors = error.errors;
+  return isArray(errors);
 }
