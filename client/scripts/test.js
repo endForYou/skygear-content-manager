@@ -21,6 +21,11 @@ const argv = process.argv.slice(2);
 // Just run *.spec.ts(x) files in __tests__ folder
 argv.unshift('.*/__tests__/.*\.(spec|test)\.ts(x)?$');
 
+// run coverage for CI
+if (!!process.env.CI) {
+  argv.push('--coverage');
+}
+
 // Watch unless on CI or in coverage mode
 if (!process.env.CI && argv.indexOf('--coverage') < 0) {
   argv.push('--watch');
