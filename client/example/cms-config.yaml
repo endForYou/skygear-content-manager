@@ -1,6 +1,7 @@
 timezone: America/New_York
 site:
   - type: UserManagement
+  - type: Space
   - type: Record
     name: user
     label: User
@@ -31,7 +32,10 @@ site:
   - type: Record
     name: welcome_message
     label: Welcome Message
+  - type: Space
   - type: PushNotifications
+  - type: Space
+    size: Large
 imports:
   import-user:
     record_type: user
