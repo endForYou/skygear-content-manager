@@ -1346,12 +1346,14 @@ test('parseCmsConfig should parse example config', () => {
     site: [
       { type: 'UserManagement', label: 'USER' },
       { type: 'PushNotifications', label: 'PUSH' },
+      { type: 'Space', size: 'Medium' },
       { type: 'Record', name: 'field_demo', label: 'Field demo' },
       {
         type: 'Record',
         name: 'field_demo_deleted',
         label: 'Field demo deleted',
       },
+      { type: 'Space', size: 'Large' },
     ],
     timezone: 'Asia/Hong_Kong',
     userManagement: { enabled: true },
