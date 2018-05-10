@@ -1,8 +1,9 @@
-import './Sidebar.css';
+import './Sidebar.scss';
 
 import * as React from 'react';
 import { connect, MapDispatchToProps } from 'react-redux';
 import { Link, NavLink, withRouter } from 'react-router-dom';
+import { Record } from 'skygear';
 
 import { logout } from '../actions/auth';
 import * as logo from '../assets/logo.png';
@@ -15,6 +16,7 @@ import { getCmsConfig, RootState } from '../states';
 
 export interface SidebarProps {
   items: SiteItemConfig[];
+  user?: Record;
 }
 
 interface DispatchProps {
@@ -25,33 +27,40 @@ type Props = SidebarProps & DispatchProps;
 
 class Sidebar extends React.PureComponent<Props> {
   public render() {
+    const { user } = this.props;
+
     return (
-      <nav className="col-sm-3 sidebar">
-        <Link className="sidebar-logo" to="/">
-          <img className="img-fluid" src={logo} alt="Skygear CMS" />
+      <nav className="sidebar">
+        <Link className="sidebar-logo-link" to="/">
+          <img className="sidebar-logo" src={logo} alt="Skygear CMS" />
         </Link>
+        <div className="user">
+          <div className="email">
+            {user ? user.email : 'Unknown user'}
+          </div>
+          <NavLink className="btn-logout" to="#" onClick={this.props.onLogout}>
+            LOG OUT
+          </NavLink>
+        </div>
         <ListItems {...this.props} />
       </nav>
     );
   }
 }
 
-function ListItems({ items, onLogout }: Props): JSX.Element {
+function ListItems({ items }: Props): JSX.Element {
   const listItems = items.map((item, index) => {
     return (
-      <li key={index} className="nav-item">
+      <div key={index}>
         <Item item={item} />
-      </li>
+      </div>
     );
   });
 
   return (
-    <ul className="nav flex-column">
+    <div>
       {listItems}
-      <li key="logout" className="nav-item">
-        <LogoutButton onClick={onLogout} />
-      </li>
-    </ul>
+    </div>
   );
 }
 
@@ -105,21 +114,10 @@ function Spacer({ size }: SpacerProps): JSX.Element {
   return <div className={sizeClassName} />;
 }
 
-interface LogoutButtonProps {
-  onClick: () => void;
-}
-
-function LogoutButton({ onClick }: LogoutButtonProps): JSX.Element {
-  return (
-    <NavLink className="nav-link" to="#" onClick={onClick}>
-      Logout
-    </NavLink>
-  );
-}
-
 const mapStateToProps = (state: RootState): SidebarProps => {
   return {
     items: getCmsConfig(state).site,
+    user: state.auth.user,
   };
 };
 
