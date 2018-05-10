@@ -1,5 +1,13 @@
+html {
+  font-size: 14px;
+  font-family: 'Lato';
+}
+
 body {
   margin: 0;
   padding: 0;
   font-family: sans-serif;
+
+  background-color: #E9ECEE;
+  color: #373A3C;
 }
