@@ -1,3 +1,5 @@
+import './LoadingSpinner.css';
+
 import * as React from 'react';
 
 export const LoadingSpinner: React.SFC = () => {
