@@ -3,7 +3,8 @@
 
 .sidebar {
 	background: #19c2bf;
-	min-height: 100vh;
+	height: 100vh;
+	overflow-y: auto;
 	width: to-rem(250px);
 	padding: to-rem(40px);
 
