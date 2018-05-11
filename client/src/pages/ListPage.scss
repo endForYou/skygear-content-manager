@@ -32,6 +32,13 @@ $horizontal-spacing: to-rem(32px);
     }
   }
 
+  .list-loading, .list-empty {
+    padding: to-rem(24px) $horizontal-spacing to-rem(48px);
+    font-family: Lato-Light;
+    font-size: 18px;
+    line-height: 18px;
+  }
+
   .list-content {
     margin-top: to-rem(30px);
     margin-bottom: to-rem(38px);

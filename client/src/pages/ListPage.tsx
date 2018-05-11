@@ -477,10 +477,10 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
         <div className="list-content">
           {(() => {
             if (isLoading) {
-              return <div>Loading...</div>;
+              return <div className="list-loading">Loading...</div>;
             } else {
               if (records.length === 0) {
-                return <div>No records found.</div>;
+                return <div className="list-empty">No records found.</div>;
               } else {
                 return (
                   <ListTable
