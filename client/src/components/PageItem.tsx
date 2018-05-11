@@ -1,3 +1,5 @@
+import './Pagination.scss';
+
 import classNames from 'classnames';
 import { Location } from 'history';
 import * as qs from 'query-string';
@@ -5,6 +7,7 @@ import * as React from 'react';
 import { Link } from 'react-router-dom';
 
 export interface PageItemProps {
+  className?: string;
   location: Location;
   page: number;
   isDisabled?: boolean;
@@ -17,6 +20,7 @@ export class PageItem extends React.PureComponent<PageItemProps> {
   public render() {
     const {
       children,
+      className,
       location,
       page,
       isDisabled = false,
@@ -26,22 +30,19 @@ export class PageItem extends React.PureComponent<PageItemProps> {
 
     if (isDisabled) {
       return (
-        <li className="page-item disabled">
-          <span className="page-link">{children}</span>
+        <li className={classNames(className, 'page-item-container disabled')}>
+          <span className="link disabled">{children}</span>
         </li>
       );
     } else {
-      const itemClassName = classNames('page-item', {
+      const itemClassName = classNames(className, 'page-item-container', {
         active: isActive,
       });
       const search = qs.parse(location.search);
       search.page = page;
       return (
         <li className={itemClassName}>
-          <Link
-            className="page-link"
-            to={`${pathname}?${qs.stringify(search)}`}
-          >
+          <Link className="link" to={`${pathname}?${qs.stringify(search)}`}>
             {children}
           </Link>
         </li>

@@ -499,6 +499,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
         {maxPage > 0 ? (
           <Pagination
             key="pagination"
+            className="pagination"
             location={location}
             currentPage={page}
             maxPage={maxPage}

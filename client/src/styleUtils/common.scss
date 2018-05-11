@@ -46,3 +46,8 @@ $base-font-size: 14px;
 
   @include btn-hover-effect-darken($btn-secondary-bg-color);
 }
+
+@mixin pagination-position {
+  float: right;
+  margin-right: to-rem(42px);
+}
