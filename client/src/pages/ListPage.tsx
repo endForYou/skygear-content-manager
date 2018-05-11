@@ -1,3 +1,5 @@
+import './ListPage.scss';
+
 import classNames from 'classnames';
 import { Location } from 'history';
 import * as qs from 'query-string';
@@ -99,23 +101,23 @@ const TableHeader: React.SFC<TableHeaderProps> = ({
         ? sortState.order
         : SortOrder.Undefined;
     return (
-      <th key={index}>
+      <div key={index} className="table-cell">
         {fieldConfig.label}
         <SortButton
           className="d-inline-block mx-1"
           sortOrder={sortOrder}
           onClick={() => onSortButtonClick(fieldConfig.name)}
         />
-      </th>
+      </div>
     );
   });
   return (
-    <thead className="thead-light">
-      <tr>
+    <div className="table-header">
+      <div className="table-row">
         {columns}
-        <th />
-      </tr>
-    </thead>
+        <div className="table-cell" />
+      </div>
+    </div>
   );
 };
 
@@ -132,20 +134,20 @@ const TableRow: React.SFC<TableRowProps> = ({
 }) => {
   const columns = fieldConfigs.map((fieldConfig, index) => {
     return (
-      <td key={index}>
+      <div key={index} className="table-cell">
         <Field
           config={fieldConfig}
           value={record[fieldConfig.name]}
           context={FieldContext(record)}
         />
-      </td>
+      </div>
     );
   });
 
   return (
-    <tr>
+    <div className="table-row">
       {columns}
-      <td>
+      <div className="table-cell">
         <SpaceSeperatedList>
           {itemActions.map((action, index) => (
             <LinkButton
@@ -155,8 +157,8 @@ const TableRow: React.SFC<TableRowProps> = ({
             />
           ))}
         </SpaceSeperatedList>
-      </td>
-    </tr>
+      </div>
+    </div>
   );
 };
 
@@ -181,7 +183,7 @@ const TableBody: React.SFC<TableBodyProps> = ({
       />
     );
   });
-  return <tbody>{rows}</tbody>;
+  return <div className="table-body">{rows}</div>;
 };
 
 interface ListTableProps {
@@ -200,7 +202,7 @@ const ListTable: React.SFC<ListTableProps> = ({
   sortState,
 }) => {
   return (
-    <table key="table" className="table table-sm table-hover table-responsive">
+    <div key="table" className="list-table">
       <TableHeader
         fieldConfigs={fieldConfigs}
         sortState={sortState}
@@ -211,7 +213,7 @@ const ListTable: React.SFC<ListTableProps> = ({
         itemActions={itemActions}
         records={records}
       />
-    </table>
+    </div>
   );
 };
 
@@ -423,12 +425,12 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
     const { showfilterMenu } = this.state;
 
     return (
-      <div>
+      <div className="list-page">
         {this.renderImportModal()}
         {this.renderExportModal()}
-        <div className="navbar">
-          <h1 className="display-4">{pageConfig.label}</h1>
-          <div className="float-right">
+        <div className="topbar">
+          <div className="title">{pageConfig.label}</div>
+          <div className="action-container">
             {pageConfig.filters && (
               <div className="dropdown float-right ml-2">
                 <button
@@ -471,7 +473,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
           />
         </div>
 
-        <div className="table-responsive">
+        <div className="list-content">
           {(() => {
             if (isLoading) {
               return <div>Loading...</div>;
@@ -491,15 +493,16 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
               }
             }
           })()}
-          {maxPage > 0 ? (
-            <Pagination
-              key="pagination"
-              location={location}
-              currentPage={page}
-              maxPage={maxPage}
-            />
-          ) : null}
         </div>
+
+        {maxPage > 0 ? (
+          <Pagination
+            key="pagination"
+            location={location}
+            currentPage={page}
+            maxPage={maxPage}
+          />
+        ) : null}
       </div>
     );
   }

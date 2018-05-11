@@ -1,0 +1,75 @@
+@import 'styleUtils/common.scss';
+
+$horizontal-spacing: to-rem(32px);
+
+.list-page {
+  .topbar {
+    padding: to-rem(24px) $horizontal-spacing;
+    background-color: white;
+  }
+
+  .title {
+    font-family: Lato-Light;
+    font-size: 38px;
+    line-height: 38px;
+  }
+
+  .action-container {
+    float: right;
+  }
+
+  .list-content {
+    margin-top: to-rem(30px);
+    margin-bottom: to-rem(38px);
+    background-color: white;
+    overflow-x: auto;
+  }
+
+  .list-table {
+    display: table;
+    min-width: calc(100vw - 250px);
+  }
+
+  .table-row {
+    display: table-row;
+
+    & .table-cell:first-child {
+      padding-left: to-rem(32px);
+    }
+
+    & .table-cell:last-child {
+      padding-right: to-rem(32px);
+    }
+  }
+
+  .table-cell {
+    display: table-cell;
+    height: to-rem(66px);
+    padding-right: to-rem(32px);
+    border-bottom: 1px #ECEEEF solid;
+    font-family: HelveticaNeue;
+    vertical-align: middle;
+    max-width: to-rem(250px);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .table-header {
+    display: table-header-group;
+    background: #FFFFFF;
+
+    .table-cell {
+      height: to-rem(50px);
+      font-family: HelveticaNeue-Bold;
+    }
+  }
+
+  .table-body {
+    display: table-row-group;
+
+    .table-row:nth-child(2n-1) {
+      background-color: #F9F9F9;
+    }
+  }
+}
