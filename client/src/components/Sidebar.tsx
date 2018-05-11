@@ -35,9 +35,7 @@ class Sidebar extends React.PureComponent<Props> {
           <img className="sidebar-logo" src={logo} alt="Skygear CMS" />
         </Link>
         <div className="user">
-          <div className="email">
-            {user ? user.email : 'Unknown user'}
-          </div>
+          <div className="name">{user ? user.username : 'Unknown user'}</div>
           <NavLink className="btn-logout" to="#" onClick={this.props.onLogout}>
             LOG OUT
           </NavLink>
@@ -57,11 +55,7 @@ function ListItems({ items }: Props): JSX.Element {
     );
   });
 
-  return (
-    <div>
-      {listItems}
-    </div>
-  );
+  return <div>{listItems}</div>;
 }
 
 interface ItemProps {

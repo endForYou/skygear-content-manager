@@ -22,10 +22,13 @@
 		margin-bottom: to-rem(32px);
 	}
 
-	.email {
+	.name {
 		color: white;
 		font-size: to-rem(16px);
 		line-height: to-rem(16px);
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 
 	.btn-logout {
