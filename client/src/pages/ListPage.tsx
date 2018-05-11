@@ -38,7 +38,6 @@ import {
 import { LinkButton } from '../components/LinkButton';
 import Pagination from '../components/Pagination';
 import { SortButton } from '../components/SortButton';
-import { SpaceSeperatedList } from '../components/SpaceSeperatedList';
 import {
   InjectedProps as SyncFilterProps,
   syncFilterWithUrl,
@@ -148,15 +147,14 @@ const TableRow: React.SFC<TableRowProps> = ({
     <div className="table-row">
       {columns}
       <div className="table-cell">
-        <SpaceSeperatedList>
-          {itemActions.map((action, index) => (
-            <LinkButton
-              key={index}
-              actionConfig={action}
-              context={{ record }}
-            />
-          ))}
-        </SpaceSeperatedList>
+        {itemActions.map((action, index) => (
+          <LinkButton
+            key={index}
+            className="item-action"
+            actionConfig={action}
+            context={{ record }}
+          />
+        ))}
       </div>
     </div>
   );
@@ -329,6 +327,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
         return (
           <ExportButton
             key={index}
+            className="list-action"
             actionConfig={actionConfig}
             onClick={() => this.setState({ exporting: actionConfig })}
           />
@@ -337,6 +336,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
         return (
           <ImportButton
             key={index}
+            className="list-action"
             actionConfig={actionConfig}
             onFileSelected={this.onImportFileSelected}
           />
@@ -345,6 +345,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
         return (
           <LinkButton
             key={index}
+            className="list-action"
             actionConfig={actionConfig}
             context={{
               record_type: recordName,
@@ -361,7 +362,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
     const actionsButtons = actions.map((action, index) =>
       this.renderActionButton(recordName, action, index)
     );
-    return <SpaceSeperatedList>{actionsButtons}</SpaceSeperatedList>;
+    return actionsButtons;
   }
 
   public renderImportModal() {
@@ -431,11 +432,12 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
         <div className="topbar">
           <div className="title">{pageConfig.label}</div>
           <div className="action-container">
+            {this.renderActionButtons()}
             {pageConfig.filters && (
-              <div className="dropdown float-right ml-2">
+              <div className="dropdown float-right">
                 <button
                   type="button"
-                  className="btn btn-primary dropdown-toggle"
+                  className="list-action dropdown-toggle"
                   onClick={() => this.toggleFilterMenu()}
                 >
                   Add Filter <span className="caret" />
@@ -461,7 +463,6 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
                 </div>
               </div>
             )}
-            {this.renderActionButtons()}
           </div>
         </div>
 

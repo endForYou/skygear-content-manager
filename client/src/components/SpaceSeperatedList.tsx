@@ -12,7 +12,7 @@ export const SpaceSeperatedList: React.SFC = ({
     // tslint:disable-next-line: no-any
     (prev: any, current: any, index: number): any => [
       prev,
-      <span key={`space-${index}`}>&nbsp;</span>,
+      <span key={`space-${index}`} />,
       current,
     ],
     []

@@ -24,6 +24,7 @@ $base-font-size: 14px;
   border-radius: to-rem(4px);
   font-size: to-rem(18px);
   cursor: pointer;
+  text-decoration: none;
 }
 
 @mixin btn-primary {
@@ -34,4 +35,14 @@ $base-font-size: 14px;
   color: white;
 
   @include btn-hover-effect-darken($btn-primary-bg-color);
+}
+
+@mixin btn-secondary {
+  $btn-secondary-bg-color: white;
+
+  background-color: $btn-secondary-bg-color;
+  border: 1px solid #CCCCCC;
+  color: #373A3C;
+
+  @include btn-hover-effect-darken($btn-secondary-bg-color);
 }
