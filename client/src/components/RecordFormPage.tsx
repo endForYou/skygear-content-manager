@@ -5,8 +5,6 @@ import { Record } from 'skygear';
 
 import { RecordActionDispatcher } from '../actions/record';
 import { FieldConfig, RecordFormPageConfig } from '../cmsConfig';
-import { LinkButton } from '../components/LinkButton';
-import { SpaceSeperatedList } from '../components/SpaceSeperatedList';
 import { Field, FieldContext } from '../fields';
 import { errorMessageFromError, isRecordsOperationError } from '../recordUtil';
 import { RootState } from '../states';
@@ -18,6 +16,7 @@ import { entriesOf, objectValues } from '../util';
 // record submission.
 // e.g. Reduce reused part into RecordForm only instead of RecordFormPage.
 export interface RecordFormPageProps {
+  className?: string;
   config: RecordFormPageConfig;
   dispatch: Dispatch<RootState>;
   record: Record;
@@ -107,7 +106,7 @@ class RecordFormPageImpl extends React.PureComponent<
   }
 
   public render() {
-    const { config, record, savingRecord } = this.props;
+    const { className, config, record, savingRecord } = this.props;
 
     const formGroups = config.fields.map((fieldConfig, index) => {
       return (
@@ -122,21 +121,7 @@ class RecordFormPageImpl extends React.PureComponent<
     });
 
     return (
-      <form onSubmit={this.handleSubmit}>
-        <div className="navbar">
-          <h1 className="display-4">{config.label}</h1>
-          <div className="float-right">
-            <SpaceSeperatedList>
-              {config.actions.map((action, index) => (
-                <LinkButton
-                  key={index}
-                  actionConfig={action}
-                  context={{ record }}
-                />
-              ))}
-            </SpaceSeperatedList>
-          </div>
-        </div>
+      <form className={className} onSubmit={this.handleSubmit}>
         {formGroups}
         {this.renderErrorMessage()}
         <SubmitButton savingRecord={savingRecord} />

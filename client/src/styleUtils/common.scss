@@ -47,6 +47,12 @@ $base-font-size: 14px;
   @include btn-hover-effect-darken($btn-secondary-bg-color);
 }
 
+@mixin record-form {
+  margin: to-rem(20px) to-rem(32px);
+  padding: to-rem(32px);
+  background-color: white;
+}
+
 @mixin pagination-position {
   float: right;
   margin-right: to-rem(42px);

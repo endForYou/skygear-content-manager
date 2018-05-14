@@ -1,3 +1,5 @@
+import './EditPageContainer.scss';
+
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
@@ -6,6 +8,7 @@ import { Record } from 'skygear';
 import { RecordActionDispatcher } from '../actions/record';
 import { RecordFormPageConfig } from '../cmsConfig';
 import { RecordFormPage } from '../components/RecordFormPage';
+import { RecordFormTopbar } from '../components/RecordFormTopbar';
 import { RootState } from '../states';
 import { Remote, RemoteType } from '../types';
 
@@ -50,13 +53,21 @@ class EditPageContainerImpl extends React.PureComponent<Props> {
         return <div>Loading record...</div>;
       case RemoteType.Success:
         return (
-          <RecordFormPage
-            config={this.props.config}
-            dispatch={this.props.dispatch}
-            record={remoteRecord.value}
-            recordDispatcher={this.recordDispatcher}
-            savingRecord={savingRecord}
-          />
+          <div className="edit-page">
+            <RecordFormTopbar
+              title={this.props.config.label}
+              actions={this.props.config.actions}
+              actionContext={{ record: remoteRecord.value }}
+            />
+            <RecordFormPage
+              className="record-form"
+              config={this.props.config}
+              dispatch={this.props.dispatch}
+              record={remoteRecord.value}
+              recordDispatcher={this.recordDispatcher}
+              savingRecord={savingRecord}
+            />
+          </div>
         );
       case RemoteType.Failure:
         return (

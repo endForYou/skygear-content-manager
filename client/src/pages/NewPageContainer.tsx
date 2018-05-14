@@ -1,3 +1,5 @@
+import './NewPageContainer.scss';
+
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
@@ -6,6 +8,7 @@ import { Record } from 'skygear';
 import { RecordActionDispatcher } from '../actions/record';
 import { RecordFormPageConfig } from '../cmsConfig';
 import { RecordFormPage } from '../components/RecordFormPage';
+import { RecordFormTopbar } from '../components/RecordFormTopbar';
 import { RootState } from '../states';
 import { Remote } from '../types';
 
@@ -46,14 +49,24 @@ class NewPageContainerImpl extends React.PureComponent<Props> {
   }
 
   public render() {
+    const { config, dispatch, savingRecord } = this.props;
+
     return (
-      <RecordFormPage
-        config={this.props.config}
-        dispatch={this.props.dispatch}
-        recordDispatcher={this.recordDispatcher}
-        record={this.newRecord}
-        savingRecord={this.props.savingRecord}
-      />
+      <div className="new-page">
+        <RecordFormTopbar
+          title={`Create New ${config.label}`}
+          actions={config.actions}
+          actionContext={{ record: this.newRecord }}
+        />
+        <RecordFormPage
+          className="record-form"
+          config={config}
+          dispatch={dispatch}
+          recordDispatcher={this.recordDispatcher}
+          record={this.newRecord}
+          savingRecord={savingRecord}
+        />
+      </div>
     );
   }
 }
