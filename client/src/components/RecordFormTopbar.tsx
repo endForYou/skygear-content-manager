@@ -24,11 +24,12 @@ export const RecordFormTopbar: React.SFC<Props> = ({
   return (
     <div className={classnames(className, 'record-form-topbar')}>
       <div className="title">{title}</div>
-      <div className="float-right">
+      <div className="action-container">
         <SpaceSeperatedList>
           {actions.map((action, index) => (
             <LinkButton
               key={index}
+              className="record-form-action"
               actionConfig={action}
               context={actionContext}
             />
