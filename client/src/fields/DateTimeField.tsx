@@ -1,3 +1,4 @@
+import classnames from 'classnames';
 import * as moment from 'moment-timezone';
 import * as React from 'react';
 
@@ -32,7 +33,7 @@ class DateTimeFieldImpl extends React.PureComponent<DateTimeFieldProps, State> {
   public render() {
     const {
       config: { editable, timezone },
-      className: className,
+      className,
       onFieldChange: _onFieldChange,
       value: _value,
       ...rest,
@@ -47,7 +48,7 @@ class DateTimeFieldImpl extends React.PureComponent<DateTimeFieldProps, State> {
           timeFormat={timeFormat}
           value={this.state.value}
           onChange={this.handleChange}
-          inputProps={{ className }}
+          inputProps={{ className: classnames(className, 'datetime-input') }}
           timezone={timezone}
         />
       );

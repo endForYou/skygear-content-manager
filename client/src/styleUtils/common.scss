@@ -1,11 +1,15 @@
+@import './effect.scss';
+
 $base-font-size: 14px;
 
 @function to-rem($px) {
   @return ($px / $base-font-size) * 1rem;
 }
 
+$input-horizontal-padding: to-rem(16px);
+
 @mixin text-input {
-  padding: 0 to-rem(16px);
+  padding: 0 $input-horizontal-padding;
   color: #495057;
   background-color: #fff;
   background-image: none;

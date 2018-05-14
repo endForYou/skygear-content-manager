@@ -6,14 +6,12 @@ import { RequiredFieldProps } from './Field';
 import { ImageAssetUploader } from './ImageAssetUploader';
 import { NullField } from './NullField';
 
-import './ImageAssetField.css';
-
 export type ImageAssetFieldProps = RequiredFieldProps<ImageAssetFieldConfig>;
 
 export class ImageAssetField extends React.PureComponent<ImageAssetFieldProps> {
   public renderClearButton() {
     return (
-      <button className="btn btn-light mt-2" onClick={this.onClearClick}>
+      <button className="btn-clear" onClick={this.onClearClick}>
         Clear Image
       </button>
     );
@@ -23,6 +21,7 @@ export class ImageAssetField extends React.PureComponent<ImageAssetFieldProps> {
     const {
       config: { editable, nullable },
       context: _context,
+      className,
       onFieldChange: _onFieldChange,
       value: value,
       ...rest,
@@ -30,7 +29,7 @@ export class ImageAssetField extends React.PureComponent<ImageAssetFieldProps> {
 
     if (editable) {
       return (
-        <div>
+        <div className={className}>
           <ImageAssetUploader {...this.props} />
           {nullable && this.renderClearButton()}
         </div>
@@ -38,11 +37,11 @@ export class ImageAssetField extends React.PureComponent<ImageAssetFieldProps> {
     }
 
     if (value == null) {
-      return <NullField {...rest} />;
+      return <NullField {...rest} className={className} />;
     }
 
     return (
-      <a href={value.url}>
+      <a className={className} href={value.url}>
         <div
           className="image-asset-image"
           style={{

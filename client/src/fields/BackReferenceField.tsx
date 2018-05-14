@@ -1,3 +1,4 @@
+import classnames from 'classnames';
 import * as React from 'react';
 import { Record } from 'skygear';
 
@@ -19,6 +20,7 @@ export class BackReferenceField extends React.PureComponent<
     const {
       context,
       config,
+      className,
       onFieldChange: _onFieldChange,
       value: _value,
       ...rest,
@@ -27,7 +29,12 @@ export class BackReferenceField extends React.PureComponent<
     const $transient = context.record.$transient;
 
     if (config.editable) {
-      return <BackReferenceSelect {...this.props} />;
+      return (
+        <BackReferenceSelect
+          {...this.props}
+          className={classnames(className, 'back-ref-select')}
+        />
+      );
     }
 
     const targetFieldName = config.name;
@@ -48,9 +55,12 @@ export class BackReferenceField extends React.PureComponent<
     if (config.compact) {
       return <span {...rest}>{join(items, ', ')}</span>;
     } else {
-      const { className: _className, ...restWithoutClassName } = rest;
       const listItems = items.map((item, i) => <li key={i}>{item}</li>);
-      return <ul {...restWithoutClassName}>{listItems}</ul>;
+      return (
+        <ul {...rest} className={classnames(className, 'back-ref-list')}>
+          {listItems}
+        </ul>
+      );
     }
   }
 }

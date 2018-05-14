@@ -1,3 +1,6 @@
+import './RecordFormPage.scss';
+
+import classnames from 'classnames';
 import * as React from 'react';
 import { Dispatch } from 'react-redux';
 import { push } from 'react-router-redux';
@@ -121,7 +124,10 @@ class RecordFormPageImpl extends React.PureComponent<
     });
 
     return (
-      <form className={className} onSubmit={this.handleSubmit}>
+      <form
+        className={classnames(className, 'record-form-page')}
+        onSubmit={this.handleSubmit}
+      >
         {formGroups}
         {this.renderErrorMessage()}
         <SubmitButton savingRecord={savingRecord} />
@@ -190,8 +196,10 @@ interface FieldProps {
 function FormGroup(props: FieldProps): JSX.Element {
   const { fieldConfig } = props;
   return (
-    <div className="form-group">
-      <label htmlFor={fieldConfig.name}>{fieldConfig.label}</label>
+    <div className="record-form-group">
+      <div className="record-form-label">
+        <label htmlFor={fieldConfig.name}>{fieldConfig.label}</label>
+      </div>
       <FormField {...props} />
     </div>
   );
@@ -205,7 +213,7 @@ function FormField(props: FieldProps): JSX.Element {
     recordChange[name] === undefined ? record[name] : recordChange[name];
   return (
     <Field
-      className="form-control"
+      className="record-form-field"
       config={fieldConfig}
       value={fieldValue}
       context={FieldContext(record)}

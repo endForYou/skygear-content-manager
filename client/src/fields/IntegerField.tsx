@@ -1,3 +1,4 @@
+import classnames from 'classnames';
 import * as React from 'react';
 
 import { IntegerFieldConfig } from '../cmsConfig';
@@ -33,6 +34,7 @@ class IntegerFieldImpl extends React.PureComponent<IntegerFieldProps, State> {
   public render() {
     const {
       config: { editable },
+      className,
       onFieldChange: _onFieldChange,
       value: _value,
       ...rest,
@@ -42,14 +44,21 @@ class IntegerFieldImpl extends React.PureComponent<IntegerFieldProps, State> {
       return (
         <input
           {...rest}
+          className={classnames(className, 'integer-input')}
           type="text"
+          id={name}
+          name={name}
           value={this.state.stringValue}
           onChange={this.handleChange}
           placeholder="0"
         />
       );
     } else {
-      return <span {...rest}>{this.state.value}</span>;
+      return (
+        <span {...rest} className={className}>
+          {this.state.value}
+        </span>
+      );
     }
   }
 

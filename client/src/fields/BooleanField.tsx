@@ -1,3 +1,4 @@
+import classnames from 'classnames';
 import * as React from 'react';
 import ReactToggle, { ReactToggleElement } from 'react-toggle';
 // tslint:disable-next-line: no-submodule-imports
@@ -28,6 +29,7 @@ class BooleanFieldImpl extends React.PureComponent<BooleanFieldProps, State> {
   public render() {
     const {
       config: { editable },
+      className,
       onFieldChange: _onFieldChange,
       value: _value,
       ...rest,
@@ -36,12 +38,16 @@ class BooleanFieldImpl extends React.PureComponent<BooleanFieldProps, State> {
     const disabled = editable === undefined ? true : !editable;
 
     return (
-      <ReactToggle
-        {...rest}
-        checked={this.state.value}
-        onChange={this.handleChange}
-        disabled={disabled}
-      />
+      <div className={classnames(className, 'boolean-input')}>
+        <div className="boolean-toggle-container">
+          <ReactToggle
+            {...rest}
+            checked={this.state.value}
+            onChange={this.handleChange}
+            disabled={disabled}
+          />
+        </div>
+      </div>
     );
   }
 

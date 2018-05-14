@@ -1,3 +1,4 @@
+import classnames from 'classnames';
 import * as React from 'react';
 import {
   Async as SelectAsync,
@@ -80,6 +81,7 @@ class ReferenceFieldImpl extends React.PureComponent<
       return (
         <StringSelectAsync
           {...rest}
+          className={classnames(className, 'ref-select')}
           loadOptions={this.debouncedLoadOptions}
           onChange={this.onChange}
           value={value || undefined}
@@ -92,7 +94,7 @@ class ReferenceFieldImpl extends React.PureComponent<
         const { targetCmsRecord } = config;
 
         return (
-          <span className={className}>
+          <span className={classnames(className, 'ref-display')}>
             <ReferenceLink
               recordName={targetCmsRecord.name}
               recordId={value.value}

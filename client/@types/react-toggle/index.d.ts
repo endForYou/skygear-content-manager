@@ -8,6 +8,7 @@ declare module 'react-toggle' {
   export default class ReactToggle extends React.Component<ReactToggleProps> {}
 
   export interface ReactToggleProps {
+    className?: string;
     checked?: boolean;
     defaultChecked?: boolean;
     onChange?: React.ReactEventHandler<ReactToggleElement>;

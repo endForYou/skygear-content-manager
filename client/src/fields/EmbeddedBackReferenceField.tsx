@@ -144,7 +144,7 @@ export class EmbeddedBackReferenceField extends React.PureComponent<
   }
 
   public render() {
-    const { config } = this.props;
+    const { config, className } = this.props;
     const { embeddedRecords } = this.state;
 
     const items = embeddedRecords.map((r, index) => {
@@ -197,7 +197,7 @@ export class EmbeddedBackReferenceField extends React.PureComponent<
     });
 
     return (
-      <div>
+      <div className={className}>
         <div className="embedded-back-reference-field">{items}</div>
         {config.editable && (
           <button

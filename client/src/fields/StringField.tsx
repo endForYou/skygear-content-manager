@@ -1,3 +1,4 @@
+import classnames from 'classnames';
 import * as React from 'react';
 
 import { BaseStringField } from './BaseStringField';
@@ -12,19 +13,32 @@ export class StringField extends BaseStringField<
   StringFieldProps
 > {
   public render() {
-    const { config: { editable }, onFieldChange: _, ...rest } = this.props;
+    const {
+      className,
+      config: { editable, label, name },
+      onFieldChange: _,
+      ...rest,
+    } = this.props;
 
     if (editable) {
       return (
         <input
           {...rest}
+          className={classnames(className, 'text-input')}
           type="text"
+          id={name}
+          name={name}
+          placeholder={label}
           value={this.state.value}
           onChange={this.handleChange}
         />
       );
     } else {
-      return <span {...rest}>{this.state.value}</span>;
+      return (
+        <span {...rest} className={className}>
+          {this.state.value}
+        </span>
+      );
     }
   }
 

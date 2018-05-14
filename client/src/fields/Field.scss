@@ -1,0 +1,85 @@
+@import 'styleUtils/common.scss';
+
+.record-form-field {
+  &.text-input,
+  &.integer-input,
+  &.number-input,
+  &.boolean-input,
+  &.textarea-input,
+  &.datetime-input {
+    display: table-cell;
+    width: 100%;
+  }
+
+  &.back-ref-select,
+  &.back-ref-list,
+  &.ref-select,
+  &.ref-display {
+    width: 100%;
+  }
+}
+
+.text-input,
+.integer-input,
+.number-input,
+.datetime-input {
+  @include text-input;
+  height: to-rem(38px);
+  vertical-align: middle;
+}
+
+.boolean-input {
+  vertical-align: middle;
+}
+
+.boolean-toggle-container {
+  // to align its child vertically center
+  display: flex;
+}
+
+.dropdown-custom-input {
+  @include text-input;
+  width: 100%;
+  height: to-rem(38px);
+  margin-top: to-rem(10px);
+}
+
+.image-asset-image {
+  background-size: cover;
+}
+
+.btn-clear {
+  @include btn;
+  @include btn-secondary;
+  font-size: to-rem(12px);
+  line-height: to-rem(12px);
+  padding: to-rem(8px) to-rem(12px);
+  margin-top: to-rem(10px);
+}
+
+/*
+ * Override react-select styles
+ */
+.Select-placeholder,
+.Select-input,
+.Select-value,
+.Select-option,
+.Select-noresults {
+  padding-left: $input-horizontal-padding !important;
+  padding-right: $input-horizontal-padding !important;
+}
+
+.Select--multi .Select-input {
+  margin-left: 0px !important;
+}
+
+.Select-placeholder,
+.Select-value,
+.Select-input {
+  line-height: to-rem(36px) !important;
+  height: to-rem(36px) !important;
+}
+
+.Select-control {
+  height: to-rem(38px) !important;
+}
