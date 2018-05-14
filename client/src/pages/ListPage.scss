@@ -106,5 +106,6 @@ $horizontal-spacing: to-rem(32px);
 
   .pagination {
     @include pagination-position;
+    margin-bottom: to-rem(38px);
   }
 }
