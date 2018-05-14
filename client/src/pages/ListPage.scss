@@ -5,14 +5,18 @@ $horizontal-spacing: to-rem(32px);
 
 .list-page {
   .topbar {
+    display: table;
+    width: 100%;
     padding: to-rem(24px) $horizontal-spacing;
     background-color: white;
   }
 
   .title {
+    display: table-cell;
     font-family: Lato-Light;
     font-size: 38px;
     line-height: 38px;
+    min-width: to-rem(250px);
   }
 
   .list-action {
@@ -25,10 +29,12 @@ $horizontal-spacing: to-rem(32px);
   }
 
   .action-container {
-    float: right;
+    display: table-cell;
+    text-align: right;
 
     .list-action {
       margin-left: to-rem(10px);
+      margin-bottom: to-rem(10px);
     }
   }
 

@@ -434,7 +434,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
           <div className="action-container">
             {this.renderActionButtons()}
             {pageConfig.filters && (
-              <div className="dropdown float-right">
+              <div className="dropdown d-inline-block">
                 <button
                   type="button"
                   className="list-action dropdown-toggle"
