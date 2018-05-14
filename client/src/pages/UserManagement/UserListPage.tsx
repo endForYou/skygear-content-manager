@@ -1,3 +1,5 @@
+import './UserListPage.scss';
+
 import classNames from 'classnames';
 import { Location } from 'history';
 import * as qs from 'query-string';
@@ -60,15 +62,15 @@ const filterConfigs: FilterConfig[] = [
 
 const TableHeader: React.SFC = () => {
   return (
-    <thead className="thead-light">
-      <tr>
-        <th>id</th>
-        <th>Username</th>
-        <th>Email</th>
-        <th>CMS Access</th>
-        <th />
-      </tr>
-    </thead>
+    <div className="table-header">
+      <div className="table-row">
+        <div className="table-cell">id</div>
+        <div className="table-cell">Username</div>
+        <div className="table-cell">Email</div>
+        <div className="table-cell">CMS Access</div>
+        <div className="table-cell" />
+      </div>
+    </div>
   );
 };
 
@@ -94,27 +96,27 @@ const TableRow: React.SFC<TableRowProps> = ({
   );
 
   return (
-    <tr>
-      <td>{user.record._id}</td>
-      <td>{user.record.username}</td>
-      <td>{user.record.email}</td>
-      <td>
+    <div className="table-row">
+      <div className="table-cell">{user.record._id}</div>
+      <div className="table-cell">{user.record.username}</div>
+      <div className="table-cell">{user.record.email}</div>
+      <div className="table-cell">
         <ReactToggle
           checked={hasAdminRole}
           disabled={user.isRolesUpdating}
           onChange={onChange}
         />
         {user.isRolesUpdating && <LoadingSpinner />}
-      </td>
-      <td>
+      </div>
+      <div className="table-cell">
         <Link
-          className="btn btn-light"
+          className="item-action"
           to={`/user-management/${user.record._id}/change-password`}
         >
           Change Password
         </Link>
-      </td>
-    </tr>
+      </div>
+    </div>
   );
 };
 
@@ -149,7 +151,7 @@ interface ListTableProps {
 
 const ListTable: React.SFC<ListTableProps> = ({ users, ...rest }) => {
   return (
-    <table key="table" className="table table-sm table-hover table-responsive">
+    <table key="table" className="list-table">
       <TableHeader />
       <TableBody {...rest} users={users} />
     </table>
@@ -239,14 +241,14 @@ class UserListPageImpl extends React.PureComponent<UserListPageProps, State> {
     const { showfilterMenu } = this.state;
 
     return (
-      <div>
-        <div className="navbar">
-          <h1 className="display-4">User Management</h1>
-          <div className="float-right">
-            <div className="dropdown float-right ml-2">
+      <div className="user-list">
+        <div className="topbar">
+          <div className="title">User Management</div>
+          <div className="action-container">
+            <div className="dropdown d-inline-block">
               <button
                 type="button"
-                className="btn btn-primary dropdown-toggle"
+                className="list-action dropdown-toggle"
                 onClick={() => this.toggleFilterMenu()}
               >
                 Add Filter <span className="caret" />
@@ -280,13 +282,13 @@ class UserListPageImpl extends React.PureComponent<UserListPageProps, State> {
             onChangeFilter={this.props.onChangeFilter}
           />
         </div>
-        <div className="table-responsive">
+        <div className="list-content">
           {(() => {
             if (isLoading) {
-              return <div>Loading...</div>;
+              return <div className="list-loading">Loading...</div>;
             } else {
               if (users.length === 0) {
-                return <div>No records found.</div>;
+                return <div className="list-empty">No users found.</div>;
               } else {
                 return (
                   <ListTable
@@ -298,14 +300,16 @@ class UserListPageImpl extends React.PureComponent<UserListPageProps, State> {
               }
             }
           })()}
-          {maxPage > 0 ? (
-            <Pagination
-              location={location}
-              currentPage={page}
-              maxPage={maxPage}
-            />
-          ) : null}
         </div>
+
+        {maxPage > 0 ? (
+          <Pagination
+            className="pagination"
+            location={location}
+            currentPage={page}
+            maxPage={maxPage}
+          />
+        ) : null}
       </div>
     );
   }

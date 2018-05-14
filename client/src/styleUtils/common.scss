@@ -39,6 +39,12 @@ $input-horizontal-padding: to-rem(16px);
   color: white;
 
   @include btn-hover-effect-darken($btn-primary-bg-color);
+
+  &[disabled] {
+    cursor: default;
+    background-color: rgba($btn-primary-bg-color, 0.3);
+    border-color: rgba($btn-primary-bg-color, 0.1);
+  }
 }
 
 @mixin btn-secondary {
@@ -49,6 +55,11 @@ $input-horizontal-padding: to-rem(16px);
   color: #373A3C;
 
   @include btn-hover-effect-darken($btn-secondary-bg-color);
+
+  &[disabled] {
+    cursor: default;
+    color: rgba(#373A3C, 0.3);
+  }
 }
 
 @mixin record-topbar($horizontal-spacing) {
