@@ -2,15 +2,19 @@
 
 .show-page {
   .topbar {
-    width: 100%;
-    background-color: white;
-    padding: to-rem(24px) to-rem(32px);
+    @include record-topbar(to-rem(32px));
+  }
 
-    .title {
-      font-family: Lato-Light;
-      font-size: to-rem(38px);
-      line-height: to-rem(38px);
-    }
+  .title {
+    @include record-topbar-title;
+  }
+
+  .show-action {
+    @include record-topbar-action;
+  }
+
+  .action-container {
+    @include record-topbar-action-container;
   }
 
   .record-view {

@@ -51,6 +51,37 @@ $input-horizontal-padding: to-rem(16px);
   @include btn-hover-effect-darken($btn-secondary-bg-color);
 }
 
+@mixin record-topbar($horizontal-spacing) {
+  display: table;
+  width: 100%;
+  padding: to-rem(24px) $horizontal-spacing;
+  background-color: white;
+}
+
+@mixin record-topbar-title {
+  display: table-cell;
+  font-family: Lato-Light;
+  font-size: 38px;
+  line-height: 38px;
+  min-width: to-rem(250px);
+}
+
+@mixin record-topbar-action {
+  @include btn;
+  @include btn-primary;
+  display: inline-block;
+  font-size: to-rem(18px);
+  line-height: to-rem(18px);
+  padding: to-rem(10px) to-rem(18px);
+  margin-left: to-rem(10px);
+  margin-bottom: to-rem(10px);
+}
+
+@mixin record-topbar-action-container {
+  display: table-cell;
+  text-align: right;
+}
+
 @mixin record-form {
   margin: to-rem(20px) to-rem(32px);
   padding: to-rem(32px);

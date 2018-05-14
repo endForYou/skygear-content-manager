@@ -104,10 +104,11 @@ function Topbar({
   return (
     <div className={classnames(className, 'topbar')}>
       <div className="title">{title}</div>
-      <div className="float-right">
+      <div className="action-container">
         <SpaceSeperatedList>
           {actions.map((action, index) => (
             <LinkButton
+              className="show-action"
               key={index}
               actionConfig={action}
               context={actionContext}
