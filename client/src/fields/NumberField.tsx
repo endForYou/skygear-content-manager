@@ -33,7 +33,7 @@ class NumberFieldImpl extends React.PureComponent<NumberFieldProps, State> {
 
   public render() {
     const {
-      config: { editable, name },
+      config: { compact, editable, name },
       className,
       onFieldChange: _onFieldChange,
       value: _value,
@@ -55,9 +55,13 @@ class NumberFieldImpl extends React.PureComponent<NumberFieldProps, State> {
       );
     } else {
       return (
-        <span {...rest} className={className}>
-          {this.state.stringValue}
-        </span>
+        <div
+          className={classnames(className, 'number-display', {
+            full: !compact,
+          })}
+        >
+          {this.state.value}
+        </div>
       );
     }
   }

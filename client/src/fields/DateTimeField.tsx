@@ -32,7 +32,7 @@ class DateTimeFieldImpl extends React.PureComponent<DateTimeFieldProps, State> {
 
   public render() {
     const {
-      config: { editable, timezone },
+      config: { compact, editable, timezone },
       className,
       onFieldChange: _onFieldChange,
       value: _value,
@@ -58,7 +58,9 @@ class DateTimeFieldImpl extends React.PureComponent<DateTimeFieldProps, State> {
       return (
         <TzDatetime
           {...rest}
-          className={className}
+          className={classnames(className, 'datetime-display', {
+            full: !compact,
+          })}
           datetimeFormat={datetimeFormat}
           value={this.state.value}
           timezone={timezone}

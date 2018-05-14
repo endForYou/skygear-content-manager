@@ -1,0 +1,47 @@
+@import 'styleUtils/common.scss';
+
+.show-page {
+  .topbar {
+    width: 100%;
+    background-color: white;
+    padding: to-rem(24px) to-rem(32px);
+
+    .title {
+      font-family: Lato-Light;
+      font-size: to-rem(38px);
+      line-height: to-rem(38px);
+    }
+  }
+
+  .record-view {
+    @include record-form;
+  }
+
+  .record-form-group {
+    display: table;
+    width: 100%;
+  }
+
+  .record-form-group:not(:first-child) {
+    margin-top: to-rem(10px);
+  }
+
+  .record-form-label {
+    display: table-cell;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow-x: hidden;
+    width: 26%;
+    min-width: to-rem(150px);
+    line-height: to-rem(38px);
+    vertical-align: top;
+
+    label {
+      margin-bottom: 0;
+    }
+  }
+
+  .record-form-field {
+    // leave the style to field itself
+  }
+}

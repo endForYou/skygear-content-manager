@@ -33,7 +33,7 @@ class IntegerFieldImpl extends React.PureComponent<IntegerFieldProps, State> {
 
   public render() {
     const {
-      config: { editable },
+      config: { compact, editable },
       className,
       onFieldChange: _onFieldChange,
       value: _value,
@@ -55,9 +55,13 @@ class IntegerFieldImpl extends React.PureComponent<IntegerFieldProps, State> {
       );
     } else {
       return (
-        <span {...rest} className={className}>
+        <div
+          className={classnames(className, 'integer-display', {
+            full: !compact,
+          })}
+        >
           {this.state.value}
-        </span>
+        </div>
       );
     }
   }

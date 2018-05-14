@@ -1,3 +1,4 @@
+import classnames from 'classnames';
 import * as React from 'react';
 import Select, { Option, OptionValues } from 'react-select';
 
@@ -142,7 +143,7 @@ export class DropdownField extends React.PureComponent<
 
   public render() {
     const {
-      config: { editable, name, nullOption, options },
+      config: { compact, editable, name, nullOption, options },
       className,
       onFieldChange: _,
       ...rest,
@@ -183,7 +184,11 @@ export class DropdownField extends React.PureComponent<
       } else {
         displayValue = value;
       }
-      return <span {...rest}>{displayValue}</span>;
+      return (
+        <span {...rest} className={classnames(className, { full: !compact })}>
+          {displayValue}
+        </span>
+      );
     }
   }
 }

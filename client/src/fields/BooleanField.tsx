@@ -38,7 +38,12 @@ class BooleanFieldImpl extends React.PureComponent<BooleanFieldProps, State> {
     const disabled = editable === undefined ? true : !editable;
 
     return (
-      <div className={classnames(className, 'boolean-input')}>
+      <div
+        className={classnames(className, {
+          'boolean-display': !!disabled,
+          'boolean-input': !disabled,
+        })}
+      >
         <div className="boolean-toggle-container">
           <ReactToggle
             {...rest}

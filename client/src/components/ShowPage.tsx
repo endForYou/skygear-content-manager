@@ -1,7 +1,15 @@
+import './ShowPage.scss';
+
+import classnames from 'classnames';
 import * as React from 'react';
 import { Record } from 'skygear';
 
-import { CmsRecord, FieldConfig, ShowPageConfig } from '../cmsConfig';
+import {
+  CmsRecord,
+  FieldConfig,
+  ShowActionConfig,
+  ShowPageConfig,
+} from '../cmsConfig';
 import { LinkButton } from '../components/LinkButton';
 import { SpaceSeperatedList } from '../components/SpaceSeperatedList';
 import { Field, FieldContext } from '../fields';
@@ -22,7 +30,17 @@ export class ShowPage extends React.PureComponent<ShowPageProps> {
         return <div>Loading record...</div>;
       case RemoteType.Success:
         return (
-          <RecordView config={this.props.config} record={remoteRecord.value} />
+          <div className="show-page">
+            <Topbar
+              title={this.props.config.label}
+              actions={this.props.config.actions}
+              actionContext={{ record: remoteRecord.value }}
+            />
+            <RecordView
+              config={this.props.config}
+              record={remoteRecord.value}
+            />
+          </div>
         );
       case RemoteType.Failure:
         return (
@@ -45,25 +63,7 @@ function RecordView({ config, record }: RecordViewProps): JSX.Element {
   const formGroups = config.fields.map((fieldConfig, index) => {
     return <FormGroup key={index} fieldConfig={fieldConfig} record={record} />;
   });
-  return (
-    <form>
-      <div className="navbar">
-        <h1 className="display-4">{config.label}</h1>
-        <div className="float-right">
-          <SpaceSeperatedList>
-            {config.actions.map((action, index) => (
-              <LinkButton
-                key={index}
-                actionConfig={action}
-                context={{ record }}
-              />
-            ))}
-          </SpaceSeperatedList>
-        </div>
-      </div>
-      {formGroups}
-    </form>
-  );
+  return <form className="record-view">{formGroups}</form>;
 }
 
 interface FieldProps {
@@ -74,14 +74,47 @@ interface FieldProps {
 function FormGroup(props: FieldProps): JSX.Element {
   const { fieldConfig, record } = props;
   return (
-    <div className="form-group">
-      <label htmlFor={fieldConfig.name}>{fieldConfig.label}</label>
+    <div className="record-form-group">
+      <div className="record-form-label">
+        <label htmlFor={fieldConfig.name}>{fieldConfig.label}</label>
+      </div>
       <Field
-        className="form-control"
+        className="record-form-field"
         config={fieldConfig}
         value={record[fieldConfig.name]}
         context={FieldContext(record)}
       />
+    </div>
+  );
+}
+
+interface TopbarProps {
+  className?: string;
+  title: string;
+  actions: ShowActionConfig[];
+  actionContext: object;
+}
+
+function Topbar({
+  actionContext,
+  actions,
+  className,
+  title,
+}: TopbarProps): JSX.Element {
+  return (
+    <div className={classnames(className, 'topbar')}>
+      <div className="title">{title}</div>
+      <div className="float-right">
+        <SpaceSeperatedList>
+          {actions.map((action, index) => (
+            <LinkButton
+              key={index}
+              actionConfig={action}
+              context={actionContext}
+            />
+          ))}
+        </SpaceSeperatedList>
+      </div>
     </div>
   );
 }

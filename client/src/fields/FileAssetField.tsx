@@ -1,3 +1,4 @@
+import classnames from 'classnames';
 import * as React from 'react';
 
 import { FileAssetFieldConfig } from '../cmsConfig';
@@ -19,7 +20,7 @@ export class FileAssetField extends React.PureComponent<FileAssetFieldProps> {
 
   public render() {
     const {
-      config: { accept, editable, nullable },
+      config: { accept, compact, editable, nullable },
       context: _context,
       className,
       onFieldChange,
@@ -47,11 +48,20 @@ export class FileAssetField extends React.PureComponent<FileAssetFieldProps> {
     }
 
     if (value === undefined) {
-      return <NullField {...rest} className={className} />;
+      return (
+        <NullField
+          {...rest}
+          className={classnames(className, 'file-display-null', {
+            full: !compact,
+          })}
+        />
+      );
     }
 
     return (
-      <div className={className}>
+      <div
+        className={classnames(className, 'file-display', { full: !compact })}
+      >
         <a target="_blank" href={value.url}>
           {value.name}
         </a>

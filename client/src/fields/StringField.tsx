@@ -15,7 +15,7 @@ export class StringField extends BaseStringField<
   public render() {
     const {
       className,
-      config: { editable, label, name },
+      config: { compact, editable, label, name },
       onFieldChange: _,
       ...rest,
     } = this.props;
@@ -35,7 +35,10 @@ export class StringField extends BaseStringField<
       );
     } else {
       return (
-        <span {...rest} className={className}>
+        <span
+          {...rest}
+          className={classnames(className, 'text-display', { full: !compact })}
+        >
           {this.state.value}
         </span>
       );

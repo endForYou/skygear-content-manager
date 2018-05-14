@@ -88,13 +88,16 @@ class ReferenceFieldImpl extends React.PureComponent<
         />
       );
     } else {
+      const classNames = classnames(className, 'ref-display', {
+        full: !config.compact,
+      });
       if (value === null) {
-        return <NullField />;
+        return <NullField className={classNames} />;
       } else {
         const { targetCmsRecord } = config;
 
         return (
-          <span className={classnames(className, 'ref-display')}>
+          <span className={classNames}>
             <ReferenceLink
               recordName={targetCmsRecord.name}
               recordId={value.value}

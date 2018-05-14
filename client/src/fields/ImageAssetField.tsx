@@ -1,3 +1,4 @@
+import classnames from 'classnames';
 import * as React from 'react';
 
 import { ImageAssetFieldConfig } from '../cmsConfig';
@@ -19,7 +20,7 @@ export class ImageAssetField extends React.PureComponent<ImageAssetFieldProps> {
 
   public render() {
     const {
-      config: { editable, nullable },
+      config: { compact, editable, nullable },
       context: _context,
       className,
       onFieldChange: _onFieldChange,
@@ -37,11 +38,21 @@ export class ImageAssetField extends React.PureComponent<ImageAssetFieldProps> {
     }
 
     if (value == null) {
-      return <NullField {...rest} className={className} />;
+      return (
+        <NullField
+          {...rest}
+          className={classnames(className, 'image-display-null', {
+            full: !compact,
+          })}
+        />
+      );
     }
 
     return (
-      <a className={className} href={value.url}>
+      <a
+        className={classnames(className, 'image-display', { full: !compact })}
+        href={value.url}
+      >
         <div
           className="image-asset-image"
           style={{

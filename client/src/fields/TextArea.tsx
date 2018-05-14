@@ -18,12 +18,16 @@ export class TextArea extends BaseStringField<
       onFieldChange: _,
       ...rest,
     } = this.props;
-    const disabled = editable === undefined ? false : !editable;
+
+    const disabled = editable === undefined ? true : !editable;
 
     return (
       <textarea
         {...rest}
-        className={classnames(className, 'textarea-input')}
+        className={classnames(className, {
+          'textarea-display': !!disabled,
+          'textarea-input': !disabled,
+        })}
         value={this.state.value}
         onChange={this.handleChange}
         disabled={disabled}
