@@ -28,4 +28,12 @@
   .record-form-field {
     // leave the style to field itself
   }
+
+  .btn-submit {
+    @include btn;
+    @include btn-primary;
+    font-size: to-rem(14px);
+    padding: to-rem(5px) to-rem(9px);
+    margin-top: to-rem(10px);
+  }
 }

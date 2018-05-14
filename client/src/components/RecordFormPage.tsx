@@ -231,13 +231,13 @@ function SubmitButton(props: SubmitProps): JSX.Element {
   const { savingRecord } = props;
   if (savingRecord !== undefined && savingRecord.type === RemoteType.Loading) {
     return (
-      <button type="submit" className="btn btn-primary" disabled={true}>
+      <button type="submit" className="btn-submit" disabled={true}>
         Save
       </button>
     );
   } else {
     return (
-      <button type="submit" className="btn btn-primary">
+      <button type="submit" className="btn-submit">
         Save
       </button>
     );
