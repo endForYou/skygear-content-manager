@@ -1,0 +1,19 @@
+@import 'styleUtils/common.scss';
+
+.new-push-container {
+  .topbar {
+    @include record-topbar(to-rem(32px));
+  }
+
+  .title {
+    @include record-topbar-title;
+  }
+
+  .show-action {
+    @include record-topbar-action;
+  }
+
+  .push-content {
+    @include record-form;
+  }
+}

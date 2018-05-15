@@ -1,3 +1,5 @@
+import './NewPushNotificationPageContainer.scss';
+
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
@@ -37,15 +39,16 @@ class NewPushNotificationPageContainerImpl extends React.PureComponent<Props> {
     const { dispatch, userFilters, savingPushCampaign } = this.props;
 
     return (
-      <div>
-        <h1 className="display-4">New Push Campaign</h1>
-        <div>
-          <NewPushNotificationPage
-            dispatch={dispatch}
-            filterConfigs={userFilters}
-            savingPushCampaign={savingPushCampaign}
-          />
+      <div className="new-push-container">
+        <div className="topbar">
+          <div className="title">New Push Campaign</div>
         </div>
+        <NewPushNotificationPage
+          className="push-content"
+          dispatch={dispatch}
+          filterConfigs={userFilters}
+          savingPushCampaign={savingPushCampaign}
+        />
       </div>
     );
   }

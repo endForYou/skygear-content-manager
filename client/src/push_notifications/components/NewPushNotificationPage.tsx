@@ -1,3 +1,5 @@
+import './NewPushNotificationPage.scss';
+
 import * as React from 'react';
 import { Dispatch } from 'react-redux';
 import { push } from 'react-router-redux';
@@ -16,6 +18,7 @@ import { NewPushCampaign, Remote, RemoteType } from '../../types';
 import { entriesOf } from '../../util';
 
 export interface NewPushNotificationPageProps {
+  className?: string;
   filterConfigs: FilterConfig[];
   dispatch: Dispatch<RootState>;
   savingPushCampaign?: Remote<NewPushCampaign>;
@@ -91,7 +94,7 @@ class NewPushNotificationPageImpl extends React.PureComponent<
   }
 
   public render() {
-    const { filterConfigs, savingPushCampaign } = this.props;
+    const { className, filterConfigs, savingPushCampaign } = this.props;
     const {
       newPushCampaign: { type, numberOfAudiences, title, content },
       filterOptionsByName,
@@ -109,7 +112,7 @@ class NewPushNotificationPageImpl extends React.PureComponent<
     });
 
     return (
-      <form onSubmit={this.handleSubmit}>
+      <form className={className} onSubmit={this.handleSubmit}>
         <h3>Audiences</h3>
         <div className="form-group">
           <Select

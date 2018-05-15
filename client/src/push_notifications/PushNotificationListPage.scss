@@ -1,9 +1,8 @@
 @import 'styleUtils/common.scss';
-@import 'styleUtils/effect.scss';
 
 $horizontal-spacing: to-rem(32px);
 
-.list-page {
+.push-list {
   .topbar {
     @include record-topbar($horizontal-spacing);
   }
@@ -12,7 +11,7 @@ $horizontal-spacing: to-rem(32px);
     @include record-topbar-title;
   }
 
-  .list-action {
+  .push-action {
     @include record-topbar-action;
   }
 
@@ -80,16 +79,6 @@ $horizontal-spacing: to-rem(32px);
     .table-row:nth-child(2n-1) {
       background-color: #F9F9F9;
     }
-  }
-
-  .item-action {
-    @include btn;
-    @include btn-secondary;
-    display: inline-block;
-    font-size: to-rem(12px);
-    line-height: to-rem(12px);
-    padding: to-rem(8px) to-rem(12px);
-    margin-left: to-rem(5px);
   }
 
   .pagination {
