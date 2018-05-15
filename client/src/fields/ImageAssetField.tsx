@@ -12,9 +12,11 @@ export type ImageAssetFieldProps = RequiredFieldProps<ImageAssetFieldConfig>;
 export class ImageAssetField extends React.PureComponent<ImageAssetFieldProps> {
   public renderClearButton() {
     return (
-      <button className="btn-clear" onClick={this.onClearClick}>
-        Clear Image
-      </button>
+      <div>
+        <button className="btn-clear" onClick={this.onClearClick}>
+          Clear Image
+        </button>
+      </div>
     );
   }
 
@@ -30,7 +32,7 @@ export class ImageAssetField extends React.PureComponent<ImageAssetFieldProps> {
 
     if (editable) {
       return (
-        <div className={className}>
+        <div className={classnames(className, 'image-input')}>
           <ImageAssetUploader {...this.props} />
           {nullable && this.renderClearButton()}
         </div>

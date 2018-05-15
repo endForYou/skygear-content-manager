@@ -44,11 +44,12 @@ class DateTimeFieldImpl extends React.PureComponent<DateTimeFieldProps, State> {
       return (
         <TzDatetimeInput
           {...rest}
+          className={classnames(className, 'datetime-input-container')}
           dateFormat={DATE_FORMAT}
           timeFormat={timeFormat}
           value={this.state.value}
           onChange={this.handleChange}
-          inputProps={{ className: classnames(className, 'datetime-input') }}
+          inputProps={{ className: 'datetime-input' }}
           timezone={timezone}
         />
       );

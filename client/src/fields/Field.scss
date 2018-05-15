@@ -1,6 +1,8 @@
 @import 'styleUtils/common.scss';
 
 .record-form-field {
+  display: flex;
+
   &.text-input,
   &.text-display,
   &.integer-input,
@@ -11,12 +13,17 @@
   &.boolean-display,
   &.textarea-input,
   &.textarea-display,
-  &.datetime-input,
   &.datetime-display,
   &.ref-display,
   &.image-display-null,
   &.file-display-null {
-    display: table-cell;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+  }
+
+  &.datetime-input-container {
+    display: block;
     width: 100%;
   }
 
@@ -26,6 +33,10 @@
   &.ref-display {
     width: 100%;
   }
+}
+
+.datetime-input {
+  width: 100%;
 }
 
 .text-input,
@@ -76,11 +87,22 @@
   display: flex;
 }
 
+.dropdown {
+  display: flex;
+  flex-direction: column;
+}
+
 .dropdown-custom-input {
   @include text-input;
   width: 100%;
   height: to-rem(38px);
   margin-top: to-rem(10px);
+}
+
+.image-input,
+.file-input {
+  display: flex;
+  flex-direction: column;
 }
 
 .image-asset-image {

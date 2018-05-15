@@ -2,7 +2,7 @@
 
 .record-form-page {
   .record-form-group {
-    display: table;
+    display: flex;
     width: 100%;
   }
 
@@ -11,14 +11,11 @@
   }
 
   .record-form-label {
-    display: table-cell;
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow-x: hidden;
-    width: 26%;
-    min-width: to-rem(150px);
+    width: to-rem(200px);
     line-height: to-rem(38px);
-    vertical-align: top;
 
     label {
       margin-bottom: 0;
@@ -26,7 +23,7 @@
   }
 
   .record-form-field {
-    // leave the style to field itself
+    flex: 1;
   }
 
   .btn-submit {

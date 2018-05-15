@@ -1,3 +1,5 @@
+@import 'styleUtils/common.scss';
+
 .sort-button {
   opacity: .5;
   cursor: pointer;
@@ -5,6 +7,11 @@
 
 .sort-button:hover {
   opacity: .75;
+}
+
+.embedded-back-reference {
+  display: flex;
+  flex-direction: column;
 }
 
 .embedded-record-view {
@@ -40,4 +47,12 @@ form.embedded-record-view.editable:focus-within {
 .embedded-record-view > .embedded-record-button:not(:first-child) {
   margin-left: 0.5rem;
   margin-right: 0.5rem;
+}
+
+.btn-add {
+  @include btn;
+  @include btn-primary;
+  font-size: to-rem(12px);
+  line-height: to-rem(12px);
+  padding: to-rem(8px) to-rem(12px);
 }

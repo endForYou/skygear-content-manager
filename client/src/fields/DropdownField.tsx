@@ -153,8 +153,9 @@ export class DropdownField extends React.PureComponent<
 
     if (editable) {
       return (
-        <div className={className}>
+        <div className={classnames(className, 'dropdown')}>
           <Select
+            className="dropdown-select"
             name={name}
             clearable={false}
             searchable={true}

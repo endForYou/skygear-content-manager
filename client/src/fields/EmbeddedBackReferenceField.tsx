@@ -1,4 +1,4 @@
-import './EmbeddedBackReferenceField.css';
+import './EmbeddedBackReferenceField.scss';
 
 import classnames from 'classnames';
 import * as React from 'react';
@@ -197,16 +197,18 @@ export class EmbeddedBackReferenceField extends React.PureComponent<
     });
 
     return (
-      <div className={className}>
+      <div className={classnames(className, 'embedded-back-reference')}>
         <div className="embedded-back-reference-field">{items}</div>
         {config.editable && (
-          <button
-            type="button"
-            className="btn btn-link"
-            onClick={this.handleEmbeddedRecordCreate}
-          >
-            + Add New {config.label}
-          </button>
+          <div>
+            <button
+              type="button"
+              className="btn-add"
+              onClick={this.handleEmbeddedRecordCreate}
+            >
+              Add New {config.label}
+            </button>
+          </div>
         )}
       </div>
     );

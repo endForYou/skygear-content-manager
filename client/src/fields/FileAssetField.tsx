@@ -12,9 +12,11 @@ export type FileAssetFieldProps = RequiredFieldProps<FileAssetFieldConfig>;
 export class FileAssetField extends React.PureComponent<FileAssetFieldProps> {
   public renderClearButton() {
     return (
-      <button className="btn-clear" onClick={this.onClearClick}>
-        Clear File
-      </button>
+      <div>
+        <button className="btn-clear" onClick={this.onClearClick}>
+          Clear File
+        </button>
+      </div>
     );
   }
 
@@ -30,7 +32,7 @@ export class FileAssetField extends React.PureComponent<FileAssetFieldProps> {
 
     if (editable) {
       return (
-        <div className={className}>
+        <div className={classnames(className, 'file-input')}>
           <AssetUploader
             {...rest}
             accept={accept}
