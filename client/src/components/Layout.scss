@@ -1,10 +1,21 @@
+@import 'styleUtils/common.scss';
+
 .layout {
-  .content {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+
+  .scroll-view {
     position: absolute;
+    left: to-rem(250px);
+    right: 0;
     top: 0;
     bottom: 0;
-    left: 250px;
-    right: 0;
-    overflow-y: auto;
+    overflow: auto;
+  }
+
+  .content {
+    overflow: auto;
+    min-width: to-rem(700px);
   }
 }

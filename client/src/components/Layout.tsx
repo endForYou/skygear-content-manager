@@ -6,9 +6,11 @@ import Sidebar from './Sidebar';
 
 const Main: React.SFC = ({ children }) => {
   return (
-    <main className="content" role="main">
-      {children}
-    </main>
+    <div className="scroll-view">
+      <main className="content" role="main">
+        {children}
+      </main>
+    </div>
   );
 };
 

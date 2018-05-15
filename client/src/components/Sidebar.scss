@@ -2,8 +2,11 @@
 @import 'styleUtils/effect.scss';
 
 .sidebar {
+	position: absolute;
+	top: 0;
+	left: 0;
+	bottom: 0;
 	background: #19c2bf;
-	height: 100vh;
 	overflow-y: auto;
 	width: to-rem(250px);
 	padding: to-rem(40px);
@@ -57,13 +60,6 @@
 
 		&.active {
 			opacity: 1;
-		}
-	}
-
-	@media (max-width: 767px) {
-		& {
-			min-height: auto;
-			padding-bottom: 1rem;
 		}
 	}
 }
