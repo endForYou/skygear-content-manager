@@ -47,37 +47,53 @@ class EditPageContainerImpl extends React.PureComponent<Props> {
   }
 
   public render() {
-    const { remoteRecord, savingRecord } = this.props;
+    const { config, dispatch, remoteRecord, savingRecord } = this.props;
+    let content;
     switch (remoteRecord.type) {
       case RemoteType.Loading:
-        return <div>Loading record...</div>;
+        content = <div className="record-form loading">Loading record...</div>;
+        break;
       case RemoteType.Success:
-        return (
-          <div className="edit-page">
-            <RecordFormTopbar
-              title={this.props.config.label}
-              actions={this.props.config.actions}
-              actionContext={{ record: remoteRecord.value }}
-            />
-            <RecordFormPage
-              className="record-form"
-              config={this.props.config}
-              dispatch={this.props.dispatch}
-              record={remoteRecord.value}
-              recordDispatcher={this.recordDispatcher}
-              savingRecord={savingRecord}
-            />
+        content = (
+          <RecordFormPage
+            className="record-form"
+            config={config}
+            dispatch={dispatch}
+            record={remoteRecord.value}
+            recordDispatcher={this.recordDispatcher}
+            savingRecord={savingRecord}
+          />
+        );
+        break;
+      case RemoteType.Failure:
+        content = (
+          <div className="record-form error">
+            Couldn&apos;t fetch record: {remoteRecord.error.message}
           </div>
         );
-      case RemoteType.Failure:
-        return (
-          <div>Couldn&apos;t fetch record: {remoteRecord.error.message}</div>
-        );
+        break;
       default:
         throw new Error(
           `Unknown remote record type = ${this.props.remoteRecord.type}`
         );
     }
+
+    return (
+      <div className="edit-page">
+        <RecordFormTopbar
+          title={config.label}
+          actions={
+            remoteRecord.type === RemoteType.Success ? config.actions : []
+          }
+          actionContext={
+            remoteRecord.type === RemoteType.Success
+              ? { record: remoteRecord.value }
+              : {}
+          }
+        />
+        {content}
+      </div>
+    );
   }
 }
 
