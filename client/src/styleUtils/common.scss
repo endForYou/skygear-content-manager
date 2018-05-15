@@ -63,18 +63,21 @@ $input-horizontal-padding: to-rem(16px);
 }
 
 @mixin record-topbar($horizontal-spacing) {
-  display: table;
+  display: flex;
+  justify-content: space-between;
   width: 100%;
-  padding: to-rem(24px) $horizontal-spacing;
+  padding: to-rem(19px) $horizontal-spacing;
   background-color: white;
 }
 
 @mixin record-topbar-title {
-  display: table-cell;
+  flex-shrink: 0;
   font-family: Lato-Light;
-  font-size: 38px;
-  line-height: 38px;
+  font-size: to-rem(38px);
+  line-height: to-rem(38px);
   min-width: to-rem(250px);
+  padding-top: to-rem(5px);
+  padding-bottom: to-rem(5px);
 }
 
 @mixin record-topbar-action {
@@ -85,12 +88,14 @@ $input-horizontal-padding: to-rem(16px);
   line-height: to-rem(18px);
   padding: to-rem(10px) to-rem(18px);
   margin-left: to-rem(10px);
-  margin-bottom: to-rem(10px);
+  margin-top: to-rem(5px);
+  margin-bottom: to-rem(5px);
 }
 
 @mixin record-topbar-action-container {
-  display: table-cell;
-  text-align: right;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 @mixin record-form {
