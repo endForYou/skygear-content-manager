@@ -24,33 +24,44 @@ export interface ShowPageProps {
 
 export class ShowPage extends React.PureComponent<ShowPageProps> {
   public render() {
-    const { remoteRecord } = this.props;
+    const { config, remoteRecord } = this.props;
+    let content;
     switch (remoteRecord.type) {
       case RemoteType.Loading:
-        return <div>Loading record...</div>;
+        content = <div className="record-view loading">Loading record...</div>;
+        break;
       case RemoteType.Success:
-        return (
-          <div className="show-page">
-            <Topbar
-              title={this.props.config.label}
-              actions={this.props.config.actions}
-              actionContext={{ record: remoteRecord.value }}
-            />
-            <RecordView
-              config={this.props.config}
-              record={remoteRecord.value}
-            />
+        content = <RecordView config={config} record={remoteRecord.value} />;
+        break;
+      case RemoteType.Failure:
+        content = (
+          <div className="record-view error">
+            Couldn&apos;t fetch record: {remoteRecord.error.message}
           </div>
         );
-      case RemoteType.Failure:
-        return (
-          <div>Couldn&apos;t fetch record: {remoteRecord.error.message}</div>
-        );
+        break;
       default:
         throw new Error(
           `Unknown remote record type = ${this.props.remoteRecord.type}`
         );
     }
+
+    return (
+      <div className="show-page">
+        <Topbar
+          title={config.label}
+          actions={
+            remoteRecord.type === RemoteType.Success ? config.actions : []
+          }
+          actionContext={
+            remoteRecord.type === RemoteType.Success
+              ? { record: remoteRecord.value }
+              : {}
+          }
+        />
+        {content}
+      </div>
+    );
   }
 }
 

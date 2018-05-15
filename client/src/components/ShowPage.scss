@@ -45,4 +45,11 @@
   .record-form-field {
     flex: 1;
   }
+
+  .loading,
+  .error {
+    font-family: Lato-Light;
+    font-size: 18px;
+    line-height: 18px;
+  }
 }
