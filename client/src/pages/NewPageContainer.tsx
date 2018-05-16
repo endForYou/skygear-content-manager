@@ -38,6 +38,11 @@ class NewPageContainerImpl extends React.PureComponent<Props> {
     );
 
     this.newRecord = new (Record.extend(props.config.cmsRecord.name))();
+    props.config.fields.forEach(field => {
+      if (field.defaultValue !== undefined) {
+        this.newRecord[field.name] = field.defaultValue;
+      }
+    });
   }
 
   public render() {

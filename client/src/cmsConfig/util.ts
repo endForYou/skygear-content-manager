@@ -48,6 +48,24 @@ export function parseOptionalBoolean(
   return parseOptional<boolean>('boolean', a, fieldName, context);
 }
 
+export function parseOptionalDate(
+  // tslint:disable-next-line: no-any
+  a: any,
+  fieldName: string,
+  context: string
+): Date | undefined {
+  return parseOptional<Date>('[object Date]', a, fieldName, context);
+}
+
+export function parseOptionalNumber(
+  // tslint:disable-next-line: no-any
+  a: any,
+  fieldName: string,
+  context: string
+): number | undefined {
+  return parseOptional<number>('number', a, fieldName, context);
+}
+
 export function parseStringArray(
   // tslint:disable-next-line: no-any
   a: any,
@@ -81,11 +99,14 @@ export function parseOptional<T>(
     return undefined;
   }
 
-  if (typeof value === t) {
+  if (
+    typeof value === t ||
+    (typeof value === 'object' && Object.prototype.toString.call(value) === t)
+  ) {
     return value;
   }
 
-  throw new Error(`${context}.${fieldName} want a ${t}, got ${typeof a}`);
+  throw new Error(`${context}.${fieldName} want a ${t}, got ${typeof value}`);
 }
 
 // tslint:disable-next-line: no-any

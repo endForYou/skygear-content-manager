@@ -8,6 +8,8 @@ import {
 } from './cmsConfig';
 import {
   parseOptionalBoolean,
+  parseOptionalDate,
+  parseOptionalNumber,
   parseOptionalString,
   parseString,
   parseTimezone,
@@ -67,20 +69,23 @@ export interface FieldConfigAttrs {
 
   // derived attrs depending on which page the field lives in
   compact: boolean;
+  defaultValue?: any; // tslint:disable-line: no-any
   editable?: boolean;
 }
 
 export interface StringFieldConfig extends FieldConfigAttrs {
   type: FieldConfigTypes.String;
+  defaultValue?: string;
 }
 
 export interface TextAreaFieldConfig extends FieldConfigAttrs {
   type: FieldConfigTypes.TextArea;
+  defaultValue?: string;
 }
 
 export interface DropdownFieldConfig extends FieldConfigAttrs {
   type: FieldConfigTypes.Dropdown;
-  default: string | null;
+  defaultValue?: string;
   nullOption: {
     enabled: boolean;
     label: string;
@@ -94,24 +99,29 @@ export interface DropdownFieldConfig extends FieldConfigAttrs {
 
 export interface WYSIWYGFieldConfig extends FieldConfigAttrs {
   type: FieldConfigTypes.WYSIWYG;
+  defaultValue?: string;
   config?: any; // tslint:disable-line: no-any
 }
 
 export interface DateTimeFieldConfig extends FieldConfigAttrs {
   type: FieldConfigTypes.DateTime;
+  defaultValue?: Date;
   timezone: TimezoneValue;
 }
 
 export interface BooleanFieldConfig extends FieldConfigAttrs {
   type: FieldConfigTypes.Boolean;
+  defaultValue?: boolean;
 }
 
 export interface IntegerFieldConfig extends FieldConfigAttrs {
   type: FieldConfigTypes.Integer;
+  defaultValue?: number;
 }
 
 export interface NumberFieldConfig extends FieldConfigAttrs {
   type: FieldConfigTypes.Number;
+  defaultValue?: number;
 }
 
 export interface ReferenceFieldConfig extends FieldConfigAttrs {
@@ -246,6 +256,7 @@ export function parseNonReferenceFieldConfig(
 function parseStringFieldConfig(input: FieldConfigInput): StringFieldConfig {
   return {
     ...parseFieldConfigAttrs(input, 'String'),
+    defaultValue: parseOptionalString(input, 'default_value', 'String'),
     type: FieldConfigTypes.String,
   };
 }
@@ -255,6 +266,7 @@ function parseTextAreaFieldConfig(
 ): TextAreaFieldConfig {
   return {
     ...parseFieldConfigAttrs(input, 'TextArea'),
+    defaultValue: parseOptionalString(input, 'default_value', 'TextArea'),
     type: FieldConfigTypes.TextArea,
   };
 }
@@ -292,8 +304,9 @@ function parseDropdownFieldConfig(
   return {
     ...parseFieldConfigAttrs(input, 'Dropdown'),
     customOption,
-    default:
-      parseOptionalString(input, 'default', 'Dropdown') || options[0].value,
+    defaultValue:
+      parseOptionalString(input, 'default_value', 'Dropdown') ||
+      options[0].value,
     nullOption,
     options,
     type: FieldConfigTypes.Dropdown,
@@ -304,6 +317,7 @@ function parseWYSIWYGFieldConfig(input: FieldConfigInput): WYSIWYGFieldConfig {
   return {
     ...parseFieldConfigAttrs(input, 'WYSIWYG'),
     config: input.config,
+    defaultValue: parseOptionalString(input, 'default_value', 'WYSIWYG'),
     type: FieldConfigTypes.WYSIWYG,
   };
 }
@@ -319,6 +333,7 @@ function parseDateTimeFieldConfig(
 
   return {
     ...parseFieldConfigAttrs(input, 'DateTime'),
+    defaultValue: parseOptionalDate(input, 'default_value', 'DateTime'),
     timezone,
     type: FieldConfigTypes.DateTime,
   };
@@ -327,6 +342,7 @@ function parseDateTimeFieldConfig(
 function parseBooleanFieldConfig(input: FieldConfigInput): BooleanFieldConfig {
   return {
     ...parseFieldConfigAttrs(input, 'Boolean'),
+    defaultValue: parseOptionalBoolean(input, 'default_value', 'Boolean'),
     type: FieldConfigTypes.Boolean,
   };
 }
@@ -334,6 +350,7 @@ function parseBooleanFieldConfig(input: FieldConfigInput): BooleanFieldConfig {
 function parseIntegerFieldConfig(input: FieldConfigInput): IntegerFieldConfig {
   return {
     ...parseFieldConfigAttrs(input, 'Integer'),
+    defaultValue: parseOptionalNumber(input, 'default_value', 'Integer'),
     type: FieldConfigTypes.Integer,
   };
 }
@@ -341,6 +358,7 @@ function parseIntegerFieldConfig(input: FieldConfigInput): IntegerFieldConfig {
 function parseNumberFieldConfig(input: FieldConfigInput): NumberFieldConfig {
   return {
     ...parseFieldConfigAttrs(input, 'Number'),
+    defaultValue: parseOptionalNumber(input, 'default_value', 'Number'),
     type: FieldConfigTypes.Number,
   };
 }

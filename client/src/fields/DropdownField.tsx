@@ -28,19 +28,13 @@ export class DropdownField extends React.PureComponent<
   constructor(props: DropdownFieldProps) {
     super(props);
 
-    const isNewRecord = this.isNewRecord(props);
-    const value = isNewRecord ? props.config.default : props.value;
     this.state = {
-      ...this.deriveValueStates(props.config, value),
+      ...this.deriveValueStates(props.config, props.value),
       expanded: false,
     };
 
     this.handleSelectChange = this.handleSelectChange.bind(this);
     this.handleCustomValueChange = this.handleCustomValueChange.bind(this);
-
-    if (isNewRecord && props.onFieldChange) {
-      props.onFieldChange(props.config.default);
-    }
   }
 
   // Does not handle componentWillReceiveProps
@@ -146,10 +140,6 @@ export class DropdownField extends React.PureComponent<
     }
 
     return combinedOptions;
-  }
-
-  public isNewRecord(props: DropdownFieldProps) {
-    return props.context.record.createdAt == null;
   }
 
   public render() {
