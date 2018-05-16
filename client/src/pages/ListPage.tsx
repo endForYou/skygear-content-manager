@@ -27,8 +27,7 @@ import {
 import { Predicate } from '../cmsConfig/predicateConfig';
 import { ExportButton } from '../components/ExportButton';
 import { ExportModal } from '../components/ExportModal';
-import { FilterList } from '../components/FilterList';
-import { withEventHandler as withFilterListEventHandler } from '../components/FilterListEventHandler';
+import { FilterMenu } from '../components/FilterMenu';
 import { ImportButton } from '../components/ImportButton';
 import {
   ImportFailureModal,
@@ -52,8 +51,6 @@ import { RemoteType, SortOrder, SortState } from '../types';
 import { debounce } from '../util';
 
 type SortButtonClickHandler = (name: string) => void;
-
-const HandledFilterList = withFilterListEventHandler(FilterList);
 
 export function nextSortState(
   sortState: SortState,
@@ -304,7 +301,6 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
           ];
 
     this.props.onChangeFilter(filters);
-    this.toggleFilterMenu();
   }
 
   public onImportFileSelected(actionConfig: ImportActionConfig, file: File) {
@@ -444,34 +440,21 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
                 </button>
 
                 <div
-                  style={{ right: 0, left: 'unset' }}
                   className={classNames(
-                    'dropdown-menu-right',
-                    'dropdown-menu',
+                    // 'dropdown-menu',
+                    'list-filter-menu',
                     showfilterMenu ? 'show' : ''
                   )}
                 >
-                  {pageConfig.filters.map(filterConfig => (
-                    <a
-                      key={filterConfig.label}
-                      className="dropdown-item"
-                      onClick={() => this.onFilterItemClicked(filterConfig)}
-                    >
-                      {filterConfig.label}
-                    </a>
-                  ))}
+                  <FilterMenu
+                    filterConfigs={pageConfig.filters}
+                    filters={filters}
+                    onChangeFilter={this.props.onChangeFilter}
+                  />
                 </div>
               </div>
             )}
           </div>
-        </div>
-
-        <div className="float-right">
-          <HandledFilterList
-            filters={filters}
-            filterConfigs={pageConfig.filters}
-            onChangeFilter={this.props.onChangeFilter}
-          />
         </div>
 
         <div className="list-content">

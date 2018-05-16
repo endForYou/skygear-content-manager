@@ -17,5 +17,6 @@
   .content {
     overflow: auto;
     min-width: to-rem(700px);
+    min-height: 100vh;
   }
 }

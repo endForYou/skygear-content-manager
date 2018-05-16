@@ -27,6 +27,25 @@ $horizontal-spacing: to-rem(32px);
     line-height: 18px;
   }
 
+  .list-filter-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    z-index: 1000;
+    display: none;
+    float: left;
+    background-color: #fff;
+    background-clip: padding-box;
+    padding: to-rem(24px) to-rem(15px);
+    border: 1px solid #DEDEDE;
+    border-radius: 4px;
+    box-shadow: 0 0 2px 0 rgba(0,0,0,0.30);
+
+    &.show {
+      display: block;
+    }
+  }
+
   .list-content {
     margin-top: to-rem(30px);
     margin-bottom: to-rem(38px);

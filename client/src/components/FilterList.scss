@@ -1,0 +1,41 @@
+@import 'styleUtils/common.scss';
+
+.filter-list {
+  .filter-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    height: to-rem(62px);
+    padding: 0 to-rem(9px);
+    border-top: 1px solid #F0F0F0;
+  }
+
+  .filter-name {
+    margin-left: to-rem(18px);
+    font-family: HelveticaNeue-Bold;
+    width: to-rem(104px);
+  }
+
+  .filter-select {
+    width: to-rem(130px);
+  }
+
+  .filter-input {
+    width: to-rem(280px);
+    margin-left: to-rem(10px);
+  }
+
+  .btn-close {
+    cursor: pointer;
+    color: #0275D8;
+    opacity: 1;
+    font-weight: 100;
+    font-size: to-rem(21px);
+    line-height: to-rem(21px);
+
+    &:hover {
+      color: #0275D8;
+      opacity: .75;
+    }
+  }
+}

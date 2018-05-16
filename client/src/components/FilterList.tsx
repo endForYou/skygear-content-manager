@@ -1,4 +1,4 @@
-import './FilterList.css';
+import './FilterList.scss';
 
 import moment from 'moment';
 import * as React from 'react';
@@ -55,22 +55,17 @@ export class FilterList extends React.PureComponent<FilterListProps> {
 
     return (
       <div key={index} className="filter-item">
-        <div className="filter-name pr-2 pb-2">{filter.label}</div>
-        <div className="filter-select pr-2 pb-2">
-          {this.renderFilterSelect(filter)}
-        </div>
-        <div className="filter-input pr-4 pb-2">
-          {this.renderInput(filter, config)}
-        </div>
-        <div className="filter-remove pb-2">
-          <button
-            onClick={() => onCloseFilterClicked(filter)}
-            type="button"
-            className="button-close"
-          >
-            <span>&times;</span>
-          </button>
-        </div>
+        <button
+          onClick={() => onCloseFilterClicked(filter)}
+          type="button"
+          className="close btn-close"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <div className="filter-name">{filter.label}</div>
+        <div className="filter-select">{this.renderFilterSelect(filter)}</div>
+        <div className="filter-input">{this.renderInput(filter, config)}</div>
       </div>
     );
   }
@@ -296,7 +291,7 @@ export class FilterList extends React.PureComponent<FilterListProps> {
   public render() {
     const { filters } = this.props;
     return (
-      <div className="filter-list mb-2">
+      <div className="filter-list">
         {filters.map((filter, index) => this.renderFilter(filter, index))}
       </div>
     );
