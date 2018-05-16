@@ -16,9 +16,6 @@ import {
   FieldConfig,
   Filter,
   FilterConfig,
-  FilterConfigTypes,
-  filterFactory,
-  FilterType,
   ImportActionConfig,
   ListActionConfig,
   ListItemActionConfig,
@@ -28,6 +25,7 @@ import { Predicate } from '../cmsConfig/predicateConfig';
 import { ExportButton } from '../components/ExportButton';
 import { ExportModal } from '../components/ExportModal';
 import { FilterMenu } from '../components/FilterMenu';
+import { FilterTagList } from '../components/FilterTagList';
 import { ImportButton } from '../components/ImportButton';
 import {
   ImportFailureModal,
@@ -287,22 +285,6 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
     this.setState({ showfilterMenu: !this.state.showfilterMenu });
   }
 
-  public onFilterItemClicked(filterConfig: FilterConfig) {
-    const newFilter = filterFactory(filterConfig);
-
-    const filters =
-      filterConfig.type === FilterConfigTypes.General
-        ? [newFilter]
-        : [
-            ...this.props.filters.filter(
-              f => f.type !== FilterType.GeneralFilterType
-            ),
-            newFilter,
-          ];
-
-    this.props.onChangeFilter(filters);
-  }
-
   public onImportFileSelected(actionConfig: ImportActionConfig, file: File) {
     const { dispatch } = this.props;
     dispatch(importRecords(actionConfig.name, file));
@@ -456,6 +438,18 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
             )}
           </div>
         </div>
+
+        {filters.length > 0 && (
+          <div className="list-filter-tag-list-container">
+            <div className="list-filter-tag-list-label">Filter</div>
+            <FilterTagList
+              className="list-filter-tag-list"
+              filters={filters}
+              filterConfigs={pageConfig.filters}
+              onChangeFilter={this.props.onChangeFilter}
+            />
+          </div>
+        )}
 
         <div className="list-content">
           {(() => {

@@ -1,5 +1,6 @@
 import './FilterList.scss';
 
+import classnames from 'classnames';
 import moment from 'moment';
 import * as React from 'react';
 // tslint:disable-next-line: no-submodule-imports
@@ -27,6 +28,7 @@ import { TzDatetimeInput } from '../components/TzDatetimeInput';
 import { ReferenceFilterInput } from '../filters/ReferenceFilterInput';
 
 interface FilterListProps {
+  className?: string;
   filters: Filter[];
   filterConfigs: FilterConfig[];
   handleQueryTypeChange: (
@@ -47,14 +49,14 @@ const TIME_FORMAT = 'HH:mm:ss';
 
 export class FilterList extends React.PureComponent<FilterListProps> {
   public renderFilter(filter: Filter, index: number) {
-    const { filterConfigs, onCloseFilterClicked } = this.props;
+    const { className, filterConfigs, onCloseFilterClicked } = this.props;
     const config = filterConfigs.find(c => c.name === filter.name);
     if (config == null) {
       return null;
     }
 
     return (
-      <div key={index} className="filter-item">
+      <div key={index} className={classnames(className, 'filter-item')}>
         <button
           onClick={() => onCloseFilterClicked(filter)}
           type="button"

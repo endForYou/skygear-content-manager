@@ -45,6 +45,8 @@ export function withEventHandler<P extends InjectedProps>(
         <ListImpl
           {...this.props}
           handleQueryTypeChange={this.handleQueryTypeChange}
+          // TODO (Steven-Chan):
+          // Should debounce the function
           handleFilterValueChange={this.handleFilterValueChange}
           handleDateTimeValueChange={this.handleDateTimeValueChange}
           handleReferenceChange={this.handleReferenceFilterChange}

@@ -60,6 +60,7 @@ export class FilterMenu extends React.PureComponent<Props, State> {
           </button>
         </div>
         <HandledFilterList
+          className="filter-list"
           filters={filters}
           filterConfigs={filterConfigs}
           onChangeFilter={this.props.onChangeFilter}
