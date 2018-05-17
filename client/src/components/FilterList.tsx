@@ -14,6 +14,7 @@ import {
   DateTimeFilterQueryType,
   Filter,
   FilterConfig,
+  FilterQueryType,
   FilterType,
   GeneralFilter,
   IntegerFilter,
@@ -27,14 +28,14 @@ import {
 import { TzDatetimeInput } from '../components/TzDatetimeInput';
 import { ReferenceFilterInput } from '../filters/ReferenceFilterInput';
 
+import { Option, OptionValues } from 'react-select';
+import { ReactSelectWrapper } from './ReactSelectWrapper';
+
 interface FilterListProps {
   className?: string;
   filters: Filter[];
   filterConfigs: FilterConfig[];
-  handleQueryTypeChange: (
-    filter: Filter,
-    event: React.ChangeEvent<HTMLSelectElement>
-  ) => void;
+  handleQueryTypeChange: (filter: Filter, value: FilterQueryType) => void;
   handleFilterValueChange: (
     filter: Filter,
     event: React.ChangeEvent<HTMLInputElement>
@@ -104,29 +105,29 @@ export class FilterList extends React.PureComponent<FilterListProps> {
   }
 
   public renderStringFilterSelect(filter: Filter) {
-    const { handleQueryTypeChange } = this.props;
     return (
-      <select
-        className="form-control"
+      <ReactSelectWrapper
+        clearable={false}
         value={filter.query}
-        onChange={event => handleQueryTypeChange(filter, event)}
+        onChange={(value: Option<OptionValues> | null) =>
+          this.handleQueryTypeChange(filter, value)}
       >
         <option value={StringFilterQueryType.EqualTo}>Equal to</option>
         <option value={StringFilterQueryType.NotEqualTo}>Not equal to</option>
         <option value={StringFilterQueryType.Like}>Like</option>
         <option value={StringFilterQueryType.NotLike}>Not like</option>
         {this.renderNullFilterSelect(filter)}
-      </select>
+      </ReactSelectWrapper>
     );
   }
 
   public renderIntegerFilterSelect(filter: Filter) {
-    const { handleQueryTypeChange } = this.props;
     return (
-      <select
-        className="form-control"
+      <ReactSelectWrapper
+        clearable={false}
         value={filter.query}
-        onChange={event => handleQueryTypeChange(filter, event)}
+        onChange={(value: Option<OptionValues> | null) =>
+          this.handleQueryTypeChange(filter, value)}
       >
         <option value={IntegerFilterQueryType.EqualTo}>Equal to</option>
         <option value={IntegerFilterQueryType.NotEqualTo}>Not equal to</option>
@@ -139,54 +140,51 @@ export class FilterList extends React.PureComponent<FilterListProps> {
           Greater than or equal to
         </option>
         {this.renderNullFilterSelect(filter)}
-      </select>
+      </ReactSelectWrapper>
     );
   }
 
   public renderBooleanFilterSelect(filter: Filter) {
-    const { handleQueryTypeChange } = this.props;
-
     return (
-      <select
-        className="form-control"
+      <ReactSelectWrapper
+        clearable={false}
         value={filter.query}
-        onChange={event => handleQueryTypeChange(filter, event)}
+        onChange={(value: Option<OptionValues> | null) =>
+          this.handleQueryTypeChange(filter, value)}
       >
         <option value={BooleanFilterQueryType.True}>True</option>
         <option value={BooleanFilterQueryType.False}>False</option>
         {this.renderNullFilterSelect(filter)}
-      </select>
+      </ReactSelectWrapper>
     );
   }
 
   public renderDateTimeFilterSelect(filter: Filter) {
-    const { handleQueryTypeChange } = this.props;
-
     return (
-      <select
-        className="form-control"
+      <ReactSelectWrapper
+        clearable={false}
         value={filter.query}
-        onChange={event => handleQueryTypeChange(filter, event)}
+        onChange={(value: Option<OptionValues> | null) =>
+          this.handleQueryTypeChange(filter, value)}
       >
         <option value={DateTimeFilterQueryType.Before}>Before</option>
         <option value={DateTimeFilterQueryType.After}>After</option>
         {this.renderNullFilterSelect(filter)}
-      </select>
+      </ReactSelectWrapper>
     );
   }
 
   public renderReferenceFilterSelect(filter: Filter) {
-    const { handleQueryTypeChange } = this.props;
-
     return (
-      <select
-        className="form-control"
+      <ReactSelectWrapper
+        clearable={false}
         value={filter.query}
-        onChange={event => handleQueryTypeChange(filter, event)}
+        onChange={(value: Option<OptionValues> | null) =>
+          this.handleQueryTypeChange(filter, value)}
       >
         <option value={ReferenceFilterQueryType.Contains}>Contains</option>
         {this.renderNullFilterSelect(filter)}
-      </select>
+      </ReactSelectWrapper>
     );
   }
 
@@ -224,7 +222,7 @@ export class FilterList extends React.PureComponent<FilterListProps> {
     return (
       <input
         type="text"
-        className="form-control"
+        className="text-input"
         autoFocus={true}
         onChange={event => handleFilterValueChange(filter, event)}
         value={filter.value}
@@ -238,7 +236,7 @@ export class FilterList extends React.PureComponent<FilterListProps> {
     return (
       <input
         type="number"
-        className="form-control"
+        className="text-input"
         autoFocus={true}
         onChange={event => handleFilterValueChange(filter, event)}
         value={filter.value}
@@ -253,6 +251,8 @@ export class FilterList extends React.PureComponent<FilterListProps> {
       config.timezone === 'Local' ? TIME_FORMAT : `${TIME_FORMAT}Z`;
     return (
       <TzDatetimeInput
+        className="datetime-input-container"
+        inputProps={{ className: 'datetime-input' }}
         dateFormat={DATE_FORMAT}
         timeFormat={timeFormat}
         value={filter.value}
@@ -268,7 +268,7 @@ export class FilterList extends React.PureComponent<FilterListProps> {
     return (
       <input
         type="text"
-        className="form-control"
+        className="text-input"
         autoFocus={true}
         onChange={event => handleFilterValueChange(filter, event)}
         value={filter.value}
@@ -308,5 +308,17 @@ export class FilterList extends React.PureComponent<FilterListProps> {
       return;
     }
     this.props.handleDateTimeValueChange(filter, event.toDate());
+  }
+
+  private handleQueryTypeChange(
+    filter: Filter,
+    value: Option<OptionValues> | null
+  ) {
+    const { handleQueryTypeChange } = this.props;
+    if (value == null || value.value == null) {
+      return;
+    }
+
+    handleQueryTypeChange(filter, value.value as FilterQueryType);
   }
 }

@@ -5,6 +5,7 @@ import {
   DateTimeFilter,
   DateTimeFilterQueryType,
   Filter,
+  FilterQueryType,
   FilterType,
   GeneralFilter,
   IntegerFilter,
@@ -22,10 +23,7 @@ interface FilterListEventHandlerProps {
 }
 
 export interface InjectedProps {
-  handleQueryTypeChange: (
-    filter: Filter,
-    event: React.ChangeEvent<HTMLSelectElement>
-  ) => void;
+  handleQueryTypeChange: (filter: Filter, value: FilterQueryType) => void;
   handleFilterValueChange: (
     filter: Filter,
     event: React.ChangeEvent<HTMLInputElement>
@@ -57,19 +55,16 @@ export function withEventHandler<P extends InjectedProps>(
 
     private handleQueryTypeChange = (
       filter: Filter,
-      event: React.ChangeEvent<HTMLSelectElement>
+      value: FilterQueryType
     ) => {
-      if (!event.target.value.length) {
-        return;
-      }
       const filters = this.props.filters.map(f => {
         if (f.id === filter.id) {
-          switch (event.target.value) {
+          switch (value) {
             case BaseFilterQueryType.IsNull:
             case BaseFilterQueryType.IsNotNull:
               return {
                 ...f,
-                query: BaseFilterQueryType[event.target.value],
+                query: BaseFilterQueryType[value],
               };
             default:
           }
@@ -77,27 +72,27 @@ export function withEventHandler<P extends InjectedProps>(
             case FilterType.StringFilterType:
               return {
                 ...f,
-                query: StringFilterQueryType[event.target.value],
+                query: StringFilterQueryType[value],
               };
             case FilterType.IntegerFilterType:
               return {
                 ...f,
-                query: IntegerFilterQueryType[event.target.value],
+                query: IntegerFilterQueryType[value],
               };
             case FilterType.BooleanFilterType:
               return {
                 ...f,
-                query: BooleanFilterQueryType[event.target.value],
+                query: BooleanFilterQueryType[value],
               };
             case FilterType.DateTimeFilterType:
               return {
                 ...f,
-                query: DateTimeFilterQueryType[event.target.value],
+                query: DateTimeFilterQueryType[value],
               };
             case FilterType.ReferenceFilterType:
               return {
                 ...f,
-                query: ReferenceFilterQueryType[event.target.value],
+                query: ReferenceFilterQueryType[value],
               };
             default:
               throw new Error(

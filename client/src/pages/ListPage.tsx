@@ -423,16 +423,17 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
 
                 <div
                   className={classNames(
-                    // 'dropdown-menu',
-                    'list-filter-menu',
+                    'list-filter-menu-wrapper',
                     showfilterMenu ? 'show' : ''
                   )}
                 >
-                  <FilterMenu
-                    filterConfigs={pageConfig.filters}
-                    filters={filters}
-                    onChangeFilter={this.props.onChangeFilter}
-                  />
+                  <div className="list-filter-menu">
+                    <FilterMenu
+                      filterConfigs={pageConfig.filters}
+                      filters={filters}
+                      onChangeFilter={this.props.onChangeFilter}
+                    />
+                  </div>
                 </div>
               </div>
             )}

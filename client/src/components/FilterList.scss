@@ -1,5 +1,8 @@
 @import 'styleUtils/common.scss';
 
+$filter-select-left: 230px;
+$filter-select-width: 120px;
+
 .filter-list {
   .filter-item {
     display: flex;
@@ -13,16 +16,38 @@
   .filter-name {
     margin-left: to-rem(18px);
     font-family: HelveticaNeue-Bold;
-    width: to-rem(104px);
+    width: to-rem(164px);
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
   }
 
   .filter-select {
-    width: to-rem(130px);
+    width: to-rem($filter-select-width);
+    position: absolute;
+    left: to-rem($filter-select-left);
   }
 
   .filter-input {
+    height: to-rem(38px);
     width: to-rem(280px);
-    margin-left: to-rem(10px);
+    position: absolute;
+    left: to-rem($filter-select-left + $filter-select-width + 10px);
+  }
+
+  .text-input {
+    @include text-input;
+    height: 100%;
+    width: 100%;
+  }
+
+  .datetime-input-container {
+    height: to-rem(38px);
+  }
+
+  .datetime-input {
+    height: 100%;
+    width: 100%;
   }
 
   .btn-close {

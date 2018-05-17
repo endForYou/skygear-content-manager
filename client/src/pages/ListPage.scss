@@ -28,7 +28,7 @@ $horizontal-spacing: to-rem(32px);
     line-height: 18px;
   }
 
-  .list-filter-menu {
+  .list-filter-menu-wrapper {
     position: absolute;
     top: 100%;
     right: 0;
@@ -37,17 +37,18 @@ $horizontal-spacing: to-rem(32px);
     float: left;
     background-color: #fff;
     background-clip: padding-box;
-    padding: to-rem(24px) to-rem(15px);
     border: 1px solid #DEDEDE;
     border-radius: 4px;
     box-shadow: 0 0 2px 0 rgba(0,0,0,0.30);
 
-    max-height: to-rem(500px);
-    overflow-y: auto;
-
     &.show {
       display: block;
     }
+  }
+
+  .list-filter-menu {
+    overflow-y: auto;
+    padding: to-rem(24px) to-rem(15px);
   }
 
   .list-filter-tag-list-container {

@@ -5,10 +5,12 @@
     display: flex;
     flex-direction: row;
     align-items: center;
+    justify-content: space-between;
     padding: to-rem(15px) to-rem(9px);
+    width: to-rem(644px);
 
     .label {
-      width: to-rem(136px);
+      width: to-rem(206px);
       font-size: to-rem(16px);
       line-height: to-rem(16px);
     }
@@ -16,6 +18,9 @@
     .config-select {
       display: block;
       width: to-rem(345px);
+
+      position: absolute;
+      left: to-rem(230px);
     }
 
     .btn-config-select {
