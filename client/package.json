@@ -16,7 +16,7 @@
     "fs-extra": "3.0.1",
     "history": "4.7.2",
     "html-webpack-plugin": "2.29.0",
-    "jest": "20.0.4",
+    "jest": "22.4.2",
     "js-yaml": "3.10.0",
     "moment": "2.19.1",
     "moment-timezone": "^0.5.16",
@@ -44,7 +44,7 @@
     "style-loader": "0.18.2",
     "sw-precache-webpack-plugin": "0.11.4",
     "tinymce": "^4.7.10",
-    "ts-jest": "20.0.7",
+    "ts-jest": "22.4.2",
     "ts-loader": "2.3.7",
     "tslint": "5.8.0",
     "tslint-loader": "3.5.3",
@@ -82,10 +82,17 @@
     "prettier": "1.7.4"
   },
   "jest": {
-    "mapCoverage": true,
     "collectCoverageFrom": [
       "src/**/*.{js,jsx,ts,tsx}"
     ],
+    "coverageThreshold": {
+      "global": {
+        "statements": 0
+      },
+      "./src/cmsConfig/": {
+        "statements": 80
+      }
+    },
     "setupFiles": [
       "<rootDir>/config/polyfills.js"
     ],
@@ -120,7 +127,7 @@
     ],
     "globals": {
       "ts-jest": {
-        "tsConfigFile": "/Users/limouren/my-app/tsconfig.test.json"
+        "tsConfigFile": "./tsconfig.test.json"
       }
     }
   }

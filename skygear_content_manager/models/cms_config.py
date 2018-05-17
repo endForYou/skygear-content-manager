@@ -60,11 +60,13 @@ class CMSRecordExport:
 
 class CMSRecordExportField:
 
-    def __init__(self, record_type, name, label, type, reference = None):
+    def __init__(self, record_type, name, label, type, format = None,
+                 reference = None):
         self.record_type = record_type
         self.name = name
         self.label = label
         self.type = type
+        self.format = format
         self.reference = reference
 
 

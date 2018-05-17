@@ -1,3 +1,4 @@
+import { isArray } from 'util';
 import { ConfigContext } from './cmsConfig';
 import { FilterConfig, parseFilterConfig } from './filterConfig';
 
@@ -20,13 +21,24 @@ export function parsePushNotificationConfig(
 
   const { enabled, filters } = input;
 
-  // tslint:disable-next-line: no-any
-  const filterUserConfigs = filters.map((f: any) =>
-    parseFilterConfig(f, context)
-  ) as FilterConfig[];
-
   return {
     enabled,
-    filterUserConfigs,
+    filterUserConfigs: parsePushNotificationFilter(context, filters),
   };
+}
+
+function parsePushNotificationFilter(
+  context: ConfigContext,
+  // tslint:disable-next-line:no-any
+  input: any
+): FilterConfig[] {
+  if (input == null) {
+    return [];
+  }
+
+  if (!isArray(input)) {
+    throw new Error('Expect push notification user filter to be Array');
+  }
+
+  return input.map(f => parseFilterConfig(f, context));
 }

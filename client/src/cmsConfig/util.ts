@@ -122,5 +122,5 @@ export function parseTimezone(a: any, fieldName: string): TimezoneValue {
     throw new Error(`Unexpected timezone value: ${value}`);
   }
 
-  return zone;
+  return value;
 }
