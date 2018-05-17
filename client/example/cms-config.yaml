@@ -203,6 +203,8 @@ records:
           type: ImageAsset
         - name: fileasset
           type: FileAsset
+        - name: deleted
+          type: Boolean
     edit:
       fields:
         - type: _id
@@ -260,6 +262,9 @@ records:
           type: ImageAsset
         - name: fileasset
           type: FileAsset
+        - name: deleted
+          type: Boolean
+          default_value: false
     new:
       fields:
         - type: _id
@@ -317,6 +322,9 @@ records:
           type: ImageAsset
         - name: fileasset
           type: FileAsset
+        - name: deleted
+          type: Boolean
+          default_value: false
   field_demo_deleted:
     record_type: field_demo
     list:
