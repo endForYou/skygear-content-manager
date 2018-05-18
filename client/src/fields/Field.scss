@@ -134,25 +134,31 @@
  * Override react-select styles
  */
 .Select-placeholder,
-.Select-input,
-.Select-value,
 .Select-option,
 .Select-noresults {
   padding-left: $input-horizontal-padding !important;
   padding-right: $input-horizontal-padding !important;
 }
 
+.Select--single {
+  .Select-value {
+    padding-left: $input-horizontal-padding !important;
+    padding-right: $input-horizontal-padding !important;
+  }
+}
+
+.Select-control {
+  padding-left: #{$input-horizontal-padding - to-rem(5px)} !important;
+  padding-right: #{$input-horizontal-padding - to-rem(5px)} !important;
+}
+
 .Select--multi .Select-input {
   margin-left: 0px !important;
 }
 
-.Select-placeholder,
-.Select-value,
-.Select-input {
-  line-height: to-rem(36px) !important;
-  height: to-rem(36px) !important;
-}
-
-.Select-control {
-  height: to-rem(38px) !important;
+.Select-multi-value-wrapper {
+  & > .Select-input {
+    padding-left: 5px !important;
+    padding-right: 5px !important;
+  }
 }
