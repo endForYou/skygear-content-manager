@@ -14,7 +14,6 @@
   }
 
   .push-content {
-    @include record-form;
     margin: to-rem(20px) to-rem(32px);
   }
 }
