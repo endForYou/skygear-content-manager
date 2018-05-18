@@ -285,31 +285,33 @@ function EmbeddedRecordView({
   });
   return (
     <div className={className}>
-      {removable && (
-        <button
-          type="button"
-          className="embedded-record-button close"
-          aria-label="Close"
-          onClick={onRecordRemove}
-        >
-          <span aria-hidden="true">&times;</span>
-        </button>
-      )}
-      {downMovable && (
-        <Arrow
-          className="embedded-record-button float-right"
-          direction={ArrowDirection.Down}
-          onClick={onRecordMoveDown}
-        />
-      )}
-      {upMovable && (
-        <Arrow
-          className="embedded-record-button float-right"
-          direction={ArrowDirection.Up}
-          onClick={onRecordMoveUp}
-        />
-      )}
       {formGroups}
+      <div className="embedded-record-buttons">
+        {removable && (
+          <button
+            type="button"
+            className="embedded-record-button close"
+            aria-label="Close"
+            onClick={onRecordRemove}
+          >
+            <span aria-hidden="true">&times;</span>
+          </button>
+        )}
+        {downMovable && (
+          <Arrow
+            className="embedded-record-button float-right"
+            direction={ArrowDirection.Down}
+            onClick={onRecordMoveDown}
+          />
+        )}
+        {upMovable && (
+          <Arrow
+            className="embedded-record-button float-right"
+            direction={ArrowDirection.Up}
+            onClick={onRecordMoveUp}
+          />
+        )}
+      </div>
     </div>
   );
 }

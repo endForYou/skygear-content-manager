@@ -6,7 +6,7 @@
     width: 100%;
   }
 
-  .record-form-group:not(:first-child) {
+  & > .record-form-group:not(:first-child) {
     margin-top: to-rem(10px);
   }
 
