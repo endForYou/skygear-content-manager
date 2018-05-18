@@ -55,7 +55,11 @@ export class BackReferenceField extends React.PureComponent<
     if (config.compact) {
       return <span {...rest}>{join(items, ', ')}</span>;
     } else {
-      const listItems = items.map((item, i) => <li key={i}>{item}</li>);
+      const listItems = items.map((item, i) => (
+        <li key={i} className="back-ref-list-item">
+          {item}
+        </li>
+      ));
       return (
         <ul {...rest} className={classnames(className, 'back-ref-list')}>
           {listItems}

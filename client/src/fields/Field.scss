@@ -118,6 +118,18 @@
   margin-top: to-rem(10px);
 }
 
+.back-ref-list,
+.asso-ref-list {
+  display: list-item;
+  columns: 2;
+  margin-bottom: unset;
+}
+
+.back-ref-list-item,
+.asso-ref-list-item {
+  line-height: to-rem(38px);
+}
+
 /*
  * Override react-select styles
  */

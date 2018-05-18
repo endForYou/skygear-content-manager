@@ -1,3 +1,4 @@
+import classnames from 'classnames';
 import * as React from 'react';
 import { Record } from 'skygear';
 
@@ -48,9 +49,20 @@ export class AssociationReferenceField extends React.PureComponent<
     if (config.compact) {
       return <span {...rest}>{join(items, ', ')}</span>;
     } else {
-      const { className: _className, ...restWithoutClassName } = rest;
-      const listItems = items.map((item, i) => <li key={i}>{item}</li>);
-      return <ul {...restWithoutClassName}>{listItems}</ul>;
+      const { className: className, ...restWithoutClassName } = rest;
+      const listItems = items.map((item, i) => (
+        <li key={i} className="asso-ref-list-item">
+          {item}
+        </li>
+      ));
+      return (
+        <ul
+          {...restWithoutClassName}
+          className={classnames(className, 'asso-ref-list')}
+        >
+          {listItems}
+        </ul>
+      );
     }
   }
 }
