@@ -19,6 +19,7 @@
 
   .record-view {
     @include record-form;
+    margin: to-rem(20px) to-rem(32px);
 
     & > .record-form-group {
       display: flex;

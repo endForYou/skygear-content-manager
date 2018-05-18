@@ -1,13 +1,18 @@
 @import 'styleUtils/common.scss';
 
 .record-form-page {
+
+  .record-form-groups {
+    @include record-form;
+
+    & > .record-form-group:not(:first-child) {
+      margin-top: to-rem(10px);
+    }
+  }
+
   .record-form-group {
     display: flex;
     width: 100%;
-  }
-
-  & > .record-form-group:not(:first-child) {
-    margin-top: to-rem(10px);
   }
 
   .record-form-label {
@@ -32,5 +37,7 @@
     font-size: to-rem(14px);
     padding: to-rem(5px) to-rem(9px);
     margin-top: to-rem(10px);
+    margin-left: auto;
+    margin-right: 0;
   }
 }
