@@ -16,14 +16,13 @@
 
 .embedded-record-view {
   position: relative;
-  margin-bottom: 1rem;
+  margin-bottom: to-rem(10px);
   padding-left: 15px;
   padding-right: 15px;
   padding-top: 1rem;
   padding-bottom: 1rem;
-  border-color: rgba(0, 0, 0, .15);
-  border-width: 1px;
-  border-style: solid;
+  background-color: rgba(#EEE, 0.3);
+  border-radius: 4px;
   transition: box-shadow 0.3s ease-in-out;
 }
 
@@ -33,7 +32,7 @@ form.embedded-record-view.editable:focus-within {
 }
 
 .embedded-back-reference-field > .embedded-record-view:not(:first-child) {
-  margin-top: 1rem;
+  margin-top: to-rem(10px);
 }
 
 .embedded-record-button {
@@ -47,6 +46,17 @@ form.embedded-record-view.editable:focus-within {
 .embedded-record-view > .embedded-record-button:not(:first-child) {
   margin-left: 0.5rem;
   margin-right: 0.5rem;
+}
+
+.embedded-record-view {
+  .record-form-group {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .record-form-label {
+    line-height: to-rem(18px) !important;
+  }
 }
 
 .btn-add {

@@ -323,10 +323,12 @@ interface FieldProps {
 function FormGroup(props: FieldProps): JSX.Element {
   const { fieldConfig, onFieldChange, record } = props;
   return (
-    <div className="form-group">
-      <label htmlFor={fieldConfig.name}>{fieldConfig.label}</label>
+    <div className="record-form-group">
+      <label className="record-form-label" htmlFor={fieldConfig.name}>
+        {fieldConfig.label}
+      </label>
       <Field
-        className="form-control"
+        className="record-form-field"
         config={fieldConfig}
         value={record[fieldConfig.name]}
         context={FieldContext(record)}
