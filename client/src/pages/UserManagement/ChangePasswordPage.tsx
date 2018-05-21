@@ -62,42 +62,50 @@ class PasswordForm extends React.PureComponent<
     } = this.state;
 
     return (
-      <form className="password-form" onSubmit={this.onFormSubmit}>
-        <div className="password-form-group">
-          <div className="password-form-label">
-            <label>User ID</label>
+      <form className="password-form-page" onSubmit={this.onFormSubmit}>
+        <div className="password-form">
+          <div className="password-form-group">
+            <div className="password-form-label">
+              <label>User ID</label>
+            </div>
+            <div className="password-form-field static">{userId}</div>
           </div>
-          <div className="password-form-field static">{userId}</div>
-        </div>
 
-        <div className="password-form-group">
-          <div className="password-form-label">
-            <label htmlFor="password">Password</label>
+          <div className="password-form-group">
+            <div className="password-form-label">
+              <label htmlFor="password">Password</label>
+            </div>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              className="password-form-field"
+              placeholder="Password"
+              value={password}
+              onChange={this.onPasswordChange}
+            />
           </div>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            className="password-form-field"
-            placeholder="Password"
-            value={password}
-            onChange={this.onPasswordChange}
-          />
-        </div>
 
-        <div className="password-form-group">
-          <div className="password-form-label">
-            <label htmlFor="confirmPassword">Confirm Password</label>
+          <div className="password-form-group">
+            <div className="password-form-label">
+              <label htmlFor="confirmPassword">Confirm Password</label>
+            </div>
+            <input
+              type="password"
+              id="confirmPassword"
+              name="confirmPassword"
+              className="password-form-field"
+              placeholder="Confirm Password"
+              value={confirmPassword}
+              onChange={this.onConfirmPasswordChange}
+            />
           </div>
-          <input
-            type="password"
-            id="confirmPassword"
-            name="confirmPassword"
-            className="password-form-field"
-            placeholder="Confirm Password"
-            value={confirmPassword}
-            onChange={this.onConfirmPasswordChange}
-          />
+          {successMessage.length > 0 && (
+            <span className="ml-3 text-success">{successMessage}</span>
+          )}
+          {errorMessage.length > 0 && (
+            <span className="ml-3 text-danger">{errorMessage}</span>
+          )}
         </div>
 
         <button
@@ -107,12 +115,6 @@ class PasswordForm extends React.PureComponent<
         >
           Submit
         </button>
-        {successMessage.length > 0 && (
-          <span className="ml-3 text-success">{successMessage}</span>
-        )}
-        {errorMessage.length > 0 && (
-          <span className="ml-3 text-danger">{errorMessage}</span>
-        )}
       </form>
     );
   }
