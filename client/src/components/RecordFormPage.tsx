@@ -124,16 +124,16 @@ class RecordFormPageImpl extends React.PureComponent<
     });
 
     return (
-      <div className={classnames(className, 'record-form-page')}>
-        <form
-          className="record-form-groups"
-          onSubmit={this.handleSubmit}
-        >
+      <form
+        className={classnames(className, 'record-form-page')}
+        onSubmit={this.handleSubmit}
+      >
+        <div className="record-form-groups">
           {formGroups}
           {this.renderErrorMessage()}
-        </form>
+        </div>
         <SubmitButton savingRecord={savingRecord} />
-      </div>
+      </form>
     );
   }
 
