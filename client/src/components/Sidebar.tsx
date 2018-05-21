@@ -30,7 +30,7 @@ class Sidebar extends React.PureComponent<Props> {
     const { user } = this.props;
 
     return (
-      <nav className="sidebar">
+      <nav className="sidebar sidebar-color">
         <Link className="sidebar-logo-link" to="/">
           <img className="sidebar-logo" src={logo} alt="Skygear CMS" />
         </Link>

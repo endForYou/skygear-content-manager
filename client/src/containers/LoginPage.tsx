@@ -129,7 +129,7 @@ const ConnectedLoginForm = connect(mapStateToProps, mapDispatchToProps)(
 
 const Topbar: React.SFC = () => {
   return (
-    <div className="topbar">
+    <div className="topbar sidebar-color">
       <Link className="topbar-logo-link" to="/">
         <img className="topbar-logo" src={logo} alt="Skygear CMS" />
       </Link>
