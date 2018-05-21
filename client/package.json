@@ -39,7 +39,7 @@
     "react-toggle": "4.0.2",
     "redux": "3.7.2",
     "redux-thunk": "2.2.0",
-    "skygear": "1.1.2",
+    "skygear": "1.5.0",
     "source-map-loader": "0.2.1",
     "style-loader": "0.18.2",
     "sw-precache-webpack-plugin": "0.11.4",
