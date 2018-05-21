@@ -3,12 +3,14 @@
 .edit-page {
   .record-form {
     margin: to-rem(20px) to-rem(32px);
-  }
 
-  .loading,
-  .error {
-    font-family: Lato-Light;
-    font-size: 18px;
-    line-height: 18px;
+    &.loading,
+    &.error {
+      padding: to-rem(24px) to-rem(32px);
+      background-color: white;
+      font-family: Lato-Light;
+      font-size: 18px;
+      line-height: 18px;
+    }
   }
 }
