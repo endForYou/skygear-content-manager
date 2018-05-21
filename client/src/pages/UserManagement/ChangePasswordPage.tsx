@@ -100,12 +100,6 @@ class PasswordForm extends React.PureComponent<
               onChange={this.onConfirmPasswordChange}
             />
           </div>
-          {successMessage.length > 0 && (
-            <span className="ml-3 text-success">{successMessage}</span>
-          )}
-          {errorMessage.length > 0 && (
-            <span className="ml-3 text-danger">{errorMessage}</span>
-          )}
         </div>
 
         <button
@@ -115,6 +109,14 @@ class PasswordForm extends React.PureComponent<
         >
           Submit
         </button>
+
+        {successMessage.length > 0 && (
+          <div className="text-success submit-message">{successMessage}</div>
+        )}
+        {errorMessage.length > 0 && (
+          <div className="text-danger submit-message">{errorMessage}</div>
+        )}
+
       </form>
     );
   }
