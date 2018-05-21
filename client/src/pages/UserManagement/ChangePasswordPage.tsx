@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 
 import { changePassword } from '../../actions/user';
+import { PrimaryButton } from '../../components/PrimaryButton';
 import { isOutlawError } from '../../recordUtil';
 import { RootState } from '../../states';
 
@@ -102,13 +103,13 @@ class PasswordForm extends React.PureComponent<
           </div>
         </div>
 
-        <button
+        <PrimaryButton
           type="submit"
           className="btn-submit"
           disabled={!this.canSubmitPassword() || isSubmitting}
         >
           Submit
-        </button>
+        </PrimaryButton>
 
         {successMessage.length > 0 && (
           <div className="text-success submit-message">{successMessage}</div>
@@ -116,7 +117,6 @@ class PasswordForm extends React.PureComponent<
         {errorMessage.length > 0 && (
           <div className="text-danger submit-message">{errorMessage}</div>
         )}
-
       </form>
     );
   }

@@ -34,6 +34,7 @@ import {
 } from '../components/ImportModal';
 import { LinkButton } from '../components/LinkButton';
 import Pagination from '../components/Pagination';
+import { PrimaryButton } from '../components/PrimaryButton';
 import { SortButton } from '../components/SortButton';
 import {
   InjectedProps as SyncFilterProps,
@@ -305,7 +306,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
         return (
           <ExportButton
             key={index}
-            className="list-action"
+            className="list-action primary-button"
             actionConfig={actionConfig}
             onClick={() => this.setState({ exporting: actionConfig })}
           />
@@ -314,7 +315,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
         return (
           <ImportButton
             key={index}
-            className="list-action"
+            className="list-action primary-button"
             actionConfig={actionConfig}
             onFileSelected={this.onImportFileSelected}
           />
@@ -323,7 +324,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
         return (
           <LinkButton
             key={index}
-            className="list-action"
+            className="list-action primary-button"
             actionConfig={actionConfig}
             context={{
               record_type: recordName,
@@ -413,13 +414,13 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
             {this.renderActionButtons()}
             {pageConfig.filters && (
               <div className="dropdown d-inline-block">
-                <button
+                <PrimaryButton
                   type="button"
                   className="list-action dropdown-toggle"
                   onClick={() => this.toggleFilterMenu()}
                 >
                   Add Filter <span className="caret" />
-                </button>
+                </PrimaryButton>
 
                 <div
                   className={classNames(

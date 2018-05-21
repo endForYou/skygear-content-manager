@@ -6,6 +6,7 @@ import { login } from '../actions/auth';
 import * as logo from '../assets/logo.png';
 import { RootState } from '../states';
 
+import { PrimaryButton } from '../components/PrimaryButton';
 import './LoginPage.scss';
 
 type LoginFormProps = StateProps & DispatchProps;
@@ -101,9 +102,9 @@ class LoginForm extends React.PureComponent<LoginFormProps, State> {
             {this.props.errorMessage}
           </div>
         )}
-        <button type="submit" className="btn form-submit">
+        <PrimaryButton type="submit" className="form-submit">
           Login
-        </button>
+        </PrimaryButton>
       </form>
     );
   }

@@ -15,7 +15,7 @@ import { TzDatetime } from './TzDatetime';
 const DATETIME_FORMAT = 'YYYY-MM-DD HH:mm:ss';
 
 function QueryType({ filter }: { filter: Filter }) {
-  return <div className="query-type">{filter.query}</div>;
+  return <div className="query-type primary-color">{filter.query}</div>;
 }
 
 function Value({ config, filter }: { config: FilterConfig; filter: Filter }) {
@@ -30,10 +30,10 @@ function Value({ config, filter }: { config: FilterConfig; filter: Filter }) {
     case FilterType.StringFilterType:
     case FilterType.IntegerFilterType:
     case FilterType.GeneralFilterType:
-      return <div className="value">{filter.value}</div>;
+      return <div className="value primary-color">{filter.value}</div>;
     case FilterType.BooleanFilterType:
       return (
-        <div className="value">
+        <div className="value primary-color">
           is {filter.query === BooleanFilterQueryType.True ? 'True' : 'False'}
         </div>
       );
@@ -41,7 +41,7 @@ function Value({ config, filter }: { config: FilterConfig; filter: Filter }) {
       const filterConfig = config as DateTimeFilterConfig;
       return (
         <TzDatetime
-          className="value"
+          className="value primary-color"
           datetimeFormat={DATETIME_FORMAT}
           value={filter.value}
           timezone={filterConfig.timezone}
@@ -49,7 +49,9 @@ function Value({ config, filter }: { config: FilterConfig; filter: Filter }) {
       );
 
     case FilterType.ReferenceFilterType:
-      return <div className="value">{filter.values.join(', ')}</div>;
+      return (
+        <div className="value primary-color">{filter.values.join(', ')}</div>
+      );
     default:
       throw new Error('unsupported FilterType in renderInput');
   }
@@ -70,7 +72,7 @@ const Tag: React.SFC<TagProps> = ({ config, filter, onCloseFilterClicked }) => {
       <button
         onClick={() => onCloseFilterClicked()}
         type="button"
-        className="close btn-close"
+        className="close btn-close primary-color"
         aria-label="Close"
       >
         <span aria-hidden="true">&times;</span>

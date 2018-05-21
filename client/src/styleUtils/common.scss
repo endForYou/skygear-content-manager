@@ -32,18 +32,12 @@ $input-horizontal-padding: to-rem(16px);
 }
 
 @mixin btn-primary {
-  $btn-primary-bg-color: #0275D8;
-
-  background-color: $btn-primary-bg-color;
-  border: 1px solid $btn-primary-bg-color;
   color: white;
-
-  @include btn-hover-effect-darken($btn-primary-bg-color);
+  border-width: 1px;
+  border-style: solid;
 
   &[disabled] {
     cursor: default;
-    background-color: rgba($btn-primary-bg-color, 0.3);
-    border-color: rgba($btn-primary-bg-color, 0.1);
   }
 }
 

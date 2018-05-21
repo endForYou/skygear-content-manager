@@ -13,6 +13,7 @@ import {
 } from '../cmsConfig';
 import { withEventHandler as withFilterListEventHandler } from '../components/FilterListEventHandler';
 import { FilterList } from './FilterList';
+import { PrimaryButton } from './PrimaryButton';
 
 const HandledFilterList = withFilterListEventHandler(FilterList);
 
@@ -55,9 +56,9 @@ export class FilterMenu extends React.PureComponent<Props, State> {
               value: c.name,
             }))}
           />
-          <button className="btn-add" onClick={this.onFilterAdd}>
+          <PrimaryButton className="btn-add" onClick={this.onFilterAdd}>
             Add
-          </button>
+          </PrimaryButton>
         </div>
         <HandledFilterList
           className="filter-list"

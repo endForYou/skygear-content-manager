@@ -61,7 +61,7 @@ export class FilterList extends React.PureComponent<FilterListProps> {
         <button
           onClick={() => onCloseFilterClicked(filter)}
           type="button"
-          className="close btn-close"
+          className="close btn-close primary-color"
           aria-label="Close"
         >
           <span aria-hidden="true">&times;</span>

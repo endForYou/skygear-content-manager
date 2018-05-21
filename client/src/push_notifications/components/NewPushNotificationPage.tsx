@@ -13,6 +13,7 @@ import {
   FilterConfigTypes,
   ReferenceFilterConfig,
 } from '../../cmsConfig';
+import { PrimaryButton } from '../../components/PrimaryButton';
 import { FilterInput } from '../../filters/FilterInput';
 import { RootState } from '../../states';
 import { NewPushCampaign, Remote, RemoteType } from '../../types';
@@ -412,15 +413,15 @@ function SubmitButton(props: SubmitProps): JSX.Element {
     savingPushCampaign.type === RemoteType.Loading
   ) {
     return (
-      <button type="submit" className="btn-submit" disabled={true}>
+      <PrimaryButton type="submit" className="btn-submit" disabled={true}>
         Save
-      </button>
+      </PrimaryButton>
     );
   } else {
     return (
-      <button type="submit" className="btn-submit">
+      <PrimaryButton type="submit" className="btn-submit">
         Save
-      </button>
+      </PrimaryButton>
     );
   }
 }

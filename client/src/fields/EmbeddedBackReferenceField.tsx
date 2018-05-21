@@ -11,6 +11,7 @@ import {
   SortOrder,
 } from '../cmsConfig';
 import { Arrow, ArrowDirection } from '../components/Arrow';
+import { PrimaryButton } from '../components/PrimaryButton';
 import {
   Effect,
   EffectAll,
@@ -201,13 +202,13 @@ export class EmbeddedBackReferenceField extends React.PureComponent<
         <div className="embedded-back-reference-field">{items}</div>
         {config.editable && (
           <div>
-            <button
+            <PrimaryButton
               type="button"
               className="btn-add"
               onClick={this.handleEmbeddedRecordCreate}
             >
               Add New {config.label}
-            </button>
+            </PrimaryButton>
           </div>
         )}
       </div>

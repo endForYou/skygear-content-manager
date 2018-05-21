@@ -24,6 +24,7 @@ import { FilterList } from '../../components/FilterList';
 import { withEventHandler as withFilterListEventHandler } from '../../components/FilterListEventHandler';
 import { LoadingSpinner } from '../../components/LoadingSpinner';
 import Pagination from '../../components/Pagination';
+import { PrimaryButton } from '../../components/PrimaryButton';
 import {
   InjectedProps as SyncFilterProps,
   syncFilterWithUrl,
@@ -246,13 +247,13 @@ class UserListPageImpl extends React.PureComponent<UserListPageProps, State> {
           <div className="title">User Management</div>
           <div className="action-container">
             <div className="dropdown d-inline-block">
-              <button
+              <PrimaryButton
                 type="button"
                 className="list-action dropdown-toggle"
                 onClick={() => this.toggleFilterMenu()}
               >
                 Add Filter <span className="caret" />
-              </button>
+              </PrimaryButton>
 
               <div
                 style={{ right: 0, left: 'unset' }}

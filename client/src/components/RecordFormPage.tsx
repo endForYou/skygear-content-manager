@@ -8,6 +8,7 @@ import { Record } from 'skygear';
 
 import { RecordActionDispatcher } from '../actions/record';
 import { FieldConfig, RecordFormPageConfig } from '../cmsConfig';
+import { PrimaryButton } from '../components/PrimaryButton';
 import { Field, FieldContext } from '../fields';
 import { errorMessageFromError, isRecordsOperationError } from '../recordUtil';
 import { RootState } from '../states';
@@ -233,15 +234,15 @@ function SubmitButton(props: SubmitProps): JSX.Element {
   const { savingRecord } = props;
   if (savingRecord !== undefined && savingRecord.type === RemoteType.Loading) {
     return (
-      <button type="submit" className="btn-submit" disabled={true}>
+      <PrimaryButton type="submit" className="btn-submit" disabled={true}>
         Save
-      </button>
+      </PrimaryButton>
     );
   } else {
     return (
-      <button type="submit" className="btn-submit">
+      <PrimaryButton type="submit" className="btn-submit">
         Save
-      </button>
+      </PrimaryButton>
     );
   }
 }

@@ -1,6 +1,6 @@
 import './Pagination.scss';
 
-import classNames from 'classnames';
+import classnames from 'classnames';
 import { Location } from 'history';
 import * as qs from 'query-string';
 import * as React from 'react';
@@ -30,19 +30,26 @@ export class PageItem extends React.PureComponent<PageItemProps> {
 
     if (isDisabled) {
       return (
-        <li className={classNames(className, 'page-item-container disabled')}>
+        <li className={classnames(className, 'page-item-container disabled')}>
           <span className="link disabled">{children}</span>
         </li>
       );
     } else {
-      const itemClassName = classNames(className, 'page-item-container', {
+      const itemClassName = classnames(className, 'page-item-container', {
+        // tslint:disable-next-line:object-literal-key-quotes
         active: isActive,
+        'primary-border-color': isActive,
       });
       const search = qs.parse(location.search);
       search.page = page;
       return (
         <li className={itemClassName}>
-          <Link className="link" to={`${pathname}?${qs.stringify(search)}`}>
+          <Link
+            className={classnames('link', {
+              'primary-color': isActive,
+            })}
+            to={`${pathname}?${qs.stringify(search)}`}
+          >
             {children}
           </Link>
         </li>

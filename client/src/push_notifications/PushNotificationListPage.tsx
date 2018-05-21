@@ -122,7 +122,10 @@ class PushNotificationListPageImpl extends React.PureComponent<
         <div className="topbar">
           <div className="title">Push Notifications</div>
           <div className="action-container">
-            <Link className="push-action" to={`/notification/new`}>
+            <Link
+              className="push-action primary-button"
+              to={`/notification/new`}
+            >
               New Notification
             </Link>
           </div>
