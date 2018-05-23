@@ -1,0 +1,42 @@
+@import 'styleUtils/common.scss';
+
+.modal {
+  .modal-above-backdrop {
+    z-index: 1050;
+  }
+
+  .modal-lodaing-img {
+    display: block;
+    width: 50px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 25px;
+    margin-bottom: 25px;
+  }
+
+  .modal-loading-text {
+    text-align: center;
+    margin-bottom: 50px;
+  }
+
+  .modal-title {
+    font-family: Lato-Bold;
+    font-size: to-rem(18px);
+  }
+
+  .modal-button-primary {
+    @include btn;
+    @include btn-primary;
+    text-decoration: none;
+    font-size: to-rem(14px);
+    padding: to-rem(4px) to-rem(12px);
+  }
+
+  .modal-button-secondary {
+    @include btn;
+    @include btn-secondary;
+    text-decoration: none;
+    font-size: to-rem(14px);
+    padding: to-rem(4px) to-rem(12px);
+  }
+}

@@ -1,4 +1,4 @@
-import './Modal.css';
+import './Modal.scss';
 
 import * as React from 'react';
 
@@ -55,7 +55,7 @@ export const Modal: React.SFC<ModalProps> = props => {
         />
         <div className="modal-content modal-above-backdrop">
           <div className="modal-header">
-            <h5 className="modal-title">{title}</h5>
+            <div className="modal-title">{title}</div>
           </div>
           {bodyElement && <div className="modal-body">{bodyElement}</div>}
           {footerElement && <div className="modal-footer">{footerElement}</div>}
@@ -99,7 +99,7 @@ export function createFailureModal(title: string) {
           <a
             href="#"
             role="button"
-            className="btn btn-primary"
+            className="modal-button-primary primary-button"
             onClick={onDismiss}
           >
             Close
