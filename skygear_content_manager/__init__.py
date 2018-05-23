@@ -26,7 +26,8 @@ from .schema.skygear_schema import SkygearSchemaSchema
 from .settings import (CMS_USER_PERMITTED_ROLE, CMS_SKYGEAR_ENDPOINT,
                        CMS_SKYGEAR_API_KEY, CMS_PUBLIC_URL, CMS_STATIC_URL,
                        CMS_SITE_TITLE, CMS_CONFIG_FILE_URL,
-                       CMS_THEME_PRIMARY_COLOR, CMS_THEME_SIDEBAR_COLOR)
+                       CMS_THEME_PRIMARY_COLOR, CMS_THEME_SIDEBAR_COLOR,
+                       CMS_THEME_LOGO)
 from .skygear_utils import (SkygearRequest, SkygearResponse, AuthData,
                             request_skygear, get_schema, save_records,
                             fetch_records, eq_predicate)
@@ -78,6 +79,7 @@ def includeme(settings):
             'CMS_CONFIG_FILE_URL': CMS_CONFIG_FILE_URL,
             'CMS_THEME_PRIMARY_COLOR': CMS_THEME_PRIMARY_COLOR,
             'CMS_THEME_SIDEBAR_COLOR': CMS_THEME_SIDEBAR_COLOR,
+            'CMS_THEME_LOGO': CMS_THEME_LOGO if CMS_THEME_LOGO is not None else ''
         }
         return skygear.Response(
             INDEX_HTML_FORMAT.format(**context),
@@ -449,6 +451,7 @@ INDEX_HTML_FORMAT = """<!doctype html>
         style: {{
             primaryColor: "{CMS_THEME_PRIMARY_COLOR}",
             sidebarColor: "{CMS_THEME_SIDEBAR_COLOR}",
+            logoPath: "{CMS_THEME_LOGO}",
         }},
       }});
     </script>

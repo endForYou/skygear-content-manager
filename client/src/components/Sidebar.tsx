@@ -6,12 +6,12 @@ import { Link, NavLink, withRouter } from 'react-router-dom';
 import { Record } from 'skygear';
 
 import { logout } from '../actions/auth';
-import * as logo from '../assets/logo.png';
 import {
   SiteItemConfig,
   SiteItemConfigTypes,
   SpaceSizeType,
 } from '../cmsConfig';
+import { AppLogo } from '../containers/AppLogo';
 import { getCmsConfig, RootState } from '../states';
 
 export interface SidebarProps {
@@ -32,7 +32,7 @@ class Sidebar extends React.PureComponent<Props> {
     return (
       <nav className="sidebar sidebar-color">
         <Link className="sidebar-logo-link" to="/">
-          <img className="sidebar-logo" src={logo} alt="Skygear CMS" />
+          <AppLogo className="sidebar-logo" alt="Skygear CMS" />
         </Link>
         <div className="user">
           <div className="name">{user ? user.username : 'Unknown user'}</div>

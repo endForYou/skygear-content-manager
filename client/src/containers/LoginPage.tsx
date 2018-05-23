@@ -3,10 +3,10 @@ import { connect, MapDispatchToProps, MapStateToProps } from 'react-redux';
 import { Link } from 'react-router-dom';
 
 import { login } from '../actions/auth';
-import * as logo from '../assets/logo.png';
 import { RootState } from '../states';
 
 import { PrimaryButton } from '../components/PrimaryButton';
+import { AppLogo } from './AppLogo';
 import './LoginPage.scss';
 
 type LoginFormProps = StateProps & DispatchProps;
@@ -132,7 +132,7 @@ const Topbar: React.SFC = () => {
   return (
     <div className="topbar sidebar-color">
       <Link className="topbar-logo-link" to="/">
-        <img className="topbar-logo" src={logo} alt="Skygear CMS" />
+        <AppLogo className="topbar-logo" alt="Skygear CMS" />
       </Link>
     </div>
   );

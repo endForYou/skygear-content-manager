@@ -1,4 +1,5 @@
 export interface AppTheme {
+  logoPath?: string;
   primaryColor: string;
   sidebarColor: string;
 }
@@ -28,6 +29,7 @@ export default {
     process.env.REACT_APP_SKYGEAR_ENDPOINT || 'http://localhost:3000/cms-api/',
   staticUrl: process.env.REACT_APP_PUBLIC_URL || '.',
   style: {
+    logoPath: process.env.REACT_APP_LOGO,
     primaryColor: process.env.REACT_APP_PRIMARY_COLOR || '#0275D8',
     sidebarColor: process.env.REACT_APP_SIDEBAR_COLOR || '#19c2bf',
   },
