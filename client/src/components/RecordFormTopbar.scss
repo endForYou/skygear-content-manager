@@ -1,0 +1,17 @@
+@import 'styleUtils/common.scss';
+
+.record-form-topbar {
+  @include record-topbar(to-rem(32px));
+
+  .title {
+    @include record-topbar-title;
+  }
+
+  .record-form-action {
+    @include record-topbar-action;
+  }
+
+  .action-container {
+    @include record-topbar-action-container;
+  }
+}

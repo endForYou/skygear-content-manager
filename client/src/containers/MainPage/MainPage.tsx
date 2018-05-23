@@ -2,28 +2,27 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import { Route, Switch, withRouter } from 'react-router-dom';
 
-import { RecordConfig } from '../../cmsConfig';
+import { RecordConfig, SiteConfig } from '../../cmsConfig';
 import Layout from '../../components/Layout';
 import NotFoundPage from '../../components/NotFoundPage';
 import { getCmsConfig, RootState } from '../../states';
-import FrontPage from '../FrontPage';
 
 import {
+  frontPageRedirect,
   pushNotificationRoutes,
   routesFromRecordConfigs,
   userManagementRoutes,
 } from './routes';
 
 export interface MainPageProps {
+  siteItems: SiteConfig;
   recordConfigs: RecordConfig[];
   pushNotificationEnabled: boolean;
   userManagementEnabled: boolean;
 }
 
-// tslint:disable-next-line: no-any
-const AnyFrontPage = FrontPage as any;
-
 class MainPage extends React.PureComponent<MainPageProps> {
+  private frontPageRedirect: JSX.Element;
   private recordRoutes: JSX.Element[];
   private pushNotificationRoutes: JSX.Element[];
   private userManagementRoutes: JSX.Element[];
@@ -31,6 +30,7 @@ class MainPage extends React.PureComponent<MainPageProps> {
   constructor(props: MainPageProps) {
     super(props);
 
+    this.frontPageRedirect = frontPageRedirect(props.siteItems);
     this.recordRoutes = routesFromRecordConfigs(props.recordConfigs);
     this.pushNotificationRoutes = pushNotificationRoutes();
     this.userManagementRoutes = userManagementRoutes();
@@ -42,8 +42,7 @@ class MainPage extends React.PureComponent<MainPageProps> {
     return (
       <Layout>
         <Switch>
-          <Route exact={true} path="/" component={AnyFrontPage} />
-
+          {this.frontPageRedirect}
           {this.recordRoutes}
           {pushNotificationEnabled && this.pushNotificationRoutes}
           {userManagementEnabled && this.userManagementRoutes}
@@ -62,6 +61,7 @@ function mapStateToProps(state: RootState): MainPageProps {
     recordConfigs: Object.values(cmsConfig.records)
       .filter(recordConfig => recordConfig !== undefined)
       .map(recordConfig => recordConfig!),
+    siteItems: cmsConfig.site,
     userManagementEnabled: cmsConfig.userManagement.enabled,
   };
 }

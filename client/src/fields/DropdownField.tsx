@@ -1,5 +1,4 @@
-import './DropdownField.css';
-
+import classnames from 'classnames';
 import * as React from 'react';
 import Select, { Option, OptionValues } from 'react-select';
 
@@ -144,7 +143,8 @@ export class DropdownField extends React.PureComponent<
 
   public render() {
     const {
-      config: { editable, name, nullOption, options },
+      config: { compact, editable, name, nullOption, options },
+      className,
       onFieldChange: _,
       ...rest,
     } = this.props;
@@ -153,8 +153,9 @@ export class DropdownField extends React.PureComponent<
 
     if (editable) {
       return (
-        <div>
+        <div className={classnames(className, 'dropdown')}>
           <Select
+            className="dropdown-select"
             name={name}
             clearable={false}
             searchable={true}
@@ -166,7 +167,7 @@ export class DropdownField extends React.PureComponent<
           {selectValue === SelectValue.Custom && (
             <input
               {...rest}
-              className="form-control dropdown-custom-input"
+              className="dropdown-custom-input"
               type="text"
               value={value || ''}
               onChange={this.handleCustomValueChange}
@@ -184,7 +185,11 @@ export class DropdownField extends React.PureComponent<
       } else {
         displayValue = value;
       }
-      return <span {...rest}>{displayValue}</span>;
+      return (
+        <span {...rest} className={classnames(className, { full: !compact })}>
+          {displayValue}
+        </span>
+      );
     }
   }
 }

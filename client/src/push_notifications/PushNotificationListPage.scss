@@ -1,0 +1,88 @@
+@import 'styleUtils/common.scss';
+
+$horizontal-spacing: to-rem(32px);
+
+.push-list {
+  .topbar {
+    @include record-topbar($horizontal-spacing);
+  }
+
+  .title {
+    @include record-topbar-title;
+  }
+
+  .push-action {
+    @include record-topbar-action;
+  }
+
+  .action-container {
+    @include record-topbar-action-container;
+  }
+
+  .list-loading, .list-empty {
+    padding: to-rem(24px) $horizontal-spacing;
+    font-family: Lato-Light;
+    font-size: 18px;
+    line-height: 18px;
+  }
+
+  .list-content {
+    margin-top: to-rem(30px);
+    margin-bottom: to-rem(38px);
+    background-color: white;
+    overflow-x: auto;
+  }
+
+  .list-table {
+    display: table;
+    min-width: 100%;
+  }
+
+  .table-row {
+    display: table-row;
+
+    & .table-cell:first-child {
+      padding-left: to-rem(32px);
+    }
+
+    & .table-cell:last-child {
+      padding-right: to-rem(32px);
+    }
+  }
+
+  .table-cell {
+    display: table-cell;
+    height: to-rem(66px);
+    padding-right: to-rem(32px);
+    border-bottom: 1px #ECEEEF solid;
+    font-family: HelveticaNeue;
+    vertical-align: middle;
+    min-width: to-rem(250px);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .table-header {
+    display: table-header-group;
+    background: #FFFFFF;
+
+    .table-cell {
+      height: to-rem(50px);
+      font-family: HelveticaNeue-Bold;
+    }
+  }
+
+  .table-body {
+    display: table-row-group;
+
+    .table-row:nth-child(2n-1) {
+      background-color: #F9F9F9;
+    }
+  }
+
+  .pagination {
+    @include pagination-position;
+    margin-bottom: to-rem(38px);
+  }
+}

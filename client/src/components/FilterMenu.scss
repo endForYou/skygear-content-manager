@@ -1,0 +1,46 @@
+@import 'styleUtils/common.scss';
+
+.filter-menu {
+  .add-filter {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: to-rem(15px) to-rem(9px);
+    width: to-rem(644px);
+
+    .label {
+      width: to-rem(206px);
+      font-size: to-rem(16px);
+      line-height: to-rem(16px);
+    }
+
+    .config-select {
+      display: block;
+      width: to-rem(345px);
+
+      position: absolute;
+      left: to-rem(230px);
+    }
+
+    .btn-config-select {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: to-rem(345px);
+      height: to-rem(38px);
+      line-height: to-rem(38px);
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .btn-add {
+      @include btn;
+      @include btn-primary;
+      width: to-rem(65px);
+      font-size: to-rem(16px);
+      line-height: to-rem(16px);
+      margin-left: to-rem(10px);
+    }
+  }
+}

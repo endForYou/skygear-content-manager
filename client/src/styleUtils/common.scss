@@ -1,0 +1,103 @@
+@import './effect.scss';
+
+$base-font-size: 14px;
+
+@function to-rem($px) {
+  @return ($px / $base-font-size) * 1rem;
+}
+
+$input-horizontal-padding: to-rem(16px);
+
+@mixin text-input {
+  padding: 0 $input-horizontal-padding;
+  color: #495057;
+  background-color: #fff;
+  background-image: none;
+  background-clip: padding-box;
+  border: 1px solid #CCCCCC;
+  border-radius: 4px;
+  transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+
+  &::placeholder {
+    color: #999999;
+  }
+}
+
+@mixin btn {
+  display: block;
+  border-radius: to-rem(4px);
+  font-size: to-rem(18px);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+@mixin btn-primary {
+  color: white;
+  border-width: 1px;
+  border-style: solid;
+
+  &[disabled] {
+    cursor: default;
+  }
+}
+
+@mixin btn-secondary {
+  $btn-secondary-bg-color: white;
+
+  background-color: $btn-secondary-bg-color;
+  border: 1px solid #CCCCCC;
+  color: #373A3C;
+
+  @include btn-hover-effect-darken($btn-secondary-bg-color);
+
+  &[disabled] {
+    cursor: default;
+    color: rgba(#373A3C, 0.3);
+  }
+}
+
+@mixin record-topbar($horizontal-spacing) {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  padding: to-rem(19px) $horizontal-spacing;
+  background-color: white;
+}
+
+@mixin record-topbar-title {
+  flex-shrink: 0;
+  font-family: Lato-Light;
+  font-size: to-rem(38px);
+  line-height: to-rem(38px);
+  min-width: to-rem(250px);
+  padding-top: to-rem(5px);
+  padding-bottom: to-rem(5px);
+}
+
+@mixin record-topbar-action {
+  @include btn;
+  @include btn-primary;
+  display: inline-block;
+  font-size: to-rem(18px);
+  line-height: to-rem(18px);
+  padding: to-rem(10px) to-rem(18px);
+  margin-left: to-rem(10px);
+  margin-top: to-rem(5px);
+  margin-bottom: to-rem(5px);
+}
+
+@mixin record-topbar-action-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+@mixin record-form {
+  padding: to-rem(32px);
+  background-color: white;
+}
+
+@mixin pagination-position {
+  float: right;
+  margin-right: to-rem(42px);
+}

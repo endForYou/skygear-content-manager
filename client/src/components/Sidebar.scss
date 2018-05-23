@@ -1,0 +1,65 @@
+@import 'styleUtils/common.scss';
+@import 'styleUtils/effect.scss';
+
+.sidebar {
+	position: absolute;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	background: #19c2bf;
+	overflow-y: auto;
+	width: to-rem(250px);
+	padding: to-rem(40px);
+
+	.sidebar-logo-link {
+		@include btn-hover-effect-opacity;
+		display: inline-block;
+		margin-bottom: to-rem(40px);
+	}
+
+	.sidebar-logo {
+		width: 100%;
+		height: auto;
+	}
+
+	.user {
+		margin-bottom: to-rem(32px);
+	}
+
+	.name {
+		color: white;
+		font-size: to-rem(16px);
+		line-height: to-rem(16px);
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.btn-logout {
+		color: white;
+		font-size: to-rem(11px);
+		text-decoration: underline;
+		opacity: 0.6;
+
+		&:hover {
+			opacity: 0.8;
+		}
+	}
+
+	.nav-link {
+		display: block;
+		padding: 0;
+		color: white;
+		font-size: to-rem(16px);
+		line-height: to-rem(28px);
+		opacity: 0.7;
+
+		&:hover {
+			opacity: 1;
+		}
+
+		&.active {
+			opacity: 1;
+		}
+	}
+}

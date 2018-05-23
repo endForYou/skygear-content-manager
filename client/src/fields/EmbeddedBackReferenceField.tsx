@@ -1,4 +1,4 @@
-import './EmbeddedBackReferenceField.css';
+import './EmbeddedBackReferenceField.scss';
 
 import classnames from 'classnames';
 import * as React from 'react';
@@ -11,6 +11,7 @@ import {
   SortOrder,
 } from '../cmsConfig';
 import { Arrow, ArrowDirection } from '../components/Arrow';
+import { PrimaryButton } from '../components/PrimaryButton';
 import {
   Effect,
   EffectAll,
@@ -144,7 +145,7 @@ export class EmbeddedBackReferenceField extends React.PureComponent<
   }
 
   public render() {
-    const { config } = this.props;
+    const { config, className } = this.props;
     const { embeddedRecords } = this.state;
 
     const items = embeddedRecords.map((r, index) => {
@@ -197,16 +198,18 @@ export class EmbeddedBackReferenceField extends React.PureComponent<
     });
 
     return (
-      <div>
+      <div className={classnames(className, 'embedded-back-reference')}>
         <div className="embedded-back-reference-field">{items}</div>
         {config.editable && (
-          <button
-            type="button"
-            className="btn btn-link"
-            onClick={this.handleEmbeddedRecordCreate}
-          >
-            + Add New {config.label}
-          </button>
+          <div>
+            <PrimaryButton
+              type="button"
+              className="btn-add"
+              onClick={this.handleEmbeddedRecordCreate}
+            >
+              Add New {config.label}
+            </PrimaryButton>
+          </div>
         )}
       </div>
     );
@@ -283,31 +286,33 @@ function EmbeddedRecordView({
   });
   return (
     <div className={className}>
-      {removable && (
-        <button
-          type="button"
-          className="embedded-record-button close"
-          aria-label="Close"
-          onClick={onRecordRemove}
-        >
-          <span aria-hidden="true">&times;</span>
-        </button>
-      )}
-      {downMovable && (
-        <Arrow
-          className="embedded-record-button float-right"
-          direction={ArrowDirection.Down}
-          onClick={onRecordMoveDown}
-        />
-      )}
-      {upMovable && (
-        <Arrow
-          className="embedded-record-button float-right"
-          direction={ArrowDirection.Up}
-          onClick={onRecordMoveUp}
-        />
-      )}
       {formGroups}
+      <div className="embedded-record-buttons">
+        {removable && (
+          <button
+            type="button"
+            className="embedded-record-button close"
+            aria-label="Close"
+            onClick={onRecordRemove}
+          >
+            <span aria-hidden="true">&times;</span>
+          </button>
+        )}
+        {downMovable && (
+          <Arrow
+            className="embedded-record-button float-right"
+            direction={ArrowDirection.Down}
+            onClick={onRecordMoveDown}
+          />
+        )}
+        {upMovable && (
+          <Arrow
+            className="embedded-record-button float-right"
+            direction={ArrowDirection.Up}
+            onClick={onRecordMoveUp}
+          />
+        )}
+      </div>
     </div>
   );
 }
@@ -321,10 +326,12 @@ interface FieldProps {
 function FormGroup(props: FieldProps): JSX.Element {
   const { fieldConfig, onFieldChange, record } = props;
   return (
-    <div className="form-group">
-      <label htmlFor={fieldConfig.name}>{fieldConfig.label}</label>
+    <div className="record-form-group">
+      <label className="record-form-label" htmlFor={fieldConfig.name}>
+        {fieldConfig.label}
+      </label>
       <Field
-        className="form-control"
+        className="record-form-field"
         config={fieldConfig}
         value={record[fieldConfig.name]}
         context={FieldContext(record)}

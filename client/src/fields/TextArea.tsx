@@ -1,3 +1,4 @@
+import classnames from 'classnames';
 import * as React from 'react';
 
 import { TextAreaFieldConfig } from '../cmsConfig';
@@ -11,12 +12,22 @@ export class TextArea extends BaseStringField<
   TextAreaProps
 > {
   public render() {
-    const { config: { editable }, onFieldChange: _, ...rest } = this.props;
-    const disabled = editable === undefined ? false : !editable;
+    const {
+      config: { editable },
+      className,
+      onFieldChange: _,
+      ...rest,
+    } = this.props;
+
+    const disabled = editable === undefined ? true : !editable;
 
     return (
       <textarea
         {...rest}
+        className={classnames(className, {
+          'textarea-display': !!disabled,
+          'textarea-input': !disabled,
+        })}
         value={this.state.value}
         onChange={this.handleChange}
         disabled={disabled}

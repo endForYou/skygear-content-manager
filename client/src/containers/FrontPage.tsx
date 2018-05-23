@@ -7,7 +7,7 @@ interface StateProps {
 }
 
 const FrontPageImpl: React.SFC<StateProps> = ({ user }) => {
-  return <div>My name is {user.username} :D</div>;
+  return <h5 style={{ padding: '1.5rem' }}>My name is {user.username} :D</h5>;
 };
 
 const mapStateToProps: MapStateToProps<StateProps, {}> = state => {

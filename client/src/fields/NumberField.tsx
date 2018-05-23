@@ -1,3 +1,4 @@
+import classnames from 'classnames';
 import * as React from 'react';
 
 import { NumberFieldConfig } from '../cmsConfig';
@@ -32,7 +33,8 @@ class NumberFieldImpl extends React.PureComponent<NumberFieldProps, State> {
 
   public render() {
     const {
-      config: { editable },
+      config: { compact, editable, name },
+      className,
       onFieldChange: _onFieldChange,
       value: _value,
       ...rest,
@@ -42,14 +44,25 @@ class NumberFieldImpl extends React.PureComponent<NumberFieldProps, State> {
       return (
         <input
           {...rest}
+          className={classnames(className, 'number-input')}
           type="text"
+          id={name}
+          name={name}
           value={this.state.stringValue}
           onChange={this.handleChange}
           placeholder="0"
         />
       );
     } else {
-      return <span {...rest}>{this.state.stringValue}</span>;
+      return (
+        <div
+          className={classnames(className, 'number-display', {
+            full: !compact,
+          })}
+        >
+          {this.state.value}
+        </div>
+      );
     }
   }
 

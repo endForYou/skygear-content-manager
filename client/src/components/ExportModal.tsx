@@ -93,7 +93,7 @@ export class ExportModal extends React.PureComponent<ExportModalProps, State> {
     return (
       <Modal
         show={show}
-        title="Export"
+        title="Export records"
         onDismiss={onDismiss}
         body={() => this.renderFilterOptions()}
         footer={() => [
@@ -102,7 +102,7 @@ export class ExportModal extends React.PureComponent<ExportModalProps, State> {
             href={action}
             target="_blank"
             role="button"
-            className="btn btn-primary"
+            className="modal-button-primary primary-button"
             onClick={onDismiss}
           >
             Export
@@ -111,7 +111,7 @@ export class ExportModal extends React.PureComponent<ExportModalProps, State> {
             key="cancel"
             href="#"
             role="button"
-            className="btn btn-secondary"
+            className="modal-button-secondary"
             onClick={onDismiss}
           >
             Cancel

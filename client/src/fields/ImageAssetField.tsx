@@ -1,3 +1,4 @@
+import classnames from 'classnames';
 import * as React from 'react';
 
 import { ImageAssetFieldConfig } from '../cmsConfig';
@@ -6,23 +7,24 @@ import { RequiredFieldProps } from './Field';
 import { ImageAssetUploader } from './ImageAssetUploader';
 import { NullField } from './NullField';
 
-import './ImageAssetField.css';
-
 export type ImageAssetFieldProps = RequiredFieldProps<ImageAssetFieldConfig>;
 
 export class ImageAssetField extends React.PureComponent<ImageAssetFieldProps> {
   public renderClearButton() {
     return (
-      <button className="btn btn-light mt-2" onClick={this.onClearClick}>
-        Clear Image
-      </button>
+      <div>
+        <button className="btn-clear" onClick={this.onClearClick}>
+          Clear Image
+        </button>
+      </div>
     );
   }
 
   public render() {
     const {
-      config: { editable, nullable },
+      config: { compact, editable, nullable },
       context: _context,
+      className,
       onFieldChange: _onFieldChange,
       value: value,
       ...rest,
@@ -30,7 +32,7 @@ export class ImageAssetField extends React.PureComponent<ImageAssetFieldProps> {
 
     if (editable) {
       return (
-        <div>
+        <div className={classnames(className, 'image-input')}>
           <ImageAssetUploader {...this.props} />
           {nullable && this.renderClearButton()}
         </div>
@@ -38,11 +40,21 @@ export class ImageAssetField extends React.PureComponent<ImageAssetFieldProps> {
     }
 
     if (value == null) {
-      return <NullField {...rest} />;
+      return (
+        <NullField
+          {...rest}
+          className={classnames(className, 'image-display-null', {
+            full: !compact,
+          })}
+        />
+      );
     }
 
     return (
-      <a href={value.url}>
+      <a
+        className={classnames(className, 'image-display', { full: !compact })}
+        href={value.url}
+      >
         <div
           className="image-asset-image"
           style={{

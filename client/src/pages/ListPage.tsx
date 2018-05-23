@@ -1,3 +1,5 @@
+import './ListPage.scss';
+
 import classNames from 'classnames';
 import { Location } from 'history';
 import * as qs from 'query-string';
@@ -14,9 +16,6 @@ import {
   FieldConfig,
   Filter,
   FilterConfig,
-  FilterConfigTypes,
-  filterFactory,
-  FilterType,
   ImportActionConfig,
   ListActionConfig,
   ListItemActionConfig,
@@ -25,8 +24,8 @@ import {
 import { Predicate } from '../cmsConfig/predicateConfig';
 import { ExportButton } from '../components/ExportButton';
 import { ExportModal } from '../components/ExportModal';
-import { FilterList } from '../components/FilterList';
-import { withEventHandler as withFilterListEventHandler } from '../components/FilterListEventHandler';
+import { FilterMenu } from '../components/FilterMenu';
+import { FilterTagList } from '../components/FilterTagList';
 import { ImportButton } from '../components/ImportButton';
 import {
   ImportFailureModal,
@@ -35,8 +34,8 @@ import {
 } from '../components/ImportModal';
 import { LinkButton } from '../components/LinkButton';
 import Pagination from '../components/Pagination';
+import { PrimaryButton } from '../components/PrimaryButton';
 import { SortButton } from '../components/SortButton';
-import { SpaceSeperatedList } from '../components/SpaceSeperatedList';
 import {
   InjectedProps as SyncFilterProps,
   syncFilterWithUrl,
@@ -51,8 +50,6 @@ import { RemoteType, SortOrder, SortState } from '../types';
 import { debounce } from '../util';
 
 type SortButtonClickHandler = (name: string) => void;
-
-const HandledFilterList = withFilterListEventHandler(FilterList);
 
 export function nextSortState(
   sortState: SortState,
@@ -99,23 +96,23 @@ const TableHeader: React.SFC<TableHeaderProps> = ({
         ? sortState.order
         : SortOrder.Undefined;
     return (
-      <th key={index}>
+      <div key={index} className="table-cell">
         {fieldConfig.label}
         <SortButton
           className="d-inline-block mx-1"
           sortOrder={sortOrder}
           onClick={() => onSortButtonClick(fieldConfig.name)}
         />
-      </th>
+      </div>
     );
   });
   return (
-    <thead className="thead-light">
-      <tr>
+    <div className="table-header">
+      <div className="table-row">
         {columns}
-        <th />
-      </tr>
-    </thead>
+        <div className="table-cell" />
+      </div>
+    </div>
   );
 };
 
@@ -132,31 +129,30 @@ const TableRow: React.SFC<TableRowProps> = ({
 }) => {
   const columns = fieldConfigs.map((fieldConfig, index) => {
     return (
-      <td key={index}>
+      <div key={index} className="table-cell">
         <Field
           config={fieldConfig}
           value={record[fieldConfig.name]}
           context={FieldContext(record)}
         />
-      </td>
+      </div>
     );
   });
 
   return (
-    <tr>
+    <div className="table-row">
       {columns}
-      <td>
-        <SpaceSeperatedList>
-          {itemActions.map((action, index) => (
-            <LinkButton
-              key={index}
-              actionConfig={action}
-              context={{ record }}
-            />
-          ))}
-        </SpaceSeperatedList>
-      </td>
-    </tr>
+      <div className="table-cell">
+        {itemActions.map((action, index) => (
+          <LinkButton
+            key={index}
+            className="item-action"
+            actionConfig={action}
+            context={{ record }}
+          />
+        ))}
+      </div>
+    </div>
   );
 };
 
@@ -181,7 +177,7 @@ const TableBody: React.SFC<TableBodyProps> = ({
       />
     );
   });
-  return <tbody>{rows}</tbody>;
+  return <div className="table-body">{rows}</div>;
 };
 
 interface ListTableProps {
@@ -200,7 +196,7 @@ const ListTable: React.SFC<ListTableProps> = ({
   sortState,
 }) => {
   return (
-    <table key="table" className="table table-sm table-hover table-responsive">
+    <div key="table" className="list-table">
       <TableHeader
         fieldConfigs={fieldConfigs}
         sortState={sortState}
@@ -211,7 +207,7 @@ const ListTable: React.SFC<ListTableProps> = ({
         itemActions={itemActions}
         records={records}
       />
-    </table>
+    </div>
   );
 };
 
@@ -290,23 +286,6 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
     this.setState({ showfilterMenu: !this.state.showfilterMenu });
   }
 
-  public onFilterItemClicked(filterConfig: FilterConfig) {
-    const newFilter = filterFactory(filterConfig);
-
-    const filters =
-      filterConfig.type === FilterConfigTypes.General
-        ? [newFilter]
-        : [
-            ...this.props.filters.filter(
-              f => f.type !== FilterType.GeneralFilterType
-            ),
-            newFilter,
-          ];
-
-    this.props.onChangeFilter(filters);
-    this.toggleFilterMenu();
-  }
-
   public onImportFileSelected(actionConfig: ImportActionConfig, file: File) {
     const { dispatch } = this.props;
     dispatch(importRecords(actionConfig.name, file));
@@ -327,6 +306,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
         return (
           <ExportButton
             key={index}
+            className="list-action primary-button"
             actionConfig={actionConfig}
             onClick={() => this.setState({ exporting: actionConfig })}
           />
@@ -335,6 +315,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
         return (
           <ImportButton
             key={index}
+            className="list-action primary-button"
             actionConfig={actionConfig}
             onFileSelected={this.onImportFileSelected}
           />
@@ -343,6 +324,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
         return (
           <LinkButton
             key={index}
+            className="list-action primary-button"
             actionConfig={actionConfig}
             context={{
               record_type: recordName,
@@ -359,7 +341,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
     const actionsButtons = actions.map((action, index) =>
       this.renderActionButton(recordName, action, index)
     );
-    return <SpaceSeperatedList>{actionsButtons}</SpaceSeperatedList>;
+    return actionsButtons;
   }
 
   public renderImportModal() {
@@ -423,61 +405,61 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
     const { showfilterMenu } = this.state;
 
     return (
-      <div>
+      <div className="list-page">
         {this.renderImportModal()}
         {this.renderExportModal()}
-        <div className="navbar">
-          <h1 className="display-4">{pageConfig.label}</h1>
-          <div className="float-right">
+        <div className="topbar">
+          <div className="title">{pageConfig.label}</div>
+          <div className="action-container">
+            {this.renderActionButtons()}
             {pageConfig.filters && (
-              <div className="dropdown float-right ml-2">
-                <button
+              <div className="dropdown d-inline-block">
+                <PrimaryButton
                   type="button"
-                  className="btn btn-primary dropdown-toggle"
+                  className="list-action dropdown-toggle"
                   onClick={() => this.toggleFilterMenu()}
                 >
                   Add Filter <span className="caret" />
-                </button>
+                </PrimaryButton>
 
                 <div
-                  style={{ right: 0, left: 'unset' }}
                   className={classNames(
-                    'dropdown-menu-right',
-                    'dropdown-menu',
+                    'list-filter-menu-wrapper',
                     showfilterMenu ? 'show' : ''
                   )}
                 >
-                  {pageConfig.filters.map(filterConfig => (
-                    <a
-                      key={filterConfig.label}
-                      className="dropdown-item"
-                      onClick={() => this.onFilterItemClicked(filterConfig)}
-                    >
-                      {filterConfig.label}
-                    </a>
-                  ))}
+                  <div className="list-filter-menu">
+                    <FilterMenu
+                      filterConfigs={pageConfig.filters}
+                      filters={filters}
+                      onChangeFilter={this.props.onChangeFilter}
+                    />
+                  </div>
                 </div>
               </div>
             )}
-            {this.renderActionButtons()}
           </div>
         </div>
 
-        <div className="float-right">
-          <HandledFilterList
-            filters={filters}
-            filterConfigs={pageConfig.filters}
-            onChangeFilter={this.props.onChangeFilter}
-          />
-        </div>
+        {filters.length > 0 && (
+          <div className="list-filter-tag-list-container">
+            <div className="list-filter-tag-list-label">Filter</div>
+            <FilterTagList
+              className="list-filter-tag-list"
+              filters={filters}
+              filterConfigs={pageConfig.filters}
+              onChangeFilter={this.props.onChangeFilter}
+            />
+          </div>
+        )}
 
-        <div className="table-responsive">
+        <div className="list-content">
           {(() => {
             if (isLoading) {
-              return <div>Loading...</div>;
+              return <div className="list-loading">Loading...</div>;
             } else {
               if (records.length === 0) {
-                return <div>No records found.</div>;
+                return <div className="list-empty">No records found.</div>;
               } else {
                 return (
                   <ListTable
@@ -491,15 +473,17 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
               }
             }
           })()}
-          {maxPage > 0 ? (
-            <Pagination
-              key="pagination"
-              location={location}
-              currentPage={page}
-              maxPage={maxPage}
-            />
-          ) : null}
         </div>
+
+        {maxPage > 0 ? (
+          <Pagination
+            key="pagination"
+            className="pagination"
+            location={location}
+            currentPage={page}
+            maxPage={maxPage}
+          />
+        ) : null}
       </div>
     );
   }

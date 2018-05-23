@@ -8,6 +8,7 @@ export interface LinkButtonProps {
   actionConfig: LinkActionConfig;
   // tslint:disable-next-line: no-any
   context: any;
+  className?: string;
 }
 
 // tslint:disable-next-line: no-any
@@ -29,7 +30,7 @@ function applyContext(href: string, context: any): string {
 }
 
 export const LinkButton: React.SFC<LinkButtonProps> = props => {
-  const { actionConfig: { href, label, target }, context } = props;
+  const { actionConfig: { href, label, target }, context, className } = props;
   const formattedHref = applyContext(href, context);
 
   // string starts with {scheme}:// or // are external link
@@ -41,7 +42,7 @@ export const LinkButton: React.SFC<LinkButtonProps> = props => {
         href={formattedHref}
         target={target === '' ? undefined : target}
         role="button"
-        className="btn btn-light"
+        className={className}
       >
         {label}
       </a>
@@ -53,7 +54,7 @@ export const LinkButton: React.SFC<LinkButtonProps> = props => {
       to={formattedHref}
       target={target === '' ? undefined : target}
       role="button"
-      className="btn btn-light"
+      className={className}
     >
       {label}
     </Link>

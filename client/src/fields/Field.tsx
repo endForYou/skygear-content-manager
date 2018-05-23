@@ -1,3 +1,5 @@
+import './Field.scss';
+
 import * as React from 'react';
 import { Record } from 'skygear';
 

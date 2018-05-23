@@ -1,9 +1,13 @@
+import './Pagination.scss';
+
+import classnames from 'classnames';
 import { Location } from 'history';
 import * as React from 'react';
 
 import { PageItem } from './PageItem';
 
 export interface PaginationProps {
+  className?: string;
   location: Location;
   currentPage: number;
   maxPage: number;
@@ -12,11 +16,9 @@ export interface PaginationProps {
 export default class Pagination extends React.PureComponent<PaginationProps> {
   public render() {
     return (
-      <nav>
-        <ul className="pagination justify-content-end">
-          {this.renderPaginationItems()}
-        </ul>
-      </nav>
+      <div className={classnames(this.props.className, 'pagination-container')}>
+        {this.renderPaginationItems()}
+      </div>
     );
   }
 
@@ -27,6 +29,7 @@ export default class Pagination extends React.PureComponent<PaginationProps> {
       return (
         <PageItem
           key={page}
+          className="pagination-item"
           location={location}
           page={page}
           isActive={currentPage === page}
@@ -39,22 +42,24 @@ export default class Pagination extends React.PureComponent<PaginationProps> {
     const prevItem = (
       <PageItem
         key="prev"
+        className="pagination-item"
         location={location}
         page={currentPage - 1}
         isDisabled={currentPage <= 1}
       >
-        <span>&laquo;</span>
+        Previous
       </PageItem>
     );
 
     const nextItem = (
       <PageItem
         key="next"
+        className="pagination-item"
         location={location}
         page={currentPage + 1}
         isDisabled={currentPage >= maxPage}
       >
-        <span>&raquo;</span>
+        Next
       </PageItem>
     );
 
@@ -64,7 +69,7 @@ export default class Pagination extends React.PureComponent<PaginationProps> {
 
 function getPages(page: number, maxPage: number): number[] {
   const minPage = 1;
-  const step = 5;
+  const step = 3;
 
   const startPage = Math.max(minPage, page - step);
   const endPage = Math.min(maxPage, startPage + 2 * step);

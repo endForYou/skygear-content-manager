@@ -1,0 +1,138 @@
+@import 'styleUtils/common.scss';
+@import 'styleUtils/effect.scss';
+
+$horizontal-spacing: to-rem(32px);
+
+.list-page {
+  .topbar {
+    @include record-topbar($horizontal-spacing);
+    margin-bottom: to-rem(30px);
+  }
+
+  .title {
+    @include record-topbar-title;
+  }
+
+  .list-action {
+    @include record-topbar-action;
+  }
+
+  .action-container {
+    @include record-topbar-action-container;
+  }
+
+  .list-loading, .list-empty {
+    padding: to-rem(24px) $horizontal-spacing;
+    font-family: Lato-Light;
+    font-size: 18px;
+    line-height: 18px;
+  }
+
+  .list-filter-menu-wrapper {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    z-index: 1000;
+    display: none;
+    float: left;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #DEDEDE;
+    border-radius: 4px;
+    box-shadow: 0 0 2px 0 rgba(0,0,0,0.30);
+
+    &.show {
+      display: block;
+    }
+  }
+
+  .list-filter-menu {
+    overflow-y: auto;
+    padding: to-rem(24px) to-rem(15px);
+  }
+
+  .list-filter-tag-list-container {
+    margin-bottom: to-rem(12px);
+    background-color: white;
+    padding: to-rem(12px) $horizontal-spacing;
+    display: flex;
+  }
+
+  .list-filter-tag-list-label {
+    font-size: to-rem(16px);
+    padding-top: to-rem(9px);
+  }
+
+  .list-filter-tag-list {
+    margin-left: to-rem(24px);
+  }
+
+  .list-content {
+    margin-bottom: to-rem(38px);
+    background-color: white;
+    overflow-x: auto;
+  }
+
+  .list-table {
+    display: table;
+    min-width: 100%;
+  }
+
+  .table-row {
+    display: table-row;
+
+    & .table-cell:first-child {
+      padding-left: to-rem(32px);
+    }
+
+    & .table-cell:last-child {
+      padding-right: to-rem(32px);
+    }
+  }
+
+  .table-cell {
+    display: table-cell;
+    height: to-rem(66px);
+    padding-right: to-rem(32px);
+    border-bottom: 1px #ECEEEF solid;
+    font-family: HelveticaNeue;
+    vertical-align: middle;
+    min-width: to-rem(250px);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .table-header {
+    display: table-header-group;
+    background: #FFFFFF;
+
+    .table-cell {
+      height: to-rem(50px);
+      font-family: HelveticaNeue-Bold;
+    }
+  }
+
+  .table-body {
+    display: table-row-group;
+
+    .table-row:nth-child(2n-1) {
+      background-color: #F9F9F9;
+    }
+  }
+
+  .item-action {
+    @include btn;
+    @include btn-secondary;
+    display: inline-block;
+    font-size: to-rem(12px);
+    line-height: to-rem(12px);
+    padding: to-rem(8px) to-rem(12px);
+    margin-left: to-rem(5px);
+  }
+
+  .pagination {
+    @include pagination-position;
+    margin-bottom: to-rem(38px);
+  }
+}

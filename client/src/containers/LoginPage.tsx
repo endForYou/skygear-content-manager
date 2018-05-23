@@ -1,10 +1,13 @@
 import * as React from 'react';
 import { connect, MapDispatchToProps, MapStateToProps } from 'react-redux';
+import { Link } from 'react-router-dom';
 
 import { login } from '../actions/auth';
 import { RootState } from '../states';
 
-import './LoginPage.css';
+import { PrimaryButton } from '../components/PrimaryButton';
+import { AppLogo } from './AppLogo';
+import './LoginPage.scss';
 
 type LoginFormProps = StateProps & DispatchProps;
 
@@ -61,43 +64,47 @@ class LoginForm extends React.PureComponent<LoginFormProps, State> {
 
   public render() {
     return (
-      <form className="form-login" onSubmit={this.handleSubmit}>
-        <h2>Login</h2>
-        <label className="sr-only" htmlFor="username">
-          Username
-        </label>
-        <input
-          type="text"
-          className="form-control form-login-username"
-          id="username"
-          name="username"
-          placeholder="Username"
-          required={true}
-          autoFocus={true}
-          value={this.state.username}
-          onChange={this.handleInputChange}
-        />
-        <label className="sr-only" htmlFor="password">
-          Password
-        </label>
-        <input
-          type="password"
-          className="form-control form-login-password"
-          id="password"
-          name="password"
-          placeholder="Password"
-          required={true}
-          value={this.state.password}
-          onChange={this.handleInputChange}
-        />
+      <form className="form-container" onSubmit={this.handleSubmit}>
+        <div className="form-title">Login</div>
+        <div className="form-item">
+          <label className="form-label" htmlFor="username">
+            Username
+          </label>
+          <input
+            type="text"
+            className="form-text-input"
+            id="username"
+            name="username"
+            placeholder="Username"
+            required={true}
+            autoFocus={true}
+            value={this.state.username}
+            onChange={this.handleInputChange}
+          />
+        </div>
+        <div className="form-item">
+          <label className="form-label" htmlFor="password">
+            Password
+          </label>
+          <input
+            type="password"
+            className="form-text-input"
+            id="password"
+            name="password"
+            placeholder="Password"
+            required={true}
+            value={this.state.password}
+            onChange={this.handleInputChange}
+          />
+        </div>
         {this.props.errorMessage !== undefined && (
           <div className="alert alert-danger form-login-alert" role="alert">
             {this.props.errorMessage}
           </div>
         )}
-        <button type="submit" className="btn btn-primary btn-lg btn-block">
+        <PrimaryButton type="submit" className="form-submit">
           Login
-        </button>
+        </PrimaryButton>
       </form>
     );
   }
@@ -121,9 +128,20 @@ const ConnectedLoginForm = connect(mapStateToProps, mapDispatchToProps)(
   LoginForm
 );
 
+const Topbar: React.SFC = () => {
+  return (
+    <div className="topbar sidebar-color">
+      <Link className="topbar-logo-link" to="/">
+        <AppLogo className="topbar-logo" alt="Skygear CMS" />
+      </Link>
+    </div>
+  );
+};
+
 const LoginPage: React.SFC = () => {
   return (
-    <div className="container">
+    <div className="login">
+      <Topbar />
       <ConnectedLoginForm />
     </div>
   );

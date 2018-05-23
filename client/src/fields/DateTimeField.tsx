@@ -1,3 +1,4 @@
+import classnames from 'classnames';
 import * as moment from 'moment-timezone';
 import * as React from 'react';
 
@@ -31,8 +32,8 @@ class DateTimeFieldImpl extends React.PureComponent<DateTimeFieldProps, State> {
 
   public render() {
     const {
-      config: { editable, timezone },
-      className: className,
+      config: { compact, editable, timezone },
+      className,
       onFieldChange: _onFieldChange,
       value: _value,
       ...rest,
@@ -43,11 +44,12 @@ class DateTimeFieldImpl extends React.PureComponent<DateTimeFieldProps, State> {
       return (
         <TzDatetimeInput
           {...rest}
+          className={classnames(className, 'datetime-input-container')}
           dateFormat={DATE_FORMAT}
           timeFormat={timeFormat}
           value={this.state.value}
           onChange={this.handleChange}
-          inputProps={{ className }}
+          inputProps={{ className: 'datetime-input' }}
           timezone={timezone}
         />
       );
@@ -57,7 +59,9 @@ class DateTimeFieldImpl extends React.PureComponent<DateTimeFieldProps, State> {
       return (
         <TzDatetime
           {...rest}
-          className={className}
+          className={classnames(className, 'datetime-display', {
+            full: !compact,
+          })}
           datetimeFormat={datetimeFormat}
           value={this.state.value}
           timezone={timezone}

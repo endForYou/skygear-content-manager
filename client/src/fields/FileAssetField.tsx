@@ -1,3 +1,4 @@
+import classnames from 'classnames';
 import * as React from 'react';
 
 import { FileAssetFieldConfig } from '../cmsConfig';
@@ -11,16 +12,19 @@ export type FileAssetFieldProps = RequiredFieldProps<FileAssetFieldConfig>;
 export class FileAssetField extends React.PureComponent<FileAssetFieldProps> {
   public renderClearButton() {
     return (
-      <button className="btn btn-light mt-2" onClick={this.onClearClick}>
-        Clear File
-      </button>
+      <div>
+        <button className="btn-clear" onClick={this.onClearClick}>
+          Clear File
+        </button>
+      </div>
     );
   }
 
   public render() {
     const {
-      config: { accept, editable, nullable },
+      config: { accept, compact, editable, nullable },
       context: _context,
+      className,
       onFieldChange,
       value: value,
       ...rest,
@@ -28,7 +32,7 @@ export class FileAssetField extends React.PureComponent<FileAssetFieldProps> {
 
     if (editable) {
       return (
-        <div>
+        <div className={classnames(className, 'file-input')}>
           <AssetUploader
             {...rest}
             accept={accept}
@@ -46,11 +50,20 @@ export class FileAssetField extends React.PureComponent<FileAssetFieldProps> {
     }
 
     if (value === undefined) {
-      return <NullField {...rest} />;
+      return (
+        <NullField
+          {...rest}
+          className={classnames(className, 'file-display-null', {
+            full: !compact,
+          })}
+        />
+      );
     }
 
     return (
-      <div>
+      <div
+        className={classnames(className, 'file-display', { full: !compact })}
+      >
         <a target="_blank" href={value.url}>
           {value.name}
         </a>

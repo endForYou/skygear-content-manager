@@ -61,7 +61,6 @@ class AssociationRecordSelectImpl extends React.PureComponent<
 
   public render() {
     const {
-      className: _classname,
       context,
       config,
       onFieldChange: _onFieldChange,

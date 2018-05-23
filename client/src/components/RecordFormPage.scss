@@ -1,0 +1,43 @@
+@import 'styleUtils/common.scss';
+
+.record-form-page {
+
+  .record-form-groups {
+    @include record-form;
+
+    & > .record-form-group:not(:first-child) {
+      margin-top: to-rem(10px);
+    }
+  }
+
+  .record-form-group {
+    display: flex;
+    width: 100%;
+  }
+
+  .record-form-label {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow-x: hidden;
+    width: to-rem(200px);
+    line-height: to-rem(38px);
+
+    label {
+      margin-bottom: 0;
+    }
+  }
+
+  .record-form-field {
+    flex: 1;
+  }
+
+  .btn-submit {
+    @include btn;
+    @include btn-primary;
+    font-size: to-rem(14px);
+    padding: to-rem(5px) to-rem(9px);
+    margin-top: to-rem(10px);
+    margin-left: auto;
+    margin-right: 0;
+  }
+}

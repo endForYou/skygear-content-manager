@@ -1,22 +1,24 @@
+import './Layout.scss';
+
 import * as React from 'react';
 
 import Sidebar from './Sidebar';
 
 const Main: React.SFC = ({ children }) => {
   return (
-    <main className="col-sm-9 pt-3" role="main">
-      {children}
-    </main>
+    <div className="scroll-view">
+      <main className="content" role="main">
+        {children}
+      </main>
+    </div>
   );
 };
 
 const Layout: React.SFC = ({ children, ...rest }) => {
   return (
-    <div className="container-fluid">
-      <div className="row">
-        <Sidebar {...rest} />
-        <Main>{children}</Main>
-      </div>
+    <div className="layout">
+      <Sidebar {...rest} />
+      <Main>{children}</Main>
     </div>
   );
 };

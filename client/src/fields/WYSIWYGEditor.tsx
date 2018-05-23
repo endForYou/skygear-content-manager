@@ -10,6 +10,7 @@ import { RequiredFieldProps } from './Field';
 export interface WYSIWYGEditorProps
   extends RequiredFieldProps<WYSIWYGFieldConfig> {
   appConfig: AppConfig;
+  className?: string;
 }
 
 interface State {
@@ -46,6 +47,7 @@ class WYSIWYGEditorImpl extends React.PureComponent<WYSIWYGEditorProps, State> {
   }
 
   public render() {
+    const { className } = this.props;
     const { config: userConfig, editable } = this.props.config;
     const { value } = this.state;
 
@@ -62,11 +64,13 @@ class WYSIWYGEditorImpl extends React.PureComponent<WYSIWYGEditorProps, State> {
     }
 
     return (
-      <Editor
-        init={editorEditInitObj}
-        value={value}
-        onEditorChange={this.handleEditorChange}
-      />
+      <div className={className}>
+        <Editor
+          init={editorEditInitObj}
+          value={value}
+          onEditorChange={this.handleEditorChange}
+        />
+      </div>
     );
   }
 

@@ -1,0 +1,87 @@
+@import 'styleUtils/common.scss';
+
+.sort-button {
+  opacity: .5;
+  cursor: pointer;
+}
+
+.sort-button:hover {
+  opacity: .75;
+}
+
+.embedded-back-reference {
+  display: flex;
+  flex-direction: column;
+}
+
+.embedded-record-view {
+  position: relative;
+  margin-bottom: to-rem(10px);
+  padding-left: to-rem(18px);
+  padding-right: to-rem(18px);
+  padding-top: to-rem(18px);
+  padding-bottom: to-rem(18px);
+  background-color: rgba(#EEE, 0.3);
+  border-radius: 4px;
+  transition: box-shadow 0.3s ease-in-out;
+
+  &.editable {
+    padding-top: to-rem(24px);
+    padding-bottom: to-rem(24px);
+  }
+}
+
+form.embedded-record-view.editable:hover,
+form.embedded-record-view.editable:focus-within {
+  box-shadow: 0 1px 5px rgba(0,0,0,0.3);
+}
+
+.embedded-back-reference-field > .embedded-record-view:not(:first-child) {
+  margin-top: to-rem(10px);
+}
+
+.embedded-record-buttons {
+  position: absolute;
+  top: to-rem(18px);
+  right: to-rem(18px);
+
+  & > .embedded-record-button:not(:first-child) {
+    margin-right: to-rem(10px);
+  }
+}
+
+.embedded-record-button {
+  cursor: pointer;
+}
+
+.embedded-record-view > .embedded-record-button:first-child {
+  margin-left: 0.5rem;
+}
+
+.embedded-record-view > .embedded-record-button:not(:first-child) {
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+}
+
+.embedded-record-view {
+  & > .record-form-group {
+    display: flex;
+    flex-direction: column;
+  }
+
+  & > .record-form-group:not(:first-child) {
+    margin-top: to-rem(10px);
+  }
+
+  .record-form-label {
+    line-height: to-rem(18px) !important;
+  }
+}
+
+.btn-add {
+  @include btn;
+  @include btn-primary;
+  font-size: to-rem(12px);
+  line-height: to-rem(12px);
+  padding: to-rem(8px) to-rem(12px);
+}

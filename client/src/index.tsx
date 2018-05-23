@@ -16,6 +16,7 @@ import { CMSConfigProvider } from './containers/CMSConfigProvider';
 import { getUnauthenticatedMiddleware } from './middlewares';
 import rootReducerFactory from './reducers';
 import { initialRootState, RootState } from './states';
+import { generateCSSClass } from './theme';
 import { getPath } from './util';
 
 // tslint:disable-next-line: no-any
@@ -66,6 +67,18 @@ function main(appConfig: AppConfig = defaultAppConfig): void {
       <Root history={history} store={store} />,
       document.getElementById('root')
     );
+
+    // inject theme classes to head
+    const head = document.getElementsByTagName('head')[0];
+    const linkElement: HTMLLinkElement = document.createElement('link');
+    linkElement.setAttribute('rel', 'stylesheet');
+    linkElement.setAttribute('type', 'text/css');
+    linkElement.setAttribute(
+      'href',
+      'data:text/css;charset=UTF-8,' +
+        encodeURIComponent(generateCSSClass(appConfig.style))
+    );
+    head.appendChild(linkElement);
   });
 }
 

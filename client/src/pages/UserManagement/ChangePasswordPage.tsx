@@ -1,8 +1,11 @@
+import './ChangePasswordPage.scss';
+
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 
 import { changePassword } from '../../actions/user';
+import { PrimaryButton } from '../../components/PrimaryButton';
 import { isOutlawError } from '../../recordUtil';
 import { RootState } from '../../states';
 
@@ -60,46 +63,59 @@ class PasswordForm extends React.PureComponent<
     } = this.state;
 
     return (
-      <form onSubmit={this.onFormSubmit}>
-        <div className="form-group">
-          <label>User ID</label>
-          <p className="form-control-static">{userId}</p>
+      <form className="password-form-page" onSubmit={this.onFormSubmit}>
+        <div className="password-form">
+          <div className="password-form-group">
+            <div className="password-form-label">
+              <label>User ID</label>
+            </div>
+            <div className="password-form-field static">{userId}</div>
+          </div>
+
+          <div className="password-form-group">
+            <div className="password-form-label">
+              <label htmlFor="password">Password</label>
+            </div>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              className="password-form-field"
+              placeholder="Password"
+              value={password}
+              onChange={this.onPasswordChange}
+            />
+          </div>
+
+          <div className="password-form-group">
+            <div className="password-form-label">
+              <label htmlFor="confirmPassword">Confirm Password</label>
+            </div>
+            <input
+              type="password"
+              id="confirmPassword"
+              name="confirmPassword"
+              className="password-form-field"
+              placeholder="Confirm Password"
+              value={confirmPassword}
+              onChange={this.onConfirmPasswordChange}
+            />
+          </div>
         </div>
 
-        <div className="form-group">
-          <label>Password</label>
-          <input
-            type="password"
-            className="form-control"
-            placeholder="Password"
-            value={password}
-            onChange={this.onPasswordChange}
-          />
-        </div>
-
-        <div className="form-group">
-          <label>Confirm Password</label>
-          <input
-            type="password"
-            className="form-control"
-            placeholder="Confirm Password"
-            value={confirmPassword}
-            onChange={this.onConfirmPasswordChange}
-          />
-        </div>
-
-        <button
+        <PrimaryButton
           type="submit"
-          className="btn btn-primary"
+          className="btn-submit"
           disabled={!this.canSubmitPassword() || isSubmitting}
         >
           Submit
-        </button>
+        </PrimaryButton>
+
         {successMessage.length > 0 && (
-          <span className="ml-3 text-success">{successMessage}</span>
+          <div className="text-success submit-message">{successMessage}</div>
         )}
         {errorMessage.length > 0 && (
-          <span className="ml-3 text-danger">{errorMessage}</span>
+          <div className="text-danger submit-message">{errorMessage}</div>
         )}
       </form>
     );
@@ -147,9 +163,9 @@ class PasswordForm extends React.PureComponent<
 
 const ChangePasswordPageImpl: React.SFC<Props> = ({ userId }) => {
   return (
-    <div>
-      <div className="navbar">
-        <h1 className="display-4">Change Password</h1>
+    <div className="change-password">
+      <div className="topbar">
+        <div className="title">Change Password</div>
       </div>
       <PasswordForm userId={userId} />
     </div>

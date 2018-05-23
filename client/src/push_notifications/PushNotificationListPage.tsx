@@ -1,3 +1,5 @@
+import './PushNotificationListPage.scss';
+
 import { Location } from 'history';
 import * as qs from 'query-string';
 import * as React from 'react';
@@ -26,12 +28,16 @@ const pushCampaignConfig: FieldConfig[] = [
 
 const TableHeader: React.SFC = () => {
   const columns = pushCampaignConfig.map((fieldName, index) => {
-    return <th key={index}>{fieldName.fieldTitle}</th>;
+    return (
+      <div key={index} className="table-cell">
+        {fieldName.fieldTitle}
+      </div>
+    );
   });
   return (
-    <thead className="thead-light">
-      <tr>{columns}</tr>
-    </thead>
+    <div className="table-header">
+      <div className="table-row">{columns}</div>
+    </div>
   );
 };
 
@@ -42,12 +48,12 @@ interface TableRowProps {
 const TableRow: React.SFC<TableRowProps> = ({ pushCampaign }) => {
   const columns = pushCampaignConfig.map((fieldName, index) => {
     return (
-      <td key={index}>
+      <div key={index} className="table-cell">
         <span>{pushCampaign[fieldName.field]}</span>
-      </td>
+      </div>
     );
   });
-  return <tr>{columns}</tr>;
+  return <div className="table-row">{columns}</div>;
 };
 
 interface TableBodyProps {
@@ -58,7 +64,7 @@ const TableBody: React.SFC<TableBodyProps> = ({ pushCampaigns }) => {
   const rows = pushCampaigns.map((pushCampaign, index) => {
     return <TableRow key={index} pushCampaign={pushCampaign} />;
   });
-  return <tbody>{rows}</tbody>;
+  return <div className="table-body">{rows}</div>;
 };
 
 interface ListTableProps {
@@ -67,10 +73,10 @@ interface ListTableProps {
 
 const ListTable: React.SFC<ListTableProps> = ({ pushCampaigns }) => {
   return (
-    <table key="table" className="table table-sm table-hover table-responsive">
+    <div key="table" className="list-table">
       <TableHeader />
       <TableBody pushCampaigns={pushCampaigns} />
-    </table>
+    </div>
   );
 };
 
@@ -112,34 +118,41 @@ class PushNotificationListPageImpl extends React.PureComponent<
     const { location, page, maxPage, isLoading, pushCampaigns } = this.props;
 
     return (
-      <div>
-        <div>
-          <h1 className="display-4 d-inline-block">Push Notifications</h1>
-          <Link className="btn btn-light float-right" to={`/notification/new`}>
-            New Notification
-          </Link>
+      <div className="push-list">
+        <div className="topbar">
+          <div className="title">Push Notifications</div>
+          <div className="action-container">
+            <Link
+              className="push-action primary-button"
+              to={`/notification/new`}
+            >
+              New Notification
+            </Link>
+          </div>
         </div>
-        <div className="table-responsive">
+        <div className="list-content">
           {(() => {
             if (isLoading) {
-              return <div>Loading...</div>;
+              return <div className="list-loading">Loading...</div>;
             } else {
               if (pushCampaigns.length === 0) {
-                return <div>No campaigns found.</div>;
+                return <div className="list-empty">No campaigns found.</div>;
               } else {
                 return <ListTable pushCampaigns={pushCampaigns} />;
               }
             }
           })()}
-          {maxPage > 0 ? (
-            <Pagination
-              key="pagination"
-              location={location}
-              currentPage={page}
-              maxPage={maxPage}
-            />
-          ) : null}
         </div>
+
+        {maxPage > 0 ? (
+          <Pagination
+            key="pagination"
+            className="pagination"
+            location={location}
+            currentPage={page}
+            maxPage={maxPage}
+          />
+        ) : null}
       </div>
     );
   }

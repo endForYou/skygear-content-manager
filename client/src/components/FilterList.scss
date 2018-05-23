@@ -1,0 +1,66 @@
+@import 'styleUtils/common.scss';
+
+$filter-select-left: 230px;
+$filter-select-width: 120px;
+
+.filter-list {
+  .filter-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    height: to-rem(62px);
+    padding: 0 to-rem(9px);
+    border-top: 1px solid #F0F0F0;
+  }
+
+  .filter-name {
+    margin-left: to-rem(18px);
+    font-family: HelveticaNeue-Bold;
+    width: to-rem(164px);
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .filter-select {
+    width: to-rem($filter-select-width);
+    position: absolute;
+    left: to-rem($filter-select-left);
+  }
+
+  .filter-input {
+    height: to-rem(38px);
+    width: to-rem(280px);
+    position: absolute;
+    left: to-rem($filter-select-left + $filter-select-width + 10px);
+  }
+
+  .text-input {
+    @include text-input;
+    height: 100%;
+    width: 100%;
+  }
+
+  .datetime-input-container {
+    height: to-rem(38px);
+  }
+
+  .datetime-input {
+    height: 100%;
+    width: 100%;
+  }
+
+  .btn-close {
+    cursor: pointer;
+    color: #0275D8;
+    opacity: 1;
+    font-weight: 100;
+    font-size: to-rem(21px);
+    line-height: to-rem(21px);
+
+    &:hover {
+      color: #0275D8;
+      opacity: .75;
+    }
+  }
+}

@@ -1,3 +1,6 @@
+import './NewPushNotificationPage.scss';
+
+import classnames from 'classnames';
 import * as React from 'react';
 import { Dispatch } from 'react-redux';
 import { push } from 'react-router-redux';
@@ -10,12 +13,14 @@ import {
   FilterConfigTypes,
   ReferenceFilterConfig,
 } from '../../cmsConfig';
+import { PrimaryButton } from '../../components/PrimaryButton';
 import { FilterInput } from '../../filters/FilterInput';
 import { RootState } from '../../states';
 import { NewPushCampaign, Remote, RemoteType } from '../../types';
 import { entriesOf } from '../../util';
 
 export interface NewPushNotificationPageProps {
+  className?: string;
   filterConfigs: FilterConfig[];
   dispatch: Dispatch<RootState>;
   savingPushCampaign?: Remote<NewPushCampaign>;
@@ -91,7 +96,7 @@ class NewPushNotificationPageImpl extends React.PureComponent<
   }
 
   public render() {
-    const { filterConfigs, savingPushCampaign } = this.props;
+    const { className, filterConfigs, savingPushCampaign } = this.props;
     const {
       newPushCampaign: { type, numberOfAudiences, title, content },
       filterOptionsByName,
@@ -109,53 +114,76 @@ class NewPushNotificationPageImpl extends React.PureComponent<
     });
 
     return (
-      <form onSubmit={this.handleSubmit}>
-        <h3>Audiences</h3>
-        <div className="form-group">
-          <Select
-            name="selecttype"
-            searchable={false}
-            value={type}
-            onChange={this.handleSelectTypeChange}
-            options={campaignTypeOptions}
-          />
-        </div>
-        {type === PushCampaignType.SpecificUsers && (
-          <div style={{ marginLeft: 20 }}>
-            <h5>Filter Conditions</h5>
-            {formGroups}
+      <div className={classnames(className, 'push-form-page')}>
+        <form className="push-form-groups" onSubmit={this.handleSubmit}>
+          <div className="push-form-group">
+            <div className="push-form-label">Audiences</div>
+            <div className="push-form-field">
+              <Select
+                name="selecttype"
+                className="push-form-select"
+                clearable={false}
+                searchable={false}
+                value={type}
+                onChange={this.handleSelectTypeChange}
+                options={campaignTypeOptions}
+              />
+            </div>
           </div>
-        )}
-        <p>No. of audiences: {numberOfAudiences}</p>
-        <h3>Message</h3>
-        <div className="form-group">
-          <label htmlFor="title">Title</label>
-          <input
-            type="text"
-            className="form-control"
-            name="title"
-            placeholder="Title"
-            value={title}
-            onChange={this.handleTitleChange}
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="content">Content</label>
-          <textarea
-            value={content}
-            onChange={this.handlerContentChange}
-            className="form-control"
-            required={true}
-            rows={5}
-          />
-        </div>
-        {this.state.errorMessage !== undefined && (
-          <div className="alert alert-danger form-login-alert" role="alert">
-            {this.state.errorMessage}
+          {type === PushCampaignType.SpecificUsers && (
+            <div className="push-form-group">
+              <div className="push-form-label" />
+              <div className="push-form-field push-filters">
+                <div className="push-filters-title">Filter Conditions</div>
+                {formGroups}
+              </div>
+            </div>
+          )}
+          <div className="push-form-group">
+            <div className="push-form-label">No. of audiences</div>
+            <div className="push-form-field">
+              <div className="push-form-display">{numberOfAudiences}</div>
+            </div>
           </div>
-        )}
+          <div className="push-form-section-title">Message</div>
+          <div className="push-form-group">
+            <div className="push-form-label">Title</div>
+            <div className="push-form-field">
+              <input
+                type="text"
+                className="push-form-input"
+                name="title"
+                placeholder="Title"
+                value={title}
+                onChange={this.handleTitleChange}
+              />
+            </div>
+          </div>
+          <div className="push-form-group">
+            <label className="push-form-label" htmlFor="content">
+              Content
+            </label>
+            <div className="push-form-field">
+              <textarea
+                value={content}
+                onChange={this.handlerContentChange}
+                className="push-form-input textarea"
+                required={true}
+                rows={5}
+              />
+            </div>
+          </div>
+          {this.state.errorMessage !== undefined && (
+            <div
+              className="push-filter-error alert alert-danger form-login-alert"
+              role="alert"
+            >
+              {this.state.errorMessage}
+            </div>
+          )}
+        </form>
         <SubmitButton savingPushCampaign={savingPushCampaign} />
-      </form>
+      </div>
     );
   }
 
@@ -348,10 +376,9 @@ interface FieldProps {
 
 function FormGroup(props: FieldProps): JSX.Element {
   const { filterFieldConfig } = props;
-  const name = filterFieldConfig.name || 'general';
   return (
-    <div className="form-group">
-      <label htmlFor={name}>{filterFieldConfig.label}</label>
+    <div className="push-filter-group">
+      <div className="push-filter-label">{filterFieldConfig.label}</div>
       <FormField {...props} />
     </div>
   );
@@ -367,7 +394,7 @@ function FormField(props: FieldProps): JSX.Element {
       : filterOptionsByName[name].value;
   return (
     <FilterInput
-      className="form-control"
+      className="push-filter-input"
       config={filterFieldConfig}
       value={fieldValue}
       onFieldChange={value => onFilterChange(name, filterType, value)}
@@ -386,15 +413,15 @@ function SubmitButton(props: SubmitProps): JSX.Element {
     savingPushCampaign.type === RemoteType.Loading
   ) {
     return (
-      <button type="submit" className="btn btn-primary" disabled={true}>
+      <PrimaryButton type="submit" className="btn-submit" disabled={true}>
         Save
-      </button>
+      </PrimaryButton>
     );
   } else {
     return (
-      <button type="submit" className="btn btn-primary">
+      <PrimaryButton type="submit" className="btn-submit">
         Save
-      </button>
+      </PrimaryButton>
     );
   }
 }

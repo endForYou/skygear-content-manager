@@ -1,0 +1,48 @@
+@import 'styleUtils/common.scss';
+@import 'styleUtils/effect.scss';
+
+.pagination-container {
+  .pagination-item {
+    background: white;
+    border-top: 1px solid #CCCCCC;
+    border-bottom: 1px solid #CCCCCC;
+    border-left: 1px solid #CCCCCC;
+  }
+
+  .pagination-item:first-child {
+    border-left: 1px solid #CCCCCC;
+    border-radius: 2px 0 0 2px;
+  }
+
+  .pagination-item:last-child {
+    border-right: 1px solid #CCCCCC;
+    border-radius: 0 2px 2px 0;
+  }
+}
+
+.page-item-container {
+  .link {
+    display: inline-block;
+    padding: to-rem(10px) to-rem(14px);
+    color: #4A4A4A;
+    @include btn-hover-effect-darken(white);
+
+    &:hover {
+      text-decoration: none;
+    }
+  }
+
+  &.active {
+    color: #0275D8;
+    border: 1px solid #0275D8;
+
+    .link {
+      color: #0275D8;
+    }
+  }
+
+  .disabled {
+    color: #CCCCCC;
+    cursor: default;
+  }
+}

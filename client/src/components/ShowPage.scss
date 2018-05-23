@@ -1,0 +1,56 @@
+@import 'styleUtils/common.scss';
+
+.show-page {
+  .topbar {
+    @include record-topbar(to-rem(32px));
+  }
+
+  .title {
+    @include record-topbar-title;
+  }
+
+  .show-action {
+    @include record-topbar-action;
+  }
+
+  .action-container {
+    @include record-topbar-action-container;
+  }
+
+  .record-view {
+    @include record-form;
+    margin: to-rem(20px) to-rem(32px);
+
+    & > .record-form-group {
+      display: flex;
+      width: 100%;
+    }
+
+    & > .record-form-group:not(:first-child) {
+      margin-top: to-rem(10px);
+    }
+  }
+
+  .record-form-label {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow-x: hidden;
+    width: to-rem(200px);
+    line-height: to-rem(38px);
+
+    label {
+      margin-bottom: 0;
+    }
+  }
+
+  .record-form-field {
+    flex: 1;
+  }
+
+  .loading,
+  .error {
+    font-family: Lato-Light;
+    font-size: 18px;
+    line-height: 18px;
+  }
+}

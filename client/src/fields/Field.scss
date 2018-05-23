@@ -1,0 +1,164 @@
+@import 'styleUtils/common.scss';
+
+.record-form-field {
+  display: flex;
+
+  &.text-input,
+  &.text-display,
+  &.integer-input,
+  &.integer-display,
+  &.number-input,
+  &.number-display,
+  &.boolean-input,
+  &.boolean-display,
+  &.textarea-input,
+  &.textarea-display,
+  &.datetime-display,
+  &.ref-display,
+  &.image-display-null,
+  &.file-display-null {
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+  }
+
+  &.datetime-input-container {
+    display: block;
+    width: 100%;
+  }
+
+  &.back-ref-select,
+  &.back-ref-list,
+  &.ref-select,
+  &.ref-display {
+    width: 100%;
+  }
+}
+
+.datetime-input {
+  width: 100%;
+}
+
+.text-input,
+.integer-input,
+.number-input,
+.datetime-input {
+  @include text-input;
+  height: to-rem(38px);
+  vertical-align: middle;
+}
+
+.text-display,
+.integer-display,
+.number-display,
+.datetime-display,
+.ref-display,
+.image-display-null,
+.file-display-null {
+  &.full {
+    @include text-input;
+    border-color: rgba(#CCC, 0.3);
+    height: to-rem(38px);
+    vertical-align: middle;
+  }
+}
+
+.textarea-input {
+  @include text-input;
+  padding-top: to-rem(12px);
+  padding-bottom: to-rem(12px);
+}
+
+.textarea-display {
+  @include text-input;
+  padding-top: to-rem(12px);
+  padding-bottom: to-rem(12px);
+  border-color: rgba(#CCC, 0.3);
+  color: #495057;
+}
+
+.boolean-input,
+.boolean-display {
+  vertical-align: middle;
+}
+
+.boolean-toggle-container {
+  // to align its child vertically center
+  display: flex;
+}
+
+.dropdown {
+  display: flex;
+  flex-direction: column;
+}
+
+.dropdown-custom-input {
+  @include text-input;
+  width: 100%;
+  height: to-rem(38px);
+  margin-top: to-rem(10px);
+}
+
+.image-input,
+.file-input {
+  display: flex;
+  flex-direction: column;
+}
+
+.image-asset-image {
+  background-size: cover;
+}
+
+.btn-clear {
+  @include btn;
+  @include btn-secondary;
+  font-size: to-rem(12px);
+  line-height: to-rem(12px);
+  padding: to-rem(8px) to-rem(12px);
+  margin-top: to-rem(10px);
+}
+
+.back-ref-list,
+.asso-ref-list {
+  display: list-item;
+  columns: 2;
+  margin-bottom: unset;
+}
+
+.back-ref-list-item,
+.asso-ref-list-item {
+  line-height: to-rem(38px);
+}
+
+/*
+ * Override react-select styles
+ */
+.Select-placeholder,
+.Select-option,
+.Select-noresults {
+  padding-left: $input-horizontal-padding !important;
+  padding-right: $input-horizontal-padding !important;
+}
+
+.Select--single {
+  .Select-value {
+    padding-left: $input-horizontal-padding !important;
+    padding-right: $input-horizontal-padding !important;
+  }
+}
+
+.Select-control {
+  padding-left: #{$input-horizontal-padding - to-rem(5px)} !important;
+  padding-right: #{$input-horizontal-padding - to-rem(5px)} !important;
+}
+
+.Select--multi .Select-input {
+  margin-left: 0px !important;
+}
+
+.Select-multi-value-wrapper {
+  & > .Select-input {
+    padding-left: 5px !important;
+    padding-right: 5px !important;
+  }
+}

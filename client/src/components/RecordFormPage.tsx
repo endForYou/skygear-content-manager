@@ -1,3 +1,6 @@
+import './RecordFormPage.scss';
+
+import classnames from 'classnames';
 import * as React from 'react';
 import { Dispatch } from 'react-redux';
 import { push } from 'react-router-redux';
@@ -5,8 +8,7 @@ import { Record } from 'skygear';
 
 import { RecordActionDispatcher } from '../actions/record';
 import { FieldConfig, RecordFormPageConfig } from '../cmsConfig';
-import { LinkButton } from '../components/LinkButton';
-import { SpaceSeperatedList } from '../components/SpaceSeperatedList';
+import { PrimaryButton } from '../components/PrimaryButton';
 import { Field, FieldContext } from '../fields';
 import { errorMessageFromError, isRecordsOperationError } from '../recordUtil';
 import { RootState } from '../states';
@@ -18,6 +20,7 @@ import { entriesOf, objectValues } from '../util';
 // record submission.
 // e.g. Reduce reused part into RecordForm only instead of RecordFormPage.
 export interface RecordFormPageProps {
+  className?: string;
   config: RecordFormPageConfig;
   dispatch: Dispatch<RootState>;
   record: Record;
@@ -107,7 +110,7 @@ class RecordFormPageImpl extends React.PureComponent<
   }
 
   public render() {
-    const { config, record, savingRecord } = this.props;
+    const { className, config, record, savingRecord } = this.props;
 
     const formGroups = config.fields.map((fieldConfig, index) => {
       return (
@@ -122,23 +125,14 @@ class RecordFormPageImpl extends React.PureComponent<
     });
 
     return (
-      <form onSubmit={this.handleSubmit}>
-        <div className="navbar">
-          <h1 className="display-4">{config.label}</h1>
-          <div className="float-right">
-            <SpaceSeperatedList>
-              {config.actions.map((action, index) => (
-                <LinkButton
-                  key={index}
-                  actionConfig={action}
-                  context={{ record }}
-                />
-              ))}
-            </SpaceSeperatedList>
-          </div>
+      <form
+        className={classnames(className, 'record-form-page')}
+        onSubmit={this.handleSubmit}
+      >
+        <div className="record-form-groups">
+          {formGroups}
+          {this.renderErrorMessage()}
         </div>
-        {formGroups}
-        {this.renderErrorMessage()}
         <SubmitButton savingRecord={savingRecord} />
       </form>
     );
@@ -205,8 +199,10 @@ interface FieldProps {
 function FormGroup(props: FieldProps): JSX.Element {
   const { fieldConfig } = props;
   return (
-    <div className="form-group">
-      <label htmlFor={fieldConfig.name}>{fieldConfig.label}</label>
+    <div className="record-form-group">
+      <div className="record-form-label">
+        <label htmlFor={fieldConfig.name}>{fieldConfig.label}</label>
+      </div>
       <FormField {...props} />
     </div>
   );
@@ -220,7 +216,7 @@ function FormField(props: FieldProps): JSX.Element {
     recordChange[name] === undefined ? record[name] : recordChange[name];
   return (
     <Field
-      className="form-control"
+      className="record-form-field"
       config={fieldConfig}
       value={fieldValue}
       context={FieldContext(record)}
@@ -238,15 +234,15 @@ function SubmitButton(props: SubmitProps): JSX.Element {
   const { savingRecord } = props;
   if (savingRecord !== undefined && savingRecord.type === RemoteType.Loading) {
     return (
-      <button type="submit" className="btn btn-primary" disabled={true}>
+      <PrimaryButton type="submit" className="btn-submit" disabled={true}>
         Save
-      </button>
+      </PrimaryButton>
     );
   } else {
     return (
-      <button type="submit" className="btn btn-primary">
+      <PrimaryButton type="submit" className="btn-submit">
         Save
-      </button>
+      </PrimaryButton>
     );
   }
 }

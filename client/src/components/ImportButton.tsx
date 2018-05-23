@@ -3,6 +3,7 @@ import { ImportActionConfig } from '../cmsConfig';
 
 export interface ImportButtonProps {
   actionConfig: ImportActionConfig;
+  className?: string;
   onFileSelected(actionConfig: ImportActionConfig, file: File): void;
 }
 
@@ -34,11 +35,11 @@ export class ImportButton extends React.PureComponent<ImportButtonProps> {
   }
 
   public render() {
-    const { actionConfig } = this.props;
+    const { actionConfig, className } = this.props;
     const title = actionConfig.label || actionConfig.name;
 
     return (
-      <a href="#" className="btn btn-light" onClick={this.onClick}>
+      <a href="#" className={className} onClick={this.onClick}>
         {title}
         <input
           ref={ref => (this.fileInput = ref)}

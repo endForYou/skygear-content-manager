@@ -1,4 +1,4 @@
-import './App.css';
+import './App.scss';
 
 import * as React from 'react';
 import { connect } from 'react-redux';
@@ -29,7 +29,11 @@ const App: React.StatelessComponent<AppProps> = ({ cmsConfig, isLoggedIn }) => {
   if (cmsConfig) {
     switch (cmsConfig.type) {
       case RemoteType.Loading:
-        return <img className="img-config-loading" src={loading} />;
+        return (
+          <div className="img-config-loading-container">
+            <img className="img-config-loading" src={loading} />
+          </div>
+        );
       case RemoteType.Failure:
         return (
           <div>

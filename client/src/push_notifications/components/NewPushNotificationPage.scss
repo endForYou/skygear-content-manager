@@ -1,0 +1,119 @@
+@import 'styleUtils/common.scss';
+
+.push-form-page {
+
+  .push-form-groups {
+    @include record-form;
+
+    & > .push-form-group:not(:first-child) {
+      margin-top: to-rem(10px);
+    }
+  }
+
+  .push-form-group {
+    display: flex;
+    width: 100%;
+  }
+
+  .push-form-label {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow-x: hidden;
+    width: to-rem(200px);
+    line-height: to-rem(38px);
+    margin-bottom: 0;
+  }
+
+  .push-form-field {
+    display: flex;
+    flex: 1;
+  }
+
+  .push-filters {
+    position: relative;
+    margin-bottom: to-rem(10px);
+    padding-left: to-rem(18px);
+    padding-right: to-rem(18px);
+    padding-top: to-rem(24px);
+    padding-bottom: to-rem(24px);
+    background-color: rgba(#EEE, 0.3);
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .push-filters-title {
+    font-size: to-rem(14px);
+  }
+
+  .push-filter-group {
+    display: flex;
+    flex-direction: row;
+    margin-top: to-rem(10px);
+  }
+
+  .push-filter-label {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow-x: hidden;
+    width: to-rem(80px);
+    line-height: to-rem(38px);
+    margin-bottom: 0;
+    font-family: Lato-Bold;
+  }
+
+  .push-filter-input {
+    @include text-input;
+    width: 100%;
+  }
+
+  .push-form-select {
+    width: 100%;
+  }
+
+  .push-form-display {
+    @include text-input;
+    border-color: rgba(#CCC, 0.3);
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: to-rem(38px);
+    vertical-align: middle;
+  }
+
+  .push-form-input {
+    @include text-input;
+    width: 100%;
+    flex-direction: column;
+    justify-content: center;
+    height: to-rem(38px);
+    vertical-align: middle;
+
+    &.textarea {
+      height: to-rem(200px);
+      padding-top: to-rem(12px);
+      padding-bottom: to-rem(12px);
+    }
+  }
+
+  .push-form-section-title {
+    font-family: Lato-Bold;
+    color: #999999;
+    margin-top: to-rem(38px);
+  }
+
+  .push-filter-error {
+    margin-top: to-rem(10px);
+  }
+
+  .btn-submit {
+    @include btn;
+    @include btn-primary;
+    font-size: to-rem(14px);
+    padding: to-rem(5px) to-rem(9px);
+    margin-top: to-rem(10px);
+    margin-left: auto;
+    margin-right: 0;
+  }
+}

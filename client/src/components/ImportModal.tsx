@@ -26,7 +26,7 @@ export const ImportModal: React.SFC<ImportModalProps> = props => {
         <a
           href="#"
           role="button"
-          className="btn btn-primary"
+          className="modal-button-primary primary-button"
           onClick={onDismiss}
         >
           Close
