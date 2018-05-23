@@ -1,12 +1,16 @@
 import * as React from 'react';
-import { Route } from 'react-router';
-
+import { Redirect, Route } from 'react-router';
 import {
   ListPageConfig,
   RecordConfig,
   RecordFormPageConfig,
   ShowPageConfig,
+  SiteConfig,
+  SiteItemConfigTypes,
 } from '../../cmsConfig';
+
+import FrontPage from '../FrontPage';
+
 import { EditPageContainer } from '../../pages/EditPageContainer';
 import { ListPageFactory } from '../../pages/ListPage';
 import { NewPageContainer } from '../../pages/NewPageContainer';
@@ -17,6 +21,40 @@ import { PushNotificationListPageFactory } from '../../push_notifications/PushNo
 
 import { ChangePasswordPageContainer } from '../../pages/UserManagement/ChangePasswordPage';
 import { UserListPageFactory } from '../../pages/UserManagement/UserListPage';
+
+// tslint:disable-next-line: no-any
+const AnyFrontPage = FrontPage as any;
+
+const frontPageRoute = <Route exact={true} path="/" component={AnyFrontPage} />;
+
+export function frontPageRedirect(siteItems: SiteConfig): JSX.Element {
+  const items = siteItems.filter(s => s.type !== SiteItemConfigTypes.Space);
+  if (items.length === 0) {
+    return frontPageRoute;
+  }
+
+  const firstSiteItem = items[0];
+  let redirectPath;
+  switch (firstSiteItem.type) {
+    case SiteItemConfigTypes.PushNotifications:
+      redirectPath = '/notification';
+      break;
+    case SiteItemConfigTypes.Record:
+      redirectPath = `/records/${firstSiteItem.name}`;
+      break;
+    case SiteItemConfigTypes.UserManagement:
+      redirectPath = '/user-management';
+      break;
+    default:
+      throw new Error(`Unexpected site item type: ${firstSiteItem.type}`);
+  }
+
+  if (redirectPath == null) {
+    return frontPageRoute;
+  }
+
+  return <Redirect exact={true} from="/" to={redirectPath} />;
+}
 
 export function routesFromRecordConfigs(
   configs: RecordConfig[]
