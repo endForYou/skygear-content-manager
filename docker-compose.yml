@@ -75,6 +75,8 @@ services:
       CMS_STATIC_URL: http://localhost:3002/
       CMS_PUBLIC_URL: http://localhost:3001/cms
       CMS_CONFIG_FILE_URL: http://localhost:3003/cms-config.yaml
+      CMS_THEME_PRIMARY_COLOR: '#FF5722'
+      CMS_THEME_SIDEBAR_COLOR: '#03A9F4'
 
   cms-client-lib:
     build:

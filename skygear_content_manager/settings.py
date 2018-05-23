@@ -19,3 +19,8 @@ CMS_SITE_TITLE = \
 CMS_CONFIG_FILE_URL = \
     os.environ.get('CMS_CONFIG_FILE_URL',
                    'http://localhost:3002/cms-config.yaml')
+
+# cms theme params
+
+CMS_THEME_PRIMARY_COLOR = os.environ.get('CMS_THEME_PRIMARY_COLOR', '#0275D8')
+CMS_THEME_SIDEBAR_COLOR = os.environ.get('CMS_THEME_SIDEBAR_COLOR', '#19c2bf')
