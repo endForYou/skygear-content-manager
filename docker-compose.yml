@@ -69,12 +69,12 @@ services:
       ASSET_STORE_BUCKET:
       ASSET_STORE_URL_PREFIX: http://localhost:3000/files
       ASSET_STORE_SECRET:
-      CMS_SKYGEAR_ENDPOINT: http://localhost:3001/cms-api/
+      CMS_SKYGEAR_ENDPOINT: http://localhost:80/cms-api/
       CMS_SKYGEAR_API_KEY: my_skygear_key
       CMS_SKYGEAR_MASTER_KEY: my_master_key
-      CMS_STATIC_URL: http://localhost:3002/
-      CMS_PUBLIC_URL: http://localhost:3001/cms
-      CMS_CONFIG_FILE_URL: http://localhost:3003/cms-config.yaml
+      CMS_STATIC_URL: http://localhost:80/lib/
+      CMS_PUBLIC_URL: http://localhost:80/cms
+      CMS_CONFIG_FILE_URL: http://localhost:80/static/cms-config.yaml
       CMS_THEME_PRIMARY_COLOR: '#FF5722'
       CMS_THEME_SIDEBAR_COLOR: '#03A9F4'
 
@@ -87,11 +87,22 @@ services:
   cms-client:
     image: halverneus/static-file-server:latest
     ports:
-      - "3003:8080"
+      - "8080"
     volumes:
       - ./client/example:/content
     environment:
       FOLDER: /content
+
+  reverseproxy:
+    image: nginx:alpine
+    links:
+      - app
+      - cms-client-lib
+      - cms-client
+    volumes:
+      - ./nginx.reverseproxy.conf:/etc/nginx/nginx.conf
+    ports:
+      - "80:80"
 
 # The volume container for skygear
 volumes:
