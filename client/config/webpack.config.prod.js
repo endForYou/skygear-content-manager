@@ -207,12 +207,12 @@ module.exports = {
                         ],
                       },
                     },
+                    {
+                      loader: require.resolve('sass-loader'),
+                    }
                   ],
                 },
-                {
-                  loader: require.resolve('sass-loader'),
-                },
-                extractTextPluginOptions,
+                extractTextPluginOptions
               )
             ),
             // Note: this won't work without `new ExtractTextPlugin()` in `plugins`.
