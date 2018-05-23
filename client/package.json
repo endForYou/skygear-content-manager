@@ -27,7 +27,7 @@
     "promise": "8.0.1",
     "query-string": "5.0.1",
     "react": "16.0.0",
-    "react-datetime": "git+ssh://git@github.com/Steven-Chan/react-datetime.git",
+    "react-datetime": "git+https://git@github.com/Steven-Chan/react-datetime.git",
     "react-dev-utils": "4.1.0",
     "react-dom": "16.0.0",
     "react-dropzone": "4.2.1",
