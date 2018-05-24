@@ -56,6 +56,49 @@ $input-horizontal-padding: to-rem(16px);
   }
 }
 
+@mixin list-filter-menu {
+  .list-filter-menu-wrapper {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    z-index: 1000;
+    display: none;
+    float: left;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #DEDEDE;
+    border-radius: 4px;
+    box-shadow: 0 0 2px 0 rgba(0,0,0,0.30);
+
+    &.show {
+      display: block;
+    }
+  }
+
+  .list-filter-menu {
+    overflow-y: auto;
+    padding: to-rem(24px) to-rem(15px);
+  }
+}
+
+@mixin list-filter-tag-list {
+  .list-filter-tag-list-container {
+    margin-bottom: to-rem(12px);
+    background-color: white;
+    padding: to-rem(12px) $horizontal-spacing;
+    display: flex;
+  }
+
+  .list-filter-tag-list-label {
+    font-size: to-rem(16px);
+    padding-top: to-rem(9px);
+  }
+
+  .list-filter-tag-list {
+    margin-left: to-rem(24px);
+  }
+}
+
 @mixin record-topbar($horizontal-spacing) {
   display: flex;
   justify-content: space-between;

@@ -6,6 +6,7 @@ $horizontal-spacing: to-rem(32px);
 .user-list {
   .topbar {
     @include record-topbar($horizontal-spacing);
+    margin-bottom: to-rem(30px);
   }
 
   .title {
@@ -21,14 +22,16 @@ $horizontal-spacing: to-rem(32px);
   }
 
   .list-loading, .list-empty {
-    padding: to-rem(24px) $horizontal-spacing to-rem(48px);
+    padding: to-rem(24px) $horizontal-spacing;
     font-family: Lato-Light;
     font-size: 18px;
     line-height: 18px;
   }
 
+  @include list-filter-menu;
+  @include list-filter-tag-list;
+
   .list-content {
-    margin-top: to-rem(30px);
     margin-bottom: to-rem(38px);
     background-color: white;
     overflow-x: auto;
