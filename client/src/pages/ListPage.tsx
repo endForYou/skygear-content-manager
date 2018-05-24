@@ -34,7 +34,6 @@ import {
 } from '../components/ImportModal';
 import { LinkButton } from '../components/LinkButton';
 import Pagination from '../components/Pagination';
-import { PrimaryButton } from '../components/PrimaryButton';
 import { SortButton } from '../components/SortButton';
 import {
   InjectedProps as SyncFilterProps,
@@ -44,6 +43,7 @@ import {
   InjectedProps as SyncSortProps,
   syncSortWithUrl,
 } from '../components/SyncUrl/SyncUrlSort';
+import { ToggleButton } from '../components/ToggleButton';
 import { Field, FieldContext } from '../fields';
 import { getCmsConfig, ImportState, RootState, RouteProps } from '../states';
 import { RemoteType, SortOrder, SortState } from '../types';
@@ -413,14 +413,20 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
           <div className="action-container">
             {this.renderActionButtons()}
             {pageConfig.filters && (
-              <div className="dropdown d-inline-block">
-                <PrimaryButton
+              <div
+                className={classNames('d-inline-block', {
+                  dropdown: !showfilterMenu,
+                  dropup: showfilterMenu,
+                })}
+              >
+                <ToggleButton
                   type="button"
                   className="list-action dropdown-toggle"
+                  isActive={showfilterMenu}
                   onClick={() => this.toggleFilterMenu()}
                 >
                   Add Filter <span className="caret" />
-                </PrimaryButton>
+                </ToggleButton>
 
                 <div
                   className={classNames(
