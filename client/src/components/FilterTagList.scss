@@ -17,7 +17,7 @@
   }
 
   .label {
-    font-family: Lato-Bold;
+    font-weight: 700;
     line-height: to-rem(14px);
     max-width: to-rem(100px);
     text-overflow: ellipsis;
@@ -32,7 +32,7 @@
   }
 
   .value {
-    font-family: Lato-Bold;
+    font-weight: 700;
     margin-left: to-rem(5px);
     line-height: to-rem(14px);
     max-width: to-rem(250px);

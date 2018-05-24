@@ -23,7 +23,7 @@ $horizontal-spacing: to-rem(32px);
 
   .list-loading, .list-empty {
     padding: to-rem(24px) $horizontal-spacing;
-    font-family: Lato-Light;
+    font-weight: 300;
     font-size: 18px;
     line-height: 18px;
   }
@@ -59,7 +59,7 @@ $horizontal-spacing: to-rem(32px);
     height: to-rem(66px);
     padding-right: to-rem(32px);
     border-bottom: 1px #ECEEEF solid;
-    font-family: HelveticaNeue;
+    font-family: HelveticaNeue, sans-serif;
     vertical-align: middle;
     max-width: to-rem(250px);
     white-space: nowrap;
@@ -73,7 +73,8 @@ $horizontal-spacing: to-rem(32px);
 
     .table-cell {
       height: to-rem(50px);
-      font-family: HelveticaNeue-Bold;
+      font-family: Helvetica, sans-serif;
+      font-weight: 700;
     }
   }
 

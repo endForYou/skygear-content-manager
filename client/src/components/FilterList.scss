@@ -15,7 +15,8 @@ $filter-select-width: 120px;
 
   .filter-name {
     margin-left: to-rem(18px);
-    font-family: HelveticaNeue-Bold;
+    font-family: Helvetica, sans-serif;
+    font-weight: 700;
     width: to-rem(164px);
     text-overflow: ellipsis;
     overflow: hidden;
