@@ -199,8 +199,8 @@ export enum BaseFilterQueryType {
 export enum StringFilterQueryType {
   EqualTo = 'EqualTo',
   NotEqualTo = 'NotEqualTo',
-  Like = 'Like',
-  NotLike = 'NotLike',
+  Contain = 'Contain',
+  NotContain = 'NotContain',
 }
 
 export enum IntegerFilterQueryType {
