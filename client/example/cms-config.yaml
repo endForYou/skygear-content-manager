@@ -95,9 +95,9 @@ records:
           href: https://www.google.com/search?q={record.name}
           target: _blank
       fields:
-        - type: _id
-        - type: _created_at
-        - type: _updated_at
+        - name: _id
+        - name: _created_at
+        - name: _updated_at
         - name: name
           label: Name
           type: String
@@ -154,9 +154,9 @@ records:
           nullable: true
     show:
       fields:
-        - type: _id
-        - type: _created_at
-        - type: _updated_at
+        - name: _id
+        - name: _created_at
+        - name: _updated_at
         - name: name
           label: Name
           type: String
@@ -196,7 +196,7 @@ records:
           reference_position_field: field_demo_position
           reference_position_ascending: false
           reference_fields:
-            - type: _id
+            - name: _id
             - name: name
               type: String
         - name: imageasset
@@ -207,9 +207,9 @@ records:
           type: Boolean
     edit:
       fields:
-        - type: _id
-        - type: _created_at
-        - type: _updated_at
+        - name: _id
+        - name: _created_at
+        - name: _updated_at
         - name: name
           label: Name
           type: String
@@ -255,7 +255,7 @@ records:
           reference_position_field: field_demo_position
           reference_position_ascending: true
           reference_fields:
-            - type: _id
+            - name: _id
             - name: name
               type: String
         - name: imageasset
@@ -267,9 +267,9 @@ records:
           default_value: false
     new:
       fields:
-        - type: _id
-        - type: _created_at
-        - type: _updated_at
+        - name: _id
+        - name: _created_at
+        - name: _updated_at
         - name: name
           label: Name
           type: String
@@ -315,7 +315,7 @@ records:
           reference_position_field: field_demo_position
           reference_position_ascending: true
           reference_fields:
-            - type: _id
+            - name: _id
             - name: name
               type: String
         - name: imageasset
@@ -333,16 +333,16 @@ records:
           predicate: EqualTo
           value: true
       fields:
-        - type: _id
-        - type: _created_at
-        - type: _updated_at
+        - name: _id
+        - name: _created_at
+        - name: _updated_at
         - name: name
           label: Name
           type: String
   ref_demo:
     show:
       fields:
-        - type: _id
+        - name: _id
         - name: name
           label: Name
           type: String
@@ -353,7 +353,7 @@ records:
           reference_field_name: name
     edit:
       fields:
-        - type: _id
+        - name: _id
         - name: name
           label: Name
           type: String
@@ -364,7 +364,7 @@ records:
           reference_field_name: name
     new:
       fields:
-        - type: _id
+        - name: _id
         - name: name
           label: Name
           type: String
@@ -376,7 +376,7 @@ records:
   back_ref_demo:
     show:
       fields:
-        - type: _id
+        - name: _id
         - name: reference
           type: Reference
           reference_target: field_demo
@@ -386,7 +386,7 @@ records:
           type: String
     edit:
       fields:
-        - type: _id
+        - name: _id
         - name: reference
           type: Reference
           reference_target: field_demo
@@ -396,7 +396,7 @@ records:
           type: String
     new:
       fields:
-        - type: _id
+        - name: _id
         - name: reference
           type: Reference
           reference_target: field_demo
@@ -407,7 +407,7 @@ records:
   asso_ref_demo:
     show:
       fields:
-        - type: _id
+        - name: _id
         - name: name
           label: Name
           type: String

@@ -220,6 +220,16 @@ export function parseNonReferenceFieldConfig(
   // tslint:disable-next-line: no-any
   a: any
 ): FieldConfig {
+  // built-in fields
+  switch (a.name) {
+    case '_id':
+      return parseIdFieldConfig(a);
+    case '_created_at':
+      return parseCreatedAtFieldConfig(a, context);
+    case '_updated_at':
+      return parseUpdatedAtFieldConfig(a, context);
+  }
+
   switch (a.type) {
     case 'String':
       return parseStringFieldConfig(a);
@@ -242,13 +252,17 @@ export function parseNonReferenceFieldConfig(
     case 'FileAsset':
       return parseFileAssetFieldConfig(a);
 
-    // built-in fields
+    // backward compatible
     case '_id':
+      delete a.type;
       return parseIdFieldConfig(a);
     case '_created_at':
+      delete a.type;
       return parseCreatedAtFieldConfig(a, context);
     case '_updated_at':
+      delete a.type;
       return parseUpdatedAtFieldConfig(a, context);
+
     default:
       throw new Error(`Received unknown field config type: ${a.type}`);
   }
@@ -593,10 +607,14 @@ function parseFieldConfigAttrs(
 }
 
 function parseIdFieldConfig(input: FieldConfigInput): StringFieldConfig {
+  if (input.type) {
+    console.log(`Type (${input.type}) is ignored in _id field.`);
+  }
+
   return {
     compact: false,
     editable: false,
-    label: 'ID',
+    label: parseOptionalString(input, 'label', 'ID') || 'ID',
     name: '_id',
     type: FieldConfigTypes.String,
   };
@@ -611,10 +629,15 @@ function parseCreatedAtFieldConfig(
       ? context.timezone
       : parseTimezone(input, 'timezone');
 
+  if (input.type) {
+    // TODO: allow other DateTime field type
+    console.log(`Type (${input.type}) is ignored in _created_at field.`);
+  }
+
   return {
     compact: false,
     editable: false,
-    label: 'Created at',
+    label: parseOptionalString(input, 'label', '_created_at') || 'Created at',
     name: 'createdAt',
     timezone,
     type: FieldConfigTypes.DateTime,
@@ -630,10 +653,15 @@ function parseUpdatedAtFieldConfig(
       ? context.timezone
       : parseTimezone(input, 'timezone');
 
+  if (input.type) {
+    // TODO: allow other DateTime field type
+    console.log(`Type (${input.type}) is ignored in _updated_at field.`);
+  }
+
   return {
     compact: false,
     editable: false,
-    label: 'Updated at',
+    label: parseOptionalString(input, 'label', '_updated_at') || 'Updated at',
     name: 'updatedAt',
     timezone,
     type: FieldConfigTypes.DateTime,
