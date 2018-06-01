@@ -35,6 +35,12 @@ from .skygear_utils import (SkygearRequest, SkygearResponse, AuthData,
 
 cms_config = None
 logger = logging.getLogger(__name__)
+try:
+    # Available in py-skygear v1.6
+    from skygear.utils.logging import setLoggerTag
+    setLoggerTag(logger, 'cms_plugin')
+except ImportError:
+    pass
 
 
 def includeme(settings):
