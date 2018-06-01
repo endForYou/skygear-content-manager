@@ -75,6 +75,7 @@ const TableHeader: React.SFC = () => {
 
 interface TableRowProps {
   adminRole: string;
+  showCMSAccess: boolean;
   onCMSAccessChange: (newValue: boolean) => void;
   user: SkygearUser;
 }
@@ -82,6 +83,7 @@ interface TableRowProps {
 const TableRow: React.SFC<TableRowProps> = ({
   adminRole,
   onCMSAccessChange,
+  showCMSAccess,
   user,
 }) => {
   const onChange: React.ReactEventHandler<ReactToggleElement> = event => {
@@ -100,11 +102,13 @@ const TableRow: React.SFC<TableRowProps> = ({
       <div className="table-cell">{user.record.username}</div>
       <div className="table-cell">{user.record.email}</div>
       <div className="table-cell">
-        <ReactToggle
-          checked={hasAdminRole}
-          disabled={user.isRolesUpdating}
-          onChange={onChange}
-        />
+        {showCMSAccess && (
+          <ReactToggle
+            checked={hasAdminRole}
+            disabled={user.isRolesUpdating}
+            onChange={onChange}
+          />
+        )}
         {user.isRolesUpdating && <LoadingSpinner />}
       </div>
       <div className="table-cell">
@@ -122,10 +126,15 @@ const TableRow: React.SFC<TableRowProps> = ({
 interface TableBodyProps {
   adminRole: string;
   onCMSAccessChange: (user: SkygearUser, newValue: boolean) => void;
+  currentUserId: string;
   users: SkygearUser[];
 }
 
-const TableBody: React.SFC<TableBodyProps> = ({ users, ...rest }) => {
+const TableBody: React.SFC<TableBodyProps> = ({
+  currentUserId,
+  users,
+  ...rest,
+}) => {
   const rows = users.map((user, index) => {
     const onCMSAccessChange = (newValue: boolean) => {
       rest.onCMSAccessChange(user, newValue);
@@ -134,6 +143,7 @@ const TableBody: React.SFC<TableBodyProps> = ({ users, ...rest }) => {
       <TableRow
         {...rest}
         key={index}
+        showCMSAccess={user.id !== currentUserId}
         onCMSAccessChange={onCMSAccessChange}
         user={user}
       />
@@ -145,14 +155,15 @@ const TableBody: React.SFC<TableBodyProps> = ({ users, ...rest }) => {
 interface ListTableProps {
   adminRole: string;
   onCMSAccessChange: (user: SkygearUser, newValue: boolean) => void;
+  currentUserId: string;
   users: SkygearUser[];
 }
 
-const ListTable: React.SFC<ListTableProps> = ({ users, ...rest }) => {
+const ListTable: React.SFC<ListTableProps> = (props: ListTableProps) => {
   return (
     <table key="table" className="list-table">
       <TableHeader />
-      <TableBody {...rest} users={users} />
+      <TableBody {...props} />
     </table>
   );
 };
@@ -166,6 +177,7 @@ interface StateProps {
   page: number;
   maxPage: number;
   isLoading: boolean;
+  currentUserId: string;
   users: SkygearUser[];
 }
 
@@ -230,6 +242,7 @@ class UserListPageImpl extends React.PureComponent<UserListPageProps, State> {
   public render() {
     const {
       adminRole,
+      currentUserId,
       filters,
       isLoading,
       location,
@@ -301,6 +314,7 @@ class UserListPageImpl extends React.PureComponent<UserListPageProps, State> {
                   <ListTable
                     adminRole={adminRole}
                     onCMSAccessChange={this.onCMSAccessChange}
+                    currentUserId={currentUserId}
                     users={users}
                   />
                 );
@@ -344,11 +358,13 @@ function UserListPageFactory() {
 
     const adminRole = state.adminRole;
     const { isLoading, users, totalCount } = state.user;
+    const currentUserId = state.auth.user ? state.auth.user._id : '';
 
     const maxPage = Math.ceil(totalCount / UserListPerPageCount);
 
     return {
       adminRole,
+      currentUserId,
       filterConfigs,
       isLoading,
       location,
