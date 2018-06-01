@@ -17,7 +17,6 @@ type ImgProps = React.DetailedHTMLProps<
 type Props = StateProps & Omit<ImgProps, 'src'>;
 
 function AppLogoImpl({ logoPath, ...restProps }: Props) {
-  console.log('AppLogoImpl', logoPath);
   const src = logoPath ? logoPath : logo;
   return <img {...restProps} src={src} />;
 }
