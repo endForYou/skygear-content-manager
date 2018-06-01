@@ -29,3 +29,10 @@ deploy:
       branch: master
     local_dir: client/build
     upload_dir: js/content-manager/$(git describe --always --tags)
+  - provider: s3
+    bucket: "code.skygear.io"
+    skip_cleanup: true
+    on:
+      tags: true
+    local_dir: client/build
+    upload_dir: js/content-manager/${TRAVIS_TAG}
