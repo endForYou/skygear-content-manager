@@ -119,7 +119,7 @@ function Topbar({
         <SpaceSeperatedList>
           {actions.map((action, index) => (
             <LinkButton
-              className="show-action"
+              className="show-action primary-button"
               key={index}
               actionConfig={action}
               context={actionContext}
