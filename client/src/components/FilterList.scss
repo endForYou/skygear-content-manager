@@ -1,7 +1,7 @@
 @import 'styleUtils/common.scss';
 
 $filter-select-left: 230px;
-$filter-select-width: 120px;
+$filter-select-width: 140px;
 
 .filter-list {
   .filter-item {
@@ -31,7 +31,7 @@ $filter-select-width: 120px;
 
   .filter-input {
     height: to-rem(38px);
-    width: to-rem(290px);
+    width: to-rem(270px);
     position: absolute;
     left: to-rem($filter-select-left + $filter-select-width + 10px);
   }
