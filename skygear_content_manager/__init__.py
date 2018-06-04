@@ -54,24 +54,14 @@ def includeme(settings):
 
     @skygear.event('after-plugins-ready')
     def after_plugins_ready(config):
-        cms_config = CMSConfig.empty()
-        try:
-            cms_config = parse_cms_config()
-        except Exception as e:
-            logger.exception(e)
-
-        set_cms_config(cms_config)
+        global cms_config
+        cms_config = None
 
 
     @skygear.event('schema-changed')
     def schema_change(config):
-        cms_config = CMSConfig.empty()
-        try:
-            cms_config = parse_cms_config()
-        except Exception as e:
-            logger.exception(e)
-
-        set_cms_config(cms_config)
+        global cms_config
+        cms_config = None
 
 
     @skygear.handler('cms/')
@@ -347,13 +337,19 @@ def parse_cms_config():
     return cms_config
 
 
-def set_cms_config(_cms_config):
-    global cms_config
-    cms_config = _cms_config
-
-
 def get_cms_config():
+    """
+    Get and parse cms config from remote lazily
+    """
     global cms_config
+
+    if cms_config == None:
+        cms_config = CMSConfig.empty()
+        try:
+            cms_config = parse_cms_config()
+        except Exception as e:
+            logger.exception(e)
+
     return cms_config
 
 
