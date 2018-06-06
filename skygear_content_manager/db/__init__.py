@@ -1,11 +1,17 @@
 from skygear.utils import db
 
+from .migrations import *
+
 # _cms_version table will keep the number of migrations run
 get_migrations = lambda: [
     ##
     #  Initialize _cms_push_campaign and _cms_push_campaign_user
     ##
     migration_1,
+    ##
+    # Initialize _cms_imported_file
+    ##
+    migration_2,
 ]
 
 

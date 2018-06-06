@@ -16,3 +16,14 @@ CREATE TABLE _cms_push_campaign_user (
     PRIMARY KEY (id)
 );
     """)
+
+
+def migration_2(conn):
+    conn.execute("""
+CREATE TABLE _cms_imported_file (
+    id text NOT NULL,
+    asset text NOT NULL REFERENCES _asset(id),
+    uploaded_at timestamp NOT NULL,
+    PRIMARY KEY (id)
+);
+    """)
