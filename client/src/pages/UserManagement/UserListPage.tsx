@@ -20,20 +20,18 @@ import {
   filterFactory,
   FilterType,
 } from '../../cmsConfig';
-import { FilterList } from '../../components/FilterList';
-import { withEventHandler as withFilterListEventHandler } from '../../components/FilterListEventHandler';
+import { FilterMenu } from '../../components/FilterMenu';
+import { FilterTagList } from '../../components/FilterTagList';
 import { LoadingSpinner } from '../../components/LoadingSpinner';
 import Pagination from '../../components/Pagination';
-import { PrimaryButton } from '../../components/PrimaryButton';
 import {
   InjectedProps as SyncFilterProps,
   syncFilterWithUrl,
 } from '../../components/SyncUrl/SyncUrlFilter';
+import { ToggleButton } from '../../components/ToggleButton';
 import { RootState, RouteProps } from '../../states';
 import { SkygearUser } from '../../types';
 import { debounce } from '../../util';
-
-const HandledFilterList = withFilterListEventHandler(FilterList);
 
 // constants
 const UserListPerPageCount = 20;
@@ -246,43 +244,51 @@ class UserListPageImpl extends React.PureComponent<UserListPageProps, State> {
         <div className="topbar">
           <div className="title">User Management</div>
           <div className="action-container">
-            <div className="dropdown d-inline-block">
-              <PrimaryButton
+            <div
+              className={classNames('d-inline-block', {
+                dropdown: !showfilterMenu,
+                dropup: showfilterMenu,
+              })}
+            >
+              <ToggleButton
                 type="button"
                 className="list-action dropdown-toggle"
+                isActive={showfilterMenu}
                 onClick={() => this.toggleFilterMenu()}
               >
                 Add Filter <span className="caret" />
-              </PrimaryButton>
+              </ToggleButton>
 
               <div
-                style={{ right: 0, left: 'unset' }}
                 className={classNames(
-                  'dropdown-menu-right',
-                  'dropdown-menu',
+                  'list-filter-menu-wrapper',
                   showfilterMenu ? 'show' : ''
                 )}
               >
-                {this.props.filterConfigs.map(filterConfig => (
-                  <a
-                    key={filterConfig.label}
-                    className="dropdown-item"
-                    onClick={() => this.onFilterItemClicked(filterConfig)}
-                  >
-                    {filterConfig.label}
-                  </a>
-                ))}
+                <div className="list-filter-menu">
+                  <FilterMenu
+                    filterConfigs={this.props.filterConfigs}
+                    filters={filters}
+                    onChangeFilter={this.props.onChangeFilter}
+                  />
+                </div>
               </div>
             </div>
           </div>
         </div>
-        <div className="float-right">
-          <HandledFilterList
-            filters={filters}
-            filterConfigs={this.props.filterConfigs}
-            onChangeFilter={this.props.onChangeFilter}
-          />
-        </div>
+
+        {filters.length > 0 && (
+          <div className="list-filter-tag-list-container">
+            <div className="list-filter-tag-list-label">Filter</div>
+            <FilterTagList
+              className="list-filter-tag-list"
+              filters={filters}
+              filterConfigs={this.props.filterConfigs}
+              onChangeFilter={this.props.onChangeFilter}
+            />
+          </div>
+        )}
+
         <div className="list-content">
           {(() => {
             if (isLoading) {

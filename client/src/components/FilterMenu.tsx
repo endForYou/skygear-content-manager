@@ -55,8 +55,14 @@ export class FilterMenu extends React.PureComponent<Props, State> {
               label: c.label,
               value: c.name,
             }))}
+            searchable={false}
+            clearable={false}
           />
-          <PrimaryButton className="btn-add" onClick={this.onFilterAdd}>
+          <PrimaryButton
+            className="btn-add"
+            onClick={this.onFilterAdd}
+            disabled={selectedFilterConfig == null}
+          >
             Add
           </PrimaryButton>
         </div>

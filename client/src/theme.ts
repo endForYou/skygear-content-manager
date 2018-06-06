@@ -20,11 +20,20 @@ export function generateCSSClass(theme: AppTheme): string {
   opacity: 1;
 }
 
-.primary-button:hover {
+.primary-button-active {
+  background-color: white !important;
+  border-color: ${theme.primaryColor} !important;
+  color: ${theme.primaryColor} !important;
+  opacity: 1;
+}
+
+.primary-button:hover,
+.primary-button-active:hover {
   opacity: 0.7;
 }
 
-.primary-button[disabled] {
+.primary-button[disabled],
+.primary-button-active[disabled] {
   opacity: 0.3;
 }
 

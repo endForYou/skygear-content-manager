@@ -1,0 +1,27 @@
+@import url('https://fonts.googleapis.com/css?family=Lato:300,400,700');
+
+html {
+  font-size: 14px;
+  font-family: 'Lato', sans-serif;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Lato', sans-serif;
+
+  background-color: #E9ECEE;
+  color: #373A3C;
+}
+
+ul {
+   list-style-type: disc;
+   list-style-position: inside;
+   margin-left: -15px;
+}
+
+ol {
+   list-style-type: decimal;
+   list-style-position: inside;
+   margin-left: -15px;
+}

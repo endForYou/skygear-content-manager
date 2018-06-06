@@ -1,4 +1,4 @@
-import './index.css';
+import './index.scss';
 
 import { createBrowserHistory, History } from 'history';
 import * as React from 'react';
