@@ -11,6 +11,7 @@ from skygear.options import options
 from skygear.utils.assets import directory_assets
 from urllib.parse import parse_qs
 
+from .db import cms_db_init
 from .import_export import (RecordSerializer, RecordDeserializer,
                             RecordIdentifierMap, render_header,
                             render_data,
@@ -19,7 +20,6 @@ from .import_export import prepare_response as prepare_export_response
 from .models.cms_config import (CMSConfig, CMSRecord,
                                 CMSRecordBackReference,
                                 CMSRecordAssociationReference)
-from .push_notifications import cms_push_notification_db_init
 from .push_notifications import register_lambda as register_push_notifications_lambda
 from .schema.cms_config import CMSAssociationRecordSchema, CMSConfigSchema
 from .schema.skygear_schema import SkygearSchemaSchema
@@ -49,7 +49,7 @@ def includeme(settings):
 
     @skygear.event("before-plugins-ready")
     def before_plugins_ready(config):
-        cms_push_notification_db_init(config)
+        cms_db_init(config)
 
 
     @skygear.event('after-plugins-ready')
