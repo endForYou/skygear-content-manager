@@ -1,12 +1,12 @@
 import skygear
 from skygear.utils import db
 from marshmallow import Schema, fields
-from skygear.utils.context import current_context
 from skygear.error import SkygearException
 
-from .db_session import scoped_session
 from .helper import PushNotificationHelper
+from ..db_session import scoped_session
 from ..models.push_campaign import CmsPushCampaign, CmsPushCampaignUser
+from ..skygear_utils import validate_master_user
 
 PAGE_SIZE = 25
 PAGE = 1
@@ -32,7 +32,7 @@ class NewPushCampaignSchema(Schema):
 def register_lambda(settings):
     @skygear.op("push_campaign:get_all", user_required=True)
     def get_all_push_campaigns(**kwargs):
-        _validate_master_user()
+        validate_master_user()
         page_size = kwargs.get('perPage', PAGE_SIZE)
         page = kwargs.get('page', PAGE)
         with db.conn() as conn:
@@ -50,7 +50,7 @@ def register_lambda(settings):
 
     @skygear.op("push_campaign:create_new", user_required=True)
     def create_push_notification(**kwargs):
-        _validate_master_user()
+        validate_master_user()
         new_push_campaign = kwargs['new_push_campaign']
         new_push_campaign, errors = NewPushCampaignSchema().load(new_push_campaign)
         if len(errors) > 0:
@@ -75,8 +75,3 @@ def _create_cms_push_campaign_user(session, cms_push_campaign_id, user_ids):
     for user_id in user_ids:
         new_cms_push_campaign_user = CmsPushCampaignUser(cms_push_campaign_id, user_id)
         session.add(new_cms_push_campaign_user)
-
-
-def _validate_master_user():
-    if current_context().get('access_key_type') != 'master':
-        raise SkygearException('Permission denied')

@@ -5,6 +5,7 @@ import skygear
 from jose import JWTError, jwt
 from skygear.error import AccessTokenNotAccepted, PermissionDenied
 from skygear.options import options
+from skygear.utils.context import current_context
 
 from .settings import CMS_AUTH_SECRET
 
@@ -318,3 +319,8 @@ def or_predicate(predicates):
 
 def eq_predicate(key, value):
     return ['eq', {'$type': 'keypath', '$val': key}, value]
+
+
+def validate_master_user():
+    if current_context().get('access_key_type') != 'master':
+        raise SkygearException('Permission denied')

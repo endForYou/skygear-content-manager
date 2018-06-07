@@ -12,6 +12,7 @@ from skygear.utils.assets import directory_assets
 from urllib.parse import parse_qs
 
 from .db import cms_db_init
+from .file_import import register_lambda as register_file_import_lambda
 from .import_export import (RecordSerializer, RecordDeserializer,
                             RecordIdentifierMap, render_header,
                             render_data,
@@ -45,6 +46,7 @@ except ImportError:
 
 def includeme(settings):
     register_push_notifications_lambda(settings)
+    register_file_import_lambda(settings)
 
 
     @skygear.event("before-plugins-ready")
