@@ -13,6 +13,7 @@ import {
   RemoteType,
   SkygearUser,
 } from './types';
+import { ImportedFile } from './types/importedFile';
 
 export interface RootState {
   adminRole: string;
@@ -21,12 +22,27 @@ export interface RootState {
   cmsConfig: CmsConfigState;
   import: ImportState;
   pushCampaign: PushCampaignState;
+  fileImport: FileImportState;
   recordViewsByName: RecordViewsByName;
   router: RouterState;
   user: UserState;
 }
 
 export type RouteProps = RouteComponentProps<any>; // tslint:disable-line: no-any
+
+interface ListStateAttrs {
+  isLoading: boolean;
+  page: number;
+  totalCount: number;
+  error?: Error;
+}
+
+const initialListStateAttrs: ListStateAttrs = {
+  error: undefined,
+  isLoading: true,
+  page: 1,
+  totalCount: 0,
+};
 
 export interface AuthState {
   user?: Record;
@@ -46,12 +62,8 @@ export interface RecordViewState {
   new: NewState;
 }
 
-export interface ListState {
-  isLoading: boolean;
-  page: number;
+export interface ListState extends ListStateAttrs {
   records: Record[];
-  totalCount: number;
-  error?: Error;
 }
 
 export interface ShowState {
@@ -68,11 +80,8 @@ export interface NewState {
 }
 
 export const initialListState: ListState = {
-  error: undefined,
-  isLoading: true,
-  page: 1,
+  ...initialListStateAttrs,
   records: [],
-  totalCount: 0,
 };
 
 export const initialShowState: ShowState = {
@@ -110,12 +119,8 @@ export interface PushCampaignState {
   new: NewPushCampaignState;
 }
 
-export interface PushCampaignListState {
-  isLoading: boolean;
-  page: number;
-  totalCount: number;
+export interface PushCampaignListState extends ListStateAttrs {
   pushCampaigns: PushCampaign[];
-  error?: Error;
 }
 
 export interface NewPushCampaignState {
@@ -126,11 +131,8 @@ export const initialNewPushCampaignState: NewPushCampaignState = {
 };
 
 export const initialPushCampaignListState: PushCampaignListState = {
-  error: undefined,
-  isLoading: true,
-  page: 1,
+  ...initialListStateAttrs,
   pushCampaigns: [],
-  totalCount: 0,
 };
 
 export const initialPushCampaignState: PushCampaignState = {
@@ -138,20 +140,30 @@ export const initialPushCampaignState: PushCampaignState = {
   new: initialNewPushCampaignState,
 };
 
-export interface UserState {
+export interface UserState extends ListStateAttrs {
   users: SkygearUser[];
-  isLoading: boolean;
-  page: number;
-  totalCount: number;
-  error?: Error;
 }
 
 export const initialUserState: UserState = {
-  error: undefined,
-  isLoading: true,
-  page: 1,
-  totalCount: 0,
+  ...initialListStateAttrs,
   users: [],
+};
+
+export interface FileImportState {
+  list: ImportedFileListState;
+}
+
+export interface ImportedFileListState extends ListStateAttrs {
+  files: ImportedFile[];
+}
+
+export const initialImportedFileListState: ImportedFileListState = {
+  ...initialListStateAttrs,
+  files: [],
+};
+
+export const initialFileImportState: FileImportState = {
+  list: initialImportedFileListState,
 };
 
 export function initialRootState(
@@ -166,6 +178,7 @@ export function initialRootState(
       user: user === null ? undefined : user,
     },
     cmsConfig: null,
+    fileImport: initialFileImportState,
     import: initialImportState,
     pushCampaign: initialPushCampaignState,
     recordViewsByName: {},

@@ -5,6 +5,7 @@ import { RootState } from '../states';
 
 import auth from './auth';
 import cmsConfigReducer from './cmsConfig';
+import { fileImportViewsReducer } from './fileImport';
 import importReducer from './import';
 import { pushCampaignViewsReducer } from './pushCampaign';
 import recordViewsByNameReducer from './recordFactory';
@@ -23,6 +24,7 @@ function rootReducerFactory() {
     appConfig: constReducer as Reducer<any>,
     auth: auth as Reducer<any>,
     cmsConfig: cmsConfigReducer as Reducer<any>,
+    fileImport: fileImportViewsReducer as Reducer<any>,
     import: importReducer as Reducer<any>,
     pushCampaign: pushCampaignViewsReducer as Reducer<any>,
     recordViewsByName: recordViewsByNameReducer as Reducer<any>,

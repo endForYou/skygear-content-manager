@@ -49,7 +49,7 @@ import { getCmsConfig, ImportState, RootState, RouteProps } from '../states';
 import { RemoteType, SortOrder, SortState } from '../types';
 import { debounce } from '../util';
 
-type SortButtonClickHandler = (name: string) => void;
+export type SortButtonClickHandler = (name: string) => void;
 
 export function nextSortState(
   sortState: SortState,
