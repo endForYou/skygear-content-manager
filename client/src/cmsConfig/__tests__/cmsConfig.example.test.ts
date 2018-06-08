@@ -37,6 +37,9 @@ test('parseCmsConfig should parse example config', () => {
         ],
       },
     },
+    fileImport: {
+      enabled: true,
+    },
     pushNotifications: {
       enabled: true,
       filterUserConfigs: [
@@ -1368,6 +1371,7 @@ test('parseCmsConfig should parse example config', () => {
     site: [
       { type: 'UserManagement', label: 'USER' },
       { type: 'PushNotifications', label: 'PUSH' },
+      { type: 'FileImport', label: 'FILE' },
       { type: 'Space', size: 'Medium' },
       { type: 'Record', name: 'field_demo', label: 'Field demo' },
       {

@@ -11,6 +11,7 @@ import {
   ReferenceConfig,
   ReferenceFieldConfig,
 } from './fieldConfig';
+import { FileImportConfig, parseFileImportConfig } from './fileImportConfig';
 import { FilterConfig, parseFilterConfig } from './filterConfig';
 import { parsePredicateConfig, PredicateValue } from './predicateConfig';
 import {
@@ -35,6 +36,7 @@ export interface CmsConfig {
   associationRecordByName: AssociationRecordByName;
   pushNotifications: PushNotificationsConfig;
   userManagement: UserManagementConfig;
+  fileImport: FileImportConfig;
 }
 
 export type SiteConfig = SiteItemConfig[];
@@ -42,11 +44,13 @@ export type SiteItemConfig =
   | RecordSiteItemConfig
   | UserManagementSiteItemConfig
   | PushNotificationsSiteItemConfig
+  | FileImportSiteItemConfig
   | SpaceSiteItemConfig;
 export enum SiteItemConfigTypes {
   Record = 'Record',
   UserManagement = 'UserManagement',
   PushNotifications = 'PushNotifications',
+  FileImport = 'FileImport',
   Space = 'Space',
 }
 
@@ -66,6 +70,10 @@ export interface UserManagementSiteItemConfig extends SiteItemConfigAttrs {
 
 export interface PushNotificationsSiteItemConfig extends SiteItemConfigAttrs {
   type: SiteItemConfigTypes.PushNotifications;
+}
+
+export interface FileImportSiteItemConfig extends SiteItemConfigAttrs {
+  type: SiteItemConfigTypes.FileImport;
 }
 
 export enum SpaceSizeType {
@@ -199,6 +207,7 @@ export function parseCmsConfig(input: any): CmsConfig {
     site,
     records = {},
     association_records: associationRecords,
+    file_import: fileImport,
     push_notifications: pushNotifications,
     user_management: userManagement,
   } = input;
@@ -218,6 +227,7 @@ export function parseCmsConfig(input: any): CmsConfig {
 
   return {
     associationRecordByName,
+    fileImport: parseFileImportConfig(context, fileImport),
     pushNotifications: parsePushNotificationConfig(context, pushNotifications),
     records: entriesOf(
       records
@@ -253,6 +263,8 @@ function parseSiteConfig(siteConfig: any): SiteItemConfig {
       return parseSiteUserManagementConfig(siteConfig);
     case SiteItemConfigTypes.PushNotifications:
       return parseSitePushNotificationsConfig(siteConfig);
+    case SiteItemConfigTypes.FileImport:
+      return parseSiteFileImportConfig(siteConfig);
     case SiteItemConfigTypes.Space:
       return parseSiteSpaceConfig(siteConfig);
     default:
@@ -286,6 +298,16 @@ function parseSitePushNotificationsConfig(
   const label =
     parseOptionalString(input, 'label', 'PushNotifications') ||
     'Push Notifications';
+  return { type, label };
+}
+
+function parseSiteFileImportConfig(
+  // tslint:disable-next-line: no-any
+  input: any
+): FileImportSiteItemConfig {
+  const { type } = input;
+  const label =
+    parseOptionalString(input, 'label', 'FileImport') || 'File Import';
   return { type, label };
 }
 

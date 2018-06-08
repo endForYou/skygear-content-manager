@@ -11,6 +11,9 @@ const deepCloneJSON = (o: object) => JSON.parse(JSON.stringify(o));
 
 const emptyCmsConfig = {
   associationRecordByName: {},
+  fileImport: {
+    enabled: false,
+  },
   pushNotifications: {
     enabled: false,
     filterUserConfigs: [],
