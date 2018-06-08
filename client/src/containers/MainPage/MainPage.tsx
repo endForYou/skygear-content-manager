@@ -8,6 +8,7 @@ import NotFoundPage from '../../components/NotFoundPage';
 import { getCmsConfig, RootState } from '../../states';
 
 import {
+  fileImportRoutes,
   frontPageRedirect,
   pushNotificationRoutes,
   routesFromRecordConfigs,
@@ -17,6 +18,7 @@ import {
 export interface MainPageProps {
   siteItems: SiteConfig;
   recordConfigs: RecordConfig[];
+  fileImportEnabled: boolean;
   pushNotificationEnabled: boolean;
   userManagementEnabled: boolean;
 }
@@ -26,6 +28,7 @@ class MainPage extends React.PureComponent<MainPageProps> {
   private recordRoutes: JSX.Element[];
   private pushNotificationRoutes: JSX.Element[];
   private userManagementRoutes: JSX.Element[];
+  private fileImportRoutes: JSX.Element[];
 
   constructor(props: MainPageProps) {
     super(props);
@@ -34,10 +37,15 @@ class MainPage extends React.PureComponent<MainPageProps> {
     this.recordRoutes = routesFromRecordConfigs(props.recordConfigs);
     this.pushNotificationRoutes = pushNotificationRoutes();
     this.userManagementRoutes = userManagementRoutes();
+    this.fileImportRoutes = fileImportRoutes();
   }
 
   public render() {
-    const { pushNotificationEnabled, userManagementEnabled } = this.props;
+    const {
+      fileImportEnabled,
+      pushNotificationEnabled,
+      userManagementEnabled,
+    } = this.props;
 
     return (
       <Layout>
@@ -46,6 +54,7 @@ class MainPage extends React.PureComponent<MainPageProps> {
           {this.recordRoutes}
           {pushNotificationEnabled && this.pushNotificationRoutes}
           {userManagementEnabled && this.userManagementRoutes}
+          {fileImportEnabled && this.fileImportRoutes}
 
           <Route component={NotFoundPage} />
         </Switch>
@@ -57,6 +66,7 @@ class MainPage extends React.PureComponent<MainPageProps> {
 function mapStateToProps(state: RootState): MainPageProps {
   const cmsConfig = getCmsConfig(state);
   return {
+    fileImportEnabled: cmsConfig.fileImport.enabled,
     pushNotificationEnabled: cmsConfig.pushNotifications.enabled,
     recordConfigs: Object.values(cmsConfig.records)
       .filter(recordConfig => recordConfig !== undefined)
