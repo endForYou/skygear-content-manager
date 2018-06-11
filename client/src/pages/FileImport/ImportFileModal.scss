@@ -1,0 +1,32 @@
+@import 'styleUtils/common.scss';
+
+.file-import-modal {
+  .file-dropzone {
+    height: to-rem(200px);
+    background-color: rgba(#EEE, 0.3);
+    margin-top: to-rem(15px);
+    overflow-y: auto;
+  }
+
+  .file-empty {
+    padding: to-rem(15px);
+  }
+
+  .file-item {
+    display: flex;
+    flex-direction: row;
+    padding: to-rem(15px) to-rem(15px);
+
+    &:hover {
+      background-color: rgba(#EEE, 0.1);
+    }
+  }
+
+  .file-name {
+    flex: 1;
+  }
+
+  .file-remove {
+    cursor: pointer;
+  }
+}

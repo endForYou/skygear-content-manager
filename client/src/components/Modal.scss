@@ -39,4 +39,8 @@
     font-size: to-rem(14px);
     padding: to-rem(4px) to-rem(12px);
   }
+
+  .modal-body {
+    position: relative;
+  }
 }
