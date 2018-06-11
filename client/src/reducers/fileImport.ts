@@ -65,6 +65,8 @@ function fileImportReducer(
     case FileImportActionTypes.ImportFilesSuccess:
       return {
         ...state,
+        fileNames: [],
+        filesByName: {},
         importing: false,
       };
     case FileImportActionTypes.ImportFilesFailure:
