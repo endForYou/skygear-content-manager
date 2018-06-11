@@ -77,7 +77,7 @@ class ImportFileModalImpl extends React.PureComponent<Props> {
   }
 
   public render() {
-    const { show, importing } = this.props;
+    const { fileNames, show, importing } = this.props;
 
     return (
       <Modal
@@ -90,7 +90,7 @@ class ImportFileModalImpl extends React.PureComponent<Props> {
             key="import"
             role="button"
             className="modal-button-primary"
-            disabled={importing}
+            disabled={importing || fileNames.length === 0}
             onClick={this.onImportClick}
           >
             Import
