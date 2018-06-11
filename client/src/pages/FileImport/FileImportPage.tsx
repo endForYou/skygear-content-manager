@@ -210,8 +210,9 @@ class FileImportPage extends React.Component<FileImportPageProps, State> {
     return (
       <div className="file-import">
         <ImportFileModal
+          actionDispatcher={this.actionCreator}
           show={showImportModal}
-          onDismiss={() => this.setState({ showImportModal: false })}
+          onDismiss={this.onImportModalDismiss}
         />
         <div className="topbar">
           <div className="title">File Import</div>
@@ -317,6 +318,13 @@ class FileImportPage extends React.Component<FileImportPageProps, State> {
   private reloadList = (props: FileImportPageProps) => {
     const { filters, page, sortState } = props;
     this.fetchList(page, ImportedFileListPerPageCount, filters, sortState);
+  };
+
+  private onImportModalDismiss = (didImportSuccess: boolean) => {
+    this.setState({ showImportModal: false });
+    if (didImportSuccess) {
+      this.reloadList(this.props);
+    }
   };
 }
 

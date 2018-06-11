@@ -4,7 +4,9 @@ import { FileImportActionTypes } from '../actions/fileImport';
 import {
   FileImportState,
   ImportedFileListState,
+  ImportFileState,
   initialImportedFileListState,
+  initialImportFileState,
 } from '../states';
 import { ImportedFile } from '../types/importedFile';
 
@@ -12,6 +14,7 @@ import { ImportedFile } from '../types/importedFile';
 // See https://github.com/reactjs/redux/issues/2709
 // tslint:disable: no-any
 export const fileImportViewsReducer = combineReducers<FileImportState>({
+  import: fileImportReducer as Reducer<any>,
   list: importedFileListReducer as Reducer<any>,
 });
 // tslint:enable: no-any
@@ -33,6 +36,83 @@ function importedFileListReducer(
       };
     case FileImportActionTypes.FetchListFailure:
       return { ...state, isLoading: false, error: action.payload.error };
+    default:
+      return state;
+  }
+}
+
+function fileImportReducer(
+  state: ImportFileState = initialImportFileState,
+  action: Actions
+): ImportFileState {
+  switch (action.type) {
+    case FileImportActionTypes.ImportFilesRequest:
+      return {
+        ...state,
+        importError: undefined,
+        importing: true,
+        uploadingFileNames: [...state.fileNames],
+      };
+    case FileImportActionTypes.UploadFileSuccess:
+      return {
+        ...state,
+        uploadingFileNames: state.uploadingFileNames.filter(
+          name => name !== action.payload.name
+        ),
+      };
+    case FileImportActionTypes.UploadFileFailure:
+      return state;
+    case FileImportActionTypes.ImportFilesSuccess:
+      return {
+        ...state,
+        importing: false,
+      };
+    case FileImportActionTypes.ImportFilesFailure:
+      return {
+        ...state,
+        importError: action.payload.error,
+        importing: false,
+      };
+    case FileImportActionTypes.ImportAddFiles: {
+      const files = action.payload.files;
+      const { fileNames, filesByName } = state;
+      const filesToAdd = files.filter(
+        f => !!!fileNames.find(n => n === f.name)
+      );
+      return {
+        ...state,
+        fileNames: [...fileNames, ...filesToAdd.map(f => f.name)],
+        filesByName: files.reduce(
+          (acc, file) => ({
+            ...acc,
+            [file.name]: file,
+          }),
+          filesByName
+        ),
+      };
+    }
+    case FileImportActionTypes.ImportRemoveFile: {
+      const file = action.payload.file;
+      const { fileNames, filesByName } = state;
+      if (filesByName[file.name] == null) {
+        return state;
+      }
+
+      return {
+        ...state,
+        fileNames: fileNames.filter(name => name !== file.name),
+        filesByName: {
+          ...filesByName,
+          [file.name]: undefined,
+        },
+      };
+    }
+    case FileImportActionTypes.ImportRemoveAllFiles:
+      return {
+        ...state,
+        fileNames: [],
+        filesByName: {},
+      };
     default:
       return state;
   }

@@ -2,30 +2,82 @@ import './ImportFileModal.scss';
 
 import * as React from 'react';
 import Dropzone, { DropFileEventHandler } from 'react-dropzone';
+import { connect } from 'react-redux';
 
+import { FileImportActionDispatcher } from '../../actions/fileImport';
+import { LoadingSpinner } from '../../components/LoadingSpinner';
 import { Modal } from '../../components/Modal';
+import { PrimaryButton } from '../../components/PrimaryButton';
+import { errorMessageFromError } from '../../recordUtil';
+import { ImportFileState, RootState } from '../../states';
 
-interface Props {
+interface ImportFileModalProps {
   show: boolean;
-  onDismiss: () => void;
+  onDismiss: (didImportSuccess: boolean) => void;
+  actionDispatcher: FileImportActionDispatcher;
 }
 
-interface State {
-  files: File[];
+type StateProps = ImportFileState;
+
+type Props = ImportFileModalProps & StateProps;
+
+interface FileItemProps {
+  file: File;
+  isUploading: boolean;
+  canRemove: boolean;
+  onRemoveClick: (file: File) => void;
 }
 
-export class ImportFileModal extends React.PureComponent<Props, State> {
+const FileItem: React.SFC<FileItemProps> = ({
+  canRemove,
+  file,
+  isUploading,
+  onRemoveClick,
+}) => {
+  return (
+    <div className="file-item" onClick={evt => evt.stopPropagation()}>
+      <div className="file-name">{file.name}</div>
+      {isUploading && <LoadingSpinner />}
+      {canRemove && (
+        <button
+          type="button"
+          className="file-remove close"
+          aria-label="Close"
+          onClick={evt => {
+            evt.stopPropagation();
+            onRemoveClick(file);
+          }}
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      )}
+    </div>
+  );
+};
+
+class ImportFileModalImpl extends React.PureComponent<Props> {
   private fileInput: HTMLInputElement | null = null;
 
   constructor(props: Props) {
     super(props);
     this.state = {
-      files: [],
+      fileNames: [],
+      filesByName: {},
     };
   }
 
+  public componentWillReceiveProps(nextProps: Props) {
+    const didImportSuccess =
+      !nextProps.importing &&
+      this.props.importing &&
+      nextProps.importError == null;
+    if (didImportSuccess) {
+      this.props.onDismiss(true);
+    }
+  }
+
   public render() {
-    const { show } = this.props;
+    const { show, importing } = this.props;
 
     return (
       <Modal
@@ -34,82 +86,106 @@ export class ImportFileModal extends React.PureComponent<Props, State> {
         onDismiss={this.onDismiss}
         body={this.renderBody}
         footer={() => [
-          <a
+          <PrimaryButton
             key="import"
-            href="#"
             role="button"
-            className="modal-button-primary primary-button"
+            className="modal-button-primary"
+            disabled={importing}
             onClick={this.onImportClick}
           >
             Import
-          </a>,
-          <a
+          </PrimaryButton>,
+          <button
             key="cancel"
-            href="#"
             role="button"
             className="modal-button-secondary"
+            disabled={importing}
             onClick={this.onDismiss}
           >
             Cancel
-          </a>,
+          </button>,
         ]}
       />
     );
   }
 
   private renderBody = () => {
-    const { files } = this.state;
+    const { fileNames, importing, uploadingFileNames } = this.props;
 
     return (
       <div className="file-import-modal">
-        <button type="button" className="" onClick={this.removeAllFiles}>
+        <button
+          type="button"
+          className=""
+          disabled={importing}
+          onClick={this.removeAllFiles}
+        >
           Clear all
         </button>
         <input
           ref={ref => (this.fileInput = ref)}
           type="file"
+          disabled={importing}
           onChange={this.onFileInputChange}
         />
         <Dropzone
           className="file-dropzone"
+          disabled={importing}
           disablePreview={true}
           // TODO: allow customization
           // accept="*"
           multiple={true}
           onDropAccepted={this.onDropAccepted}
         >
-          {files.length === 0 && <div className="file-empty">Empty files.</div>}
+          {fileNames.length === 0 && (
+            <div className="file-empty">Empty files.</div>
+          )}
           <div className="file-list">
-            {files.map((f, index) => (
-              <div
+            {this.files.map((file, index) => (
+              <FileItem
                 key={index}
-                className="file-item"
-                onClick={evt => evt.stopPropagation()}
-              >
-                <div className="file-name">{f.name}</div>
-                <button
-                  type="button"
-                  className="file-remove close"
-                  aria-label="Close"
-                  onClick={evt => {
-                    evt.stopPropagation();
-                    this.removeFile(f);
-                  }}
-                >
-                  <span aria-hidden="true">&times;</span>
-                </button>
-              </div>
+                file={file}
+                isUploading={!!uploadingFileNames.find(n => n === file.name)}
+                canRemove={!importing}
+                onRemoveClick={this.removeFile}
+              />
             ))}
           </div>
         </Dropzone>
+        {this.renderErrorMessage()}
       </div>
     );
   };
 
+  private renderErrorMessage = () => {
+    const { importError } = this.props;
+
+    if (importError == null) {
+      return null;
+    }
+
+    const errorDescription = errorMessageFromError(importError);
+    return (
+      <div className="alert alert-danger" role="alert">
+        Failed to import: {errorDescription}
+      </div>
+    );
+  };
+
+  private get files() {
+    return this.props.fileNames
+      .map(f => this.props.filesByName[f])
+      .filter(f => f != null) as File[];
+  }
+
   private onDismiss = () => {
-    const { onDismiss } = this.props;
+    const { importing, onDismiss } = this.props;
+    if (importing) {
+      return;
+    }
+
     this.removeAllFiles();
-    onDismiss();
+    onDismiss(false);
   };
 
   private onDropAccepted: DropFileEventHandler = (accepted: File[]) => {
@@ -138,29 +214,28 @@ export class ImportFileModal extends React.PureComponent<Props, State> {
   };
 
   private addFiles = (files: File[]) => {
-    this.setState({
-      files: [...this.state.files, ...files],
-    });
+    this.props.actionDispatcher.addFiles(files);
   };
 
   private removeFile = (file: File) => {
-    const filesToRemove = this.state.files.filter(f => f.name === file.name);
-    if (filesToRemove.length === 0) {
-      return;
-    }
-
-    this.setState({
-      files: this.state.files.filter(f => f.name !== file.name),
-    });
+    this.props.actionDispatcher.removeFile(file);
   };
 
   private removeAllFiles = () => {
-    this.setState({
-      files: [],
-    });
+    this.props.actionDispatcher.removeAllFile();
   };
 
   private onImportClick = () => {
-    console.log('import click');
+    const { fileNames, filesByName } = this.props;
+    const files = fileNames
+      .map(n => filesByName[n])
+      .filter(f => f != null) as File[];
+    this.props.actionDispatcher.importFiles(files);
   };
 }
+
+const mapStateToProps = (state: RootState): StateProps => {
+  return state.fileImport.import;
+};
+
+export const ImportFileModal = connect(mapStateToProps)(ImportFileModalImpl);

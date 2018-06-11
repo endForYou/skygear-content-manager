@@ -151,10 +151,19 @@ export const initialUserState: UserState = {
 
 export interface FileImportState {
   list: ImportedFileListState;
+  import: ImportFileState;
 }
 
 export interface ImportedFileListState extends ListStateAttrs {
   files: ImportedFile[];
+}
+
+export interface ImportFileState {
+  fileNames: string[];
+  filesByName: { [key: string]: File | undefined };
+  importing: boolean;
+  importError?: Error;
+  uploadingFileNames: string[];
 }
 
 export const initialImportedFileListState: ImportedFileListState = {
@@ -162,7 +171,15 @@ export const initialImportedFileListState: ImportedFileListState = {
   files: [],
 };
 
+export const initialImportFileState: ImportFileState = {
+  fileNames: [],
+  filesByName: {},
+  importing: false,
+  uploadingFileNames: [],
+};
+
 export const initialFileImportState: FileImportState = {
+  import: initialImportFileState,
   list: initialImportedFileListState,
 };
 

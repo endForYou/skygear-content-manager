@@ -1,6 +1,6 @@
 import { Dispatch } from 'redux';
 import { ThunkAction } from 'redux-thunk';
-import skygear from 'skygear';
+import skygear, { Asset, DatabaseContainer } from 'skygear';
 
 import { Filter } from '../cmsConfig';
 import { RootState } from '../states';
@@ -9,17 +9,38 @@ import { deserializeImportedFile, ImportedFile } from '../types/importedFile';
 export type FileImportActions =
   | FetchImportedFileListRequest
   | FetchImportedFileListSuccess
-  | FetchImportedFileListFailure;
+  | FetchImportedFileListFailure
+  | ImportFilesRequest
+  | UploadFileSuccess
+  | UploadFileFailure
+  | ImportFilesSuccess
+  | ImportFilesFailure
+  | ImportAddFiles
+  | ImportRemoveFile
+  | ImportRemoveAllFiles;
 
 export enum FileImportActionTypes {
   FetchListRequest = 'FETCH_IMPORTED_FILE_LIST_REQUEST',
   FetchListSuccess = 'FETCH_IMPORTED_FILE_LIST_SUCCESS',
   FetchListFailure = 'FETCH_IMPORTED_FILE_LIST_FAILURE',
+  ImportFilesRequest = 'IMPORT_FILES_REQUEST',
+  UploadFileSuccess = 'UPLOAD_FILE_SUCCESS',
+  UploadFileFailure = 'UPLOAD_FILE_FAILURE',
+  ImportFilesSuccess = 'IMPORT_FILES_SUCCESS',
+  ImportFilesFailure = 'IMPORT_FILES_FAILURE',
+  ImportAddFiles = 'IMPORT_ADD_FILES',
+  ImportRemoveFile = 'IMPORT_REMOVE_FILE',
+  ImportRemoveAllFiles = 'IMPORT_REMOVE_ALL_FILES',
 }
 
 interface ImportedFileQueryResult {
   files: ImportedFile[];
   overallCount: number;
+}
+
+interface CreateImportedFileRequestData {
+  id: string; // file path / name
+  asset: string; // asset id
 }
 
 export interface FetchImportedFileListRequest {
@@ -46,6 +67,69 @@ export interface FetchImportedFileListFailure {
     error: Error;
   };
   type: FileImportActionTypes.FetchListFailure;
+  context: undefined;
+}
+
+export interface ImportFilesRequest {
+  payload: {
+    files: File[];
+  };
+  type: FileImportActionTypes.ImportFilesRequest;
+  context: undefined;
+}
+
+export interface UploadFileSuccess {
+  payload: {
+    name: string;
+  };
+  type: FileImportActionTypes.UploadFileSuccess;
+  context: undefined;
+}
+
+export interface UploadFileFailure {
+  payload: {
+    name: string;
+    error: Error;
+  };
+  type: FileImportActionTypes.UploadFileFailure;
+  context: undefined;
+}
+
+export interface ImportFilesSuccess {
+  payload: {
+    files: File[];
+  };
+  type: FileImportActionTypes.ImportFilesSuccess;
+  context: undefined;
+}
+
+export interface ImportFilesFailure {
+  payload: {
+    error: Error;
+  };
+  type: FileImportActionTypes.ImportFilesFailure;
+  context: undefined;
+}
+
+export interface ImportAddFiles {
+  payload: {
+    files: File[];
+  };
+  type: FileImportActionTypes.ImportAddFiles;
+  context: undefined;
+}
+
+export interface ImportRemoveFile {
+  payload: {
+    file: File;
+  };
+  type: FileImportActionTypes.ImportRemoveFile;
+  context: undefined;
+}
+
+export interface ImportRemoveAllFiles {
+  payload: undefined;
+  type: FileImportActionTypes.ImportRemoveAllFiles;
   context: undefined;
 }
 
@@ -87,6 +171,70 @@ function fetchImportedFileListFailure(
       error,
     },
     type: FileImportActionTypes.FetchListFailure,
+  };
+}
+
+function importFilesRequest(files: File[]): ImportFilesRequest {
+  return {
+    context: undefined,
+    payload: { files },
+    type: FileImportActionTypes.ImportFilesRequest,
+  };
+}
+
+function uploadFileSuccess(name: string): UploadFileSuccess {
+  return {
+    context: undefined,
+    payload: { name },
+    type: FileImportActionTypes.UploadFileSuccess,
+  };
+}
+
+function uploadFileFailure(name: string, error: Error): UploadFileFailure {
+  return {
+    context: undefined,
+    payload: { name, error },
+    type: FileImportActionTypes.UploadFileFailure,
+  };
+}
+
+function importFilesSuccess(files: File[]): ImportFilesSuccess {
+  return {
+    context: undefined,
+    payload: { files },
+    type: FileImportActionTypes.ImportFilesSuccess,
+  };
+}
+
+function importFilesFailure(error: Error): ImportFilesFailure {
+  return {
+    context: undefined,
+    payload: { error },
+    type: FileImportActionTypes.ImportFilesFailure,
+  };
+}
+
+function importAddFiles(files: File[]): ImportAddFiles {
+  return {
+    context: undefined,
+    payload: { files },
+    type: FileImportActionTypes.ImportAddFiles,
+  };
+}
+
+function importRemoveFile(file: File): ImportRemoveFile {
+  return {
+    context: undefined,
+    payload: { file },
+    type: FileImportActionTypes.ImportRemoveFile,
+  };
+}
+
+function importRemoveAllFiles(): ImportRemoveAllFiles {
+  return {
+    context: undefined,
+    payload: undefined,
+    type: FileImportActionTypes.ImportRemoveAllFiles,
   };
 }
 
@@ -135,6 +283,46 @@ function fetchImportedFiles(
   };
 }
 
+function uploadFilesImpl(file: File): Promise<Asset> {
+  const dbContainer = new DatabaseContainer(skygear);
+  return dbContainer.uploadAsset(new Asset({ name: file.name, file }));
+}
+
+function createImportedFilesImpl(
+  data: CreateImportedFileRequestData[]
+): Promise<void> {
+  return skygear.lambda('imported_file:create', { importedFiles: data });
+}
+
+function importFiles(files: File[]): ThunkAction<Promise<void>, {}, {}> {
+  return dispatch => {
+    dispatch(importFilesRequest(files));
+
+    const uploadFilesPromise = files.map(file => {
+      return uploadFilesImpl(file)
+        .then(asset => {
+          dispatch(uploadFileSuccess(file.name));
+          return { id: file.name, asset: asset.name };
+        })
+        .catch(error => {
+          dispatch(uploadFileFailure(file.name, error));
+          throw error;
+        });
+    });
+
+    return Promise.all(uploadFilesPromise)
+      .then((data: CreateImportedFileRequestData[]) => {
+        return createImportedFilesImpl(data);
+      })
+      .then(() => {
+        dispatch(importFilesSuccess(files));
+      })
+      .catch(error => {
+        dispatch(importFilesFailure(error));
+      });
+  };
+}
+
 export class FileImportActionDispatcher {
   private dispatch: Dispatch<RootState>;
 
@@ -152,5 +340,21 @@ export class FileImportActionDispatcher {
     this.dispatch(
       fetchImportedFiles(page, perPage, filters, sortByName, isAscending)
     );
+  }
+
+  public addFiles(files: File[]) {
+    this.dispatch(importAddFiles(files));
+  }
+
+  public removeFile(file: File) {
+    this.dispatch(importRemoveFile(file));
+  }
+
+  public removeAllFile() {
+    this.dispatch(importRemoveAllFiles());
+  }
+
+  public importFiles(files: File[]) {
+    this.dispatch(importFiles(files));
   }
 }

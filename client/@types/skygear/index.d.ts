@@ -140,6 +140,12 @@ declare module 'skygear' {
     public lambda(action: string, params: AnyValue): Promise<AnyValue>;
   }
 
+  export class DatabaseContainer {
+    constructor(container: Container);
+
+    public uploadAsset(asset: Asset): Promise<Asset>;
+  }
+
   export class AuthContainer {
     public currentUser: Record | undefined;
     public accessToken: string | undefined;
