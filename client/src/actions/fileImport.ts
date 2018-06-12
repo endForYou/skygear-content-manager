@@ -299,7 +299,8 @@ function importFiles(files: File[]): ThunkAction<Promise<void>, {}, {}> {
     dispatch(importFilesRequest(files));
 
     const uploadFilesPromise = files.map(file => {
-      return uploadFilesImpl(file)
+      return Promise.resolve()
+        .then(() => uploadFilesImpl(file))
         .then(asset => {
           dispatch(uploadFileSuccess(file.name));
           return { id: file.name, asset: asset.name };

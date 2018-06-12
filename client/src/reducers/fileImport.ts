@@ -74,6 +74,7 @@ function fileImportReducer(
         ...state,
         importError: action.payload.error,
         importing: false,
+        uploadingFileNames: [],
       };
     case FileImportActionTypes.ImportAddFiles: {
       const files = action.payload.files;
