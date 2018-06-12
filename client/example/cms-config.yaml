@@ -17,6 +17,13 @@ imports:
       - name: reference
         reference_target: ref_demo
         reference_field_name: name
+  import-asset-demo:
+    record_type: field_demo
+    identifier: name
+    fields:
+      - name: name
+        label: Name
+      - name: imageasset
 
 exports:
   export-field-demo:
@@ -89,6 +96,9 @@ records:
         - type: Import
           name: import-field-demo
           label: Import records
+        - type: Import
+          name: import-asset-demo
+          label: Import with asset
         - type: Export
           name: export-field-demo
           label: Export records

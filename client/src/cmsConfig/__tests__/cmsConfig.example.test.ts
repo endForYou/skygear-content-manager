@@ -286,6 +286,11 @@ test('parseCmsConfig should parse example config', () => {
               type: 'Import',
             },
             {
+              label: 'Import with asset',
+              name: 'import-asset-demo',
+              type: 'Import',
+            },
+            {
               label: 'Export records',
               name: 'export-field-demo',
               type: 'Export',

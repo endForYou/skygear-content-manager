@@ -2,9 +2,11 @@ import csv
 import uuid
 
 from .csv_deserializer import RecordDeserializer
+from ..db_session import scoped_session
 from ..skygear_utils import (save_records, fetch_records, eq_predicate,
                              or_predicate)
 from ..models.cms_config import CMSRecordImport
+from ..models.imported_file import CmsImportedFile
 
 
 class RecordIdentifierMap:
@@ -101,6 +103,7 @@ def prepare_import_records(stream, import_config):
 
     data_list = populate_record_id(data_list, import_config, identifier_map)
     data_list = populate_record_reference(data_list, import_config, identifier_map)
+    data_list = inject_asset(data_list, import_config)
 
     deserializer = RecordDeserializer(import_config.fields)
     records = deserialize_record_data(data_list, deserializer)
@@ -289,3 +292,38 @@ def fetch_records_by_values_in_key(record_type, key, values):
     value_predicates = [eq_predicate(key, v) for v in values]
     predicate = or_predicate(value_predicates)
     return fetch_records(record_type, predicate)
+
+
+def inject_asset(data_list, import_config):
+    asset_fields = [f for f in import_config.fields if f.type == 'asset']
+    files = find_files_in_record_data(data_list, asset_fields)
+    with scoped_session() as session:
+        file_assets = session.query(CmsImportedFile) \
+            .filter(CmsImportedFile.id.in_(files)) \
+            .all()
+        file_assets = {fa.id: fa.asset for fa in file_assets}
+        return replace_assets_in_record_data(data_list, asset_fields, file_assets)
+
+
+def find_files_in_record_data(data_list, fields):
+    file_ids = set()
+    for data in data_list:
+        for field in fields:
+            file_ids.add(data[field.name])
+
+    return file_ids
+
+
+def replace_assets_in_record_data(data_list, fields, file_assets):
+    for data in data_list:
+        for field in fields:
+            file_id = data[field.name]
+            asset = file_assets.get(file_id)
+
+            value = None
+            if asset != None:
+                value = asset.id
+
+            data[field.name] = value
+
+    return data_list
