@@ -239,6 +239,19 @@ function importRemoveAllFiles(): ImportRemoveAllFiles {
   };
 }
 
+function getSortByName(name: string | undefined): string | undefined {
+  switch (name) {
+    case 'name':
+      return 'id';
+    case 'uploadedAt':
+      return 'uploaded_at';
+    case 'size':
+      return 'size';
+    default:
+      return undefined;
+  }
+}
+
 function fetchImportedFilesImpl(
   page: number = 1,
   perPage: number = 25,
@@ -246,8 +259,14 @@ function fetchImportedFilesImpl(
   sortByName: string | undefined,
   isAscending: boolean
 ): Promise<ImportedFileQueryResult> {
-  // TODO: handle filter and sort
-  return skygear.lambda('imported_file:get_all', { page, perPage }).then(
+  // TODO: handle filter
+  const params = {
+    isAscending,
+    page,
+    perPage,
+    sortByName: getSortByName(sortByName),
+  };
+  return skygear.lambda('imported_file:get_all', params).then(
     // tslint:disable-next-line: no-any
     (queryResult: any) => {
       return {

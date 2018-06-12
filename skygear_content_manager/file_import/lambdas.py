@@ -4,6 +4,7 @@ from sqlalchemy.exc import IntegrityError
 from marshmallow import Schema, fields
 from skygear.asset import get_signer
 
+from ..models.asset import Asset
 from ..models.imported_file import CmsImportedFile
 
 from ..db_session import scoped_session
@@ -36,9 +37,13 @@ def register_lambda(settings):
         validate_master_user()
         page_size = kwargs.get('perPage', PAGE_SIZE)
         page = kwargs.get('page', PAGE)
+        is_ascending = kwargs.get('isAscending', False)
+        sort_by_name = kwargs.get('sortByName', 'uploaded_at')
         with scoped_session() as session:
             total_count = session.query(CmsImportedFile).count()
             query = session.query(CmsImportedFile) \
+                .join(CmsImportedFile.asset) \
+                .order_by(get_order_by(sort_by_name, is_ascending)) \
                 .limit(page_size) \
                 .offset(page_size * (page - 1))
             result = query.all()
@@ -73,6 +78,20 @@ def register_lambda(settings):
             files = CmsImportedFileSchema(many=True).dump(imported_files).data
             inject_signed_url(files)
             return {'importedFiles': files}
+
+
+def get_order_by(name, is_ascending):
+    col = None
+    if name == 'id':
+        col = CmsImportedFile.id
+    elif name == 'uploaded_at':
+        col = CmsImportedFile.uploaded_at
+    elif name == 'size':
+        col = Asset.size
+    else:
+        raise Exception('Field name is not sortable: {}'.format(name))
+
+    return col.asc() if is_ascending else col.desc()
 
 
 def inject_signed_url(files):
