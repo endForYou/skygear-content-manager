@@ -114,8 +114,8 @@ export class FilterList extends React.PureComponent<FilterListProps> {
       >
         <option value={StringFilterQueryType.EqualTo}>Equal to</option>
         <option value={StringFilterQueryType.NotEqualTo}>Not equal to</option>
-        <option value={StringFilterQueryType.Like}>Like</option>
-        <option value={StringFilterQueryType.NotLike}>Not like</option>
+        <option value={StringFilterQueryType.Contain}>Contain</option>
+        <option value={StringFilterQueryType.NotContain}>Not contain</option>
         {this.renderNullFilterSelect(filter)}
       </ReactSelectWrapper>
     );
