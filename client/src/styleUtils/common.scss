@@ -144,7 +144,7 @@ $input-horizontal-padding: to-rem(16px);
 }
 
 @mixin record-list-content {
-  margin-bottom: to-rem(38px);
+  margin-bottom: to-rem(15px);
   background-color: white;
   overflow-x: auto;
   flex-grow: 1;
@@ -157,8 +157,8 @@ $input-horizontal-padding: to-rem(16px);
 }
 
 @mixin pagination-position {
-  margin-right: to-rem(42px);
-  margin-bottom: to-rem(38px);
+  margin-right: $horizontal-spacing;
+  margin-bottom: to-rem(15px);
   align-self: flex-end;
   flex-shrink: 0;
 }
