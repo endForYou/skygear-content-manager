@@ -99,12 +99,20 @@ $input-horizontal-padding: to-rem(16px);
   }
 }
 
+@mixin record-list-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
 @mixin record-topbar($horizontal-spacing) {
   display: flex;
   justify-content: space-between;
   width: 100%;
   padding: to-rem(19px) $horizontal-spacing;
   background-color: white;
+  margin-bottom: to-rem(30px);
+  flex-shrink: 0;
 }
 
 @mixin record-topbar-title {
@@ -135,12 +143,22 @@ $input-horizontal-padding: to-rem(16px);
   justify-content: flex-end;
 }
 
+@mixin record-list-content {
+  margin-bottom: to-rem(15px);
+  background-color: white;
+  overflow-x: auto;
+  flex-grow: 1;
+  flex-shrink: 1;
+}
+
 @mixin record-form {
   padding: to-rem(32px);
   background-color: white;
 }
 
 @mixin pagination-position {
-  float: right;
-  margin-right: to-rem(42px);
+  margin-right: $horizontal-spacing;
+  margin-bottom: to-rem(15px);
+  align-self: flex-end;
+  flex-shrink: 0;
 }
