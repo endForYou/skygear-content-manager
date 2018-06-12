@@ -1,3 +1,4 @@
+import mime from 'mime-types';
 import { Dispatch } from 'redux';
 import { ThunkAction } from 'redux-thunk';
 import skygear, { Asset, DatabaseContainer } from 'skygear';
@@ -283,9 +284,28 @@ function fetchImportedFiles(
   };
 }
 
+function getContentType(
+  file: File,
+  defaultType: string = 'application/octet-stream'
+): string {
+  if (file.type) {
+    return file.type;
+  }
+
+  const result = mime.lookup(file.name);
+  if (typeof result === 'string') {
+    return result;
+  }
+
+  return defaultType;
+}
+
 function uploadFilesImpl(file: File): Promise<Asset> {
   const dbContainer = new DatabaseContainer(skygear);
-  return dbContainer.uploadAsset(new Asset({ name: file.name, file }));
+
+  return dbContainer.uploadAsset(
+    new Asset({ contentType: getContentType(file), name: file.name, file })
+  );
 }
 
 function createImportedFilesImpl(
