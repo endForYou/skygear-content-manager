@@ -3,9 +3,10 @@ import { Dispatch } from 'redux';
 import { ThunkAction } from 'redux-thunk';
 import skygear, { Asset, DatabaseContainer } from 'skygear';
 
-import { Filter } from '../cmsConfig';
+import { Filter, StringFilterQueryType } from '../cmsConfig';
 import { RootState } from '../states';
 import { deserializeImportedFile, ImportedFile } from '../types/importedFile';
+import { wrapValueForLike } from './record';
 
 export type FileImportActions =
   | FetchImportedFileListRequest
@@ -269,7 +270,11 @@ function getImportedFileFilter(filters: any[]): ImportedFileFilter[] {
 
     const name = nameMap[filter.name];
     const query = filter.query;
-    const value = filter.value;
+    const value =
+      query === StringFilterQueryType.Contain ||
+      query === StringFilterQueryType.NotContain
+        ? wrapValueForLike(filter.value)
+        : filter.value;
 
     if (name == null || query == null) {
       throw new Error(`Unexpected imported file list filter, name: ${name}`);

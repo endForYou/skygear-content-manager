@@ -101,10 +101,10 @@ def get_filter_func(name, query, value):
         return col == value
     elif query == 'NotEqualTo':
         return col != value
-    elif query == 'Like':
-        return col.like(value)
-    elif query == 'NotLike':
-        return not_(col.like(value))
+    elif query == 'Contain':
+        return col.ilike(value)
+    elif query == 'NotContain':
+        return not_(col.ilike(value))
     elif query == 'Before' or query == 'LessThan':
         return col < value
     elif query == 'After' or query == 'GreaterThan':
