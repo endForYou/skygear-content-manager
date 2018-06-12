@@ -96,18 +96,21 @@ function fileImportReducer(
     }
     case FileImportActionTypes.ImportRemoveFile: {
       const file = action.payload.file;
-      const { fileNames, filesByName } = state;
+      const { fileNames, filesByName, importError } = state;
       if (filesByName[file.name] == null) {
         return state;
       }
 
+      const newFileNames = fileNames.filter(name => name !== file.name);
+
       return {
         ...state,
-        fileNames: fileNames.filter(name => name !== file.name),
+        fileNames: newFileNames,
         filesByName: {
           ...filesByName,
           [file.name]: undefined,
         },
+        importError: newFileNames.length === 0 ? undefined : importError,
       };
     }
     case FileImportActionTypes.ImportRemoveAllFiles:
@@ -115,6 +118,7 @@ function fileImportReducer(
         ...state,
         fileNames: [],
         filesByName: {},
+        importError: undefined,
       };
     default:
       return state;
