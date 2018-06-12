@@ -28,7 +28,7 @@ from .settings import (CMS_USER_PERMITTED_ROLE, CMS_SKYGEAR_ENDPOINT,
                        CMS_SKYGEAR_API_KEY, CMS_PUBLIC_URL, CMS_STATIC_URL,
                        CMS_SITE_TITLE, CMS_CONFIG_FILE_URL,
                        CMS_THEME_PRIMARY_COLOR, CMS_THEME_SIDEBAR_COLOR,
-                       CMS_THEME_LOGO)
+                       CMS_THEME_LOGO, CLIENT_SKYGEAR_ENDPOINT)
 from .skygear_utils import (SkygearRequest, SkygearResponse, AuthData,
                             request_skygear, get_schema, save_records,
                             fetch_records, eq_predicate)
@@ -247,8 +247,10 @@ def intercept_asset_put(req):
     if not action_url.startswith('/'):
         return resp
 
+    endpoint = CLIENT_SKYGEAR_ENDPOINT or options.skygear_endpoint
+
     resp.body.data['result']['post-request']['action'] = \
-        options.skygear_endpoint + action_url[1:]
+        endpoint + action_url[1:]
 
     return resp
 
