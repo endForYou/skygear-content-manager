@@ -252,6 +252,37 @@ function getSortByName(name: string | undefined): string | undefined {
   }
 }
 
+interface ImportedFileFilter {
+  name: string;
+  query: string;
+  value: string;
+}
+
+// tslint:disable-next-line:no-any
+function getImportedFileFilter(filters: any[]): ImportedFileFilter[] {
+  return filters.map(filter => {
+    const nameMap = {
+      name: 'id',
+      size: 'size',
+      uploadedAt: 'uploaded_at',
+    };
+
+    const name = nameMap[filter.name];
+    const query = filter.query;
+    const value = filter.value;
+
+    if (name == null || query == null) {
+      throw new Error(`Unexpected imported file list filter, name: ${name}`);
+    }
+
+    return {
+      name,
+      query,
+      value,
+    };
+  });
+}
+
 function fetchImportedFilesImpl(
   page: number = 1,
   perPage: number = 25,
@@ -259,8 +290,8 @@ function fetchImportedFilesImpl(
   sortByName: string | undefined,
   isAscending: boolean
 ): Promise<ImportedFileQueryResult> {
-  // TODO: handle filter
   const params = {
+    filter: getImportedFileFilter(filters),
     isAscending,
     page,
     perPage,

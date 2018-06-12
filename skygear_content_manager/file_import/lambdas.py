@@ -1,4 +1,5 @@
 import skygear
+from sqlalchemy import not_
 from sqlalchemy.exc import IntegrityError
 
 from marshmallow import Schema, fields
@@ -39,11 +40,14 @@ def register_lambda(settings):
         page = kwargs.get('page', PAGE)
         is_ascending = kwargs.get('isAscending', False)
         sort_by_name = kwargs.get('sortByName', 'uploaded_at')
+        filter = kwargs.get('filter')
+
         with scoped_session() as session:
             total_count = session.query(CmsImportedFile).count()
             query = session.query(CmsImportedFile) \
-                .join(CmsImportedFile.asset) \
-                .order_by(get_order_by(sort_by_name, is_ascending)) \
+                .join(CmsImportedFile.asset)
+            query = apply_filters(query, filter)
+            query = query.order_by(get_order_by(sort_by_name, is_ascending)) \
                 .limit(page_size) \
                 .offset(page_size * (page - 1))
             result = query.all()
@@ -80,18 +84,49 @@ def register_lambda(settings):
             return {'importedFiles': files}
 
 
-def get_order_by(name, is_ascending):
-    col = None
+def get_col_by_name(name):
     if name == 'id':
-        col = CmsImportedFile.id
+        return CmsImportedFile.id
     elif name == 'uploaded_at':
-        col = CmsImportedFile.uploaded_at
+        return CmsImportedFile.uploaded_at
     elif name == 'size':
-        col = Asset.size
+        return Asset.size
     else:
-        raise Exception('Field name is not sortable: {}'.format(name))
+        raise Exception('Unexpected field name: {}'.format(name))
 
+
+def get_filter_func(name, query, value):
+    col = get_col_by_name(name)
+    if query == 'EqualTo':
+        return col == value
+    elif query == 'NotEqualTo':
+        return col != value
+    elif query == 'Like':
+        return col.like(value)
+    elif query == 'NotLike':
+        return not_(col.like(value))
+    elif query == 'Before' or query == 'LessThan':
+        return col < value
+    elif query == 'After' or query == 'GreaterThan':
+        return col > value
+    elif query == 'LessThanOrEqualTo':
+        return col <= value
+    elif query == 'GreaterThanOrEqualTo':
+        return col >= value
+    else:
+        raise Exception('Unexpected query type: {}', format(query))
+
+
+def get_order_by(name, is_ascending):
+    col = get_col_by_name(name)
     return col.asc() if is_ascending else col.desc()
+
+
+def apply_filters(query, filters):
+    for filter in filters:
+        query = query.filter(get_filter_func(**filter))
+
+    return query
 
 
 def inject_signed_url(files):
