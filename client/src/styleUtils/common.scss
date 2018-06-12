@@ -87,6 +87,7 @@ $input-horizontal-padding: to-rem(16px);
     background-color: white;
     padding: to-rem(12px) $horizontal-spacing;
     display: flex;
+    flex-shrink: 0;
   }
 
   .list-filter-tag-list-label {
