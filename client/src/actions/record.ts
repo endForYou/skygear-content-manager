@@ -463,13 +463,13 @@ function addStringFilterToQuery(query: Query, filter: StringFilter) {
       query.notEqualTo(filter.name, filter.value);
       break;
     case StringFilterQueryType.Contain:
-      query.like(
+      query.caseInsensitiveLike(
         filter.name,
         `%${filter.value.replace(new RegExp('%', 'g'), '\\%')}%`
       );
       break;
     case StringFilterQueryType.NotContain:
-      query.notLike(
+      query.caseInsensitiveNotLike(
         filter.name,
         `%${filter.value.replace(new RegExp('%', 'g'), '\\%')}%`
       );
