@@ -1,4 +1,5 @@
 import { Location } from 'history';
+import moment from 'moment';
 import * as qs from 'query-string';
 import * as React from 'react';
 import { Dispatch } from 'redux';
@@ -40,12 +41,18 @@ function urlStringToFilter(filterStr: string, filterConfigs: FilterConfig[]) {
       }
       // Get filter label & type from config and create filter
       const newFilter = filterFactory(filterConfig);
-      if (newFilter.type === FilterType.ReferenceFilterType) {
-        return { ...newFilter, query, values: value };
-      } else if (newFilter.type === FilterType.BooleanFilterType) {
-        return { ...newFilter, query };
+      switch (newFilter.type) {
+        case FilterType.ReferenceFilterType:
+          return { ...newFilter, query, values: value };
+        case FilterType.BooleanFilterType:
+          return { ...newFilter, query };
+        case FilterType.DateTimeFilterType:
+          return { ...newFilter, query, value: moment(value).toDate() };
+        case FilterType.IntegerFilterType:
+          return { ...newFilter, query, value: parseInt(value, 10) };
+        default:
+          return { ...newFilter, query, value };
       }
-      return { ...newFilter, query, value };
     });
   return filters;
 }
