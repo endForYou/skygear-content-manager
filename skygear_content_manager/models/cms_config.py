@@ -164,12 +164,13 @@ class CMSRecordImport:
 
     def __init__(self, record_type, name, fields,
                  handle_duplicated_identifier = DUPLICATION_HANDLING_USE_FIRST,
-                 identifier = None):
+                 identifier = None, atomic = False):
         self.record_type = record_type
         self.name = name
         self.handle_duplicated_identifier = handle_duplicated_identifier
         self.identifier = identifier
         self.fields = fields
+        self.atomic = atomic
 
     def get_reference_fields(self):
         return [f for f in self.fields if f.reference]

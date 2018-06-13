@@ -4,6 +4,7 @@ imports:
     record_type: field_demo
     identifier: name
     handle_duplicated_identifier: throw-error
+    atomic: false
     fields:
       - name: name
         label: Name

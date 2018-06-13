@@ -245,6 +245,7 @@ class CMSRecordImportSchema(Schema):
     name = fields.String()
     identifier = fields.String(required=False)
     handle_duplicated_identifier = DuplicationHandling(required=False)
+    atomic = fields.Boolean(required=False)
 
     fields = fields.Nested('CMSRecordImportFieldSchema', many=True)
 

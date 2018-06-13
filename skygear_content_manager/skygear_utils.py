@@ -292,10 +292,11 @@ def get_schema():
     return resp.body.data['result']
 
 
-def save_records(records, database_id = '_public'):
+def save_records(records, database_id = '_public', atomic = False):
     resp = request_skygear_api('record:save', data={
         'database_id': database_id,
-        'records': records
+        'records': records,
+        'atomic': atomic,
     })
     return resp.body.data['result']
 
