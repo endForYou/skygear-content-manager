@@ -1,6 +1,8 @@
 import csv
 import uuid
 
+from skygear.error import SkygearException
+
 from .csv_deserializer import RecordDeserializer
 from ..db_session import scoped_session
 from ..skygear_utils import (save_records, fetch_records, eq_predicate,
@@ -59,7 +61,7 @@ class RecordIdentifierMap:
         record_ids.append(record_id)
 
 
-class ImportRecordException(Exception):
+class ImportRecordException(SkygearException):
 
     def __init__(self, record_data, underlying_error):
         message = str(underlying_error)
@@ -85,6 +87,9 @@ class ImportRecordException(Exception):
             'message': str(self.underlying_error),
             'name': self.underlying_error.__class__.__name__,
         }
+
+    def as_dict(self):
+        return self.to_dict()
 
 
 class DuplicateIdentifierValueException(Exception):
