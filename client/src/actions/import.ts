@@ -3,7 +3,7 @@ import 'whatwg-fetch';
 import { ThunkAction } from 'redux-thunk';
 import skygear from 'skygear';
 
-import { ImportResult } from '../types';
+import { ImportResult, ImportResultItem } from '../types';
 
 export type ImportActions =
   | ImportRequest
@@ -81,10 +81,12 @@ export function dismissImport(): DismissImport {
 interface ImportAPIResult {
   success_count: number;
   error_count: number;
+  result: ImportResultItem[];
 }
 function transformImportResult(result: ImportAPIResult): ImportResult {
   return {
     errorCount: result.error_count,
+    result: result.result,
     successCount: result.success_count,
   };
 }
