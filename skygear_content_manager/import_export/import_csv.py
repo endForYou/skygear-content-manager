@@ -131,7 +131,7 @@ def import_records(records):
         if isinstance(records[i], ImportRecordException):
             index_mappings.append((i, records[i]))
 
-    for item in index_mappings:
+    for item in reversed(index_mappings):
         records.pop(item[0])
 
     resp = {'result': []}
