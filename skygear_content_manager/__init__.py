@@ -75,7 +75,8 @@ def includeme(settings):
             'CMS_CONFIG_FILE_URL': CMS_CONFIG_FILE_URL,
             'CMS_THEME_PRIMARY_COLOR': CMS_THEME_PRIMARY_COLOR,
             'CMS_THEME_SIDEBAR_COLOR': CMS_THEME_SIDEBAR_COLOR,
-            'CMS_THEME_LOGO': CMS_THEME_LOGO if CMS_THEME_LOGO is not None else ''
+            'CMS_THEME_LOGO': CMS_THEME_LOGO if CMS_THEME_LOGO is not None else '',
+            'CMS_USER_PERMITTED_ROLE': CMS_USER_PERMITTED_ROLE,
         }
         return skygear.Response(
             INDEX_HTML_FORMAT.format(**context),
@@ -450,6 +451,7 @@ INDEX_HTML_FORMAT = """<!doctype html>
         cmsConfigUrl: "{CMS_CONFIG_FILE_URL}",
         publicUrl: "{CMS_PUBLIC_URL}",
         staticUrl: "{CMS_STATIC_URL}",
+        adminRole: "{CMS_USER_PERMITTED_ROLE}",
         style: {{
             primaryColor: "{CMS_THEME_PRIMARY_COLOR}",
             sidebarColor: "{CMS_THEME_SIDEBAR_COLOR}",
