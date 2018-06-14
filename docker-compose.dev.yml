@@ -17,6 +17,7 @@ services:
       service: app
     environment:
       DEBUG: 1
+      ASSET_STORE_URL_PREFIX: http://localhost:3001/files
 
   plugin:
     extends:
@@ -24,6 +25,8 @@ services:
       service: plugin
     environment:
       CMS_CONFIG_FILE_URL: http://cms-client:8080/cms-config.yaml
+      CLIENT_SKYGEAR_ENDPOINT: http://localhost:3001/
+      ASSET_STORE_URL_PREFIX: http://localhost:3001/files
 
   cms-client-lib:
     build:
@@ -49,6 +52,13 @@ services:
     extends:
       file: docker-compose.yml
       service: cms-client
+
+  # No reverse proxy here
+  #
+  # Please disable CORS checking in your browser in order to make this
+  # enviornment to work for asset
+  #
+  # open -a Google\ Chrome --args --disable-web-security --user-data-dir
 
 # The volume container for skygear
 volumes:

@@ -454,6 +454,10 @@ function addFilterToQuery(query: Query, filter: Filter, recordCls: RecordCls) {
   }
 }
 
+export function wrapValueForLike(value: string) {
+  return `%${value.replace(new RegExp('%', 'g'), '\\%')}%`;
+}
+
 function addStringFilterToQuery(query: Query, filter: StringFilter) {
   switch (filter.query) {
     case StringFilterQueryType.EqualTo:
@@ -463,16 +467,10 @@ function addStringFilterToQuery(query: Query, filter: StringFilter) {
       query.notEqualTo(filter.name, filter.value);
       break;
     case StringFilterQueryType.Contain:
-      query.caseInsensitiveLike(
-        filter.name,
-        `%${filter.value.replace(new RegExp('%', 'g'), '\\%')}%`
-      );
+      query.caseInsensitiveLike(filter.name, wrapValueForLike(filter.value));
       break;
     case StringFilterQueryType.NotContain:
-      query.caseInsensitiveNotLike(
-        filter.name,
-        `%${filter.value.replace(new RegExp('%', 'g'), '\\%')}%`
-      );
+      query.caseInsensitiveNotLike(filter.name, wrapValueForLike(filter.value));
       break;
     default:
       throw new Error(

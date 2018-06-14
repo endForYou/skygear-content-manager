@@ -11,6 +11,8 @@ from skygear.options import options
 from skygear.utils.assets import directory_assets
 from urllib.parse import parse_qs
 
+from .db import cms_db_init
+from .file_import import register_lambda as register_file_import_lambda
 from .import_export import (RecordSerializer, RecordDeserializer,
                             RecordIdentifierMap, render_header,
                             render_data,
@@ -19,7 +21,6 @@ from .import_export import prepare_response as prepare_export_response
 from .models.cms_config import (CMSConfig, CMSRecord,
                                 CMSRecordBackReference,
                                 CMSRecordAssociationReference)
-from .push_notifications import cms_push_notification_db_init
 from .push_notifications import register_lambda as register_push_notifications_lambda
 from .schema.cms_config import CMSAssociationRecordSchema, CMSConfigSchema
 from .schema.skygear_schema import SkygearSchemaSchema
@@ -27,7 +28,7 @@ from .settings import (CMS_USER_PERMITTED_ROLE, CMS_SKYGEAR_ENDPOINT,
                        CMS_SKYGEAR_API_KEY, CMS_PUBLIC_URL, CMS_STATIC_URL,
                        CMS_SITE_TITLE, CMS_CONFIG_FILE_URL,
                        CMS_THEME_PRIMARY_COLOR, CMS_THEME_SIDEBAR_COLOR,
-                       CMS_THEME_LOGO)
+                       CMS_THEME_LOGO, CLIENT_SKYGEAR_ENDPOINT)
 from .skygear_utils import (SkygearRequest, SkygearResponse, AuthData,
                             request_skygear, get_schema, save_records,
                             fetch_records, eq_predicate)
@@ -45,11 +46,12 @@ except ImportError:
 
 def includeme(settings):
     register_push_notifications_lambda(settings)
+    register_file_import_lambda(settings)
 
 
     @skygear.event("before-plugins-ready")
     def before_plugins_ready(config):
-        cms_push_notification_db_init(config)
+        cms_db_init(config)
 
 
     @skygear.event('after-plugins-ready')
@@ -246,8 +248,10 @@ def intercept_asset_put(req):
     if not action_url.startswith('/'):
         return resp
 
+    endpoint = CLIENT_SKYGEAR_ENDPOINT or options.skygear_endpoint
+
     resp.body.data['result']['post-request']['action'] = \
-        options.skygear_endpoint + action_url[1:]
+        endpoint + action_url[1:]
 
     return resp
 

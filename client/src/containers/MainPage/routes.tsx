@@ -19,6 +19,7 @@ import { ShowPageContainer } from '../../pages/ShowPageContainer';
 import { NewPushNotificationPageContainer } from '../../push_notifications/NewPushNotificationPageContainer';
 import { PushNotificationListPageFactory } from '../../push_notifications/PushNotificationListPage';
 
+import { FileImportPageFactory } from '../../pages/FileImport/FileImportPage';
 import { ChangePasswordPageContainer } from '../../pages/UserManagement/ChangePasswordPage';
 import { UserListPageFactory } from '../../pages/UserManagement/UserListPage';
 
@@ -45,6 +46,9 @@ export function frontPageRedirect(siteItems: SiteConfig): JSX.Element {
     case SiteItemConfigTypes.UserManagement:
       redirectPath = '/user-management';
       break;
+    case SiteItemConfigTypes.FileImport:
+      redirectPath = '/file-import';
+      break;
     default:
       throw new Error(`Unexpected site item type: ${firstSiteItem.type}`);
   }
@@ -70,6 +74,10 @@ export function pushNotificationRoutes(): JSX.Element[] {
 
 export function userManagementRoutes(): JSX.Element[] {
   return [makeUserManagementRoute(), makeChangePasswordRoute()];
+}
+
+export function fileImportRoutes(): JSX.Element[] {
+  return [makeFileImportRoute()];
 }
 
 function routesFromRecordConfig(config: RecordConfig): JSX.Element[] {
@@ -190,6 +198,17 @@ function makeChangePasswordRoute(): JSX.Element {
       render={routeProps => (
         <ChangePasswordPageContainer userId={routeProps.match.params.userId} />
       )}
+    />
+  );
+}
+
+function makeFileImportRoute(): JSX.Element {
+  return (
+    <Route
+      key="file-import"
+      exact={true}
+      path="/file-import"
+      component={FileImportPageFactory()}
     />
   );
 }

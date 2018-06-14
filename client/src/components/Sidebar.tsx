@@ -82,6 +82,12 @@ function Item({ item }: ItemProps): JSX.Element {
           {item.label}
         </NavLink>
       );
+    case SiteItemConfigTypes.FileImport:
+      return (
+        <NavLink className="nav-link" to={`/file-import`}>
+          {item.label}
+        </NavLink>
+      );
     case SiteItemConfigTypes.Space:
       return <Spacer size={item.size} />;
   }

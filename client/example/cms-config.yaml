@@ -56,11 +56,16 @@ push_notifications:
       type: String
       label: Name
 
+file_import:
+  enabled: true
+
 site:
   - type: UserManagement
     label: USER
   - type: PushNotifications
     label: PUSH
+  - type: FileImport
+    label: FILE
   - type: Space
   - type: Record
     name: field_demo

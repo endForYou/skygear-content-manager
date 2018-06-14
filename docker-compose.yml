@@ -35,8 +35,8 @@ services:
       ASSET_STORE_SECRET_KEY:
       ASSET_STORE_REGION:
       ASSET_STORE_BUCKET:
-      ASSET_STORE_URL_PREFIX: http://localhost:3000/files
-      ASSET_STORE_SECRET:
+      ASSET_STORE_URL_PREFIX: http://localhost:80/files
+      ASSET_STORE_SECRET: abc
       PLUGINS: CMS
       CMS_TRANSPORT: zmq
       CMS_PATH: cms
@@ -57,6 +57,7 @@ services:
       PUBSUB_URL: ws://app:3000/pubsub
       SKYGEAR_ADDRESS: tcp://app:5555
       SKYGEAR_ENDPOINT: http://app:3000/
+      CLIENT_SKYGEAR_ENDPOINT: http://localhost:80/
       APP_NAME: my_skygear_app
       API_KEY: my_skygear_key
       MASTER_KEY: my_master_key
@@ -67,8 +68,8 @@ services:
       ASSET_STORE_SECRET_KEY:
       ASSET_STORE_REGION:
       ASSET_STORE_BUCKET:
-      ASSET_STORE_URL_PREFIX: http://localhost:3000/files
-      ASSET_STORE_SECRET:
+      ASSET_STORE_URL_PREFIX: http://localhost:80/files
+      ASSET_STORE_SECRET: abc
       CMS_SKYGEAR_ENDPOINT: http://localhost:80/cms-api/
       CMS_SKYGEAR_API_KEY: my_skygear_key
       CMS_SKYGEAR_MASTER_KEY: my_master_key

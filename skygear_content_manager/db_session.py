@@ -1,4 +1,5 @@
 from contextlib import contextmanager
+from skygear.options import options
 from skygear.utils.db import _get_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -10,6 +11,7 @@ def scoped_session(session=None):
     if session is None:
         session = _create_session()
     try:
+        session.execute('SET search_path TO app_%s, public' % options.appname)
         yield session
         session.commit()
     except:
