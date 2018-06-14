@@ -571,7 +571,7 @@ function createGeneralFilterQuery(filter: GeneralFilter, recordCls: RecordCls) {
   }
 }
 
-function applyPredicatesToQuery(query: Query, predicates: Predicate[]) {
+export function applyPredicatesToQuery(query: Query, predicates: Predicate[]) {
   predicates.forEach(predicate => {
     // tslint:disable-next-line: no-any
     let func: (key: string, value: any) => Query;

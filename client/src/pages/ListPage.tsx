@@ -9,7 +9,11 @@ import { Dispatch } from 'redux';
 import { Record } from 'skygear';
 
 import { dismissImport, importRecords } from '../actions/import';
-import { queryWithFilters, RecordActionDispatcher } from '../actions/record';
+import {
+  applyPredicatesToQuery,
+  queryWithFilters,
+  RecordActionDispatcher,
+} from '../actions/record';
 import {
   ActionConfigTypes,
   ExportActionConfig,
@@ -378,8 +382,9 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
       return undefined;
     }
 
-    const { filters, recordName: recordType } = this.props;
+    const { filters, pageConfig, recordName: recordType } = this.props;
     const query = queryWithFilters(filters, Record.extend(recordType));
+    applyPredicatesToQuery(query, pageConfig.predicates);
 
     return (
       <ExportModal
