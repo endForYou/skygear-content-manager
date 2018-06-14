@@ -1,3 +1,5 @@
+import './ImportModal.scss';
+
 import * as React from 'react';
 
 import { ImportResult } from '../types';
@@ -22,12 +24,12 @@ export const ImportModal: React.SFC<ImportModalProps> = props => {
     }
 
     return (
-      <div className="alert alert-danger" role="alert">
+      <div className="import-result-error" role="alert">
         {// tslint:disable-next-line:no-any
         errors.map((error: any, index) => (
-          <p key={index}>
+          <div key={index} className="import-result-error-item">
             line {error.index + 2}: {error.message}
-          </p>
+          </div>
         ))}
       </div>
     );
@@ -40,8 +42,14 @@ export const ImportModal: React.SFC<ImportModalProps> = props => {
       onDismiss={onDismiss}
       body={() => {
         return [
-          <p key="success-count">Successful records: {result.successCount}</p>,
-          <p key="error-count">Failed records: {result.errorCount}</p>,
+          <div key="success-count" className="import-count">
+            <div>Successful records:</div>
+            <div>{result.successCount}</div>
+          </div>,
+          <div key="error-count" className="import-count-error">
+            <div>Failed records:</div>
+            <div>{result.errorCount}</div>
+          </div>,
           renderErrorMessage(),
         ];
       }}
