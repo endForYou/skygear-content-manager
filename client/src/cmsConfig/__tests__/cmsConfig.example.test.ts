@@ -283,6 +283,12 @@ test('parseCmsConfig should parse example config', () => {
               type: 'Import',
             },
             {
+              atomic: true,
+              label: 'Import (Atomic)',
+              name: 'import-field-demo',
+              type: 'Import',
+            },
+            {
               label: 'Import with asset',
               name: 'import-asset-demo',
               type: 'Import',

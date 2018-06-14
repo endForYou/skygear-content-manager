@@ -93,6 +93,10 @@ records:
           name: import-field-demo
           label: Import records
         - type: Import
+          name: import-field-demo
+          label: Import (Atomic)
+          atomic: true
+        - type: Import
           name: import-asset-demo
           label: Import with asset
         - type: Export

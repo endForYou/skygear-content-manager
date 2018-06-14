@@ -1,4 +1,7 @@
+import './ImportModal.scss';
+
 import * as React from 'react';
+import ReactToggle from 'react-toggle';
 
 import { ImportAttrs } from '../../actions/import';
 import { ImportActionConfig } from '../../cmsConfig';
@@ -61,22 +64,34 @@ export class ImportModal extends React.PureComponent<ImportModalProps, State> {
   }
 
   private initialState = (props: ImportModalProps) => ({
+    atomic: props.importConfig.atomic || false,
     file: undefined,
   });
 
   private renderBody = () => {
     return (
-      <SingleFileInput
-        title="Select file"
-        accept=".csv"
-        file={this.state.file}
-        onFileSelected={file => this.setState({ file })}
-      />
+      <div>
+        <SingleFileInput
+          title="Select file"
+          accept=".csv"
+          file={this.state.file}
+          onFileSelected={file => this.setState({ file })}
+        />
+        {this.props.importConfig.atomic == null && (
+          <div className="setting">
+            <div className="setting-title">Allow partial failure?</div>
+            <ReactToggle
+              checked={!this.state.atomic}
+              onChange={() => this.setState({ atomic: !this.state.atomic })}
+            />
+          </div>
+        )}
+      </div>
     );
   };
 
   private importAttrs = () => {
-    if (this.state.file == null) {
+    if (this.state.file == null || this.state.atomic == null) {
       throw new Error(`Unexpected state ${this.state}`);
     }
 

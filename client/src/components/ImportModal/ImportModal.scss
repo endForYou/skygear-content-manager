@@ -1,0 +1,11 @@
+@import 'styleUtils/common.scss';
+
+.setting {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+
+  .setting-title {
+    font-weight: 700;
+  }
+}

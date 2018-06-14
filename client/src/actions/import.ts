@@ -19,6 +19,7 @@ export enum ImportActionTypes {
 }
 
 export interface ImportAttrs {
+  atomic: boolean;
   file: File;
 }
 
@@ -104,6 +105,11 @@ export function importRecords(
     data.append('file', attrs.file);
     data.append('key', skygear.auth.accessToken!);
     data.append('import_name', name);
+
+    const options = {
+      atomic: attrs.atomic,
+    };
+    data.append('options', JSON.stringify(options));
 
     dispatch(importRequest());
 

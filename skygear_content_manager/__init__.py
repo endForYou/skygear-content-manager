@@ -177,6 +177,9 @@ def includeme(settings):
         files = request.files
         form = request.form
         key = form.get('key')
+        options = json.loads(form.get('options', '{}'))
+
+        atomic = options.get('atomic', False)
 
         if not key:
             return SkygearResponse.access_token_not_accepted().to_werkzeug()
@@ -201,7 +204,6 @@ def includeme(settings):
         file.save(temp_file.name)
 
         records = None
-        atomic = import_config.atomic
         with open(temp_file.name, 'r') as fp:
             # skip first row
             next(fp)
