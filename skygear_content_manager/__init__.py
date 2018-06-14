@@ -191,7 +191,7 @@ def includeme(settings):
         file = files['file']
         name = form.get('import_name')
 
-        global cms_config
+        cms_config = get_cms_config()
         import_config = cms_config.get_import_config(name)
 
         if not import_config:

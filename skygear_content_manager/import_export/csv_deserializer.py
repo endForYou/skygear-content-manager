@@ -60,6 +60,8 @@ class FieldDeserializer:
             deserializer = DatetimeDeserializer()
         elif self.field_config.type == 'integer':
             deserializer = IntegerDeserializer()
+        elif self.field_config.type == 'asset':
+            deserializer = AssetDeserializer()
 
         return deserializer
 
@@ -162,3 +164,15 @@ class IntegerDeserializer(BaseValueDeserializer):
             return None
 
         return int(value)
+
+
+class AssetDeserializer(BaseValueDeserializer):
+
+    def deserialize(self, value):
+        if value == None or value == '':
+            return None
+
+        return {
+            '$type': 'asset',
+            '$name': value,
+        }
