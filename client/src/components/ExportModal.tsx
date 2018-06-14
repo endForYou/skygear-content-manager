@@ -3,6 +3,7 @@ import skygear, { Query } from 'skygear';
 
 import { ExportActionConfig } from '../cmsConfig';
 import { Modal } from './Modal';
+import { RadioButtonList } from './RadioButtonList';
 
 export interface ExportModalProps {
   actionConfig: ExportActionConfig;
@@ -12,7 +13,7 @@ export interface ExportModalProps {
 }
 
 interface State {
-  exportPredicateOptionIndex: string;
+  exportPredicateOptionIndex: number;
 }
 
 export class ExportModal extends React.PureComponent<ExportModalProps, State> {
@@ -28,48 +29,21 @@ export class ExportModal extends React.PureComponent<ExportModalProps, State> {
     ];
 
     this.state = {
-      exportPredicateOptionIndex: '0',
+      exportPredicateOptionIndex: 0,
     };
 
     this.onQueryOptionClick = this.onQueryOptionClick.bind(this);
-  }
-
-  public onQueryOptionClick(event: React.MouseEvent<HTMLInputElement>) {
-    const target = event.target as HTMLInputElement;
-    const value = target.value;
-    this.setState({ exportPredicateOptionIndex: value });
   }
 
   public renderFilterOptions() {
     const { exportPredicateOptionIndex } = this.state;
 
     return (
-      <div>
-        <div className="radio">
-          <label>
-            <input
-              type="radio"
-              name="exportQuery"
-              value="0"
-              onClick={this.onQueryOptionClick}
-              checked={exportPredicateOptionIndex === '0'}
-            />{' '}
-            All records
-          </label>
-        </div>
-        <div className="radio">
-          <label>
-            <input
-              type="radio"
-              name="exportQuery"
-              value="1"
-              onClick={this.onQueryOptionClick}
-              checked={exportPredicateOptionIndex === '1'}
-            />{' '}
-            Filtered records
-          </label>
-        </div>
-      </div>
+      <RadioButtonList
+        options={['All records', 'Filtered records']}
+        selectedIndex={exportPredicateOptionIndex}
+        onChange={this.onQueryOptionClick}
+      />
     );
   }
 
@@ -120,4 +94,8 @@ export class ExportModal extends React.PureComponent<ExportModalProps, State> {
       />
     );
   }
+
+  private onQueryOptionClick = (value: number) => {
+    this.setState({ exportPredicateOptionIndex: value });
+  };
 }

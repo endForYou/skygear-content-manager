@@ -1,12 +1,12 @@
 import './ImportModal.scss';
 
 import * as React from 'react';
-import ReactToggle from 'react-toggle';
 
 import { ImportAttrs } from '../../actions/import';
 import { ImportActionConfig } from '../../cmsConfig';
 
 import { Modal } from '../Modal';
+import { RadioButtonList } from '../RadioButtonList';
 import { SingleFileInput } from '../SingleFileInput';
 
 export interface ImportModalProps {
@@ -70,22 +70,29 @@ export class ImportModal extends React.PureComponent<ImportModalProps, State> {
 
   private renderBody = () => {
     return (
-      <div>
+      <div className="import-modal-body">
+        {this.props.importConfig.atomic == null && (
+          <div>
+            <div className="setting-title">If there is error in records:</div>
+            <RadioButtonList
+              className="atomic-options"
+              options={[
+                'Save correct records only', // 0: non-atomic
+                `Don't save any records`, // 1: atomic
+              ]}
+              selectedIndex={this.state.atomic ? 1 : 0}
+              onChange={value => this.setState({ atomic: !!value })}
+            />
+          </div>
+        )}
+        <div className="import-file-input-title">Select CSV file</div>
         <SingleFileInput
-          title="Select file"
+          className="import-file-input"
+          title="Choose file"
           accept=".csv"
           file={this.state.file}
           onFileSelected={file => this.setState({ file })}
         />
-        {this.props.importConfig.atomic == null && (
-          <div className="setting">
-            <div className="setting-title">Allow partial failure?</div>
-            <ReactToggle
-              checked={!this.state.atomic}
-              onChange={() => this.setState({ atomic: !this.state.atomic })}
-            />
-          </div>
-        )}
       </div>
     );
   };

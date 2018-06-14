@@ -8,6 +8,7 @@ interface Props {
   accept?: string;
   title: string;
   file?: File;
+  placeholder?: string;
   onFileSelected: (file?: File) => void;
 }
 
@@ -19,7 +20,7 @@ export class SingleFileInput extends React.PureComponent<Props> {
   }
 
   public render() {
-    const { accept, className, file, title } = this.props;
+    const { accept, className, file, title, placeholder } = this.props;
 
     const inputProps = { accept };
 
@@ -34,7 +35,7 @@ export class SingleFileInput extends React.PureComponent<Props> {
             empty: file == null,
           })}
         >
-          {file == null ? 'No file selected.' : file.name}
+          {file == null ? placeholder || '' : file.name}
         </div>
 
         <input
