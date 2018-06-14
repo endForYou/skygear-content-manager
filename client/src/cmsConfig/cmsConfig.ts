@@ -581,7 +581,7 @@ function parseListItemActions(
 function parseImportAction(input: any): ImportActionConfig {
   const name = parseString(input, 'name', 'Import');
   return {
-    label: parseOptionalString(input, 'label', 'Import') || name,
+    label: parseOptionalString(input, 'label', 'Import') || humanize(name),
     name,
     type: input.type,
   };
@@ -591,7 +591,7 @@ function parseImportAction(input: any): ImportActionConfig {
 function parseExportAction(input: any): ExportActionConfig {
   const name = parseString(input, 'name', 'Export');
   return {
-    label: parseOptionalString(input, 'label', 'Export') || name,
+    label: parseOptionalString(input, 'label', 'Export') || humanize(name),
     name,
     type: input.type,
   };

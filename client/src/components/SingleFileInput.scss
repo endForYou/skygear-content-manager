@@ -1,0 +1,25 @@
+@import 'styleUtils/common.scss';
+
+.single-file-input {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  .input-button {
+    @include btn;
+    @include btn-primary;
+    text-decoration: none;
+    font-size: to-rem(14px);
+    padding: to-rem(4px) to-rem(12px);
+  }
+
+  .file-name {
+    margin-left: to-rem(12px);
+    font-size: to-rem(14px);
+
+    &.empty {
+      color: lighten($color: #373A3C, $amount: 30);
+    }
+  }
+}
