@@ -9,6 +9,7 @@ import { fileImportViewsReducer } from './fileImport';
 import importReducer from './import';
 import { pushCampaignViewsReducer } from './pushCampaign';
 import recordViewsByNameReducer from './recordFactory';
+import settingsReducer from './settings';
 import userReducer from './user';
 
 const constReducer = (state = {}) => {
@@ -29,6 +30,7 @@ function rootReducerFactory() {
     pushCampaign: pushCampaignViewsReducer as Reducer<any>,
     recordViewsByName: recordViewsByNameReducer as Reducer<any>,
     router: routerReducer as Reducer<any>,
+    settings: settingsReducer as Reducer<any>,
     user: userReducer as Reducer<any>,
   });
   // tslint:enable: no-any

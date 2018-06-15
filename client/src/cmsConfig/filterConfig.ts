@@ -58,7 +58,7 @@ export interface BooleanFilterConfig extends FilterConfigInput {
 export interface DateTimeFilterConfig extends FilterConfigInput {
   type: FilterConfigTypes.DateTime;
   name: string;
-  timezone: TimezoneValue;
+  timezone?: TimezoneValue;
 }
 
 export interface GeneralFilterConfig extends FilterConfigInput {
@@ -141,9 +141,7 @@ function parseDateTimeFilterConfig(
   context: RecordTypeContext
 ): DateTimeFilterConfig {
   const timezone =
-    input.timezone == null
-      ? context.timezone
-      : parseTimezone(input, 'timezone');
+    input.timezone == null ? undefined : parseTimezone(input, 'timezone');
 
   return {
     ...parseFilterConfigAttrs(input, 'DateTime'),

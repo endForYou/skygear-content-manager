@@ -7,7 +7,7 @@ import Layout from '../../components/Layout';
 import NotFoundPage from '../../components/NotFoundPage';
 import { getCmsConfig, RootState } from '../../states';
 
-import { SettingsPage } from '../../pages/SettingsPage';
+import { SettingsPageFactory } from '../../pages/SettingsPage';
 import {
   fileImportRoutes,
   frontPageRedirect,
@@ -57,7 +57,11 @@ class MainPage extends React.PureComponent<MainPageProps> {
           {userManagementEnabled && this.userManagementRoutes}
           {fileImportEnabled && this.fileImportRoutes}
 
-          <Route exact={true} path="/settings" component={SettingsPage} />
+          <Route
+            exact={true}
+            path="/settings"
+            component={SettingsPageFactory()}
+          />
 
           <Route component={NotFoundPage} />
         </Switch>

@@ -107,7 +107,7 @@ export interface WYSIWYGFieldConfig extends FieldConfigAttrs {
 export interface DateTimeFieldConfig extends FieldConfigAttrs {
   type: FieldConfigTypes.DateTime;
   defaultValue?: Date;
-  timezone: TimezoneValue;
+  timezone?: TimezoneValue;
 }
 
 export interface BooleanFieldConfig extends FieldConfigAttrs {
@@ -343,9 +343,7 @@ function parseDateTimeFieldConfig(
   context: RecordTypeContext
 ): DateTimeFieldConfig {
   const timezone =
-    input.timezone == null
-      ? context.timezone
-      : parseTimezone(input, 'timezone');
+    input.timezone == null ? undefined : parseTimezone(input, 'timezone');
 
   return {
     ...parseFieldConfigAttrs(input, 'DateTime'),
@@ -627,9 +625,7 @@ function parseCreatedAtFieldConfig(
   context: RecordTypeContext
 ): DateTimeFieldConfig {
   const timezone =
-    input.timezone == null
-      ? context.timezone
-      : parseTimezone(input, 'timezone');
+    input.timezone == null ? undefined : parseTimezone(input, 'timezone');
 
   if (input.type) {
     // TODO: allow other DateTime field type
@@ -651,9 +647,7 @@ function parseUpdatedAtFieldConfig(
   context: RecordTypeContext
 ): DateTimeFieldConfig {
   const timezone =
-    input.timezone == null
-      ? context.timezone
-      : parseTimezone(input, 'timezone');
+    input.timezone == null ? undefined : parseTimezone(input, 'timezone');
 
   if (input.type) {
     // TODO: allow other DateTime field type

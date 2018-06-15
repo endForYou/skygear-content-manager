@@ -2,14 +2,16 @@ import './SettingsPage.scss';
 
 import moment from 'moment-timezone';
 import * as React from 'react';
+import { connect, Dispatch } from 'react-redux';
 import Select, { Option, OptionValues } from 'react-select';
+import { updateTimezone } from '../actions/settings';
+import { RootState, Settings } from '../states';
 
-// tslint:disable-next-line:no-empty-interface
-interface Props {}
-
-interface State {
-  timezone: string;
+interface DispatchProps {
+  dispatch: Dispatch<RootState>;
 }
+
+type Props = Settings & DispatchProps;
 
 interface TzPickerProps {
   value: string;
@@ -48,15 +50,7 @@ const TzPicker: React.SFC<TzPickerProps> = ({ value, onChange }) => {
   );
 };
 
-export class SettingsPage extends React.PureComponent<Props, State> {
-  constructor(props: Props) {
-    super(props);
-
-    this.state = {
-      timezone: moment.tz.guess(),
-    };
-  }
-
+class SettingsPage extends React.PureComponent<Props> {
   public render() {
     return (
       <div className="settings-page">
@@ -71,7 +65,7 @@ export class SettingsPage extends React.PureComponent<Props, State> {
             </div>
             <div className="form-field">
               <TzPicker
-                value={this.state.timezone}
+                value={this.props.timezone}
                 onChange={this.handleTimezoneChange}
               />
             </div>
@@ -82,8 +76,18 @@ export class SettingsPage extends React.PureComponent<Props, State> {
   }
 
   private handleTimezoneChange = (value: string) => {
-    this.setState({
-      timezone: value,
-    });
+    this.props.dispatch(updateTimezone(value));
   };
 }
+
+export const SettingsPageFactory = () => {
+  function mapStateToProps(state: RootState): Settings {
+    return state.settings;
+  }
+
+  function mapDispatchToProps(dispatch: Dispatch<RootState>): DispatchProps {
+    return { dispatch };
+  }
+
+  return connect(mapStateToProps, mapDispatchToProps)(SettingsPage);
+};
