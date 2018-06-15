@@ -53,18 +53,12 @@ exports:
           - name: name
             label: Back ref {index} - Name
 
-user_management:
-  enabled: true
-
 push_notifications:
   enabled: true
   filters:
     - name: name
       type: String
       label: Name
-
-file_import:
-  enabled: true
 
 site:
   - type: UserManagement
