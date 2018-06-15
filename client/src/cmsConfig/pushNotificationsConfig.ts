@@ -1,5 +1,5 @@
 import { isArray } from 'util';
-import { ConfigContext } from './cmsConfig';
+import { ConfigContext, SiteItemConfigTypes } from './cmsConfig';
 import { FilterConfig, parseFilterConfig } from './filterConfig';
 
 export interface PushNotificationsConfig {
@@ -13,17 +13,22 @@ export function parsePushNotificationConfig(
   input: any
 ): PushNotificationsConfig {
   if (input == null) {
-    return {
-      enabled: false,
-      filterUserConfigs: [],
-    };
+    return getConfigFromContext(context);
   }
 
-  const { enabled, filters } = input;
-
+  const { filters } = input;
   return {
-    enabled,
+    enabled: true,
     filterUserConfigs: parsePushNotificationFilter(context, filters),
+  };
+}
+
+function getConfigFromContext(context: ConfigContext) {
+  return {
+    enabled:
+      context.siteConfig.find(s => s.type === SiteItemConfigTypes.FileImport) !=
+      null,
+    filterUserConfigs: [],
   };
 }
 

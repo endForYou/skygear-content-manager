@@ -1,4 +1,4 @@
-import { ConfigContext } from './cmsConfig';
+import { ConfigContext, SiteItemConfigTypes } from './cmsConfig';
 
 export interface UserManagementConfig {
   enabled: boolean;
@@ -10,9 +10,17 @@ export function parseUserManagementConfig(
   input: any
 ): UserManagementConfig {
   if (input == null) {
-    return { enabled: false };
+    return getConfigFromContext(context);
   }
 
-  const { enabled } = input;
-  return { enabled };
+  return { enabled: true };
+}
+
+function getConfigFromContext(context: ConfigContext) {
+  return {
+    enabled:
+      context.siteConfig.find(
+        s => s.type === SiteItemConfigTypes.UserManagement
+      ) != null,
+  };
 }

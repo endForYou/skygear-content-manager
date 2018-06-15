@@ -54,6 +54,9 @@ describe('parseCmsConfig site', () => {
           type: 'Record',
         },
       ],
+      userManagement: {
+        enabled: true,
+      },
     });
   });
 

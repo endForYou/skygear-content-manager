@@ -165,6 +165,7 @@ export interface RecordTypeContext {
 
 export interface ConfigContext extends RecordTypeContext {
   associationRecordByName: AssociationRecordByName;
+  siteConfig: SiteConfig;
 }
 
 export type ListActionConfig =
@@ -218,10 +219,12 @@ export function parseCmsConfig(input: any): CmsConfig {
     { cmsRecordByName, timezone },
     associationRecords
   );
+  const siteConfig = parseSiteConfigs(site);
 
   const context = {
     associationRecordByName,
     cmsRecordByName,
+    siteConfig,
     timezone,
   };
 
@@ -235,7 +238,7 @@ export function parseCmsConfig(input: any): CmsConfig {
     ).reduce((obj: object, [name, recordConfig]: [string, any]) => {
       return { ...obj, [name]: parseRecordConfig(context, name, recordConfig) };
     }, {}),
-    site: parseSiteConfigs(site),
+    site: siteConfig,
     timezone,
     userManagement: parseUserManagementConfig(context, userManagement),
   };
