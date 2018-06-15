@@ -172,6 +172,7 @@ export interface EmbeddedBackReferenceFieldConfig extends FieldConfigAttrs {
 export interface ImageAssetFieldConfig extends FieldConfigAttrs {
   type: FieldConfigTypes.ImageAsset;
   nullable: boolean;
+  config?: any; // tslint:disable-line: no-any
 }
 
 export interface FileAssetFieldConfig extends FieldConfigAttrs {
@@ -569,6 +570,7 @@ function parseImageAssetFieldConfig(
 
   return {
     ...parseFieldConfigAttrs(input, 'ImageAsset'),
+    config: input.config,
     nullable: nullable == null ? true : nullable,
     type: FieldConfigTypes.ImageAsset,
   };

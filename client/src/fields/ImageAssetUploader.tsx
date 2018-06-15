@@ -11,6 +11,11 @@ class ImageAssetUploaderImpl extends React.PureComponent<
 > {
   public render() {
     const { onFieldChange, ...rest } = this.props;
+    const {
+      preview_height: previewHeight = 200,
+      preview_width: previewWidth = 200,
+    } =
+      this.props.config.config || {};
     return (
       <AssetUploader
         {...rest}
@@ -18,12 +23,12 @@ class ImageAssetUploaderImpl extends React.PureComponent<
         assetType={AssetType.Image}
         onChange={onFieldChange}
         style={{
-          height: 232,
-          width: 232,
+          height: previewHeight + 32,
+          width: previewWidth + 32,
         }}
         previewStyle={{
-          height: 200,
-          width: 200,
+          height: previewHeight,
+          width: previewWidth,
         }}
       />
     );
