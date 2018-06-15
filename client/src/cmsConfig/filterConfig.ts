@@ -140,12 +140,9 @@ function parseDateTimeFilterConfig(
   input: any,
   context: RecordTypeContext
 ): DateTimeFilterConfig {
-  const timezone =
-    input.timezone == null ? undefined : parseTimezone(input, 'timezone');
-
   return {
     ...parseFilterConfigAttrs(input, 'DateTime'),
-    timezone,
+    timezone: parseTimezone(input, 'timezone'),
     type: FilterConfigTypes.DateTime,
   };
 }

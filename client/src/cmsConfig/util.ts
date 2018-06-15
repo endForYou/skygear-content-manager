@@ -109,12 +109,15 @@ export function parseOptional<T>(
   throw new Error(`${context}.${fieldName} want a ${t}, got ${typeof value}`);
 }
 
-// tslint:disable-next-line: no-any
-export function parseTimezone(a: any, fieldName: string): TimezoneValue {
+export function parseTimezone(
+  // tslint:disable-next-line: no-any
+  a: any,
+  fieldName: string
+): TimezoneValue | undefined {
   const value = a[fieldName];
 
-  if (value == null || value === 'Local') {
-    return 'Local';
+  if (value == null) {
+    return undefined;
   }
 
   const zone = moment.tz.zone(value);

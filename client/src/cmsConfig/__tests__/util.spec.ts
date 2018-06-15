@@ -96,11 +96,6 @@ describe('parseStringArray', () => {
 });
 
 describe('parseTimezone', () => {
-  it('should parse local', () => {
-    const input = { key: 'Local' };
-    expect(parseTimezone(input, 'key')).toEqual('Local');
-  });
-
   it('should parse timezone', () => {
     const input = { key: 'Asia/Hong_Kong' };
 

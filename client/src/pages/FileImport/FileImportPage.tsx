@@ -34,7 +34,7 @@ import { ImportFileModal } from './ImportFileModal';
 
 const ImportedFileListPerPageCount = 25;
 
-const DATETIME_FORMAT = 'YYYY-MM-DD HH:mm:ss';
+const DATETIME_FORMAT = 'YYYY-MM-DD HH:mm:ssZ';
 
 type FileImportPageProps = StateProps &
   SyncFilterProps &
@@ -117,11 +117,7 @@ const TableRow: React.SFC<TableRowProps> = ({ file }) => {
         <div>{file.name}</div>
       </div>
       <div className="table-cell">
-        <TzDatetime
-          value={file.uploadedAt}
-          datetimeFormat={DATETIME_FORMAT}
-          timezone={'Local'}
-        />
+        <TzDatetime value={file.uploadedAt} datetimeFormat={DATETIME_FORMAT} />
       </div>
       <div className="table-cell">
         <div>{file.size}</div>
@@ -355,7 +351,7 @@ function FileImportPageFactory() {
         name: 'uploadedAt',
         nullable: false,
         // TODO: get timezone from config
-        timezone: 'Local',
+        timezone: state.settings.timezone,
         type: FilterConfigTypes.DateTime,
       },
       {

@@ -14,8 +14,8 @@ interface State {
 }
 
 const DATE_FORMAT = 'YYYY-MM-DD';
-const TIME_FORMAT = 'HH:mm:ss';
-const DATETIME_FORMAT = 'YYYY-MM-DD HH:mm:ss';
+const TIME_FORMAT = 'HH:mm:ssZ';
+const DATETIME_FORMAT = 'YYYY-MM-DD HH:mm:ssZ';
 
 class DateTimeFieldImpl extends React.PureComponent<DateTimeFieldProps, State> {
   constructor(props: DateTimeFieldProps) {
@@ -40,13 +40,12 @@ class DateTimeFieldImpl extends React.PureComponent<DateTimeFieldProps, State> {
     } = this.props;
 
     if (editable) {
-      const timeFormat = timezone === 'Local' ? TIME_FORMAT : `${TIME_FORMAT}Z`;
       return (
         <TzDatetimeInput
           {...rest}
           className={classnames(className, 'datetime-input-container')}
           dateFormat={DATE_FORMAT}
-          timeFormat={timeFormat}
+          timeFormat={TIME_FORMAT}
           value={this.state.value}
           onChange={this.handleChange}
           inputProps={{ className: 'datetime-input' }}
@@ -54,15 +53,13 @@ class DateTimeFieldImpl extends React.PureComponent<DateTimeFieldProps, State> {
         />
       );
     } else {
-      const datetimeFormat =
-        timezone === 'Local' ? DATETIME_FORMAT : `${DATETIME_FORMAT}Z`;
       return (
         <TzDatetime
           {...rest}
           className={classnames(className, 'datetime-display', {
             full: !compact,
           })}
-          datetimeFormat={datetimeFormat}
+          datetimeFormat={DATETIME_FORMAT}
           value={this.state.value}
           timezone={timezone}
         />

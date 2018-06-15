@@ -12,7 +12,7 @@ import {
 } from '../cmsConfig';
 import { TzDatetime } from './TzDatetime';
 
-const DATETIME_FORMAT = 'YYYY-MM-DD HH:mm:ss';
+const DATETIME_FORMAT = 'YYYY-MM-DD HH:mm:ssZ';
 
 function QueryType({ filter }: { filter: Filter }) {
   return <div className="query-type primary-color">{filter.query}</div>;
