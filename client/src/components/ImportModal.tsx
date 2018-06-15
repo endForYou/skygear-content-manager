@@ -1,3 +1,5 @@
+import './ImportModal.scss';
+
 import * as React from 'react';
 
 import { ImportResult } from '../types';
@@ -11,6 +13,28 @@ export interface ImportModalProps {
 
 export const ImportModal: React.SFC<ImportModalProps> = props => {
   const { onDismiss, show = true, result } = props;
+
+  const renderErrorMessage = () => {
+    const errors = result.result
+      .map((i, index) => ({ ...i, index }))
+      .filter(i => i._type === 'error');
+
+    if (errors.length === 0) {
+      return <div />;
+    }
+
+    return (
+      <div className="import-result-error" role="alert">
+        {// tslint:disable-next-line:no-any
+        errors.map((error: any, index) => (
+          <div key={index} className="import-result-error-item">
+            line {error.index + 2}: {error.message}
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   return (
     <Modal
       show={show}
@@ -18,8 +42,15 @@ export const ImportModal: React.SFC<ImportModalProps> = props => {
       onDismiss={onDismiss}
       body={() => {
         return [
-          <p key="success-count">Successful records: {result.successCount}</p>,
-          <p key="error-count">Failed records: {result.errorCount}</p>,
+          <div key="success-count" className="import-count">
+            <div>Successful records:</div>
+            <div>{result.successCount}</div>
+          </div>,
+          <div key="error-count" className="import-count-error">
+            <div>Failed records:</div>
+            <div>{result.errorCount}</div>
+          </div>,
+          renderErrorMessage(),
         ];
       }}
       footer={() => (

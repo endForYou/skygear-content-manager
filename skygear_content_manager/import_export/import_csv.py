@@ -131,7 +131,7 @@ def import_records(records):
         if isinstance(records[i], ImportRecordException):
             index_mappings.append((i, records[i]))
 
-    for item in index_mappings:
+    for item in reversed(index_mappings):
         records.pop(item[0])
 
     resp = {'result': []}
@@ -193,15 +193,17 @@ def create_identifier_map(data_list, import_config):
     for reference_field in reference_fields:
         reference = reference_field.reference
         record_type = reference.target_cms_record.record_type
-        key = reference.target_field.name
-        values = [r[reference_field.name] for r in data_list]
-        for record in fetch_records_by_values_in_key(record_type, key, values):
-            identifier_map.set(
-                record_type=record_type,
-                key=key,
-                value=record[key],
-                record_id=record['_id']
-            )
+        target_fields = reference.target_fields
+        for field in target_fields:
+            key = field.name
+            values = [r[reference_field.name] for r in data_list]
+            for record in fetch_records_by_values_in_key(record_type, key, values):
+                identifier_map.set(
+                    record_type=record_type,
+                    key=key,
+                    value=record[key],
+                    record_id=record['_id']
+                )
 
     return identifier_map
 
@@ -221,11 +223,13 @@ def populate_record_reference(data_list, import_config, identifier_map):
             # merge data with reference
             for reference_field in reference_fields:
                 reference = reference_field.reference
-                data[reference_field.name] = identifier_map.get(
-                    record_type=reference.target_cms_record.record_type,
-                    key=reference.target_field.name,
-                    value=data[reference_field.name]
-                )
+                target_fields = reference.target_fields
+                for field in target_fields:
+                    data[reference_field.name] = identifier_map.get(
+                        record_type=reference.target_cms_record.record_type,
+                        key=field.name,
+                        value=data[reference_field.name]
+                    )
             result.append(data)
         except Exception as e:
             result.append(ImportRecordException(data, e))
