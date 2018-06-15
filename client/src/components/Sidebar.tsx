@@ -14,6 +14,8 @@ import {
 import { AppLogo } from '../containers/AppLogo';
 import { getCmsConfig, RootState } from '../states';
 
+import * as iconSettings from '../assets/icon-settings.svg';
+
 export interface SidebarProps {
   items: SiteItemConfig[];
   user?: Record;
@@ -35,6 +37,9 @@ class Sidebar extends React.PureComponent<Props> {
           <AppLogo className="sidebar-logo" alt="Skygear CMS" />
         </Link>
         <div className="user">
+          <Link to="/settings">
+            <img className="setttings" src={iconSettings} />
+          </Link>
           <div className="name">{user ? user.username : 'Unknown user'}</div>
           <NavLink className="btn-logout" to="#" onClick={this.props.onLogout}>
             LOG OUT
