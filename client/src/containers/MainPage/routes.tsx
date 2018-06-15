@@ -9,8 +9,6 @@ import {
   SiteItemConfigTypes,
 } from '../../cmsConfig';
 
-import FrontPage from '../FrontPage';
-
 import { EditPageContainer } from '../../pages/EditPageContainer';
 import { ListPageFactory } from '../../pages/ListPage';
 import { NewPageContainer } from '../../pages/NewPageContainer';
@@ -23,15 +21,12 @@ import { FileImportPageFactory } from '../../pages/FileImport/FileImportPage';
 import { ChangePasswordPageContainer } from '../../pages/UserManagement/ChangePasswordPage';
 import { UserListPageFactory } from '../../pages/UserManagement/UserListPage';
 
-// tslint:disable-next-line: no-any
-const AnyFrontPage = FrontPage as any;
-
-const frontPageRoute = <Route exact={true} path="/" component={AnyFrontPage} />;
+const defaultFirstPage = '/settings';
 
 export function frontPageRedirect(siteItems: SiteConfig): JSX.Element {
   const items = siteItems.filter(s => s.type !== SiteItemConfigTypes.Space);
   if (items.length === 0) {
-    return frontPageRoute;
+    return <Redirect exact={true} from="/" to={defaultFirstPage} />;
   }
 
   const firstSiteItem = items[0];
@@ -54,7 +49,7 @@ export function frontPageRedirect(siteItems: SiteConfig): JSX.Element {
   }
 
   if (redirectPath == null) {
-    return frontPageRoute;
+    redirectPath = defaultFirstPage;
   }
 
   return <Redirect exact={true} from="/" to={redirectPath} />;
