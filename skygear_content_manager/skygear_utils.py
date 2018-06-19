@@ -3,7 +3,8 @@ import requests
 import skygear
 
 from jose import JWTError, jwt
-from skygear.error import AccessTokenNotAccepted, PermissionDenied
+from skygear.error import \
+    AccessTokenNotAccepted, PermissionDenied, SkygearException
 from skygear.options import options
 from skygear.utils.context import current_context
 
