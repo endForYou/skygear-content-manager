@@ -20,6 +20,7 @@ import {
   filterFactory,
   FilterType,
 } from '../../cmsConfig';
+import { ClickOutside } from '../../components/ClickOutside';
 import { FilterMenu } from '../../components/FilterMenu';
 import { FilterTagList } from '../../components/FilterTagList';
 import { LoadingSpinner } from '../../components/LoadingSpinner';
@@ -257,11 +258,12 @@ class UserListPageImpl extends React.PureComponent<UserListPageProps, State> {
         <div className="topbar">
           <div className="title">User Management</div>
           <div className="action-container">
-            <div
+            <ClickOutside
               className={classNames('d-inline-block', {
                 dropdown: !showfilterMenu,
                 dropup: showfilterMenu,
               })}
+              onClickOutside={() => this.setState({ showfilterMenu: false })}
             >
               <ToggleButton
                 type="button"
@@ -286,7 +288,7 @@ class UserListPageImpl extends React.PureComponent<UserListPageProps, State> {
                   />
                 </div>
               </div>
-            </div>
+            </ClickOutside>
           </div>
         </div>
 

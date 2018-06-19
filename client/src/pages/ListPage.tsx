@@ -26,6 +26,7 @@ import {
   ListPageConfig,
 } from '../cmsConfig';
 import { Predicate } from '../cmsConfig/predicateConfig';
+import { ClickOutside } from '../components/ClickOutside';
 import { ExportButton } from '../components/ExportButton';
 import { ExportModal } from '../components/ExportModal';
 import { FilterMenu } from '../components/FilterMenu';
@@ -418,11 +419,12 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
           <div className="action-container">
             {this.renderActionButtons()}
             {pageConfig.filters && (
-              <div
+              <ClickOutside
                 className={classNames('d-inline-block', {
                   dropdown: !showfilterMenu,
                   dropup: showfilterMenu,
                 })}
+                onClickOutside={() => this.setState({ showfilterMenu: false })}
               >
                 <ToggleButton
                   type="button"
@@ -447,7 +449,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
                     />
                   </div>
                 </div>
-              </div>
+              </ClickOutside>
             )}
           </div>
         </div>

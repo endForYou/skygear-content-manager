@@ -29,6 +29,7 @@ import { debounce } from '../../util';
 
 import { nextSortState, SortButtonClickHandler } from '../ListPage';
 
+import { ClickOutside } from '../../components/ClickOutside';
 import { ImportFileModal } from './ImportFileModal';
 
 const ImportedFileListPerPageCount = 25;
@@ -223,7 +224,13 @@ class FileImportPage extends React.Component<FileImportPageProps, State> {
             >
               Import Files
             </div>
-            <div className="dropdown d-inline-block">
+            <ClickOutside
+              className={classnames('d-inline-block', {
+                dropdown: !showfilterMenu,
+                dropup: showfilterMenu,
+              })}
+              onClickOutside={() => this.setState({ showfilterMenu: false })}
+            >
               <PrimaryButton
                 type="button"
                 className="list-action dropdown-toggle"
@@ -246,7 +253,7 @@ class FileImportPage extends React.Component<FileImportPageProps, State> {
                   />
                 </div>
               </div>
-            </div>
+            </ClickOutside>
           </div>
         </div>
 
