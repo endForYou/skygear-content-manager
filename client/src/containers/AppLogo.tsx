@@ -27,4 +27,5 @@ const mapStateToProps: MapStateToProps<StateProps, {}> = (state: RootState) => {
   };
 };
 
-export const AppLogo = connect(mapStateToProps)(AppLogoImpl);
+// ignore `dispatch`
+export const AppLogo = connect(mapStateToProps, () => ({}))(AppLogoImpl);
