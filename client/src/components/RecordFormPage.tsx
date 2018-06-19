@@ -179,7 +179,11 @@ class RecordFormPageImpl extends React.PureComponent<
 
     Promise.resolve()
       .then(() => EffectAll(objectValues(beforeEffectChange))())
-      .then(() => recordDispatcher.save(record))
+      .then(() =>
+        // Hotfix:
+        // save error is handled by redux, thus keep the effectError null
+        recordDispatcher.save(record).catch(() => Promise.reject(null))
+      )
       .then(() => EffectAll(objectValues(afterEffectChange))())
       .then(() => {
         const { config: { cmsRecord }, dispatch } = this.props;
