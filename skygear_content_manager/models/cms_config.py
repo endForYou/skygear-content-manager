@@ -3,6 +3,10 @@ DISPLAY_MODE_GROUPED = 'DISPLAY_MODE_GROUPED'
 # Display data in multiple columns
 DISPLAY_MODE_SPREAD = 'DISPLAY_MODE_SPREAD'
 
+# Use first when duplicated data is found
+DUPLICATION_HANDLING_USE_FIRST = 'use-first'
+# Throw error when duplicated data is found
+DUPLICATION_HANDLING_THROW_ERROR = 'throw-error'
 
 class CMSConfig:
 
@@ -158,15 +162,12 @@ class CMSAssociationRecordField:
 
 class CMSRecordImport:
 
-    USE_FIRST = 'use-first'
-    THROW_ERROR = 'throw-error'
-
     def __init__(self, record_type, name, fields,
-                 duplicate_reference_handling = USE_FIRST,
+                 handle_duplicated_identifier = DUPLICATION_HANDLING_USE_FIRST,
                  identifier = None):
         self.record_type = record_type
         self.name = name
-        self.duplicate_reference_handling = duplicate_reference_handling
+        self.handle_duplicated_identifier = handle_duplicated_identifier
         self.identifier = identifier
         self.fields = fields
 
@@ -176,12 +177,14 @@ class CMSRecordImport:
 
 class CMSRecordImportField:
 
-    def __init__(self, record_type, name, label, type, reference = None):
+    def __init__(self, record_type, name, label, type, reference = None,
+                 handle_duplicated_reference = DUPLICATION_HANDLING_USE_FIRST):
         self.record_type = record_type
         self.name = name
         self.label = label
         self.type = type
         self.reference = reference
+        self.handle_duplicated_reference = handle_duplicated_reference
 
 
 class CMSRecordImportReference:
