@@ -6,6 +6,7 @@ from ..db_session import scoped_session
 from ..skygear_utils import (save_records, fetch_records, eq_predicate,
                              or_predicate)
 from ..models.cms_config import CMSRecordImport
+from ..models.asset import Asset
 from ..models.imported_file import CmsImportedFile
 
 
@@ -302,11 +303,20 @@ def inject_asset(data_list, import_config):
     asset_fields = [f for f in import_config.fields if f.type == 'asset']
     files = find_files_in_record_data(data_list, asset_fields)
     with scoped_session() as session:
+        assets_map = {}
         file_assets = session.query(CmsImportedFile) \
             .filter(CmsImportedFile.id.in_(files)) \
             .all()
-        file_assets = {fa.id: fa.asset for fa in file_assets}
-        return replace_assets_in_record_data(data_list, asset_fields, file_assets)
+        for file_asset in file_assets:
+            assets_map[file_asset.id] = file_asset.asset
+
+        assets = session.query(Asset) \
+            .filter(Asset.id.in_(files)) \
+            .all()
+        for asset in assets:
+            assets_map[asset.id] = asset
+
+        return replace_assets_in_record_data(data_list, asset_fields, assets_map)
 
 
 def find_files_in_record_data(data_list, fields):
