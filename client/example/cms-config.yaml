@@ -3,7 +3,7 @@ imports:
   import-field-demo:
     record_type: field_demo
     identifier: name
-    duplicate_reference_handling: throw-error
+    handle_duplicated_identifier: throw-error
     fields:
       - name: name
         label: Name
@@ -17,6 +17,7 @@ imports:
       - name: reference
         reference_target: ref_demo
         reference_field_name: name
+        handle_duplicated_reference: use-first
   import-asset-demo:
     record_type: field_demo
     identifier: name
