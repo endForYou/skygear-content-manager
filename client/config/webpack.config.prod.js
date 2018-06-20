@@ -130,7 +130,7 @@ module.exports = {
         enforce: 'pre',
         include: paths.appSrc,
         options: {
-          typeCheck: true,
+          typeCheck: false,
         },
       },
       {
@@ -159,6 +159,9 @@ module.exports = {
             test: /\.(ts|tsx)$/,
             include: paths.appSrc,
             loader: require.resolve('ts-loader'),
+            options: {
+              transpileOnly: false,
+            },
           },
           // The notation here is somewhat confusing.
           // "postcss" loader applies autoprefixer to our CSS.
