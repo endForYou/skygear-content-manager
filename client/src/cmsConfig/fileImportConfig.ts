@@ -1,4 +1,4 @@
-import { ConfigContext } from './cmsConfig';
+import { ConfigContext, SiteItemConfigTypes } from './cmsConfig';
 
 export interface FileImportConfig {
   enabled: boolean;
@@ -10,9 +10,16 @@ export function parseFileImportConfig(
   input: any
 ): FileImportConfig {
   if (input == null) {
-    return { enabled: false };
+    return getConfigFromContext(context);
   }
 
-  const { enabled } = input;
-  return { enabled };
+  return { enabled: true };
+}
+
+function getConfigFromContext(context: ConfigContext) {
+  return {
+    enabled:
+      context.siteConfig.find(s => s.type === SiteItemConfigTypes.FileImport) !=
+      null,
+  };
 }

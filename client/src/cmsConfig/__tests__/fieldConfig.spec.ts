@@ -9,6 +9,7 @@ import { TimezoneValue } from '../../types';
 const minimalContext = {
   associationRecordByName: {},
   cmsRecordByName: {},
+  siteConfig: [],
   timezone: 'Local' as TimezoneValue,
 };
 
@@ -55,6 +56,7 @@ const context: ConfigContext = {
       recordType: 'b',
     },
   },
+  siteConfig: [],
   timezone: 'Local' as TimezoneValue,
 };
 
