@@ -1017,14 +1017,7 @@ test('parseCmsConfig should parse example config', () => {
       field_demo_deleted: {
         cmsRecord: { name: 'field_demo_deleted', recordType: 'field_demo' },
         list: {
-          actions: [
-            {
-              href: '/records/{record_type}/new',
-              label: 'Add',
-              target: '',
-              type: 'Link',
-            },
-          ],
+          actions: [],
           cmsRecord: { name: 'field_demo_deleted', recordType: 'field_demo' },
           defaultSort: { order: 'undefined' },
           fields: [
@@ -1051,20 +1044,7 @@ test('parseCmsConfig should parse example config', () => {
             },
             { compact: true, name: 'name', label: 'Name', type: 'String' },
           ],
-          itemActions: [
-            {
-              href: '/record/{record.id}',
-              label: 'Show',
-              target: '',
-              type: 'Link',
-            },
-            {
-              href: '/record/{record.id}/edit',
-              label: 'Edit',
-              target: '',
-              type: 'Link',
-            },
-          ],
+          itemActions: [],
           label: 'Field demo deleted',
           perPage: 25,
           predicates: [

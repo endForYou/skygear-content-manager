@@ -162,12 +162,14 @@ function parseReferencePredicate(
   );
   const id = parseString(input.value, 'reference_id', 'Predicate');
 
-  const targetCmsRecord = context.cmsRecordByName[targetRecordName];
-  if (targetCmsRecord === undefined) {
+  const cmsRecordData = context.cmsRecordByName[targetRecordName];
+  if (cmsRecordData === undefined) {
     throw new Error(
       `Couldn't find configuration of Predicate.value.reference_target = ${targetRecordName}`
     );
   }
+
+  const targetCmsRecord = cmsRecordData.record;
 
   return {
     ...parsePredicateAttrs(input),

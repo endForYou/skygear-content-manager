@@ -382,12 +382,14 @@ export function parseReferenceFieldConfig(
   const displayFieldName =
     parseOptionalString(input, 'reference_field_name', 'Reference') || '_id';
 
-  const targetCmsRecord = context.cmsRecordByName[targetRecordName];
-  if (targetCmsRecord === undefined) {
+  const cmsRecordData = context.cmsRecordByName[targetRecordName];
+  if (cmsRecordData === undefined) {
     throw new Error(
       `Couldn't find configuration of Reference.reference_target = ${targetRecordName}`
     );
   }
+
+  const targetCmsRecord = cmsRecordData.record;
 
   return {
     ...parseFieldConfigAttrs(input, 'Reference'),
@@ -481,12 +483,14 @@ function parseBackReferenceFieldConfigAttrs(
     'reference_via_back_reference',
     'Reference'
   );
-  const targetCmsRecord = context.cmsRecordByName[targetRecordName];
-  if (targetCmsRecord === undefined) {
+  const cmsRecordData = context.cmsRecordByName[targetRecordName];
+  if (cmsRecordData === undefined) {
     throw new Error(
       `Couldn't find configuration of Reference.reference_from_field = ${targetRecordName}`
     );
   }
+
+  const targetCmsRecord = cmsRecordData.record;
 
   const sourceFieldName = parseString(
     input,

@@ -148,8 +148,16 @@ export interface AssociationRecordConfig {
   referenceConfigPair: [ReferenceFieldConfig, ReferenceFieldConfig];
 }
 
+type RecordPage = 'list' | 'show' | 'edit' | 'new';
+const recordPages: RecordPage[] = ['list', 'show', 'edit', 'new'];
+
+interface PreParseCmsRecordConfig {
+  record: CmsRecord;
+  pages: Set<RecordPage>;
+}
+
 interface CmsRecordByName {
-  [key: string]: CmsRecord | undefined;
+  [key: string]: PreParseCmsRecordConfig | undefined;
 }
 
 export interface RecordTypeContext {
@@ -331,11 +339,24 @@ function parseSiteSpaceConfig(
 // tslint:disable-next-line: no-any
 function preparseRecordConfigs(records: any): CmsRecordByName {
   const cmsRecordByName = objectFrom(
-    entriesOf(records).map(([recordName, value]) => {
+    // tslint:disable-next-line:no-any
+    entriesOf(records).map(([recordName, value]: [string, any]) => {
       const recordType =
         parseOptionalString(value, 'record_type', recordName) || recordName;
       const cmsRecord = CmsRecord(recordName, recordType);
-      return [recordName, cmsRecord] as [string, CmsRecord];
+      const pages = recordPages.reduce((acc, page) => {
+        if (value[page] != null) {
+          acc.add(page);
+        }
+        return acc;
+      }, new Set());
+      return [
+        recordName,
+        {
+          pages,
+          record: cmsRecord,
+        },
+      ] as [string, PreParseCmsRecordConfig];
     })
   );
   return cmsRecordByName;
@@ -403,8 +424,12 @@ function parseListPageConfig(
     // tslint:disable-next-line: no-any
     (input.filters as any[]).map(f => parseFilterConfig(f, context));
 
-  const actions = parseListActions(input.actions);
-  const itemActions = parseListItemActions(input.item_actions);
+  const actions = parseListActions(input.actions, context, cmsRecord);
+  const itemActions = parseListItemActions(
+    input.item_actions,
+    context,
+    cmsRecord
+  );
 
   const defaultSort = SortState();
   if (input.default_sort) {
@@ -436,8 +461,47 @@ function parseListPageConfig(
   };
 }
 
-// tslint:disable-next-line: no-any
-function parseListActions(input: any): ListActionConfig[] {
+interface DefaultAction {
+  predicate: (data: PreParseCmsRecordConfig) => boolean;
+  actionType: ActionConfigTypes;
+}
+
+function getDefaultActions(
+  defaultActions: DefaultAction[],
+  context: ConfigContext,
+  cmsRecord: CmsRecord
+  // tslint:disable-next-line:no-any
+): any {
+  const cmsRecordData = context.cmsRecordByName[cmsRecord.name];
+  if (cmsRecordData == null) {
+    throw new Error(`Cms record ${cmsRecord.name} not found.`);
+  }
+
+  return defaultActions
+    .filter(action => action.predicate(cmsRecordData))
+    .map(action => ({ type: action.actionType }));
+}
+
+// tslint:disable-next-line:no-any
+function parseActionConfig(input: any) {
+  switch (input.type) {
+    case ActionConfigTypes.Export:
+      return parseExportAction(input);
+    case ActionConfigTypes.Import:
+      return parseImportAction(input);
+    case ActionConfigTypes.Link:
+      return parseLinkAction(input);
+    default:
+      throw new Error(`Unexpected action types: ${input.type}`);
+  }
+}
+
+function parseListActions(
+  // tslint:disable-next-line: no-any
+  input: any,
+  context: ConfigContext,
+  cmsRecord: CmsRecord
+): ListActionConfig[] {
   const itemActionTypes = [
     ActionConfigTypes.Export,
     ActionConfigTypes.Import,
@@ -447,12 +511,13 @@ function parseListActions(input: any): ListActionConfig[] {
 
   const defaultActions = [
     {
-      type: ActionConfigTypes.AddButton,
+      actionType: ActionConfigTypes.AddButton,
+      predicate: (c: PreParseCmsRecordConfig) => c.pages.has('new'),
     },
   ];
 
   if (input == null) {
-    input = defaultActions;
+    input = getDefaultActions(defaultActions, context, cmsRecord);
   }
 
   return (
@@ -466,24 +531,16 @@ function parseListActions(input: any): ListActionConfig[] {
         return item;
       })
       .map(mapDefaultActionToAction)
-      // tslint:disable-next-line: no-any
-      .map((item: any) => {
-        switch (item.type) {
-          case ActionConfigTypes.Export:
-            return parseExportAction(item);
-          case ActionConfigTypes.Import:
-            return parseImportAction(item);
-          case ActionConfigTypes.Link:
-            return parseLinkAction(item);
-          default:
-            throw new Error(`Unexpected list action types: ${item.type}`);
-        }
-      })
+      .map(parseActionConfig)
   );
 }
 
-// tslint:disable-next-line: no-any
-function parseListItemActions(input: any): ListItemActionConfig[] {
+function parseListItemActions(
+  // tslint:disable-next-line: no-any
+  input: any,
+  context: ConfigContext,
+  cmsRecord: CmsRecord
+): ListItemActionConfig[] {
   const itemActionTypes = [
     ActionConfigTypes.Link,
     ActionConfigTypes.ShowButton,
@@ -492,15 +549,17 @@ function parseListItemActions(input: any): ListItemActionConfig[] {
 
   const defaultActions = [
     {
-      type: ActionConfigTypes.ShowButton,
+      actionType: ActionConfigTypes.ShowButton,
+      predicate: (c: PreParseCmsRecordConfig) => c.pages.has('show'),
     },
     {
-      type: ActionConfigTypes.EditButton,
+      actionType: ActionConfigTypes.EditButton,
+      predicate: (c: PreParseCmsRecordConfig) => c.pages.has('edit'),
     },
   ];
 
   if (input == null) {
-    input = defaultActions;
+    input = getDefaultActions(defaultActions, context, cmsRecord);
   }
 
   return (
@@ -514,15 +573,7 @@ function parseListItemActions(input: any): ListItemActionConfig[] {
         return item;
       })
       .map(mapDefaultActionToAction)
-      // tslint:disable-next-line: no-any
-      .map((item: any) => {
-        switch (item.type) {
-          case ActionConfigTypes.Link:
-            return parseLinkAction(item);
-          default:
-            throw new Error(`Unexpected list item action types: ${item.type}`);
-        }
-      })
+      .map(parseActionConfig)
   );
 }
 

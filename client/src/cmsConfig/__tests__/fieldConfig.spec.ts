@@ -46,12 +46,18 @@ const context: ConfigContext = {
   },
   cmsRecordByName: {
     RecordA: {
-      name: 'RecordA',
-      recordType: 'a',
+      pages: new Set(),
+      record: {
+        name: 'RecordA',
+        recordType: 'a',
+      },
     },
     RecordB: {
-      name: 'RecordB',
-      recordType: 'b',
+      pages: new Set(),
+      record: {
+        name: 'RecordB',
+        recordType: 'b',
+      },
     },
   },
   siteConfig: [],

@@ -170,13 +170,14 @@ function parseReferenceFilterConfig(
   const targetRecordName = parseString(input, 'reference_target', 'Reference');
   const displayFieldName =
     parseOptionalString(input, 'reference_field_name', 'Reference') || '_id';
-  const targetCmsRecord = context.cmsRecordByName[targetRecordName];
+  const cmsRecordData = context.cmsRecordByName[targetRecordName];
 
-  if (targetCmsRecord === undefined) {
+  if (cmsRecordData === undefined) {
     throw new Error(
       `Couldn't find configuration of Reference.reference_target = ${targetRecordName}`
     );
   }
+  const targetCmsRecord = cmsRecordData.record;
 
   return {
     ...parseFilterConfigAttrs(input, 'Reference'),
