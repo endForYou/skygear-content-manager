@@ -29,7 +29,7 @@ $horizontal-spacing: to-rem(32px);
 
   .list-loading, .list-empty {
     padding: to-rem(24px) $horizontal-spacing;
-    font-family: Lato-Light;
+    font-weight: 300;
     font-size: 18px;
     line-height: 18px;
   }
