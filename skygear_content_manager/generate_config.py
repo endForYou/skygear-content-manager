@@ -1,3 +1,6 @@
+import copy
+
+
 def generate_config(schema):
     return {
         'site': generate_site_config(schema),
@@ -33,10 +36,11 @@ def generate_records_config(schema):
 def generate_record_config(record):
     fields_config = generate_fields_config(record)
     return {
-        'list': fields_config,
-        'show': fields_config,
-        'edit': fields_config,
-        'new': fields_config,
+        # deep copy the config to avoid references in generated yaml
+        'list': copy.deepcopy(fields_config),
+        'show': copy.deepcopy(fields_config),
+        'edit': copy.deepcopy(fields_config),
+        'new': copy.deepcopy(fields_config),
     }
 
 
