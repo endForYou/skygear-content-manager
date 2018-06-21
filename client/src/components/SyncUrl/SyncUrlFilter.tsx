@@ -123,6 +123,7 @@ export function syncFilterWithUrl<P extends InjectedProps>(
           searchKeys={['filter']}
           location={location}
           dispatch={dispatch}
+          debounced={300}
         />,
         <SearchParamsObserver
           key="seach-params-observer"
