@@ -150,7 +150,7 @@ const TableBody: React.SFC<TableBodyProps> = ({
       />
     );
   });
-  return <tbody>{rows}</tbody>;
+  return <div className="table-body">{rows}</div>;
 };
 
 interface ListTableProps {
@@ -162,10 +162,10 @@ interface ListTableProps {
 
 const ListTable: React.SFC<ListTableProps> = (props: ListTableProps) => {
   return (
-    <table key="table" className="list-table">
+    <div key="table" className="list-table">
       <TableHeader />
       <TableBody {...props} />
-    </table>
+    </div>
   );
 };
 
