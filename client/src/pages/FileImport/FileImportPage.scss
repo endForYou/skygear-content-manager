@@ -4,6 +4,8 @@
 $horizontal-spacing: to-rem(32px);
 
 .file-import {
+  @include record-list-page;
+
   .topbar {
     @include record-topbar($horizontal-spacing);
     margin-bottom: to-rem(30px);
@@ -19,6 +21,10 @@ $horizontal-spacing: to-rem(32px);
 
   .action-container {
     @include record-topbar-action-container;
+  }
+
+  .list-content {
+    @include record-list-content;
   }
 
   .list-loading, .list-empty {
@@ -65,12 +71,6 @@ $horizontal-spacing: to-rem(32px);
 
   .list-filter-tag-list {
     margin-left: to-rem(24px);
-  }
-
-  .list-content {
-    margin-bottom: to-rem(38px);
-    background-color: white;
-    overflow-x: auto;
   }
 
   .list-table {
@@ -123,6 +123,5 @@ $horizontal-spacing: to-rem(32px);
 
   .pagination {
     @include pagination-position;
-    margin-bottom: to-rem(38px);
   }
 }
