@@ -1,7 +1,7 @@
 import json
 import logging
 import tempfile
-import yaml
+from ruamel.yaml import YAML
 
 from marshmallow import ValidationError
 import requests
@@ -308,6 +308,7 @@ def parse_cms_config():
     if not (200 <= r.status_code <= 299):
         raise Exception('Failed to get cms config yaml file')
 
+    yaml = YAML()
     config = yaml.load(r.text)
 
     association_records_data = config['association_records'] \
