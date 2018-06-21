@@ -71,6 +71,8 @@ class ImportRecordException(Exception):
     def error_code_for_exception(cls, e):
         if isinstance(e, DuplicateIdentifierValueException):
             return 109
+        elif isinstance(e, AssetNotFoundException):
+            return 110
 
         return 10000
 
@@ -90,6 +92,13 @@ class DuplicateIdentifierValueException(Exception):
         message = 'duplicate identifier value for "{}.{} == {}"' \
                   .format(record_type, key, value)
         super(DuplicateIdentifierValueException, self).__init__(message)
+
+
+class AssetNotFoundException(Exception):
+
+    def __init__(self, filename):
+        message = '"{}" not found in imported file or asset'.format(filename)
+        super(AssetNotFoundException, self).__init__(message)
 
 
 def prepare_import_records(stream, import_config):
@@ -329,15 +338,19 @@ def find_files_in_record_data(data_list, fields):
 
 
 def replace_assets_in_record_data(data_list, fields, file_assets):
+    result = []
     for data in data_list:
-        for field in fields:
-            file_id = data[field.name]
-            asset = file_assets.get(file_id)
+        try:
+            for field in fields:
+                file_id = data[field.name]
+                asset = file_assets.get(file_id)
+                if asset == None:
+                    raise AssetNotFoundException(file_id)
 
-            value = None
-            if asset != None:
-                value = asset.id
+                data[field.name] = asset.id
 
-            data[field.name] = value
+            result.append(data)
+        except Exception as e:
+            result.append(ImportRecordException(data, e))
 
-    return data_list
+    return result
