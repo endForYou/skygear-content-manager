@@ -13,6 +13,7 @@ from urllib.parse import parse_qs
 
 from .db import cms_db_init
 from .file_import import register_lambda as register_file_import_lambda
+from .generate_config import generate_config
 from .import_export import (RecordSerializer, RecordDeserializer,
                             RecordIdentifierMap, render_header,
                             render_data,
@@ -32,6 +33,7 @@ from .settings import (CMS_USER_PERMITTED_ROLE, CMS_SKYGEAR_ENDPOINT,
 from .skygear_utils import (SkygearRequest, SkygearResponse, AuthData,
                             request_skygear, get_schema, save_records,
                             fetch_records, eq_predicate)
+from .werkzeug_utils import prepare_file_response
 
 
 cms_config = None
@@ -211,6 +213,16 @@ def includeme(settings):
 
         resp = import_records(records, atomic)
         return resp
+
+
+    @skygear.handler('cms-api/default-cms-config.yaml')
+    def default_cms_config(request):
+        schema = SkygearSchemaSchema().load(get_schema()).data
+        default_config = generate_config(schema)
+        response = prepare_file_response('cms-config.yaml', 'text/yaml')
+        yaml = YAML()
+        yaml.dump(default_config, response.stream)
+        return response
 
 
 def intercept_login(req):
