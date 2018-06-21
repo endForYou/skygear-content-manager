@@ -1,5 +1,5 @@
 arrow==0.12.1
-bcrypt==2.0.0
+bcrypt==3.1.4
 boto3==1.6.9
 botocore==1.9.9
 certifi==2018.1.18
@@ -20,7 +20,7 @@ PyYAML==3.12
 requests==2.18.4
 s3transfer==0.1.13
 six==1.11.0
-skygear==1.4.0
+skygear==1.5.0
 SQLAlchemy==1.2.5
 strict-rfc3339==0.7
 urllib3==1.22
