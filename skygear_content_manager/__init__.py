@@ -3,7 +3,6 @@ import logging
 import tempfile
 from ruamel.yaml import YAML
 
-from marshmallow import ValidationError
 import requests
 import skygear
 from skygear import static_assets
@@ -11,6 +10,7 @@ from skygear.options import options
 from skygear.utils.assets import directory_assets
 from urllib.parse import parse_qs
 
+from .config_loader import ConfigLoader
 from .db import cms_db_init
 from .file_import import register_lambda as register_file_import_lambda
 from .generate_config import generate_config
@@ -19,11 +19,9 @@ from .import_export import (RecordSerializer, RecordDeserializer,
                             render_data,
                             prepare_import_records, import_records)
 from .import_export import prepare_response as prepare_export_response
-from .models.cms_config import (CMSConfig, CMSRecord,
-                                CMSRecordBackReference,
+from .models.cms_config import (CMSRecordBackReference,
                                 CMSRecordAssociationReference)
 from .push_notifications import register_lambda as register_push_notifications_lambda
-from .schema.cms_config import CMSAssociationRecordSchema, CMSConfigSchema
 from .schema.skygear_schema import SkygearSchemaSchema
 from .settings import (CMS_USER_PERMITTED_ROLE, CMS_SKYGEAR_ENDPOINT,
                        CMS_SKYGEAR_API_KEY, CMS_PUBLIC_URL, CMS_STATIC_URL,
@@ -32,11 +30,12 @@ from .settings import (CMS_USER_PERMITTED_ROLE, CMS_SKYGEAR_ENDPOINT,
                        CMS_THEME_LOGO, CLIENT_SKYGEAR_ENDPOINT)
 from .skygear_utils import (SkygearRequest, SkygearResponse, AuthData,
                             request_skygear, get_schema, save_records,
-                            fetch_records, eq_predicate)
+                            fetch_records, eq_predicate, validate_master_user)
 from .werkzeug_utils import prepare_file_response
 
 
-cms_config = None
+cms_config_file_url = CMS_CONFIG_FILE_URL
+cms_config_loader = ConfigLoader()
 logger = logging.getLogger(__name__)
 try:
     # Available in py-skygear v1.6
@@ -58,14 +57,12 @@ def includeme(settings):
 
     @skygear.event('after-plugins-ready')
     def after_plugins_ready(config):
-        global cms_config
-        cms_config = None
+        cms_config_loader.set_config_source(cms_config_file_url)
 
 
     @skygear.event('schema-changed')
     def schema_change(config):
-        global cms_config
-        cms_config = None
+        cms_config_loader.reset_schema()
 
 
     @skygear.handler('cms/')
@@ -76,7 +73,7 @@ def includeme(settings):
             'CMS_SITE_TITLE': CMS_SITE_TITLE,
             'CMS_STATIC_URL': CMS_STATIC_URL,
             'CMS_PUBLIC_URL': CMS_PUBLIC_URL,
-            'CMS_CONFIG_FILE_URL': CMS_CONFIG_FILE_URL,
+            'CMS_CONFIG_FILE_URL': cms_config_file_url,
             'CMS_THEME_PRIMARY_COLOR': CMS_THEME_PRIMARY_COLOR,
             'CMS_THEME_SIDEBAR_COLOR': CMS_THEME_SIDEBAR_COLOR,
             'CMS_THEME_LOGO': CMS_THEME_LOGO if CMS_THEME_LOGO is not None else '',
@@ -135,7 +132,7 @@ def includeme(settings):
         if not authdata:
             return SkygearResponse.access_token_not_accepted().to_werkzeug()
 
-        cms_config = get_cms_config()
+        cms_config = cms_config_loader.get_config()
         export_config = cms_config.get_export_config(name)
         if not export_config:
             return skygear.Response('Export config not found', 404)
@@ -196,7 +193,7 @@ def includeme(settings):
         file = files['file']
         name = form.get('import_name')
 
-        cms_config = get_cms_config()
+        cms_config = cms_config_loader.get_config()
         import_config = cms_config.get_import_config(name)
 
         if not import_config:
@@ -223,6 +220,13 @@ def includeme(settings):
         yaml = YAML()
         yaml.dump(default_config, response.stream)
         return response
+
+
+    @skygear.handler('cms-api/reload-cms-config')
+    def cms_config_file_url_api(request):
+        validate_master_user()
+        cms_config_loader.set_config_source(cms_config_file_url)
+        return {'result': 'OK'}
 
 
 def intercept_login(req):
@@ -311,64 +315,6 @@ def get_roles(json_body):
         return None
 
     return roles
-
-
-def parse_cms_config():
-    schema = SkygearSchemaSchema().load(get_schema())
-
-    r = requests.get(CMS_CONFIG_FILE_URL)
-    if not (200 <= r.status_code <= 299):
-        raise Exception('Failed to get cms config yaml file')
-
-    yaml = YAML()
-    config = yaml.load(r.text)
-
-    association_records_data = config['association_records'] \
-                               if 'association_records' in config \
-                               else {}
-    cms_records_data = config['records'] if 'records' in config else {}
-
-    cms_records = {}
-    for key, value in cms_records_data.items():
-        record_type = value.get('record_type', key)
-        cms_records[key] = CMSRecord(name=key, record_type=record_type)
-
-    association_records = {}
-    association_record_schema = CMSAssociationRecordSchema()
-    for key, value in association_records_data.items():
-        association_record_schema.context = {
-            'name': key,
-            'cms_records': cms_records,
-        }
-        association_records[key] = association_record_schema.load(value)
-
-    config_schema = CMSConfigSchema()
-    config_schema.context = {
-        'schema': schema,
-        'association_records': association_records,
-        'cms_records': cms_records,
-    }
-
-    cms_config = config_schema.load(config)
-    cms_config.association_records = association_records
-    cms_config.cms_records = cms_records
-    return cms_config
-
-
-def get_cms_config():
-    """
-    Get and parse cms config from remote lazily
-    """
-    global cms_config
-
-    if cms_config == None:
-        cms_config = CMSConfig.empty()
-        try:
-            cms_config = parse_cms_config()
-        except Exception as e:
-            logger.exception(e)
-
-    return cms_config
 
 
 def record_to_csv_data(record, fields):
