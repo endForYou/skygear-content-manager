@@ -3,6 +3,7 @@ import requests
 from marshmallow import ValidationError
 from ruamel.yaml import YAML
 
+from .generate_config import generate_config
 from .models.cms_config import CMSRecord
 from .schema.cms_config import CMSAssociationRecordSchema, CMSConfigSchema
 from .schema.skygear_schema import SkygearSchemaSchema
@@ -27,6 +28,10 @@ class ConfigLoader:
         self.config = None
 
     def get_config(self):
+        config_source = self.config_source
+        if not config_source:
+            return self._get_default_config()
+
         if self.config_data == None:
             self.config_data = self._download_config_data(self.config_source)
 
@@ -37,6 +42,11 @@ class ConfigLoader:
             self.config = self._parse_config(self.schema, self.config_data)
 
         return self.config
+
+    def _get_default_config(self):
+        schema = self._download_schema()
+        config_data = generate_config(schema)
+        return self._parse_config(schema, config_data)
 
     def _download_config_data(self, file_path):
         r = requests.get(file_path)

@@ -73,7 +73,7 @@ def includeme(settings):
             'CMS_SITE_TITLE': CMS_SITE_TITLE,
             'CMS_STATIC_URL': CMS_STATIC_URL,
             'CMS_PUBLIC_URL': CMS_PUBLIC_URL,
-            'CMS_CONFIG_FILE_URL': cms_config_file_url,
+            'CMS_CONFIG_FILE_URL': cms_config_file_url or CMS_SKYGEAR_ENDPOINT + 'default-cms-config.yaml',
             'CMS_THEME_PRIMARY_COLOR': CMS_THEME_PRIMARY_COLOR,
             'CMS_THEME_SIDEBAR_COLOR': CMS_THEME_SIDEBAR_COLOR,
             'CMS_THEME_LOGO': CMS_THEME_LOGO if CMS_THEME_LOGO is not None else '',
