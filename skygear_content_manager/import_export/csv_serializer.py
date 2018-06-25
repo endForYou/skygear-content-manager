@@ -122,6 +122,8 @@ class FieldSerializer:
             serializer = DatetimeSerializer(format)
         elif field_type == 'integer':
             serializer = StringSerializer()
+        elif field_type == 'asset':
+            serializer = AssetSerializer()
 
         return serializer
 
@@ -269,3 +271,9 @@ class DatetimeSerializer(BaseValueSerializer):
     def serialize(self, value):
         datetime = arrow.get(value['$date'])
         return datetime.format(self.format)
+
+
+class AssetSerializer(BaseValueSerializer):
+
+    def serialize(self, value):
+        return value['$name']
