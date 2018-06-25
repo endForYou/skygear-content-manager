@@ -41,6 +41,7 @@ exports:
       - name: boolean
       - name: integer
       - name: number
+      - name: imageasset
       - name: reference
         reference_target: ref_demo
         reference_field_name: name
