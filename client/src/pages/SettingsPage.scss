@@ -1,0 +1,44 @@
+@import 'styleUtils/common.scss';
+
+$horizontal-spacing: to-rem(32px);
+
+.settings-page {
+  .topbar {
+    @include record-topbar($horizontal-spacing);
+    margin-bottom: to-rem(30px);
+  }
+
+  .title {
+    @include record-topbar-title;
+  }
+
+  .form-groups {
+    @include record-form;
+    margin: to-rem(20px) $horizontal-spacing;
+
+    & > .form-group:not(:first-child) {
+      margin-top: to-rem(10px);
+    }
+  }
+
+  .form-group {
+    display: flex;
+    width: 100%;
+  }
+
+  .form-label {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow-x: hidden;
+    width: to-rem(200px);
+    line-height: to-rem(38px);
+
+    label {
+      margin-bottom: 0;
+    }
+  }
+
+  .form-field {
+    flex: 1;
+  }
+}

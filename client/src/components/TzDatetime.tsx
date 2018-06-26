@@ -1,22 +1,26 @@
 import moment from 'moment-timezone';
 import * as React from 'react';
+import { connect } from 'react-redux';
 
+import { RootState, Settings } from '../states';
 import { TimezoneValue, utcOffsetOfTimezone } from '../types';
 
 interface Props {
   className?: string;
   datetimeFormat: string;
-  timezone: TimezoneValue;
+  settings: Settings;
+  timezone?: TimezoneValue;
   value?: Date;
 }
 
-export const TzDatetime: React.SFC<Props> = ({
+const TzDatetimeImpl: React.SFC<Props> = ({
   datetimeFormat,
   value,
+  settings,
   timezone,
   ...rest,
 }) => {
-  const utcOffset = utcOffsetOfTimezone(timezone);
+  const utcOffset = utcOffsetOfTimezone(timezone || settings.timezone);
 
   return (
     <span {...rest}>
@@ -28,3 +32,7 @@ export const TzDatetime: React.SFC<Props> = ({
     </span>
   );
 };
+
+export const TzDatetime = connect((state: RootState) => ({
+  settings: state.settings,
+}))(TzDatetimeImpl);

@@ -4,13 +4,11 @@ import {
   FieldConfigTypes,
   parseFieldConfig,
 } from '..';
-import { TimezoneValue } from '../../types';
 
-const minimalContext = {
+const minimalContext: ConfigContext = {
   associationRecordByName: {},
   cmsRecordByName: {},
   siteConfig: [],
-  timezone: 'Local' as TimezoneValue,
 };
 
 const context: ConfigContext = {
@@ -57,7 +55,6 @@ const context: ConfigContext = {
     },
   },
   siteConfig: [],
-  timezone: 'Local' as TimezoneValue,
 };
 
 describe('parseFieldConfig', () => {
@@ -81,7 +78,6 @@ describe('parseFieldConfig DateTime', () => {
       compact: false,
       label: 'Datetime',
       name: 'datetime',
-      timezone: 'Local',
       type: 'DateTime',
     });
   });

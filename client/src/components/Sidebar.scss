@@ -35,6 +35,12 @@
 		text-overflow: ellipsis;
 	}
 
+	.setttings {
+		float: right;
+		margin-right: to-rem(-25px);
+		@include btn-hover-effect-opacity;
+	}
+
 	.btn-logout {
 		color: white;
 		font-size: to-rem(11px);

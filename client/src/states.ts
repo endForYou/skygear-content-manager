@@ -4,6 +4,7 @@ import { Record } from 'skygear';
 
 import { CmsConfig } from './cmsConfig';
 import { AppConfig } from './config';
+import { getSettings } from './settings';
 import {
   ImportResult,
   NewPushCampaign,
@@ -18,6 +19,7 @@ import { ImportedFile } from './types/importedFile';
 export interface RootState {
   adminRole: string;
   appConfig: AppConfig;
+  settings: Settings;
   auth: AuthState;
   cmsConfig: CmsConfigState;
   import: ImportState;
@@ -29,6 +31,10 @@ export interface RootState {
 }
 
 export type RouteProps = RouteComponentProps<any>; // tslint:disable-line: no-any
+
+export interface Settings {
+  timezone: string;
+}
 
 interface ListStateAttrs {
   isLoading: boolean;
@@ -183,10 +189,13 @@ export const initialFileImportState: FileImportState = {
   list: initialImportedFileListState,
 };
 
+export const initialSettingsState: Settings = getSettings();
+
 export function initialRootState(
   adminRole: string,
   appConfig: AppConfig,
-  user: Record
+  user: Record,
+  settings: Settings
 ): RootState {
   return {
     adminRole,
@@ -200,6 +209,7 @@ export function initialRootState(
     pushCampaign: initialPushCampaignState,
     recordViewsByName: {},
     router: { location: null },
+    settings,
     user: initialUserState,
   };
 }

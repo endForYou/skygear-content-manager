@@ -65,7 +65,6 @@ test('parseCmsConfig should parse example config', () => {
               compact: false,
               label: 'Created at',
               name: 'createdAt',
-              timezone: 'Asia/Hong_Kong',
               type: 'DateTime',
             },
             {
@@ -73,7 +72,6 @@ test('parseCmsConfig should parse example config', () => {
               compact: false,
               label: 'Updated at',
               name: 'updatedAt',
-              timezone: 'Asia/Hong_Kong',
               type: 'DateTime',
             },
             {
@@ -117,7 +115,6 @@ test('parseCmsConfig should parse example config', () => {
               compact: false,
               name: 'datetime',
               label: 'Datetime',
-              timezone: 'Asia/Hong_Kong',
               type: 'DateTime',
             },
             {
@@ -311,7 +308,6 @@ test('parseCmsConfig should parse example config', () => {
               editable: false,
               label: 'Created at',
               name: 'createdAt',
-              timezone: 'Asia/Hong_Kong',
               type: 'DateTime',
             },
             {
@@ -319,7 +315,6 @@ test('parseCmsConfig should parse example config', () => {
               editable: false,
               label: 'Updated at',
               name: 'updatedAt',
-              timezone: 'Asia/Hong_Kong',
               type: 'DateTime',
             },
             { compact: true, name: 'name', label: 'Name', type: 'String' },
@@ -345,7 +340,6 @@ test('parseCmsConfig should parse example config', () => {
               compact: true,
               name: 'datetime',
               label: 'Datetime',
-              timezone: 'Asia/Hong_Kong',
               type: 'DateTime',
             },
             {
@@ -403,14 +397,12 @@ test('parseCmsConfig should parse example config', () => {
               name: '_created_at',
               label: 'CreatedAt',
               nullable: false,
-              timezone: 'Asia/Hong_Kong',
               type: 'DateTime',
             },
             {
               name: '_updated_at',
               label: 'UpdatedAt',
               nullable: false,
-              timezone: 'Asia/Hong_Kong',
               type: 'DateTime',
             },
             { name: 'name', label: 'Name', nullable: false, type: 'String' },
@@ -418,7 +410,6 @@ test('parseCmsConfig should parse example config', () => {
               name: 'datetime',
               label: 'Datetime',
               nullable: false,
-              timezone: 'Asia/Hong_Kong',
               type: 'DateTime',
             },
             {
@@ -511,7 +502,6 @@ test('parseCmsConfig should parse example config', () => {
               compact: false,
               label: 'Created at',
               name: 'createdAt',
-              timezone: 'Asia/Hong_Kong',
               type: 'DateTime',
             },
             {
@@ -519,7 +509,6 @@ test('parseCmsConfig should parse example config', () => {
               compact: false,
               label: 'Updated at',
               name: 'updatedAt',
-              timezone: 'Asia/Hong_Kong',
               type: 'DateTime',
             },
             {
@@ -563,7 +552,6 @@ test('parseCmsConfig should parse example config', () => {
               compact: false,
               name: 'datetime',
               label: 'Datetime',
-              timezone: 'Asia/Hong_Kong',
               type: 'DateTime',
             },
             {
@@ -741,7 +729,6 @@ test('parseCmsConfig should parse example config', () => {
               editable: false,
               label: 'Created at',
               name: 'createdAt',
-              timezone: 'Asia/Hong_Kong',
               type: 'DateTime',
             },
             {
@@ -749,7 +736,6 @@ test('parseCmsConfig should parse example config', () => {
               editable: false,
               label: 'Updated at',
               name: 'updatedAt',
-              timezone: 'Asia/Hong_Kong',
               type: 'DateTime',
             },
             { compact: false, name: 'name', label: 'Name', type: 'String' },
@@ -1054,7 +1040,6 @@ test('parseCmsConfig should parse example config', () => {
               editable: false,
               label: 'Created at',
               name: 'createdAt',
-              timezone: 'Asia/Hong_Kong',
               type: 'DateTime',
             },
             {
@@ -1062,7 +1047,6 @@ test('parseCmsConfig should parse example config', () => {
               editable: false,
               label: 'Updated at',
               name: 'updatedAt',
-              timezone: 'Asia/Hong_Kong',
               type: 'DateTime',
             },
             { compact: true, name: 'name', label: 'Name', type: 'String' },
@@ -1386,7 +1370,6 @@ test('parseCmsConfig should parse example config', () => {
       },
       { type: 'Space', size: 'Large' },
     ],
-    timezone: 'Asia/Hong_Kong',
     userManagement: { enabled: true },
   });
 });

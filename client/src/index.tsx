@@ -15,6 +15,7 @@ import { App } from './containers/App';
 import { CMSConfigProvider } from './containers/CMSConfigProvider';
 import { getUnauthenticatedMiddleware } from './middlewares';
 import rootReducerFactory from './reducers';
+import { getSettings } from './settings';
 import { initialRootState, RootState } from './states';
 import { generateCSSClass } from './theme';
 import { getPath } from './util';
@@ -50,8 +51,14 @@ function main(appConfig: AppConfig = defaultAppConfig): void {
   ).then((user: User) => {
     const publicUrl: string = appConfig.publicUrl;
     const history: History = createHistoryFromPublicUrl(publicUrl);
+    const settings = getSettings();
 
-    const initialState = initialRootState(appConfig.adminRole, appConfig, user);
+    const initialState = initialRootState(
+      appConfig.adminRole,
+      appConfig,
+      user,
+      settings
+    );
     const rootReducer = rootReducerFactory();
     const store = createStore<RootState>(
       rootReducer,

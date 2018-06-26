@@ -20,7 +20,6 @@ const emptyCmsConfig = {
   },
   records: {},
   site: [],
-  timezone: 'Local',
   userManagement: {
     enabled: false,
   },

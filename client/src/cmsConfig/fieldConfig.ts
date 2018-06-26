@@ -107,7 +107,7 @@ export interface WYSIWYGFieldConfig extends FieldConfigAttrs {
 export interface DateTimeFieldConfig extends FieldConfigAttrs {
   type: FieldConfigTypes.DateTime;
   defaultValue?: Date;
-  timezone: TimezoneValue;
+  timezone?: TimezoneValue;
 }
 
 export interface BooleanFieldConfig extends FieldConfigAttrs {
@@ -342,15 +342,10 @@ function parseDateTimeFieldConfig(
   input: FieldConfigInput,
   context: RecordTypeContext
 ): DateTimeFieldConfig {
-  const timezone =
-    input.timezone == null
-      ? context.timezone
-      : parseTimezone(input, 'timezone');
-
   return {
     ...parseFieldConfigAttrs(input, 'DateTime'),
     defaultValue: parseOptionalDate(input, 'default_value', 'DateTime'),
-    timezone,
+    timezone: parseTimezone(input, 'timezone'),
     type: FieldConfigTypes.DateTime,
   };
 }
@@ -626,11 +621,6 @@ function parseCreatedAtFieldConfig(
   input: FieldConfigInput,
   context: RecordTypeContext
 ): DateTimeFieldConfig {
-  const timezone =
-    input.timezone == null
-      ? context.timezone
-      : parseTimezone(input, 'timezone');
-
   if (input.type) {
     // TODO: allow other DateTime field type
     console.log(`Type (${input.type}) is ignored in _created_at field.`);
@@ -641,7 +631,7 @@ function parseCreatedAtFieldConfig(
     editable: false,
     label: parseOptionalString(input, 'label', '_created_at') || 'Created at',
     name: 'createdAt',
-    timezone,
+    timezone: parseTimezone(input, 'timezone'),
     type: FieldConfigTypes.DateTime,
   };
 }
@@ -650,11 +640,6 @@ function parseUpdatedAtFieldConfig(
   input: FieldConfigInput,
   context: RecordTypeContext
 ): DateTimeFieldConfig {
-  const timezone =
-    input.timezone == null
-      ? context.timezone
-      : parseTimezone(input, 'timezone');
-
   if (input.type) {
     // TODO: allow other DateTime field type
     console.log(`Type (${input.type}) is ignored in _updated_at field.`);
@@ -665,7 +650,7 @@ function parseUpdatedAtFieldConfig(
     editable: false,
     label: parseOptionalString(input, 'label', '_updated_at') || 'Updated at',
     name: 'updatedAt',
-    timezone,
+    timezone: parseTimezone(input, 'timezone'),
     type: FieldConfigTypes.DateTime,
   };
 }

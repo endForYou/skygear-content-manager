@@ -46,7 +46,7 @@ interface FilterListProps {
 }
 
 const DATE_FORMAT = 'YYYY-MM-DD';
-const TIME_FORMAT = 'HH:mm:ss';
+const TIME_FORMAT = 'HH:mm:ssZ';
 
 export class FilterList extends React.PureComponent<FilterListProps> {
   public renderFilter(filter: Filter, index: number) {
@@ -247,14 +247,12 @@ export class FilterList extends React.PureComponent<FilterListProps> {
     filter: DateTimeFilter,
     config: DateTimeFilterConfig
   ) {
-    const timeFormat =
-      config.timezone === 'Local' ? TIME_FORMAT : `${TIME_FORMAT}Z`;
     return (
       <TzDatetimeInput
         className="datetime-input-container"
         inputProps={{ className: 'datetime-input' }}
         dateFormat={DATE_FORMAT}
-        timeFormat={timeFormat}
+        timeFormat={TIME_FORMAT}
         value={filter.value}
         onChange={event => this.handleDateTimeChange(filter, event)}
         timezone={config.timezone}
