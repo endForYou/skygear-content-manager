@@ -5,9 +5,12 @@ import { parseCmsConfig } from '..';
 
 // tslint:disable:object-literal-sort-keys
 test('parseCmsConfig should parse example config', () => {
-  const text = fs.readFileSync(process.cwd() + '/example/cms-config.yaml', {
-    encoding: 'utf-8',
-  });
+  const text = fs.readFileSync(
+    process.cwd() + '/src/cmsConfig/__tests__/cms-config-example.yaml',
+    {
+      encoding: 'utf-8',
+    }
+  );
   const parsed = yaml.safeLoad(text);
   const config = parseCmsConfig(parsed);
   expect(config).toEqual({

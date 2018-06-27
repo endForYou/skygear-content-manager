@@ -1,0 +1,432 @@
+timezone: Asia/Hong_Kong
+imports:
+  import-field-demo:
+    record_type: field_demo
+    identifier: name
+    duplicate_reference_handling: throw-error
+    fields:
+      - name: name
+        label: Name
+      - name: textarea
+      - name: dropdown
+      - name: wysiwyg
+      - name: datetime
+      - name: boolean
+      - name: integer
+      - name: number
+      - name: reference
+        reference_target: ref_demo
+        reference_field_name: name
+  import-asset-demo:
+    record_type: field_demo
+    identifier: name
+    fields:
+      - name: name
+        label: Name
+      - name: imageasset
+
+exports:
+  export-field-demo:
+    record_type: field_demo
+    fields:
+      - name: _id
+      - name: _created_at
+      - name: _updated_at
+      - name: name
+        label: Name
+      - name: textarea
+      - name: dropdown
+      - name: wysiwyg
+      - name: datetime
+      - name: boolean
+      - name: integer
+      - name: number
+      - name: reference
+        reference_target: ref_demo
+        reference_field_name: name
+      - name: back_refs
+        reference_via_back_reference: back_ref_demo
+        reference_from_field: reference
+        reference_fields:
+          - name: _id
+            label: Back ref {index} - ID
+          - name: name
+            label: Back ref {index} - Name
+
+push_notifications:
+  enabled: true
+  filters:
+    - name: name
+      type: String
+      label: Name
+
+site:
+  - type: UserManagement
+    label: USER
+  - type: PushNotifications
+    label: PUSH
+  - type: FileImport
+    label: FILE
+  - type: Space
+  - type: Record
+    name: field_demo
+  - type: Record
+    name: field_demo_deleted
+  - type: Space
+    size: Large
+
+records:
+  field_demo:
+    list:
+      predicates:
+        - name: deleted
+          predicate: NotEqualTo
+          value: true
+      default_sort:
+        name: name
+        ascending: false
+      actions:
+        - type: AddButton
+        - type: Import
+          name: import-field-demo
+          label: Import records
+        - type: Import
+          name: import-asset-demo
+          label: Import with asset
+        - type: Export
+          name: export-field-demo
+          label: Export records
+      item_actions:
+        - type: ShowButton
+        - type: EditButton
+        - type: Link
+          label: Search
+          href: https://www.google.com/search?q={record.name}
+          target: _blank
+      fields:
+        - name: _id
+        - name: _created_at
+        - name: _updated_at
+        - name: name
+          label: Name
+          type: String
+        - name: textarea
+          type: TextArea
+        - name: dropdown
+          type: String
+        - name: wysiwyg
+          type: WYSIWYG
+        - name: datetime
+          type: DateTime
+        - name: boolean
+          type: Boolean
+        - name: integer
+          type: Integer
+        - name: number
+          type: Number
+        - name: reference
+          type: Reference
+          reference_target: ref_demo
+          reference_field_name: name
+        - name: back_refs
+          type: Reference
+          reference_via_back_reference: back_ref_demo
+          reference_from_field: reference
+          reference_field_name: name
+        - name: imageasset
+          type: ImageAsset
+        - name: fileasset
+          type: FileAsset
+      filters:
+        - name: _id
+          label: ID
+          type: String
+        - name: _created_at
+          label: CreatedAt
+          type: DateTime
+        - name: _updated_at
+          label: UpdatedAt
+          type: DateTime
+        - name: name
+          label: Name
+          type: String
+        - name: datetime
+          type: DateTime
+        - name: boolean
+          type: Boolean
+        - name: integer
+          type: Integer
+        - name: reference
+          type: Reference
+          reference_target: ref_demo
+          reference_field_name: name
+          nullable: true
+    show:
+      fields:
+        - name: _id
+        - name: _created_at
+        - name: _updated_at
+        - name: name
+          label: Name
+          type: String
+        - name: textarea
+          type: TextArea
+        - name: dropdown
+          type: String
+        - name: wysiwyg
+          type: WYSIWYG
+        - name: datetime
+          type: DateTime
+          timezone: America/New_York
+        - name: boolean
+          type: Boolean
+        - name: integer
+          type: Integer
+        - name: number
+          type: Number
+        - name: reference
+          type: Reference
+          reference_target: ref_demo
+          reference_field_name: name
+        - name: back_refs
+          type: Reference
+          reference_via_back_reference: back_ref_demo
+          reference_from_field: reference
+          reference_field_name: name
+        - name: asso_refs
+          type: Reference
+          reference_via_association_record: field_asso_ref
+          reference_target: asso_ref_demo
+          reference_field_name: name
+        - name: back_refs_embedded
+          type: EmbeddedReference
+          reference_via_back_reference: back_ref_demo
+          reference_from_field: reference
+          reference_position_field: field_demo_position
+          reference_position_ascending: false
+          reference_fields:
+            - name: _id
+            - name: name
+              type: String
+        - name: imageasset
+          type: ImageAsset
+        - name: fileasset
+          type: FileAsset
+        - name: deleted
+          type: Boolean
+    edit:
+      fields:
+        - name: _id
+        - name: _created_at
+        - name: _updated_at
+        - name: name
+          label: Name
+          type: String
+        - name: textarea
+          type: TextArea
+        - name: dropdown
+          type: Dropdown
+          null:
+            enabled: false
+            label: Undefined
+          custom:
+            enabled: true
+          options:
+            - label: Option A
+              value: A
+            - label: Option B
+              value: B
+            - label: Option S
+              value: S
+        - name: wysiwyg
+          type: WYSIWYG
+        - name: datetime
+          type: DateTime
+        - name: boolean
+          type: Boolean
+        - name: integer
+          type: Integer
+        - name: number
+          type: Number
+        - name: reference
+          type: Reference
+          reference_target: ref_demo
+          reference_field_name: name
+        - name: back_refs
+          type: Reference
+          reference_via_back_reference: back_ref_demo
+          reference_from_field: reference
+          reference_field_name: name
+        - name: back_refs_embedded
+          type: EmbeddedReference
+          reference_via_back_reference: back_ref_demo
+          reference_from_field: reference
+          reference_position_field: field_demo_position
+          reference_position_ascending: true
+          reference_fields:
+            - name: _id
+            - name: name
+              type: String
+        - name: imageasset
+          type: ImageAsset
+        - name: fileasset
+          type: FileAsset
+        - name: deleted
+          type: Boolean
+          default_value: false
+    new:
+      fields:
+        - name: _id
+        - name: _created_at
+        - name: _updated_at
+        - name: name
+          label: Name
+          type: String
+        - name: textarea
+          type: TextArea
+        - name: dropdown
+          type: Dropdown
+          null:
+            enabled: false
+            label: Undefined
+          custom:
+            enabled: true
+          options:
+            - label: Option A
+              value: A
+            - label: Option B
+              value: B
+            - label: Option S
+              value: S
+        - name: wysiwyg
+          type: WYSIWYG
+        - name: datetime
+          type: DateTime
+        - name: boolean
+          type: Boolean
+        - name: integer
+          type: Integer
+        - name: number
+          type: Number
+        - name: reference
+          type: Reference
+          reference_target: ref_demo
+          reference_field_name: name
+        - name: back_refs
+          type: Reference
+          reference_via_back_reference: back_ref_demo
+          reference_from_field: reference
+          reference_field_name: name
+        - name: back_refs_embedded
+          type: EmbeddedReference
+          reference_via_back_reference: back_ref_demo
+          reference_from_field: reference
+          reference_position_field: field_demo_position
+          reference_position_ascending: true
+          reference_fields:
+            - name: _id
+            - name: name
+              type: String
+        - name: imageasset
+          type: ImageAsset
+        - name: fileasset
+          type: FileAsset
+        - name: deleted
+          type: Boolean
+          default_value: false
+  field_demo_deleted:
+    record_type: field_demo
+    list:
+      predicates:
+        - name: deleted
+          predicate: EqualTo
+          value: true
+      fields:
+        - name: _id
+        - name: _created_at
+        - name: _updated_at
+        - name: name
+          label: Name
+          type: String
+  ref_demo:
+    show:
+      fields:
+        - name: _id
+        - name: name
+          label: Name
+          type: String
+        - name: field_references
+          type: Reference
+          reference_via_back_reference: field_demo
+          reference_from_field: reference
+          reference_field_name: name
+    edit:
+      fields:
+        - name: _id
+        - name: name
+          label: Name
+          type: String
+        - name: field_demos
+          type: Reference
+          reference_via_back_reference: field_demo
+          reference_from_field: reference
+          reference_field_name: name
+    new:
+      fields:
+        - name: _id
+        - name: name
+          label: Name
+          type: String
+        - name: field_demos
+          type: Reference
+          reference_via_back_reference: field_demo
+          reference_from_field: reference
+          reference_field_name: name
+  back_ref_demo:
+    show:
+      fields:
+        - name: _id
+        - name: reference
+          type: Reference
+          reference_target: field_demo
+          reference_field_name: name
+        - name: name
+          label: Name
+          type: String
+    edit:
+      fields:
+        - name: _id
+        - name: reference
+          type: Reference
+          reference_target: field_demo
+          reference_field_name: name
+        - name: name
+          label: Name
+          type: String
+    new:
+      fields:
+        - name: _id
+        - name: reference
+          type: Reference
+          reference_target: field_demo
+          reference_field_name: name
+        - name: name
+          label: Name
+          type: String
+  asso_ref_demo:
+    show:
+      fields:
+        - name: _id
+        - name: name
+          label: Name
+          type: String
+
+association_records:
+  field_asso_ref:
+    fields:
+      - name: field_demo
+        type: Reference
+        reference_target: field_demo
+      - name: asso_ref_demo
+        type: Reference
+        reference_target: asso_ref_demo
