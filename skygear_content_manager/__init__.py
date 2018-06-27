@@ -299,7 +299,7 @@ def get_roles(json_body):
 
 
 def parse_cms_config():
-    schema = SkygearSchemaSchema().load(get_schema()).data
+    schema = SkygearSchemaSchema().load(get_schema())
 
     r = requests.get(CMS_CONFIG_FILE_URL)
     if not (200 <= r.status_code <= 299):
@@ -324,7 +324,7 @@ def parse_cms_config():
             'name': key,
             'cms_records': cms_records,
         }
-        association_records[key] = association_record_schema.load(value).data
+        association_records[key] = association_record_schema.load(value)
 
     config_schema = CMSConfigSchema()
     config_schema.context = {
@@ -332,11 +332,8 @@ def parse_cms_config():
         'association_records': association_records,
         'cms_records': cms_records,
     }
-    result = config_schema.load(config)
-    if result.errors:
-        raise ValidationError(result.errors)
 
-    cms_config = result.data
+    cms_config = config_schema.load(config)
     cms_config.association_records = association_records
     cms_config.cms_records = cms_records
     return cms_config
