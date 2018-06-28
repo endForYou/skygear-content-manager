@@ -22,8 +22,8 @@ export type ReferenceConfig =
   | AssociationReferenceFieldConfig
   | EmbeddedBackReferenceFieldConfig;
 
-export type FieldConfig =
-  | StringFieldConfig
+export type EditableFieldConfig =
+  | TextInputFieldConfig
   | TextAreaFieldConfig
   | DropdownFieldConfig
   | WYSIWYGFieldConfig
@@ -37,8 +37,16 @@ export type FieldConfig =
   | EmbeddedBackReferenceFieldConfig
   | ImageAssetFieldConfig
   | FileAssetFieldConfig;
+
+export type FieldConfig =
+  // non editable fields
+  | TextDisplayFieldConfig
+  // and editable fields
+  | EditableFieldConfig;
+
 export enum FieldConfigTypes {
-  String = 'String',
+  TextDisplay = 'TextDisplay',
+  TextInput = 'TextInput',
   TextArea = 'TextArea',
   Dropdown = 'Dropdown',
   WYSIWYG = 'WYSIWYG',
@@ -70,21 +78,49 @@ export interface FieldConfigAttrs {
 
   // derived attrs depending on which page the field lives in
   compact: boolean;
+}
+
+export interface EditableFieldConfigAttrs extends FieldConfigAttrs {
   defaultValue?: any; // tslint:disable-line: no-any
   editable?: boolean;
 }
 
-export interface StringFieldConfig extends FieldConfigAttrs {
-  type: FieldConfigTypes.String;
-  defaultValue?: string;
+// tslint:disable-next-line:no-any
+export function isFieldEditable(config: {
+  type: FieldConfigTypes;
+}): config is EditableFieldConfig {
+  return (
+    config.type === FieldConfigTypes.TextInput ||
+    config.type === FieldConfigTypes.TextArea ||
+    config.type === FieldConfigTypes.Dropdown ||
+    config.type === FieldConfigTypes.WYSIWYG ||
+    config.type === FieldConfigTypes.DateTime ||
+    config.type === FieldConfigTypes.Boolean ||
+    config.type === FieldConfigTypes.Integer ||
+    config.type === FieldConfigTypes.Number ||
+    config.type === FieldConfigTypes.Reference ||
+    config.type === FieldConfigTypes.BackReference ||
+    config.type === FieldConfigTypes.AssociationReference ||
+    config.type === FieldConfigTypes.EmbeddedBackReference ||
+    config.type === FieldConfigTypes.ImageAsset ||
+    config.type === FieldConfigTypes.FileAsset
+  );
 }
 
-export interface TextAreaFieldConfig extends FieldConfigAttrs {
+export interface TextDisplayFieldConfig extends FieldConfigAttrs {
+  type: FieldConfigTypes.TextDisplay;
+}
+
+export interface TextInputFieldConfig extends EditableFieldConfigAttrs {
+  type: FieldConfigTypes.TextInput;
+}
+
+export interface TextAreaFieldConfig extends EditableFieldConfigAttrs {
   type: FieldConfigTypes.TextArea;
   defaultValue?: string;
 }
 
-export interface DropdownFieldConfig extends FieldConfigAttrs {
+export interface DropdownFieldConfig extends EditableFieldConfigAttrs {
   type: FieldConfigTypes.Dropdown;
   defaultValue?: string;
   nullOption: {
@@ -98,47 +134,48 @@ export interface DropdownFieldConfig extends FieldConfigAttrs {
   options: DropdownOption[];
 }
 
-export interface WYSIWYGFieldConfig extends FieldConfigAttrs {
+export interface WYSIWYGFieldConfig extends EditableFieldConfigAttrs {
   type: FieldConfigTypes.WYSIWYG;
   defaultValue?: string;
   config?: any; // tslint:disable-line: no-any
 }
 
-export interface DateTimeFieldConfig extends FieldConfigAttrs {
+export interface DateTimeFieldConfig extends EditableFieldConfigAttrs {
   type: FieldConfigTypes.DateTime;
   defaultValue?: Date;
   timezone?: TimezoneValue;
 }
 
-export interface BooleanFieldConfig extends FieldConfigAttrs {
+export interface BooleanFieldConfig extends EditableFieldConfigAttrs {
   type: FieldConfigTypes.Boolean;
   defaultValue?: boolean;
 }
 
-export interface IntegerFieldConfig extends FieldConfigAttrs {
+export interface IntegerFieldConfig extends EditableFieldConfigAttrs {
   type: FieldConfigTypes.Integer;
   defaultValue?: number;
 }
 
-export interface NumberFieldConfig extends FieldConfigAttrs {
+export interface NumberFieldConfig extends EditableFieldConfigAttrs {
   type: FieldConfigTypes.Number;
   defaultValue?: number;
 }
 
-export interface ReferenceFieldConfig extends FieldConfigAttrs {
+export interface ReferenceFieldConfig extends EditableFieldConfigAttrs {
   type: FieldConfigTypes.Reference;
   targetCmsRecord: CmsRecord;
   displayFieldName: string;
 }
 
-export interface BackReferenceFieldConfig extends FieldConfigAttrs {
+export interface BackReferenceFieldConfig extends EditableFieldConfigAttrs {
   type: FieldConfigTypes.BackReference;
   sourceFieldName: string;
   targetCmsRecord: CmsRecord;
   displayFieldName: string;
 }
 
-export interface AssociationReferenceFieldConfig extends FieldConfigAttrs {
+export interface AssociationReferenceFieldConfig
+  extends EditableFieldConfigAttrs {
   type: FieldConfigTypes.AssociationReference;
 
   // the AssociationRecordConfig that this reference is made on
@@ -157,7 +194,8 @@ export interface AssociationReferenceFieldConfig extends FieldConfigAttrs {
   displayFieldName: string;
 }
 
-export interface EmbeddedBackReferenceFieldConfig extends FieldConfigAttrs {
+export interface EmbeddedBackReferenceFieldConfig
+  extends EditableFieldConfigAttrs {
   type: FieldConfigTypes.EmbeddedBackReference;
   sourceFieldName: string;
   targetCmsRecord: CmsRecord;
@@ -169,13 +207,13 @@ export interface EmbeddedBackReferenceFieldConfig extends FieldConfigAttrs {
   referenceDeleteAction: DeleteAction;
 }
 
-export interface ImageAssetFieldConfig extends FieldConfigAttrs {
+export interface ImageAssetFieldConfig extends EditableFieldConfigAttrs {
   type: FieldConfigTypes.ImageAsset;
   nullable: boolean;
   config?: any; // tslint:disable-line: no-any
 }
 
-export interface FileAssetFieldConfig extends FieldConfigAttrs {
+export interface FileAssetFieldConfig extends EditableFieldConfigAttrs {
   type: FieldConfigTypes.FileAsset;
   nullable: boolean;
   accept: string;
@@ -190,6 +228,24 @@ interface FieldConfigInput {
   type: string;
   // tslint:disable-next-line: no-any
   [key: string]: any;
+}
+
+// tslint:disable-next-line:no-any
+export function preprocessFieldAlias(editable: boolean, input: any) {
+  const map = {
+    String: ['TextDisplay', 'TextInput'],
+  };
+
+  const match = map[input.type];
+  if (match == null) {
+    return input;
+  }
+
+  const type = match[editable ? 1 : 0];
+  return {
+    ...input,
+    type,
+  };
 }
 
 // tslint:disable-next-line: no-any
@@ -232,8 +288,10 @@ export function parseNonReferenceFieldConfig(
   }
 
   switch (a.type) {
-    case 'String':
-      return parseStringFieldConfig(a);
+    case 'TextDisplay':
+      return parseTextDisplayFieldConfig(a);
+    case 'TextInput':
+      return parseTextInputFieldConfig(a);
     case 'TextArea':
       return parseTextAreaFieldConfig(a);
     case 'Dropdown':
@@ -269,11 +327,22 @@ export function parseNonReferenceFieldConfig(
   }
 }
 
-function parseStringFieldConfig(input: FieldConfigInput): StringFieldConfig {
+function parseTextDisplayFieldConfig(
+  input: FieldConfigInput
+): TextDisplayFieldConfig {
   return {
-    ...parseFieldConfigAttrs(input, 'String'),
-    defaultValue: parseOptionalString(input, 'default_value', 'String'),
-    type: FieldConfigTypes.String,
+    ...parseFieldConfigAttrs(input, 'TextDisplay'),
+    type: FieldConfigTypes.TextDisplay,
+  };
+}
+
+function parseTextInputFieldConfig(
+  input: FieldConfigInput
+): TextInputFieldConfig {
+  return {
+    ...parseEditableConfigAttrs(input, 'TextInput'),
+    defaultValue: parseOptionalString(input, 'default_value', 'TextInput'),
+    type: FieldConfigTypes.TextInput,
   };
 }
 
@@ -281,7 +350,7 @@ function parseTextAreaFieldConfig(
   input: FieldConfigInput
 ): TextAreaFieldConfig {
   return {
-    ...parseFieldConfigAttrs(input, 'TextArea'),
+    ...parseEditableConfigAttrs(input, 'TextArea'),
     defaultValue: parseOptionalString(input, 'default_value', 'TextArea'),
     type: FieldConfigTypes.TextArea,
   };
@@ -318,7 +387,7 @@ function parseDropdownFieldConfig(
   customOption.label = customOption.label || 'Others';
 
   return {
-    ...parseFieldConfigAttrs(input, 'Dropdown'),
+    ...parseEditableConfigAttrs(input, 'Dropdown'),
     customOption,
     defaultValue:
       parseOptionalString(input, 'default_value', 'Dropdown') ||
@@ -331,7 +400,7 @@ function parseDropdownFieldConfig(
 
 function parseWYSIWYGFieldConfig(input: FieldConfigInput): WYSIWYGFieldConfig {
   return {
-    ...parseFieldConfigAttrs(input, 'WYSIWYG'),
+    ...parseEditableConfigAttrs(input, 'WYSIWYG'),
     config: input.config,
     defaultValue: parseOptionalString(input, 'default_value', 'WYSIWYG'),
     type: FieldConfigTypes.WYSIWYG,
@@ -343,7 +412,7 @@ function parseDateTimeFieldConfig(
   context: RecordTypeContext
 ): DateTimeFieldConfig {
   return {
-    ...parseFieldConfigAttrs(input, 'DateTime'),
+    ...parseEditableConfigAttrs(input, 'DateTime'),
     defaultValue: parseOptionalDate(input, 'default_value', 'DateTime'),
     timezone: parseTimezone(input, 'timezone'),
     type: FieldConfigTypes.DateTime,
@@ -352,7 +421,7 @@ function parseDateTimeFieldConfig(
 
 function parseBooleanFieldConfig(input: FieldConfigInput): BooleanFieldConfig {
   return {
-    ...parseFieldConfigAttrs(input, 'Boolean'),
+    ...parseEditableConfigAttrs(input, 'Boolean'),
     defaultValue: parseOptionalBoolean(input, 'default_value', 'Boolean'),
     type: FieldConfigTypes.Boolean,
   };
@@ -360,7 +429,7 @@ function parseBooleanFieldConfig(input: FieldConfigInput): BooleanFieldConfig {
 
 function parseIntegerFieldConfig(input: FieldConfigInput): IntegerFieldConfig {
   return {
-    ...parseFieldConfigAttrs(input, 'Integer'),
+    ...parseEditableConfigAttrs(input, 'Integer'),
     defaultValue: parseOptionalNumber(input, 'default_value', 'Integer'),
     type: FieldConfigTypes.Integer,
   };
@@ -368,7 +437,7 @@ function parseIntegerFieldConfig(input: FieldConfigInput): IntegerFieldConfig {
 
 function parseNumberFieldConfig(input: FieldConfigInput): NumberFieldConfig {
   return {
-    ...parseFieldConfigAttrs(input, 'Number'),
+    ...parseEditableConfigAttrs(input, 'Number'),
     defaultValue: parseOptionalNumber(input, 'default_value', 'Number'),
     type: FieldConfigTypes.Number,
   };
@@ -392,7 +461,7 @@ export function parseReferenceFieldConfig(
   const targetCmsRecord = cmsRecordData.record;
 
   return {
-    ...parseFieldConfigAttrs(input, 'Reference'),
+    ...parseEditableConfigAttrs(input, 'Reference'),
     displayFieldName,
     targetCmsRecord,
     type: FieldConfigTypes.Reference,
@@ -410,7 +479,7 @@ function parseBackReferenceFieldConfig(
   );
 
   return {
-    ...parseFieldConfigAttrs(input, 'Reference'),
+    ...parseEditableConfigAttrs(input, 'Reference'),
     ...parseBackReferenceFieldConfigAttrs(context, input),
     displayFieldName,
     type: FieldConfigTypes.BackReference,
@@ -425,10 +494,11 @@ function parseEmbeddedBackReferenceFieldConfig(
     throw new Error('Expect reference_fields to be array of fields');
   }
 
-  // tslint:disable-next-line: no-any
-  const displayFields = input.reference_fields.map((f: any) =>
-    parseFieldConfig(context, f)
-  ) as FieldConfig[];
+  const displayFields = input.reference_fields
+    // tslint:disable-next-line: no-any
+    .map((f: any) => preprocessFieldAlias(true, f))
+    // tslint:disable-next-line: no-any
+    .map((f: any) => parseFieldConfig(context, f)) as FieldConfig[];
 
   const positionFieldName = parseOptionalString(
     input,
@@ -462,7 +532,7 @@ function parseEmbeddedBackReferenceFieldConfig(
   );
 
   return {
-    ...parseFieldConfigAttrs(input, 'EmbeddedReference'),
+    ...parseEditableConfigAttrs(input, 'EmbeddedReference'),
     ...parseBackReferenceFieldConfigAttrs(context, input),
     displayFields,
     positionFieldName,
@@ -536,7 +606,7 @@ function parseAssociationReferenceFieldConfig(
   );
 
   return {
-    ...parseFieldConfigAttrs(input, 'Reference'),
+    ...parseEditableConfigAttrs(input, 'Reference'),
     associationRecordConfig,
     displayFieldName,
     sourceReference,
@@ -581,7 +651,7 @@ function parseFileAssetFieldConfig(
   const nullable = parseOptionalBoolean(input, 'nullable', 'FileAsset');
 
   return {
-    ...parseFieldConfigAttrs(input, 'FileAsset'),
+    ...parseEditableConfigAttrs(input, 'FileAsset'),
     accept: parseOptionalString(input, 'accept', 'FileAsset') || '',
     nullable: nullable == null ? true : nullable,
     type: FieldConfigTypes.FileAsset,
@@ -597,6 +667,14 @@ function parseFieldConfigAttrs(
   const label =
     parseOptionalString(input, 'label', fieldType) || humanize(name);
 
+  return { compact: false, name, label };
+}
+
+function parseEditableConfigAttrs(
+  // tslint:disable-next-line: no-any
+  input: any,
+  fieldType: string
+): EditableFieldConfigAttrs {
   const optionalAttrs: { editable?: boolean } = {};
 
   const maybeEditable = parseOptionalBoolean(input, 'editable', fieldType);
@@ -604,20 +682,22 @@ function parseFieldConfigAttrs(
     optionalAttrs.editable = maybeEditable;
   }
 
-  return { compact: false, name, label, ...optionalAttrs };
+  return {
+    ...parseFieldConfigAttrs(input, fieldType),
+    ...optionalAttrs,
+  };
 }
 
-function parseIdFieldConfig(input: FieldConfigInput): StringFieldConfig {
+function parseIdFieldConfig(input: FieldConfigInput): TextDisplayFieldConfig {
   if (input.type) {
     console.log(`Type (${input.type}) is ignored in _id field.`);
   }
 
   return {
     compact: false,
-    editable: false,
     label: parseOptionalString(input, 'label', 'ID') || 'ID',
     name: '_id',
-    type: FieldConfigTypes.String,
+    type: FieldConfigTypes.TextDisplay,
   };
 }
 

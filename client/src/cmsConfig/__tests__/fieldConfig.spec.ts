@@ -294,7 +294,7 @@ describe('parseFieldConfig EmbeddedReference', () => {
       reference_fields: [
         {
           name: 'name',
-          type: 'String',
+          type: 'TextDisplay',
         },
       ],
       reference_from_field: 'a_id',
@@ -309,7 +309,7 @@ describe('parseFieldConfig EmbeddedReference', () => {
           compact: false,
           label: 'Name',
           name: 'name',
-          type: 'String',
+          type: 'TextDisplay',
         },
       ],
       label: 'A',

@@ -6,8 +6,10 @@ import {
   FieldConfig,
   FieldConfigTypes,
   filterReferences,
+  isFieldEditable,
   parseFieldConfig,
   parseReferenceFieldConfig,
+  preprocessFieldAlias,
   ReferenceConfig,
   ReferenceFieldConfig,
 } from './fieldConfig';
@@ -413,10 +415,11 @@ function parseListPageConfig(
   const label =
     parseOptionalString(input, 'label', 'List') || humanize(cmsRecord.name);
 
-  // tslint:disable-next-line: no-any
-  const fields = input.fields.map((f: any) =>
-    parseFieldConfig(context, f)
-  ) as FieldConfig[];
+  const fields = input.fields
+    // tslint:disable-next-line: no-any
+    .map((f: any) => preprocessFieldAlias(false, f))
+    // tslint:disable-next-line: no-any
+    .map((f: any) => parseFieldConfig(context, f)) as FieldConfig[];
   const compactFields = fields.map(config => ({ ...config, compact: true }));
 
   const filters =
@@ -624,10 +627,11 @@ function parseShowPageConfig(
     throw new Error(`ShowPageConfig.label must be a string`);
   }
 
-  // tslint:disable-next-line: no-any
-  const fields = input.fields.map((f: any) =>
-    parseFieldConfig(context, f)
-  ) as FieldConfig[];
+  const fields = input.fields
+    // tslint:disable-next-line: no-any
+    .map((f: any) => preprocessFieldAlias(false, f))
+    // tslint:disable-next-line: no-any
+    .map((f: any) => parseFieldConfig(context, f)) as FieldConfig[];
 
   return {
     actions: parseShowActions(input.actions),
@@ -679,10 +683,24 @@ function parseShowActions(input: any): ShowActionConfig[] {
 }
 
 function makeEditableField(config: FieldConfig): FieldConfig {
-  return {
-    editable: true,
-    ...config,
-  };
+  if (isFieldEditable(config)) {
+    return {
+      editable: true,
+      ...config,
+    };
+  }
+
+  return config;
+}
+
+function recursivelyMakeEditableField(config: FieldConfig): FieldConfig {
+  if (config.type === FieldConfigTypes.EmbeddedBackReference) {
+    config = {
+      ...config,
+      displayFields: config.displayFields.map(recursivelyMakeEditableField),
+    };
+  }
+  return makeEditableField(config);
 }
 
 function parseRecordFormPageConfig(
@@ -703,19 +721,12 @@ function parseRecordFormPageConfig(
     throw new Error(`RecordFormPageConfig.label must be a string`);
   }
 
-  // tslint:disable-next-line: no-any
-  const fields = input.fields.map((f: any) =>
-    parseFieldConfig(context, f)
-  ) as FieldConfig[];
-  const recursivelyMakeEditableField = (config: FieldConfig): FieldConfig => {
-    if (config.type === FieldConfigTypes.EmbeddedBackReference) {
-      config = {
-        ...config,
-        displayFields: config.displayFields.map(recursivelyMakeEditableField),
-      };
-    }
-    return makeEditableField(config);
-  };
+  const fields = input.fields
+    // tslint:disable-next-line: no-any
+    .map((f: any) => preprocessFieldAlias(true, f))
+    // tslint:disable-next-line: no-any
+    .map((f: any) => parseFieldConfig(context, f)) as FieldConfig[];
+
   const editableFields = fields.map(recursivelyMakeEditableField);
 
   return {

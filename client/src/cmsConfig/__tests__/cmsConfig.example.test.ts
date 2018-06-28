@@ -37,9 +37,7 @@ test('parseCmsConfig should parse example config', () => {
         ],
       },
     },
-    fileImport: {
-      enabled: true,
-    },
+    fileImport: { enabled: true },
     pushNotifications: {
       enabled: true,
       filterUserConfigs: [
@@ -53,13 +51,7 @@ test('parseCmsConfig should parse example config', () => {
           actions: [],
           cmsRecord: { name: 'field_demo', recordType: 'field_demo' },
           fields: [
-            {
-              editable: false,
-              compact: false,
-              label: 'ID',
-              name: '_id',
-              type: 'String',
-            },
+            { compact: false, label: 'ID', name: '_id', type: 'TextDisplay' },
             {
               editable: false,
               compact: false,
@@ -79,7 +71,7 @@ test('parseCmsConfig should parse example config', () => {
               compact: false,
               name: 'name',
               label: 'Name',
-              type: 'String',
+              type: 'TextInput',
             },
             {
               editable: true,
@@ -172,18 +164,17 @@ test('parseCmsConfig should parse example config', () => {
               },
               displayFields: [
                 {
-                  editable: false,
                   compact: false,
                   label: 'ID',
                   name: '_id',
-                  type: 'String',
+                  type: 'TextDisplay',
                 },
                 {
                   editable: true,
                   compact: false,
                   name: 'name',
                   label: 'Name',
-                  type: 'String',
+                  type: 'TextInput',
                 },
               ],
               positionFieldName: 'field_demo_position',
@@ -253,12 +244,16 @@ test('parseCmsConfig should parse example config', () => {
               displayFields: [
                 {
                   compact: false,
-                  editable: false,
                   label: 'ID',
                   name: '_id',
-                  type: 'String',
+                  type: 'TextDisplay',
                 },
-                { compact: false, name: 'name', label: 'Name', type: 'String' },
+                {
+                  compact: false,
+                  name: 'name',
+                  label: 'Name',
+                  type: 'TextInput',
+                },
               ],
               positionFieldName: 'field_demo_position',
               referenceDeleteAction: 'NullifyReference',
@@ -296,13 +291,7 @@ test('parseCmsConfig should parse example config', () => {
           cmsRecord: { name: 'field_demo', recordType: 'field_demo' },
           defaultSort: { fieldName: 'name', order: 'descending' },
           fields: [
-            {
-              compact: true,
-              editable: false,
-              label: 'ID',
-              name: '_id',
-              type: 'String',
-            },
+            { compact: true, label: 'ID', name: '_id', type: 'TextDisplay' },
             {
               compact: true,
               editable: false,
@@ -317,7 +306,7 @@ test('parseCmsConfig should parse example config', () => {
               name: 'updatedAt',
               type: 'DateTime',
             },
-            { compact: true, name: 'name', label: 'Name', type: 'String' },
+            { compact: true, name: 'name', label: 'Name', type: 'TextDisplay' },
             {
               compact: true,
               name: 'textarea',
@@ -328,7 +317,7 @@ test('parseCmsConfig should parse example config', () => {
               compact: true,
               name: 'dropdown',
               label: 'Dropdown',
-              type: 'String',
+              type: 'TextDisplay',
             },
             {
               compact: true,
@@ -490,13 +479,7 @@ test('parseCmsConfig should parse example config', () => {
           actions: [],
           cmsRecord: { name: 'field_demo', recordType: 'field_demo' },
           fields: [
-            {
-              editable: false,
-              compact: false,
-              label: 'ID',
-              name: '_id',
-              type: 'String',
-            },
+            { compact: false, label: 'ID', name: '_id', type: 'TextDisplay' },
             {
               editable: false,
               compact: false,
@@ -516,7 +499,7 @@ test('parseCmsConfig should parse example config', () => {
               compact: false,
               name: 'name',
               label: 'Name',
-              type: 'String',
+              type: 'TextInput',
             },
             {
               editable: true,
@@ -609,18 +592,17 @@ test('parseCmsConfig should parse example config', () => {
               },
               displayFields: [
                 {
-                  editable: false,
                   compact: false,
                   label: 'ID',
                   name: '_id',
-                  type: 'String',
+                  type: 'TextDisplay',
                 },
                 {
                   editable: true,
                   compact: false,
                   name: 'name',
                   label: 'Name',
-                  type: 'String',
+                  type: 'TextInput',
                 },
               ],
               positionFieldName: 'field_demo_position',
@@ -690,12 +672,16 @@ test('parseCmsConfig should parse example config', () => {
               displayFields: [
                 {
                   compact: false,
-                  editable: false,
                   label: 'ID',
                   name: '_id',
-                  type: 'String',
+                  type: 'TextDisplay',
                 },
-                { compact: false, name: 'name', label: 'Name', type: 'String' },
+                {
+                  compact: false,
+                  name: 'name',
+                  label: 'Name',
+                  type: 'TextInput',
+                },
               ],
               positionFieldName: 'field_demo_position',
               referenceDeleteAction: 'NullifyReference',
@@ -717,13 +703,7 @@ test('parseCmsConfig should parse example config', () => {
           ],
           cmsRecord: { name: 'field_demo', recordType: 'field_demo' },
           fields: [
-            {
-              compact: false,
-              editable: false,
-              label: 'ID',
-              name: '_id',
-              type: 'String',
-            },
+            { compact: false, label: 'ID', name: '_id', type: 'TextDisplay' },
             {
               compact: false,
               editable: false,
@@ -738,7 +718,12 @@ test('parseCmsConfig should parse example config', () => {
               name: 'updatedAt',
               type: 'DateTime',
             },
-            { compact: false, name: 'name', label: 'Name', type: 'String' },
+            {
+              compact: false,
+              name: 'name',
+              label: 'Name',
+              type: 'TextDisplay',
+            },
             {
               compact: false,
               name: 'textarea',
@@ -749,7 +734,7 @@ test('parseCmsConfig should parse example config', () => {
               compact: false,
               name: 'dropdown',
               label: 'Dropdown',
-              type: 'String',
+              type: 'TextDisplay',
             },
             {
               compact: false,
@@ -868,12 +853,16 @@ test('parseCmsConfig should parse example config', () => {
               displayFields: [
                 {
                   compact: false,
-                  editable: false,
                   label: 'ID',
                   name: '_id',
-                  type: 'String',
+                  type: 'TextDisplay',
                 },
-                { compact: false, name: 'name', label: 'Name', type: 'String' },
+                {
+                  compact: false,
+                  name: 'name',
+                  label: 'Name',
+                  type: 'TextInput',
+                },
               ],
               positionFieldName: 'field_demo_position',
               referenceDeleteAction: 'NullifyReference',
@@ -997,12 +986,16 @@ test('parseCmsConfig should parse example config', () => {
               displayFields: [
                 {
                   compact: false,
-                  editable: false,
                   label: 'ID',
                   name: '_id',
-                  type: 'String',
+                  type: 'TextDisplay',
                 },
-                { compact: false, name: 'name', label: 'Name', type: 'String' },
+                {
+                  compact: false,
+                  name: 'name',
+                  label: 'Name',
+                  type: 'TextInput',
+                },
               ],
               positionFieldName: 'field_demo_position',
               referenceDeleteAction: 'NullifyReference',
@@ -1021,13 +1014,7 @@ test('parseCmsConfig should parse example config', () => {
           cmsRecord: { name: 'field_demo_deleted', recordType: 'field_demo' },
           defaultSort: { order: 'undefined' },
           fields: [
-            {
-              compact: true,
-              editable: false,
-              label: 'ID',
-              name: '_id',
-              type: 'String',
-            },
+            { compact: true, label: 'ID', name: '_id', type: 'TextDisplay' },
             {
               compact: true,
               editable: false,
@@ -1042,7 +1029,7 @@ test('parseCmsConfig should parse example config', () => {
               name: 'updatedAt',
               type: 'DateTime',
             },
-            { compact: true, name: 'name', label: 'Name', type: 'String' },
+            { compact: true, name: 'name', label: 'Name', type: 'TextDisplay' },
           ],
           itemActions: [],
           label: 'Field demo deleted',
@@ -1064,19 +1051,13 @@ test('parseCmsConfig should parse example config', () => {
           actions: [],
           cmsRecord: { name: 'ref_demo', recordType: 'ref_demo' },
           fields: [
-            {
-              editable: false,
-              compact: false,
-              label: 'ID',
-              name: '_id',
-              type: 'String',
-            },
+            { compact: false, label: 'ID', name: '_id', type: 'TextDisplay' },
             {
               editable: true,
               compact: false,
               name: 'name',
               label: 'Name',
-              type: 'String',
+              type: 'TextInput',
             },
             {
               editable: true,
@@ -1106,19 +1087,13 @@ test('parseCmsConfig should parse example config', () => {
           actions: [],
           cmsRecord: { name: 'ref_demo', recordType: 'ref_demo' },
           fields: [
-            {
-              editable: false,
-              compact: false,
-              label: 'ID',
-              name: '_id',
-              type: 'String',
-            },
+            { compact: false, label: 'ID', name: '_id', type: 'TextDisplay' },
             {
               editable: true,
               compact: false,
               name: 'name',
               label: 'Name',
-              type: 'String',
+              type: 'TextInput',
             },
             {
               editable: true,
@@ -1155,14 +1130,13 @@ test('parseCmsConfig should parse example config', () => {
           ],
           cmsRecord: { name: 'ref_demo', recordType: 'ref_demo' },
           fields: [
+            { compact: false, label: 'ID', name: '_id', type: 'TextDisplay' },
             {
               compact: false,
-              editable: false,
-              label: 'ID',
-              name: '_id',
-              type: 'String',
+              name: 'name',
+              label: 'Name',
+              type: 'TextDisplay',
             },
-            { compact: false, name: 'name', label: 'Name', type: 'String' },
             {
               compact: false,
               name: 'field_references',
@@ -1193,13 +1167,7 @@ test('parseCmsConfig should parse example config', () => {
           actions: [],
           cmsRecord: { name: 'back_ref_demo', recordType: 'back_ref_demo' },
           fields: [
-            {
-              editable: false,
-              compact: false,
-              label: 'ID',
-              name: '_id',
-              type: 'String',
-            },
+            { compact: false, label: 'ID', name: '_id', type: 'TextDisplay' },
             {
               editable: true,
               compact: false,
@@ -1214,7 +1182,7 @@ test('parseCmsConfig should parse example config', () => {
               compact: false,
               name: 'name',
               label: 'Name',
-              type: 'String',
+              type: 'TextInput',
             },
           ],
           label: 'Back ref demo',
@@ -1233,13 +1201,7 @@ test('parseCmsConfig should parse example config', () => {
           actions: [],
           cmsRecord: { name: 'back_ref_demo', recordType: 'back_ref_demo' },
           fields: [
-            {
-              editable: false,
-              compact: false,
-              label: 'ID',
-              name: '_id',
-              type: 'String',
-            },
+            { compact: false, label: 'ID', name: '_id', type: 'TextDisplay' },
             {
               editable: true,
               compact: false,
@@ -1254,7 +1216,7 @@ test('parseCmsConfig should parse example config', () => {
               compact: false,
               name: 'name',
               label: 'Name',
-              type: 'String',
+              type: 'TextInput',
             },
           ],
           label: 'Back ref demo',
@@ -1280,13 +1242,7 @@ test('parseCmsConfig should parse example config', () => {
           ],
           cmsRecord: { name: 'back_ref_demo', recordType: 'back_ref_demo' },
           fields: [
-            {
-              compact: false,
-              editable: false,
-              label: 'ID',
-              name: '_id',
-              type: 'String',
-            },
+            { compact: false, label: 'ID', name: '_id', type: 'TextDisplay' },
             {
               compact: false,
               name: 'reference',
@@ -1295,7 +1251,12 @@ test('parseCmsConfig should parse example config', () => {
               targetCmsRecord: { name: 'field_demo', recordType: 'field_demo' },
               type: 'Reference',
             },
-            { compact: false, name: 'name', label: 'Name', type: 'String' },
+            {
+              compact: false,
+              name: 'name',
+              label: 'Name',
+              type: 'TextDisplay',
+            },
           ],
           label: 'Back ref demo',
           references: [
@@ -1323,14 +1284,13 @@ test('parseCmsConfig should parse example config', () => {
           ],
           cmsRecord: { name: 'asso_ref_demo', recordType: 'asso_ref_demo' },
           fields: [
+            { compact: false, label: 'ID', name: '_id', type: 'TextDisplay' },
             {
               compact: false,
-              editable: false,
-              label: 'ID',
-              name: '_id',
-              type: 'String',
+              name: 'name',
+              label: 'Name',
+              type: 'TextDisplay',
             },
-            { compact: false, name: 'name', label: 'Name', type: 'String' },
           ],
           label: 'Asso ref demo',
           references: [],

@@ -6,7 +6,7 @@ import { Dispatch } from 'redux';
 import { Record } from 'skygear';
 
 import { RecordActionDispatcher } from '../actions/record';
-import { RecordFormPageConfig } from '../cmsConfig';
+import { isFieldEditable, RecordFormPageConfig } from '../cmsConfig';
 import { RecordFormPage } from '../components/RecordFormPage';
 import { RecordFormTopbar } from '../components/RecordFormTopbar';
 import { RootState } from '../states';
@@ -41,11 +41,10 @@ class NewPageContainerImpl extends React.PureComponent<Props> {
     );
 
     this.newRecord = new (Record.extend(props.config.cmsRecord.name))();
-    props.config.fields.forEach(field => {
-      if (field.defaultValue !== undefined) {
-        this.newRecord[field.name] = field.defaultValue;
-      }
-    });
+    props.config.fields
+      .filter(isFieldEditable)
+      .filter(field => field.defaultValue !== undefined)
+      .forEach(field => (this.newRecord[field.name] = field.defaultValue));
   }
 
   public render() {

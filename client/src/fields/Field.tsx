@@ -17,7 +17,7 @@ import { ImageAssetField } from './ImageAssetField';
 import { IntegerField } from './IntegerField';
 import { NumberField } from './NumberField';
 import { ReferenceField } from './ReferenceField';
-import { StringField } from './StringField';
+import { TextDisplayField, TextInputField } from './StringField';
 import { TextArea } from './TextArea';
 import { WYSIWYGEditor } from './WYSIWYGEditor';
 
@@ -62,8 +62,10 @@ export class Field extends React.PureComponent<FieldProps> {
   public render() {
     const { config, ...rest } = this.props;
     switch (config.type) {
-      case FieldConfigTypes.String:
-        return <StringField {...rest} config={config} />;
+      case FieldConfigTypes.TextDisplay:
+        return <TextDisplayField {...rest} config={config} />;
+      case FieldConfigTypes.TextInput:
+        return <TextInputField {...rest} config={config} />;
       case FieldConfigTypes.DateTime:
         return <DateTimeField {...rest} config={config} />;
       case FieldConfigTypes.Dropdown:
