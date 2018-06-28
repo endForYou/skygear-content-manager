@@ -45,8 +45,12 @@ def generate_record_config(record):
 
 
 def generate_fields_config(record):
-    fields = record.fields
-    field_configs = [generate_field_config(record, field) for field in fields]
+    field_configs = []
+    for field in record.fields:
+        field_config = generate_field_config(record, field)
+        if field_config != None:
+            field_configs.append(field_config)
+
     reserved_field_configs = [{
         'name': '_id',
     }, {
