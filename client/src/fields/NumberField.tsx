@@ -9,12 +9,14 @@ type FloatDisplayFieldProps = RequiredFieldProps<FloatDisplayFieldConfig>;
 
 export const FloatDisplayField: React.SFC<FloatDisplayFieldProps> = ({
   className,
+  value,
   ...rest,
 }) => {
   return (
     <StringDisplay
       {...rest}
       className={classnames(className, 'number-display')}
+      value={`${value == null ? '' : parseFloat(value)}`}
     />
   );
 };
