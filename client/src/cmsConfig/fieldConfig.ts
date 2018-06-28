@@ -36,7 +36,7 @@ export type EditableFieldConfig =
   | BackReferenceFieldConfig
   | AssociationReferenceFieldConfig
   | EmbeddedBackReferenceFieldConfig
-  | ImageAssetFieldConfig
+  | ImageUploaderFieldConfig
   | FileUploaderFieldConfig;
 
 export type FieldConfig =
@@ -45,6 +45,7 @@ export type FieldConfig =
   | DateTimeDisplayFieldConfig
   | IntegerDisplayFieldConfig
   | FloatDisplayFieldConfig
+  | ImageDisplayFieldConfig
   | FileDisplayFieldConfig
   // and editable fields
   | EditableFieldConfig;
@@ -66,7 +67,8 @@ export enum FieldConfigTypes {
   BackReference = 'BackReference',
   AssociationReference = 'AssociationReference',
   EmbeddedBackReference = 'EmbeddedBackReference',
-  ImageAsset = 'ImageAsset',
+  ImageDisplay = 'ImageDisplay',
+  ImageUploader = 'ImageUploader',
   FileDisplay = 'FileDisplay',
   FileUploader = 'FileUploader',
 }
@@ -111,7 +113,7 @@ export function isFieldEditable(config: {
     config.type === FieldConfigTypes.BackReference ||
     config.type === FieldConfigTypes.AssociationReference ||
     config.type === FieldConfigTypes.EmbeddedBackReference ||
-    config.type === FieldConfigTypes.ImageAsset ||
+    config.type === FieldConfigTypes.ImageUploader ||
     config.type === FieldConfigTypes.FileUploader
   );
 }
@@ -229,8 +231,13 @@ export interface EmbeddedBackReferenceFieldConfig
   referenceDeleteAction: DeleteAction;
 }
 
-export interface ImageAssetFieldConfig extends EditableFieldConfigAttrs {
-  type: FieldConfigTypes.ImageAsset;
+export interface ImageDisplayFieldConfig extends FieldConfigAttrs {
+  type: FieldConfigTypes.ImageDisplay;
+  config?: any; // tslint:disable-line: no-any
+}
+
+export interface ImageUploaderFieldConfig extends EditableFieldConfigAttrs {
+  type: FieldConfigTypes.ImageUploader;
   nullable: boolean;
   config?: any; // tslint:disable-line: no-any
 }
@@ -262,6 +269,7 @@ export function preprocessFieldAlias(editable: boolean, input: any) {
     Asset: ['FileDisplay', 'FileUploader'],
     DateTime: ['DateTimeDisplay', 'DateTimePicker'],
     Float: ['FloatDisplay', 'FloatInput'],
+    Image: ['ImageDisplay', 'ImageUploader'],
     Integer: ['IntegerDisplay', 'IntegerInput'],
     Number: ['FloatDisplay', 'FloatInput'],
     String: ['TextDisplay', 'TextInput'],
@@ -357,8 +365,10 @@ export function parseNonReferenceFieldConfig(
       return parseFloatDisplayFieldConfig(a);
     case 'FloatInput':
       return parseFloatInputFieldConfig(a);
-    case 'ImageAsset':
-      return parseImageAssetFieldConfig(a);
+    case 'ImageDisplay':
+      return parseImageDisplayFieldConfig(a);
+    case 'ImageUploader':
+      return parseImageUploaderFieldConfig(a);
     case 'FileDisplay':
       return parseFileDisplayFieldConfig(a);
     case 'FileUploader':
@@ -716,16 +726,26 @@ function deriveReferencesByTargetName(
   }
 }
 
-function parseImageAssetFieldConfig(
+function parseImageDisplayFieldConfig(
   input: FieldConfigInput
-): ImageAssetFieldConfig {
-  const nullable = parseOptionalBoolean(input, 'nullable', 'ImageAsset');
+): ImageDisplayFieldConfig {
+  return {
+    ...parseFieldConfigAttrs(input, 'ImageDisplay'),
+    config: input.config,
+    type: FieldConfigTypes.ImageDisplay,
+  };
+}
+
+function parseImageUploaderFieldConfig(
+  input: FieldConfigInput
+): ImageUploaderFieldConfig {
+  const nullable = parseOptionalBoolean(input, 'nullable', 'ImageUploader');
 
   return {
-    ...parseFieldConfigAttrs(input, 'ImageAsset'),
+    ...parseEditableConfigAttrs(input, 'ImageUploader'),
     config: input.config,
     nullable: nullable == null ? true : nullable,
-    type: FieldConfigTypes.ImageAsset,
+    type: FieldConfigTypes.ImageUploader,
   };
 }
 

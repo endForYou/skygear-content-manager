@@ -184,8 +184,9 @@ test('parseCmsConfig should parse example config', () => {
               compact: false,
               name: 'imageasset',
               label: 'Imageasset',
+              editable: true,
               nullable: true,
-              type: 'ImageAsset',
+              type: 'ImageUploader',
             },
             {
               compact: false,
@@ -369,8 +370,7 @@ test('parseCmsConfig should parse example config', () => {
               compact: true,
               name: 'imageasset',
               label: 'Imageasset',
-              nullable: true,
-              type: 'ImageAsset',
+              type: 'ImageDisplay',
             },
             {
               compact: true,
@@ -611,8 +611,9 @@ test('parseCmsConfig should parse example config', () => {
               compact: false,
               name: 'imageasset',
               label: 'Imageasset',
+              editable: true,
               nullable: true,
-              type: 'ImageAsset',
+              type: 'ImageUploader',
             },
             {
               compact: false,
@@ -875,8 +876,7 @@ test('parseCmsConfig should parse example config', () => {
               compact: false,
               name: 'imageasset',
               label: 'Imageasset',
-              nullable: true,
-              type: 'ImageAsset',
+              type: 'ImageDisplay',
             },
             {
               compact: false,

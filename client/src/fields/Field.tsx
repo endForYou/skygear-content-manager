@@ -13,7 +13,7 @@ import { DateTimeDisplayField, DateTimePickerField } from './DateTimeField';
 import { DropdownField } from './DropdownField';
 import { EmbeddedBackReferenceField } from './EmbeddedBackReferenceField';
 import { FileDisplayField, FileUploaderField } from './FileField';
-import { ImageAssetField } from './ImageAssetField';
+import { ImageDisplayField, ImageUploaderField } from './ImageField';
 import { IntegerDisplayField, IntegerInputField } from './IntegerField';
 import { FloatDisplayField, FloatInputField } from './NumberField';
 import { ReferenceField } from './ReferenceField';
@@ -94,8 +94,10 @@ export class Field extends React.PureComponent<FieldProps> {
         return <AssociationReferenceField {...rest} config={config} />;
       case FieldConfigTypes.EmbeddedBackReference:
         return <EmbeddedBackReferenceField {...rest} config={config} />;
-      case FieldConfigTypes.ImageAsset:
-        return <ImageAssetField {...rest} config={config} />;
+      case FieldConfigTypes.ImageDisplay:
+        return <ImageDisplayField {...rest} config={config} />;
+      case FieldConfigTypes.ImageUploader:
+        return <ImageUploaderField {...rest} config={config} />;
       case FieldConfigTypes.FileDisplay:
         return <FileDisplayField {...rest} config={config} />;
       case FieldConfigTypes.FileUploader:
