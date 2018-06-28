@@ -30,7 +30,7 @@ export type EditableFieldConfig =
   | DateTimeFieldConfig
   | BooleanFieldConfig
   | IntegerFieldConfig
-  | NumberFieldConfig
+  | FloatInputFieldConfig
   | ReferenceFieldConfig
   | BackReferenceFieldConfig
   | AssociationReferenceFieldConfig
@@ -41,6 +41,7 @@ export type EditableFieldConfig =
 export type FieldConfig =
   // non editable fields
   | TextDisplayFieldConfig
+  | FloatDisplayFieldConfig
   // and editable fields
   | EditableFieldConfig;
 
@@ -53,7 +54,8 @@ export enum FieldConfigTypes {
   DateTime = 'DateTime',
   Boolean = 'Boolean',
   Integer = 'Integer',
-  Number = 'Number',
+  FloatDisplay = 'FloatDisplay',
+  FloatInput = 'FloatInput',
   Reference = 'Reference',
   BackReference = 'BackReference',
   AssociationReference = 'AssociationReference',
@@ -97,7 +99,7 @@ export function isFieldEditable(config: {
     config.type === FieldConfigTypes.DateTime ||
     config.type === FieldConfigTypes.Boolean ||
     config.type === FieldConfigTypes.Integer ||
-    config.type === FieldConfigTypes.Number ||
+    config.type === FieldConfigTypes.FloatInput ||
     config.type === FieldConfigTypes.Reference ||
     config.type === FieldConfigTypes.BackReference ||
     config.type === FieldConfigTypes.AssociationReference ||
@@ -156,8 +158,12 @@ export interface IntegerFieldConfig extends EditableFieldConfigAttrs {
   defaultValue?: number;
 }
 
-export interface NumberFieldConfig extends EditableFieldConfigAttrs {
-  type: FieldConfigTypes.Number;
+export interface FloatDisplayFieldConfig extends FieldConfigAttrs {
+  type: FieldConfigTypes.FloatDisplay;
+}
+
+export interface FloatInputFieldConfig extends EditableFieldConfigAttrs {
+  type: FieldConfigTypes.FloatInput;
   defaultValue?: number;
 }
 
@@ -233,6 +239,8 @@ interface FieldConfigInput {
 // tslint:disable-next-line:no-any
 export function preprocessFieldAlias(editable: boolean, input: any) {
   const map = {
+    Float: ['FloatDisplay', 'FloatInput'],
+    Number: ['FloatDisplay', 'FloatInput'],
     String: ['TextDisplay', 'TextInput'],
   };
 
@@ -304,8 +312,10 @@ export function parseNonReferenceFieldConfig(
       return parseBooleanFieldConfig(a);
     case 'Integer':
       return parseIntegerFieldConfig(a);
-    case 'Number':
-      return parseNumberFieldConfig(a);
+    case 'FloatDisplay':
+      return parseFloatDisplayFieldConfig(a);
+    case 'FloatInput':
+      return parseFloatInputFieldConfig(a);
     case 'ImageAsset':
       return parseImageAssetFieldConfig(a);
     case 'FileAsset':
@@ -435,11 +445,22 @@ function parseIntegerFieldConfig(input: FieldConfigInput): IntegerFieldConfig {
   };
 }
 
-function parseNumberFieldConfig(input: FieldConfigInput): NumberFieldConfig {
+function parseFloatDisplayFieldConfig(
+  input: FieldConfigInput
+): FloatDisplayFieldConfig {
   return {
-    ...parseEditableConfigAttrs(input, 'Number'),
-    defaultValue: parseOptionalNumber(input, 'default_value', 'Number'),
-    type: FieldConfigTypes.Number,
+    ...parseFieldConfigAttrs(input, 'FloatDisplay'),
+    type: FieldConfigTypes.FloatDisplay,
+  };
+}
+
+function parseFloatInputFieldConfig(
+  input: FieldConfigInput
+): FloatInputFieldConfig {
+  return {
+    ...parseEditableConfigAttrs(input, 'FloatInput'),
+    defaultValue: parseOptionalNumber(input, 'default_value', 'FloatInput'),
+    type: FieldConfigTypes.FloatInput,
   };
 }
 

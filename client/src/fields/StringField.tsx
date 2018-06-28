@@ -1,32 +1,29 @@
 import classnames from 'classnames';
 import * as React from 'react';
 
-import { BaseStringField } from './BaseStringField';
+import { BaseStringInputField } from './BaseStringInputField';
 import { RequiredFieldProps } from './Field';
 
 import { TextDisplayFieldConfig, TextInputFieldConfig } from '../cmsConfig';
+import { StringDisplay } from './StringDisplay';
 
 export type TextDisplayFieldProps = RequiredFieldProps<TextDisplayFieldConfig>;
 
 export const TextDisplayField: React.SFC<TextDisplayFieldProps> = ({
-  config: { compact },
   className,
-  value,
   ...rest,
 }) => {
   return (
-    <span
+    <StringDisplay
       {...rest}
-      className={classnames(className, 'text-display', { full: !compact })}
-    >
-      {value}
-    </span>
+      className={classnames(className, 'text-display')}
+    />
   );
 };
 
 export type TextInputFieldProps = RequiredFieldProps<TextInputFieldConfig>;
 
-export class TextInputField extends BaseStringField<
+export class TextInputField extends BaseStringInputField<
   TextInputFieldConfig,
   TextInputFieldProps
 > {

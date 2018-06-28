@@ -15,7 +15,7 @@ import { EmbeddedBackReferenceField } from './EmbeddedBackReferenceField';
 import { FileAssetField } from './FileAssetField';
 import { ImageAssetField } from './ImageAssetField';
 import { IntegerField } from './IntegerField';
-import { NumberField } from './NumberField';
+import { FloatDisplayField, FloatInputField } from './NumberField';
 import { ReferenceField } from './ReferenceField';
 import { TextDisplayField, TextInputField } from './StringField';
 import { TextArea } from './TextArea';
@@ -78,8 +78,10 @@ export class Field extends React.PureComponent<FieldProps> {
         return <BooleanField {...rest} config={config} />;
       case FieldConfigTypes.Integer:
         return <IntegerField {...rest} config={config} />;
-      case FieldConfigTypes.Number:
-        return <NumberField {...rest} config={config} />;
+      case FieldConfigTypes.FloatDisplay:
+        return <FloatDisplayField {...rest} config={config} />;
+      case FieldConfigTypes.FloatInput:
+        return <FloatInputField {...rest} config={config} />;
       case FieldConfigTypes.Reference:
         return <ReferenceField {...rest} config={config} />;
       case FieldConfigTypes.BackReference:
