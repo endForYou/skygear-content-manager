@@ -250,6 +250,9 @@ export function preprocessFieldAlias(editable: boolean, input: any) {
     Integer: ['IntegerDisplay', 'IntegerInput'],
     Number: ['FloatDisplay', 'FloatInput'],
     String: ['TextDisplay', 'TextInput'],
+    // TODO:
+    // Invert the alias if more than one UI for Boolean
+    Switch: ['Boolean', 'Boolean'],
   };
 
   const match = map[input.type];
