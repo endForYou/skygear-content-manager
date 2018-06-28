@@ -121,7 +121,7 @@ test('parseCmsConfig should parse example config', () => {
               name: 'integer',
               label: 'Integer',
               editable: true,
-              type: 'Integer',
+              type: 'IntegerInput',
             },
             {
               compact: false,
@@ -342,7 +342,7 @@ test('parseCmsConfig should parse example config', () => {
               compact: true,
               name: 'integer',
               label: 'Integer',
-              type: 'Integer',
+              type: 'IntegerDisplay',
             },
             {
               compact: true,
@@ -555,7 +555,7 @@ test('parseCmsConfig should parse example config', () => {
               name: 'integer',
               label: 'Integer',
               editable: true,
-              type: 'Integer',
+              type: 'IntegerInput',
             },
             {
               compact: false,
@@ -766,7 +766,7 @@ test('parseCmsConfig should parse example config', () => {
               compact: false,
               name: 'integer',
               label: 'Integer',
-              type: 'Integer',
+              type: 'IntegerDisplay',
             },
             {
               compact: false,

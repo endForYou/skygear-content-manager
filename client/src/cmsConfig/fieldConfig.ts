@@ -30,7 +30,7 @@ export type EditableFieldConfig =
   | WYSIWYGFieldConfig
   | DateTimeFieldConfig
   | BooleanFieldConfig
-  | IntegerFieldConfig
+  | IntegerInputFieldConfig
   | FloatInputFieldConfig
   | ReferenceFieldConfig
   | BackReferenceFieldConfig
@@ -42,6 +42,7 @@ export type EditableFieldConfig =
 export type FieldConfig =
   // non editable fields
   | TextDisplayFieldConfig
+  | IntegerDisplayFieldConfig
   | FloatDisplayFieldConfig
   // and editable fields
   | EditableFieldConfig;
@@ -54,7 +55,8 @@ export enum FieldConfigTypes {
   WYSIWYG = 'WYSIWYG',
   DateTime = 'DateTime',
   Boolean = 'Boolean',
-  Integer = 'Integer',
+  IntegerDisplay = 'IntegerDisplay',
+  IntegerInput = 'IntegerInput',
   FloatDisplay = 'FloatDisplay',
   FloatInput = 'FloatInput',
   Reference = 'Reference',
@@ -99,7 +101,7 @@ export function isFieldEditable(config: {
     config.type === FieldConfigTypes.WYSIWYG ||
     config.type === FieldConfigTypes.DateTime ||
     config.type === FieldConfigTypes.Boolean ||
-    config.type === FieldConfigTypes.Integer ||
+    config.type === FieldConfigTypes.IntegerInput ||
     config.type === FieldConfigTypes.FloatInput ||
     config.type === FieldConfigTypes.Reference ||
     config.type === FieldConfigTypes.BackReference ||
@@ -154,8 +156,12 @@ export interface BooleanFieldConfig extends EditableFieldConfigAttrs {
   defaultValue?: boolean;
 }
 
-export interface IntegerFieldConfig extends EditableFieldConfigAttrs {
-  type: FieldConfigTypes.Integer;
+export interface IntegerDisplayFieldConfig extends FieldConfigAttrs {
+  type: FieldConfigTypes.IntegerDisplay;
+}
+
+export interface IntegerInputFieldConfig extends EditableFieldConfigAttrs {
+  type: FieldConfigTypes.IntegerInput;
   defaultValue?: number;
 }
 
@@ -241,6 +247,7 @@ interface FieldConfigInput {
 export function preprocessFieldAlias(editable: boolean, input: any) {
   const map = {
     Float: ['FloatDisplay', 'FloatInput'],
+    Integer: ['IntegerDisplay', 'IntegerInput'],
     Number: ['FloatDisplay', 'FloatInput'],
     String: ['TextDisplay', 'TextInput'],
   };
@@ -322,8 +329,10 @@ export function parseNonReferenceFieldConfig(
       return parseDateTimeFieldConfig(a, context);
     case 'Boolean':
       return parseBooleanFieldConfig(a);
-    case 'Integer':
-      return parseIntegerFieldConfig(a);
+    case 'IntegerDisplay':
+      return parseIntegerDisplayFieldConfig(a);
+    case 'IntegerInput':
+      return parseIntegerInputFieldConfig(a);
     case 'FloatDisplay':
       return parseFloatDisplayFieldConfig(a);
     case 'FloatInput':
@@ -449,11 +458,22 @@ function parseBooleanFieldConfig(input: FieldConfigInput): BooleanFieldConfig {
   };
 }
 
-function parseIntegerFieldConfig(input: FieldConfigInput): IntegerFieldConfig {
+function parseIntegerDisplayFieldConfig(
+  input: FieldConfigInput
+): IntegerDisplayFieldConfig {
   return {
-    ...parseEditableConfigAttrs(input, 'Integer'),
-    defaultValue: parseOptionalNumber(input, 'default_value', 'Integer'),
-    type: FieldConfigTypes.Integer,
+    ...parseFieldConfigAttrs(input, 'IntegerDisplay'),
+    type: FieldConfigTypes.IntegerDisplay,
+  };
+}
+
+function parseIntegerInputFieldConfig(
+  input: FieldConfigInput
+): IntegerInputFieldConfig {
+  return {
+    ...parseEditableConfigAttrs(input, 'IntegerInput'),
+    defaultValue: parseOptionalNumber(input, 'default_value', 'IntegerInput'),
+    type: FieldConfigTypes.IntegerInput,
   };
 }
 

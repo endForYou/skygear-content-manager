@@ -14,7 +14,7 @@ import { DropdownField } from './DropdownField';
 import { EmbeddedBackReferenceField } from './EmbeddedBackReferenceField';
 import { FileAssetField } from './FileAssetField';
 import { ImageAssetField } from './ImageAssetField';
-import { IntegerField } from './IntegerField';
+import { IntegerDisplayField, IntegerInputField } from './IntegerField';
 import { FloatDisplayField, FloatInputField } from './NumberField';
 import { ReferenceField } from './ReferenceField';
 import { TextDisplayField, TextInputField } from './StringField';
@@ -76,8 +76,10 @@ export class Field extends React.PureComponent<FieldProps> {
         return <WYSIWYGEditor {...rest} config={config} />;
       case FieldConfigTypes.Boolean:
         return <BooleanField {...rest} config={config} />;
-      case FieldConfigTypes.Integer:
-        return <IntegerField {...rest} config={config} />;
+      case FieldConfigTypes.IntegerDisplay:
+        return <IntegerDisplayField {...rest} config={config} />;
+      case FieldConfigTypes.IntegerInput:
+        return <IntegerInputField {...rest} config={config} />;
       case FieldConfigTypes.FloatDisplay:
         return <FloatDisplayField {...rest} config={config} />;
       case FieldConfigTypes.FloatInput:
