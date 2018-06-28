@@ -6,6 +6,7 @@ import {
   CmsRecord,
   ConfigContext,
   RecordTypeContext,
+  recursivelyApplyFn,
 } from './cmsConfig';
 import {
   parseOptionalBoolean,
@@ -256,8 +257,19 @@ export function preprocessFieldAlias(editable: boolean, input: any) {
   };
 }
 
-// tslint:disable-next-line: no-any
-export function parseFieldConfig(context: ConfigContext, a: any): FieldConfig {
+// tslint:disable-next-line:no-any
+export function recursivelyPreprocessFieldAlias(editable: boolean, input: any) {
+  // tslint:disable-next-line:no-any
+  return recursivelyApplyFn(input, (i: any) =>
+    preprocessFieldAlias(editable, i)
+  );
+}
+
+export function parseFieldConfig(
+  context: ConfigContext,
+  // tslint:disable-next-line:no-any
+  a: any
+): FieldConfig {
   switch (a.type) {
     case 'Reference':
       if (a.reference_via_association_record) {
@@ -516,8 +528,6 @@ function parseEmbeddedBackReferenceFieldConfig(
   }
 
   const displayFields = input.reference_fields
-    // tslint:disable-next-line: no-any
-    .map((f: any) => preprocessFieldAlias(true, f))
     // tslint:disable-next-line: no-any
     .map((f: any) => parseFieldConfig(context, f)) as FieldConfig[];
 

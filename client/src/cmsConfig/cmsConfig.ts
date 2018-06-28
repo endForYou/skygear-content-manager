@@ -4,12 +4,11 @@ import { entriesOf, humanize, isObject, objectFrom } from './../util';
 import { mapDefaultActionToAction } from './defaultActions';
 import {
   FieldConfig,
-  FieldConfigTypes,
   filterReferences,
   isFieldEditable,
   parseFieldConfig,
   parseReferenceFieldConfig,
-  preprocessFieldAlias,
+  recursivelyPreprocessFieldAlias,
   ReferenceConfig,
   ReferenceFieldConfig,
 } from './fieldConfig';
@@ -150,12 +149,22 @@ export interface AssociationRecordConfig {
   referenceConfigPair: [ReferenceFieldConfig, ReferenceFieldConfig];
 }
 
-type RecordPage = 'list' | 'show' | 'edit' | 'new';
-const recordPages: RecordPage[] = ['list', 'show', 'edit', 'new'];
+export enum RecordPageTypes {
+  List = 'List',
+  Show = 'Show',
+  Edit = 'Edit',
+  New = 'New',
+}
+const recordPages: RecordPageTypes[] = [
+  RecordPageTypes.List,
+  RecordPageTypes.Show,
+  RecordPageTypes.Edit,
+  RecordPageTypes.New,
+];
 
 interface PreParseCmsRecordConfig {
   record: CmsRecord;
-  pages: Set<RecordPage>;
+  pages: Set<RecordPageTypes>;
 }
 
 interface CmsRecordByName {
@@ -417,7 +426,7 @@ function parseListPageConfig(
 
   const fields = input.fields
     // tslint:disable-next-line: no-any
-    .map((f: any) => preprocessFieldAlias(false, f))
+    .map((f: any) => recursivelyPreprocessFieldAlias(false, f))
     // tslint:disable-next-line: no-any
     .map((f: any) => parseFieldConfig(context, f)) as FieldConfig[];
   const compactFields = fields.map(config => ({ ...config, compact: true }));
@@ -515,7 +524,8 @@ function parseListActions(
   const defaultActions = [
     {
       actionType: ActionConfigTypes.AddButton,
-      predicate: (c: PreParseCmsRecordConfig) => c.pages.has('new'),
+      predicate: (c: PreParseCmsRecordConfig) =>
+        c.pages.has(RecordPageTypes.New),
     },
   ];
 
@@ -553,11 +563,13 @@ function parseListItemActions(
   const defaultActions = [
     {
       actionType: ActionConfigTypes.ShowButton,
-      predicate: (c: PreParseCmsRecordConfig) => c.pages.has('show'),
+      predicate: (c: PreParseCmsRecordConfig) =>
+        c.pages.has(RecordPageTypes.Show),
     },
     {
       actionType: ActionConfigTypes.EditButton,
-      predicate: (c: PreParseCmsRecordConfig) => c.pages.has('edit'),
+      predicate: (c: PreParseCmsRecordConfig) =>
+        c.pages.has(RecordPageTypes.Edit),
     },
   ];
 
@@ -629,7 +641,7 @@ function parseShowPageConfig(
 
   const fields = input.fields
     // tslint:disable-next-line: no-any
-    .map((f: any) => preprocessFieldAlias(false, f))
+    .map((f: any) => recursivelyPreprocessFieldAlias(false, f))
     // tslint:disable-next-line: no-any
     .map((f: any) => parseFieldConfig(context, f)) as FieldConfig[];
 
@@ -693,14 +705,21 @@ function makeEditableField(config: FieldConfig): FieldConfig {
   return config;
 }
 
-function recursivelyMakeEditableField(config: FieldConfig): FieldConfig {
-  if (config.type === FieldConfigTypes.EmbeddedBackReference) {
-    config = {
-      ...config,
-      displayFields: config.displayFields.map(recursivelyMakeEditableField),
+// tslint:disable-next-line:no-any
+export function recursivelyApplyFn(input: any, fn: any) {
+  if (input.type === 'EmbeddedReference' && isArray(input.reference_fields)) {
+    const fields = input.reference_fields;
+    input = {
+      ...input,
+      // tslint:disable-next-line:no-any
+      reference_fields: fields.map((i: any) => recursivelyApplyFn(i, fn)),
     };
   }
-  return makeEditableField(config);
+  return fn(input);
+}
+
+function recursivelyMakeEditableField(config: FieldConfig): FieldConfig {
+  return recursivelyApplyFn(config, makeEditableField);
 }
 
 function parseRecordFormPageConfig(
@@ -723,16 +742,15 @@ function parseRecordFormPageConfig(
 
   const fields = input.fields
     // tslint:disable-next-line: no-any
-    .map((f: any) => preprocessFieldAlias(true, f))
+    .map((f: any) => recursivelyPreprocessFieldAlias(true, f))
+    .map(recursivelyMakeEditableField)
     // tslint:disable-next-line: no-any
     .map((f: any) => parseFieldConfig(context, f)) as FieldConfig[];
-
-  const editableFields = fields.map(recursivelyMakeEditableField);
 
   return {
     actions: parseRecordFormActions(input.actions),
     cmsRecord,
-    fields: editableFields,
+    fields,
     label,
     references: filterReferences(fields),
   };
