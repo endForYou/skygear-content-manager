@@ -37,7 +37,7 @@ export type EditableFieldConfig =
   | AssociationReferenceFieldConfig
   | EmbeddedBackReferenceFieldConfig
   | ImageAssetFieldConfig
-  | FileAssetFieldConfig;
+  | FileUploaderFieldConfig;
 
 export type FieldConfig =
   // non editable fields
@@ -45,6 +45,7 @@ export type FieldConfig =
   | DateTimeDisplayFieldConfig
   | IntegerDisplayFieldConfig
   | FloatDisplayFieldConfig
+  | FileDisplayFieldConfig
   // and editable fields
   | EditableFieldConfig;
 
@@ -66,7 +67,8 @@ export enum FieldConfigTypes {
   AssociationReference = 'AssociationReference',
   EmbeddedBackReference = 'EmbeddedBackReference',
   ImageAsset = 'ImageAsset',
-  FileAsset = 'FileAsset',
+  FileDisplay = 'FileDisplay',
+  FileUploader = 'FileUploader',
 }
 
 export enum SortOrder {
@@ -110,7 +112,7 @@ export function isFieldEditable(config: {
     config.type === FieldConfigTypes.AssociationReference ||
     config.type === FieldConfigTypes.EmbeddedBackReference ||
     config.type === FieldConfigTypes.ImageAsset ||
-    config.type === FieldConfigTypes.FileAsset
+    config.type === FieldConfigTypes.FileUploader
   );
 }
 
@@ -233,8 +235,12 @@ export interface ImageAssetFieldConfig extends EditableFieldConfigAttrs {
   config?: any; // tslint:disable-line: no-any
 }
 
-export interface FileAssetFieldConfig extends EditableFieldConfigAttrs {
-  type: FieldConfigTypes.FileAsset;
+export interface FileDisplayFieldConfig extends FieldConfigAttrs {
+  type: FieldConfigTypes.FileDisplay;
+}
+
+export interface FileUploaderFieldConfig extends EditableFieldConfigAttrs {
+  type: FieldConfigTypes.FileUploader;
   nullable: boolean;
   accept: string;
 }
@@ -253,6 +259,7 @@ interface FieldConfigInput {
 // tslint:disable-next-line:no-any
 export function preprocessFieldAlias(editable: boolean, input: any) {
   const map = {
+    Asset: ['FileDisplay', 'FileUploader'],
     DateTime: ['DateTimeDisplay', 'DateTimePicker'],
     Float: ['FloatDisplay', 'FloatInput'],
     Integer: ['IntegerDisplay', 'IntegerInput'],
@@ -352,8 +359,10 @@ export function parseNonReferenceFieldConfig(
       return parseFloatInputFieldConfig(a);
     case 'ImageAsset':
       return parseImageAssetFieldConfig(a);
-    case 'FileAsset':
-      return parseFileAssetFieldConfig(a);
+    case 'FileDisplay':
+      return parseFileDisplayFieldConfig(a);
+    case 'FileUploader':
+      return parseFileUploaderFieldConfig(a);
 
     // backward compatible
     case '_id':
@@ -720,16 +729,25 @@ function parseImageAssetFieldConfig(
   };
 }
 
-function parseFileAssetFieldConfig(
+function parseFileDisplayFieldConfig(
   input: FieldConfigInput
-): FileAssetFieldConfig {
-  const nullable = parseOptionalBoolean(input, 'nullable', 'FileAsset');
+): FileDisplayFieldConfig {
+  return {
+    ...parseFieldConfigAttrs(input, 'FileDisplay'),
+    type: FieldConfigTypes.FileDisplay,
+  };
+}
+
+function parseFileUploaderFieldConfig(
+  input: FieldConfigInput
+): FileUploaderFieldConfig {
+  const nullable = parseOptionalBoolean(input, 'nullable', 'FileUploader');
 
   return {
-    ...parseEditableConfigAttrs(input, 'FileAsset'),
-    accept: parseOptionalString(input, 'accept', 'FileAsset') || '',
+    ...parseEditableConfigAttrs(input, 'FileUploader'),
+    accept: parseOptionalString(input, 'accept', 'FileUploader') || '',
     nullable: nullable == null ? true : nullable,
-    type: FieldConfigTypes.FileAsset,
+    type: FieldConfigTypes.FileUploader,
   };
 }
 

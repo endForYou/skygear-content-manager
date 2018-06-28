@@ -194,7 +194,7 @@ test('parseCmsConfig should parse example config', () => {
               editable: true,
               accept: '',
               nullable: true,
-              type: 'FileAsset',
+              type: 'FileUploader',
             },
             {
               compact: false,
@@ -376,9 +376,7 @@ test('parseCmsConfig should parse example config', () => {
               compact: true,
               name: 'fileasset',
               label: 'Fileasset',
-              accept: '',
-              nullable: true,
-              type: 'FileAsset',
+              type: 'FileDisplay',
             },
           ],
           filters: [
@@ -623,7 +621,7 @@ test('parseCmsConfig should parse example config', () => {
               editable: true,
               accept: '',
               nullable: true,
-              type: 'FileAsset',
+              type: 'FileUploader',
             },
             {
               compact: false,
@@ -884,9 +882,7 @@ test('parseCmsConfig should parse example config', () => {
               compact: false,
               name: 'fileasset',
               label: 'Fileasset',
-              accept: '',
-              nullable: true,
-              type: 'FileAsset',
+              type: 'FileDisplay',
             },
             {
               compact: false,

@@ -136,7 +136,7 @@ records:
         - name: imageasset
           type: ImageAsset
         - name: fileasset
-          type: FileAsset
+          type: Asset
       filters:
         - name: _id
           label: ID
@@ -211,7 +211,7 @@ records:
         - name: imageasset
           type: ImageAsset
         - name: fileasset
-          type: FileAsset
+          type: Asset
         - name: deleted
           type: Boolean
     edit:
@@ -270,7 +270,7 @@ records:
         - name: imageasset
           type: ImageAsset
         - name: fileasset
-          type: FileAsset
+          type: Asset
         - name: deleted
           type: Boolean
           default_value: false
@@ -330,7 +330,7 @@ records:
         - name: imageasset
           type: ImageAsset
         - name: fileasset
-          type: FileAsset
+          type: Asset
         - name: deleted
           type: Boolean
           default_value: false

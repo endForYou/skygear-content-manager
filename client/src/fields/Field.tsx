@@ -12,7 +12,7 @@ import { BooleanField } from './BooleanField';
 import { DateTimeDisplayField, DateTimePickerField } from './DateTimeField';
 import { DropdownField } from './DropdownField';
 import { EmbeddedBackReferenceField } from './EmbeddedBackReferenceField';
-import { FileAssetField } from './FileAssetField';
+import { FileDisplayField, FileUploaderField } from './FileField';
 import { ImageAssetField } from './ImageAssetField';
 import { IntegerDisplayField, IntegerInputField } from './IntegerField';
 import { FloatDisplayField, FloatInputField } from './NumberField';
@@ -96,8 +96,10 @@ export class Field extends React.PureComponent<FieldProps> {
         return <EmbeddedBackReferenceField {...rest} config={config} />;
       case FieldConfigTypes.ImageAsset:
         return <ImageAssetField {...rest} config={config} />;
-      case FieldConfigTypes.FileAsset:
-        return <FileAssetField {...rest} config={config} />;
+      case FieldConfigTypes.FileDisplay:
+        return <FileDisplayField {...rest} config={config} />;
+      case FieldConfigTypes.FileUploader:
+        return <FileUploaderField {...rest} config={config} />;
     }
   }
 }
