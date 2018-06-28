@@ -54,17 +54,15 @@ test('parseCmsConfig should parse example config', () => {
             { compact: false, label: 'ID', name: '_id', type: 'TextDisplay' },
             {
               compact: false,
-              editable: false,
               label: 'Created at',
               name: 'createdAt',
-              type: 'DateTime',
+              type: 'DateTimeDisplay',
             },
             {
               compact: false,
-              editable: false,
               label: 'Updated at',
               name: 'updatedAt',
-              type: 'DateTime',
+              type: 'DateTimeDisplay',
             },
             {
               compact: false,
@@ -106,8 +104,7 @@ test('parseCmsConfig should parse example config', () => {
               compact: false,
               name: 'datetime',
               label: 'Datetime',
-              editable: true,
-              type: 'DateTime',
+              type: 'DateTimePicker',
             },
             {
               compact: false,
@@ -295,17 +292,15 @@ test('parseCmsConfig should parse example config', () => {
             { compact: true, label: 'ID', name: '_id', type: 'TextDisplay' },
             {
               compact: true,
-              editable: false,
               label: 'Created at',
               name: 'createdAt',
-              type: 'DateTime',
+              type: 'DateTimeDisplay',
             },
             {
               compact: true,
-              editable: false,
               label: 'Updated at',
               name: 'updatedAt',
-              type: 'DateTime',
+              type: 'DateTimeDisplay',
             },
             { compact: true, name: 'name', label: 'Name', type: 'TextDisplay' },
             {
@@ -330,7 +325,7 @@ test('parseCmsConfig should parse example config', () => {
               compact: true,
               name: 'datetime',
               label: 'Datetime',
-              type: 'DateTime',
+              type: 'DateTimeDisplay',
             },
             {
               compact: true,
@@ -488,17 +483,15 @@ test('parseCmsConfig should parse example config', () => {
             { compact: false, label: 'ID', name: '_id', type: 'TextDisplay' },
             {
               compact: false,
-              editable: false,
               label: 'Created at',
               name: 'createdAt',
-              type: 'DateTime',
+              type: 'DateTimeDisplay',
             },
             {
               compact: false,
-              editable: false,
               label: 'Updated at',
               name: 'updatedAt',
-              type: 'DateTime',
+              type: 'DateTimeDisplay',
             },
             {
               compact: false,
@@ -540,8 +533,7 @@ test('parseCmsConfig should parse example config', () => {
               compact: false,
               name: 'datetime',
               label: 'Datetime',
-              editable: true,
-              type: 'DateTime',
+              type: 'DateTimePicker',
             },
             {
               compact: false,
@@ -713,17 +705,15 @@ test('parseCmsConfig should parse example config', () => {
             { compact: false, label: 'ID', name: '_id', type: 'TextDisplay' },
             {
               compact: false,
-              editable: false,
               label: 'Created at',
               name: 'createdAt',
-              type: 'DateTime',
+              type: 'DateTimeDisplay',
             },
             {
               compact: false,
-              editable: false,
               label: 'Updated at',
               name: 'updatedAt',
-              type: 'DateTime',
+              type: 'DateTimeDisplay',
             },
             {
               compact: false,
@@ -754,7 +744,7 @@ test('parseCmsConfig should parse example config', () => {
               name: 'datetime',
               label: 'Datetime',
               timezone: 'America/New_York',
-              type: 'DateTime',
+              type: 'DateTimeDisplay',
             },
             {
               compact: false,
@@ -1029,17 +1019,15 @@ test('parseCmsConfig should parse example config', () => {
             { compact: true, label: 'ID', name: '_id', type: 'TextDisplay' },
             {
               compact: true,
-              editable: false,
               label: 'Created at',
               name: 'createdAt',
-              type: 'DateTime',
+              type: 'DateTimeDisplay',
             },
             {
               compact: true,
-              editable: false,
               label: 'Updated at',
               name: 'updatedAt',
-              type: 'DateTime',
+              type: 'DateTimeDisplay',
             },
             { compact: true, name: 'name', label: 'Name', type: 'TextDisplay' },
           ],

@@ -9,7 +9,7 @@ import { Effect } from '../components/RecordFormPage';
 import { AssociationReferenceField } from './AssociationReferenceField';
 import { BackReferenceField } from './BackReferenceField';
 import { BooleanField } from './BooleanField';
-import { DateTimeField } from './DateTimeField';
+import { DateTimeDisplayField, DateTimePickerField } from './DateTimeField';
 import { DropdownField } from './DropdownField';
 import { EmbeddedBackReferenceField } from './EmbeddedBackReferenceField';
 import { FileAssetField } from './FileAssetField';
@@ -66,8 +66,10 @@ export class Field extends React.PureComponent<FieldProps> {
         return <TextDisplayField {...rest} config={config} />;
       case FieldConfigTypes.TextInput:
         return <TextInputField {...rest} config={config} />;
-      case FieldConfigTypes.DateTime:
-        return <DateTimeField {...rest} config={config} />;
+      case FieldConfigTypes.DateTimeDisplay:
+        return <DateTimeDisplayField {...rest} config={config} />;
+      case FieldConfigTypes.DateTimePicker:
+        return <DateTimePickerField {...rest} config={config} />;
       case FieldConfigTypes.Dropdown:
         return <DropdownField {...rest} config={config} />;
       case FieldConfigTypes.TextArea:

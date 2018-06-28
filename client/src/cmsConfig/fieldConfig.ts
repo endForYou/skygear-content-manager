@@ -28,7 +28,7 @@ export type EditableFieldConfig =
   | TextAreaFieldConfig
   | DropdownFieldConfig
   | WYSIWYGFieldConfig
-  | DateTimeFieldConfig
+  | DateTimePickerFieldConfig
   | BooleanFieldConfig
   | IntegerInputFieldConfig
   | FloatInputFieldConfig
@@ -42,6 +42,7 @@ export type EditableFieldConfig =
 export type FieldConfig =
   // non editable fields
   | TextDisplayFieldConfig
+  | DateTimeDisplayFieldConfig
   | IntegerDisplayFieldConfig
   | FloatDisplayFieldConfig
   // and editable fields
@@ -53,7 +54,8 @@ export enum FieldConfigTypes {
   TextArea = 'TextArea',
   Dropdown = 'Dropdown',
   WYSIWYG = 'WYSIWYG',
-  DateTime = 'DateTime',
+  DateTimeDisplay = 'DateTimeDisplay',
+  DateTimePicker = 'DateTimePicker',
   Boolean = 'Boolean',
   IntegerDisplay = 'IntegerDisplay',
   IntegerInput = 'IntegerInput',
@@ -99,7 +101,7 @@ export function isFieldEditable(config: {
     config.type === FieldConfigTypes.TextArea ||
     config.type === FieldConfigTypes.Dropdown ||
     config.type === FieldConfigTypes.WYSIWYG ||
-    config.type === FieldConfigTypes.DateTime ||
+    config.type === FieldConfigTypes.DateTimeDisplay ||
     config.type === FieldConfigTypes.Boolean ||
     config.type === FieldConfigTypes.IntegerInput ||
     config.type === FieldConfigTypes.FloatInput ||
@@ -145,8 +147,13 @@ export interface WYSIWYGFieldConfig extends EditableFieldConfigAttrs {
   config?: any; // tslint:disable-line: no-any
 }
 
-export interface DateTimeFieldConfig extends EditableFieldConfigAttrs {
-  type: FieldConfigTypes.DateTime;
+export interface DateTimeDisplayFieldConfig extends FieldConfigAttrs {
+  type: FieldConfigTypes.DateTimeDisplay;
+  timezone?: TimezoneValue;
+}
+
+export interface DateTimePickerFieldConfig extends EditableFieldConfigAttrs {
+  type: FieldConfigTypes.DateTimePicker;
   defaultValue?: Date;
   timezone?: TimezoneValue;
 }
@@ -246,6 +253,7 @@ interface FieldConfigInput {
 // tslint:disable-next-line:no-any
 export function preprocessFieldAlias(editable: boolean, input: any) {
   const map = {
+    DateTime: ['DateTimeDisplay', 'DateTimePicker'],
     Float: ['FloatDisplay', 'FloatInput'],
     Integer: ['IntegerDisplay', 'IntegerInput'],
     Number: ['FloatDisplay', 'FloatInput'],
@@ -328,8 +336,10 @@ export function parseNonReferenceFieldConfig(
       return parseDropdownFieldConfig(a);
     case 'WYSIWYG':
       return parseWYSIWYGFieldConfig(a);
-    case 'DateTime':
-      return parseDateTimeFieldConfig(a, context);
+    case 'DateTimeDisplay':
+      return parseDateTimeDisplayFieldConfig(a, context);
+    case 'DateTimePicker':
+      return parseDateTimePickerFieldConfig(a, context);
     case 'Boolean':
       return parseBooleanFieldConfig(a);
     case 'IntegerDisplay':
@@ -441,15 +451,26 @@ function parseWYSIWYGFieldConfig(input: FieldConfigInput): WYSIWYGFieldConfig {
   };
 }
 
-function parseDateTimeFieldConfig(
+function parseDateTimeDisplayFieldConfig(
   input: FieldConfigInput,
   context: RecordTypeContext
-): DateTimeFieldConfig {
+): DateTimeDisplayFieldConfig {
   return {
-    ...parseEditableConfigAttrs(input, 'DateTime'),
-    defaultValue: parseOptionalDate(input, 'default_value', 'DateTime'),
+    ...parseFieldConfigAttrs(input, 'DateTimeDisplay'),
     timezone: parseTimezone(input, 'timezone'),
-    type: FieldConfigTypes.DateTime,
+    type: FieldConfigTypes.DateTimeDisplay,
+  };
+}
+
+function parseDateTimePickerFieldConfig(
+  input: FieldConfigInput,
+  context: RecordTypeContext
+): DateTimePickerFieldConfig {
+  return {
+    ...parseEditableConfigAttrs(input, 'DateTimePicker'),
+    defaultValue: parseOptionalDate(input, 'default_value', 'DateTimePicker'),
+    timezone: parseTimezone(input, 'timezone'),
+    type: FieldConfigTypes.DateTimePicker,
   };
 }
 
@@ -758,7 +779,7 @@ function parseIdFieldConfig(input: FieldConfigInput): TextDisplayFieldConfig {
 function parseCreatedAtFieldConfig(
   input: FieldConfigInput,
   context: RecordTypeContext
-): DateTimeFieldConfig {
+): DateTimeDisplayFieldConfig {
   if (input.type) {
     // TODO: allow other DateTime field type
     console.log(`Type (${input.type}) is ignored in _created_at field.`);
@@ -766,18 +787,17 @@ function parseCreatedAtFieldConfig(
 
   return {
     compact: false,
-    editable: false,
     label: parseOptionalString(input, 'label', '_created_at') || 'Created at',
     name: 'createdAt',
     timezone: parseTimezone(input, 'timezone'),
-    type: FieldConfigTypes.DateTime,
+    type: FieldConfigTypes.DateTimeDisplay,
   };
 }
 
 function parseUpdatedAtFieldConfig(
   input: FieldConfigInput,
   context: RecordTypeContext
-): DateTimeFieldConfig {
+): DateTimeDisplayFieldConfig {
   if (input.type) {
     // TODO: allow other DateTime field type
     console.log(`Type (${input.type}) is ignored in _updated_at field.`);
@@ -785,11 +805,10 @@ function parseUpdatedAtFieldConfig(
 
   return {
     compact: false,
-    editable: false,
     label: parseOptionalString(input, 'label', '_updated_at') || 'Updated at',
     name: 'updatedAt',
     timezone: parseTimezone(input, 'timezone'),
-    type: FieldConfigTypes.DateTime,
+    type: FieldConfigTypes.DateTimeDisplay,
   };
 }
 
