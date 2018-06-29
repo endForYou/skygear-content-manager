@@ -22,7 +22,7 @@ class SkygearSchema:
 
     @classmethod
     def from_dict(cls, d):
-        result, _ = SkygearDatabaseSchema().load(d)
+        result = SkygearDatabaseSchema().load(d)
         return result
 
     def field_of(self, record_type, field_name):

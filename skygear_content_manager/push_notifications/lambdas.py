@@ -44,17 +44,14 @@ def register_lambda(settings):
                 OFFSET %d
             ''' % (page_size, page_size * (page - 1)))
             push_campaigns_dict_list = CmsPushCampaignSchema(
-                many=True).dump(query_result).data
+                many=True).dump(query_result)
         return {'pushCampaigns': push_campaigns_dict_list, 'totalCount': total_count}
 
 
     @skygear.op("push_campaign:create_new", user_required=True)
     def create_push_notification(**kwargs):
         validate_master_user()
-        new_push_campaign = kwargs['new_push_campaign']
-        new_push_campaign, errors = NewPushCampaignSchema().load(new_push_campaign)
-        if len(errors) > 0:
-            return {'errors': errors}
+        new_push_campaign = NewPushCampaignSchema().load(kwargs['new_push_campaign'])
         user_ids = new_push_campaign['userIds']
         message_content = new_push_campaign['content']
         message_title = new_push_campaign.get('title', '')

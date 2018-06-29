@@ -51,7 +51,7 @@ def register_lambda(settings):
                 .limit(page_size) \
                 .offset(page_size * (page - 1))
             result = query.all()
-            files = CmsImportedFileSchema(many=True).dump(result).data
+            files = CmsImportedFileSchema(many=True).dump(result)
             inject_signed_url(files)
             return {
                 'importedFiles': files,
@@ -64,9 +64,7 @@ def register_lambda(settings):
         validate_master_user()
         new_imported_files = kwargs['importedFiles']
         schema = CmsImportedFileSchema(many=True)
-        new_imported_files, errors = schema.load(new_imported_files)
-        if len(errors) > 0:
-            return {'errors': errors}
+        new_imported_files = schema.load(new_imported_files)
 
         with scoped_session() as session:
             ensure_unique_file_name(session, new_imported_files)
@@ -79,7 +77,7 @@ def register_lambda(settings):
             # apply the update
             session.flush()
 
-            files = CmsImportedFileSchema(many=True).dump(imported_files).data
+            files = CmsImportedFileSchema(many=True).dump(imported_files)
             inject_signed_url(files)
             return {'importedFiles': files}
 
