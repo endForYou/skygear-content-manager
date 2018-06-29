@@ -5,7 +5,8 @@ from .csv_deserializer import RecordDeserializer
 from ..db_session import scoped_session
 from ..skygear_utils import (save_records, fetch_records, eq_predicate,
                              or_predicate)
-from ..models.cms_config import CMSRecordImport
+
+from ..models.cms_config import CMSRecordImport, DUPLICATION_HANDLING_USE_FIRST
 from ..models.asset import Asset
 from ..models.imported_file import CmsImportedFile
 
@@ -109,10 +110,25 @@ def prepare_import_records(stream, import_config):
         data = project_csv_data(row, import_config)
         data_list.append(data)
 
-    identifier_map = create_identifier_map(data_list, import_config)
+    identifier_map = RecordIdentifierMap()
+    if import_config.identifier != None and import_config.identifier != '_id':
+        identifier_map = create_identifier_map([r[import_config.identifier] for r in data_list],
+                                               import_config.record_type,
+                                               import_config.identifier,
+                                               import_config.handle_duplicated_identifier)
+
+    reference_fields = import_config.get_reference_fields()
+    reference_identifier_maps = {}
+    for reference_field in reference_fields:
+        reference = reference_field.reference
+        m = create_identifier_map([r[reference_field.name] for r in data_list],
+                                  reference.target_cms_record.record_type,
+                                  reference.target_fields[0].name,
+                                  reference_field.handle_duplicated_reference)
+        reference_identifier_maps[reference_field.name] = m
 
     data_list = populate_record_id(data_list, import_config, identifier_map)
-    data_list = populate_record_reference(data_list, import_config, identifier_map)
+    data_list = populate_record_reference(data_list, import_config, reference_identifier_maps)
     data_list = inject_asset(data_list, import_config)
 
     deserializer = RecordDeserializer(import_config.fields)
@@ -173,52 +189,24 @@ def project_csv_data(row, import_config):
             for i in range(len(import_config.fields))}
 
 
-def create_identifier_map(data_list, import_config):
-    """
-    Construct a custom-identifier-to-skygear-record-id mapping.
-
-    - Find record custom identifier and reference custom identifier.
-    - Query record by custom identifier.
-    - Map the queried record id to custom identifier value.
-    """
+def create_identifier_map(values, record_type, key, duplication_handling):
     identifier_map = RecordIdentifierMap(
-        allow_duplicate_value=import_config.duplicate_reference_handling == CMSRecordImport.USE_FIRST
+        allow_duplicate_value=duplication_handling == DUPLICATION_HANDLING_USE_FIRST
     )
-    reference_fields = import_config.get_reference_fields()
 
-    # for record custom id
-    if import_config.identifier != None and import_config.identifier != '_id':
-        record_type = import_config.record_type
-        key = import_config.identifier
-        values = [r[key] for r in data_list]
-        for record in fetch_records_by_values_in_key(record_type, key, values):
-            identifier_map.set(
-                record_type=record_type,
-                key=key,
-                value=record[key],
-                record_id=record['_id']
-            )
-
-    # for reference id
-    for reference_field in reference_fields:
-        reference = reference_field.reference
-        record_type = reference.target_cms_record.record_type
-        target_fields = reference.target_fields
-        for field in target_fields:
-            key = field.name
-            values = [r[reference_field.name] for r in data_list]
-            for record in fetch_records_by_values_in_key(record_type, key, values):
-                identifier_map.set(
-                    record_type=record_type,
-                    key=key,
-                    value=record[key],
-                    record_id=record['_id']
-                )
+    records = fetch_records_by_values_in_key(record_type, key, values)
+    for record in records:
+        identifier_map.set(
+            record_type=record_type,
+            key=key,
+            value=record[key],
+            record_id=record['_id']
+        )
 
     return identifier_map
 
 
-def populate_record_reference(data_list, import_config, identifier_map):
+def populate_record_reference(data_list, import_config, identifier_maps):
     """
     For each reference field, find and assign reference id from identifier map.
     """
@@ -232,6 +220,7 @@ def populate_record_reference(data_list, import_config, identifier_map):
         try:
             # merge data with reference
             for reference_field in reference_fields:
+                identifier_map = identifier_maps[reference_field.name]
                 reference = reference_field.reference
                 target_fields = reference.target_fields
                 for field in target_fields:

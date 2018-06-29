@@ -13,7 +13,9 @@ from ..models.cms_config import (CMSConfig,
                                  CMSRecordBackReference,
                                  CMSRecordAssociationReference,
                                  DISPLAY_MODE_GROUPED,
-                                 DISPLAY_MODE_SPREAD)
+                                 DISPLAY_MODE_SPREAD,
+                                 DUPLICATION_HANDLING_USE_FIRST,
+                                 DUPLICATION_HANDLING_THROW_ERROR)
 
 
 class CMSConfigSchema(Schema):
@@ -214,6 +216,15 @@ class CMSAssociationRecordSchema(Schema):
         return CMSAssociationRecord(**data)
 
 
+class DuplicationHandling(fields.String):
+
+    def _validate(self, value):
+        if value and \
+           value != DUPLICATION_HANDLING_USE_FIRST and \
+           value != DUPLICATION_HANDLING_THROW_ERROR:
+            raise ValidationError('Invalid handle_duplicated_identifier value.')
+
+
 class CMSAssociationRecordFieldSchema(Schema):
 
     name = fields.String()
@@ -232,17 +243,10 @@ class CMSRecordImportSchema(Schema):
 
     record_type = fields.String()
     name = fields.String()
-    duplicate_reference_handling = fields.String(required=False)
     identifier = fields.String(required=False)
+    handle_duplicated_identifier = DuplicationHandling(required=False)
 
     fields = fields.Nested('CMSRecordImportFieldSchema', many=True)
-
-    @validates('duplicate_reference_handling')
-    def validate_reference_handling(self, value):
-        if value and \
-           value != CMSRecordImport.USE_FIRST and \
-           value != CMSRecordImport.THROW_ERROR:
-            raise ValidationError('Invalid duplicate_reference_handling value.')
 
     @pre_load
     def pre_load(self, data):
@@ -265,6 +269,8 @@ class CMSRecordImportFieldSchema(Schema):
 
     reference_target = fields.String(required=False)
     reference_field_name = fields.String(required=False)
+
+    handle_duplicated_reference = DuplicationHandling(required=False)
 
     @pre_load
     def pre_load(self, data):
