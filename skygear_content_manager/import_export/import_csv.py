@@ -1,6 +1,8 @@
 import csv
 import uuid
 
+from skygear.error import SkygearException
+
 from .csv_deserializer import RecordDeserializer
 from ..db_session import scoped_session
 from ..skygear_utils import (save_records, fetch_records, eq_predicate,
@@ -59,7 +61,7 @@ class RecordIdentifierMap:
         record_ids.append(record_id)
 
 
-class ImportRecordException(Exception):
+class ImportRecordException(SkygearException):
 
     def __init__(self, record_data, underlying_error):
         message = str(underlying_error)
@@ -86,6 +88,9 @@ class ImportRecordException(Exception):
             'name': self.underlying_error.__class__.__name__,
         }
 
+    def as_dict(self):
+        return self.to_dict()
+
 
 class DuplicateIdentifierValueException(Exception):
 
@@ -102,7 +107,7 @@ class AssetNotFoundException(Exception):
         super(AssetNotFoundException, self).__init__(message)
 
 
-def prepare_import_records(stream, import_config):
+def prepare_import_records(stream, import_config, atomic):
     data_list = []
     reader = csv.reader(stream)
 
@@ -136,6 +141,11 @@ def prepare_import_records(stream, import_config):
 
     for record in records:
         if isinstance(record, ImportRecordException):
+            # fail early if the import is atomic
+            if atomic:
+                raise record
+
+            # conitnue if import is not atomic
             continue
 
         if not record['_id']:
@@ -148,7 +158,7 @@ def prepare_import_records(stream, import_config):
     return records
 
 
-def import_records(records):
+def import_records(records, atomic):
     """
     Extract non-record data from the list and save.
     """
@@ -162,7 +172,7 @@ def import_records(records):
 
     resp = {'result': []}
     if len(records) > 0:
-        resp['result'] = save_records(records)
+        resp['result'] = save_records(records, atomic=atomic)
 
     success_count = 0
     error_count = 0

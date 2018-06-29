@@ -8,7 +8,7 @@ import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 import { Record } from 'skygear';
 
-import { dismissImport, importRecords } from '../actions/import';
+import { dismissImport, ImportAttrs, importRecords } from '../actions/import';
 import {
   applyPredicatesToQuery,
   queryWithFilters,
@@ -27,17 +27,17 @@ import {
 } from '../cmsConfig';
 import { Predicate } from '../cmsConfig/predicateConfig';
 import { ClickOutside } from '../components/ClickOutside';
-import { ExportButton } from '../components/ExportButton';
 import { ExportModal } from '../components/ExportModal';
 import { FilterMenu } from '../components/FilterMenu';
 import { FilterTagList } from '../components/FilterTagList';
-import { ImportButton } from '../components/ImportButton';
+import { ImportModal } from '../components/ImportModal/ImportModal';
 import {
   ImportFailureModal,
   ImportingModal,
-  ImportModal,
-} from '../components/ImportModal';
+  ImportResultModal,
+} from '../components/ImportModal/ImportResultModal';
 import { LinkButton } from '../components/LinkButton';
+import { PageActionButton } from '../components/PageActionButton';
 import Pagination from '../components/Pagination';
 import { SortButton } from '../components/SortButton';
 import {
@@ -234,6 +234,7 @@ export interface StateProps {
 }
 
 interface State {
+  importing?: ImportActionConfig;
   exporting?: ExportActionConfig;
   showfilterMenu: boolean;
 }
@@ -252,6 +253,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
 
     this.state = {
       exporting: undefined,
+      importing: undefined,
       showfilterMenu: false,
     };
 
@@ -264,7 +266,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
 
     this.fetchList = debounce(this.fetchList.bind(this), 200);
 
-    this.onImportFileSelected = this.onImportFileSelected.bind(this);
+    this.onImportFile = this.onImportFile.bind(this);
     this.onSortButtonClick = this.onSortButtonClick.bind(this);
   }
 
@@ -291,9 +293,9 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
     this.setState({ showfilterMenu: !this.state.showfilterMenu });
   }
 
-  public onImportFileSelected(actionConfig: ImportActionConfig, file: File) {
+  public onImportFile(actionConfig: ImportActionConfig, attrs: ImportAttrs) {
     const { dispatch } = this.props;
-    dispatch(importRecords(actionConfig.name, file));
+    dispatch(importRecords(actionConfig.name, attrs));
   }
 
   public onSortButtonClick(name: string) {
@@ -309,7 +311,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
     switch (actionConfig.type) {
       case ActionConfigTypes.Export:
         return (
-          <ExportButton
+          <PageActionButton
             key={index}
             className="list-action primary-button"
             actionConfig={actionConfig}
@@ -318,11 +320,11 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
         );
       case ActionConfigTypes.Import:
         return (
-          <ImportButton
+          <PageActionButton
             key={index}
             className="list-action primary-button"
             actionConfig={actionConfig}
-            onFileSelected={this.onImportFileSelected}
+            onClick={() => this.setState({ importing: actionConfig })}
           />
         );
       case ActionConfigTypes.Link:
@@ -349,29 +351,46 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
     return actionsButtons;
   }
 
+  /**
+   * Import modal is managed by two state
+   *
+   * 1. Whole import process -> this.state.importing: ImportActionConfig
+   * 2. After importing starts -> this.props.import: ImportState
+   */
   public renderImportModal() {
-    const dispatch = this.props.dispatch;
+    if (!this.state.importing) {
+      return undefined;
+    }
+
     const importState = this.props.import;
     const { importResult, errorMessage } = importState;
 
     if (!importResult) {
-      return undefined;
+      return (
+        <ImportModal
+          importConfig={this.state.importing}
+          onDismiss={this.dismissImportModal}
+          onImport={this.onImportFile}
+        />
+      );
     }
 
     switch (importResult.type) {
       case RemoteType.Failure:
         return (
           <ImportFailureModal
-            onDismiss={() => dispatch(dismissImport())}
+            importConfig={this.state.importing}
+            onDismiss={this.dismissImportModal}
             errorMessage={errorMessage}
           />
         );
       case RemoteType.Loading:
-        return <ImportingModal />;
+        return <ImportingModal importConfig={this.state.importing} />;
       case RemoteType.Success:
         return (
-          <ImportModal
-            onDismiss={() => dispatch(dismissImport())}
+          <ImportResultModal
+            importConfig={this.state.importing}
+            onDismiss={this.dismissImportModal}
             result={importResult.value}
           />
         );
@@ -531,6 +550,11 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
       derivedSortState
     );
   }
+
+  private dismissImportModal = () => {
+    this.props.dispatch(dismissImport());
+    this.setState({ importing: undefined });
+  };
 }
 
 function ListPageFactory(recordName: string) {

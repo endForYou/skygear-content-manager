@@ -22,7 +22,12 @@ import {
   parseUserManagementConfig,
   UserManagementConfig,
 } from './userManagementConfig';
-import { parseBoolean, parseOptionalString, parseString } from './util';
+import {
+  parseBoolean,
+  parseOptionalBoolean,
+  parseOptionalString,
+  parseString,
+} from './util';
 
 export interface CmsConfig {
   site: SiteConfig;
@@ -196,6 +201,7 @@ export interface ExportActionConfig extends ActionConfigAttrs {
 export interface ImportActionConfig extends ActionConfigAttrs {
   type: ActionConfigTypes.Import;
   name: string;
+  atomic?: boolean;
 }
 export interface LinkActionConfig extends ActionConfigAttrs {
   type: ActionConfigTypes.Link;
@@ -581,7 +587,8 @@ function parseListItemActions(
 function parseImportAction(input: any): ImportActionConfig {
   const name = parseString(input, 'name', 'Import');
   return {
-    label: parseOptionalString(input, 'label', 'Import') || name,
+    atomic: parseOptionalBoolean(input, 'atomic', 'Import'),
+    label: parseOptionalString(input, 'label', 'Import') || humanize(name),
     name,
     type: input.type,
   };
@@ -591,7 +598,7 @@ function parseImportAction(input: any): ImportActionConfig {
 function parseExportAction(input: any): ExportActionConfig {
   const name = parseString(input, 'name', 'Export');
   return {
-    label: parseOptionalString(input, 'label', 'Export') || name,
+    label: parseOptionalString(input, 'label', 'Export') || humanize(name),
     name,
     type: input.type,
   };

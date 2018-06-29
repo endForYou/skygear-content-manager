@@ -18,6 +18,11 @@ export enum ImportActionTypes {
   DismissImport = 'DISMISS_IMPORT',
 }
 
+export interface ImportAttrs {
+  atomic: boolean;
+  file: File;
+}
+
 export interface ImportRequest {
   type: ImportActionTypes.ImportRequest;
   payload: undefined;
@@ -93,13 +98,18 @@ function transformImportResult(result: ImportAPIResult): ImportResult {
 
 export function importRecords(
   name: string,
-  file: File
+  attrs: ImportAttrs
 ): ThunkAction<Promise<void>, {}, {}> {
   return dispatch => {
     const data = new FormData();
-    data.append('file', file);
+    data.append('file', attrs.file);
     data.append('key', skygear.auth.accessToken!);
     data.append('import_name', name);
+
+    const options = {
+      atomic: attrs.atomic,
+    };
+    data.append('options', JSON.stringify(options));
 
     dispatch(importRequest());
 

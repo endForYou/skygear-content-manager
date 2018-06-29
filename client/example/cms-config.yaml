@@ -4,6 +4,7 @@ imports:
     record_type: field_demo
     identifier: name
     handle_duplicated_identifier: throw-error
+    atomic: false
     fields:
       - name: name
         label: Name
@@ -91,6 +92,10 @@ records:
         - type: Import
           name: import-field-demo
           label: Import records
+        - type: Import
+          name: import-field-demo
+          label: Import (Atomic)
+          atomic: true
         - type: Import
           name: import-asset-demo
           label: Import with asset

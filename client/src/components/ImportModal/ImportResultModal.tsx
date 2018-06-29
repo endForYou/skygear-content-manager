@@ -1,18 +1,21 @@
-import './ImportModal.scss';
+import './ImportResultModal.scss';
 
 import * as React from 'react';
 
-import { ImportResult } from '../types';
-import { createFailureModal, createLoadingModal, Modal } from './Modal';
+import { ImportActionConfig } from '../../cmsConfig';
+import { ImportResult } from '../../types';
+import { Omit } from '../../typeutil';
+import { FailureModal, FailureModalProps, LoadingModal, Modal } from '../Modal';
 
-export interface ImportModalProps {
+export interface ImportModalResultProps {
   onDismiss: () => void;
   show?: boolean;
   result: ImportResult;
+  importConfig: ImportActionConfig;
 }
 
-export const ImportModal: React.SFC<ImportModalProps> = props => {
-  const { onDismiss, show = true, result } = props;
+export const ImportResultModal: React.SFC<ImportModalResultProps> = props => {
+  const { importConfig, onDismiss, show = true, result } = props;
 
   const renderErrorMessage = () => {
     const errors = result.result
@@ -38,7 +41,7 @@ export const ImportModal: React.SFC<ImportModalProps> = props => {
   return (
     <Modal
       show={show}
-      title="Import"
+      title={importConfig.label}
       onDismiss={onDismiss}
       body={() => {
         return [
@@ -67,5 +70,17 @@ export const ImportModal: React.SFC<ImportModalProps> = props => {
   );
 };
 
-export const ImportingModal = createLoadingModal('Import');
-export const ImportFailureModal = createFailureModal('Import');
+export const ImportingModal = ({
+  importConfig,
+}: {
+  importConfig: ImportActionConfig;
+}) => {
+  return <LoadingModal title={importConfig.label} />;
+};
+
+export const ImportFailureModal = ({
+  importConfig,
+  ...rest,
+}: { importConfig: ImportActionConfig } & Omit<FailureModalProps, 'title'>) => {
+  return <FailureModal title={importConfig.label} {...rest} />;
+};

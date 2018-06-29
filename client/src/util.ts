@@ -96,7 +96,7 @@ export function capitalize(str: string): string {
 }
 
 export function humanize(str: string): string {
-  return capitalize(str.replace(/_/g, ' '));
+  return capitalize(str.replace(/(_|-)/g, ' '));
 }
 
 export function getPath(urlString: string): string {

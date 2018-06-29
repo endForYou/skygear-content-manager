@@ -12,16 +12,6 @@ export interface ModalProps {
   title: string;
 }
 
-export interface LoadingModalProps {
-  show?: boolean;
-}
-
-export interface FailureModalProps {
-  onDismiss?: () => void;
-  show?: boolean;
-  errorMessage: string;
-}
-
 const defaultBackDropStyle: React.CSSProperties = {
   backgroundColor: 'rgba(0, 0, 0, 0.5)',
 };
@@ -65,48 +55,59 @@ export const Modal: React.SFC<ModalProps> = props => {
   );
 };
 
-export function createLoadingModal(title: string) {
-  return (props: LoadingModalProps) => {
-    const { show = true } = props;
-    return (
-      <Modal
-        show={show}
-        title={title}
-        body={() => (
-          <div>
-            <img
-              className="modal-lodaing-img img-fluid"
-              src={loading}
-              alt="Loading"
-            />
-            <p className="modal-loading-text">In Progress...</p>
-          </div>
-        )}
-      />
-    );
-  };
+interface LoadingModalProps {
+  show?: boolean;
+  title: string;
 }
 
-export function createFailureModal(title: string) {
-  return (props: FailureModalProps) => {
-    const { onDismiss, show = true, errorMessage } = props;
-    return (
-      <Modal
-        show={show}
-        title={title}
-        body={errorMessage}
-        footer={() => (
-          <a
-            href="#"
-            role="button"
-            className="modal-button-primary primary-button"
-            onClick={onDismiss}
-          >
-            Close
-          </a>
-        )}
-        onDismiss={onDismiss}
-      />
-    );
-  };
+export const LoadingModal = ({ show = true, title }: LoadingModalProps) => {
+  return (
+    <Modal
+      show={show}
+      title={title}
+      body={() => (
+        <div>
+          <img
+            className="modal-lodaing-img img-fluid"
+            src={loading}
+            alt="Loading"
+          />
+          <p className="modal-loading-text">In Progress...</p>
+        </div>
+      )}
+    />
+  );
+};
+
+export interface FailureModalProps {
+  onDismiss?: () => void;
+  show?: boolean;
+  errorMessage: string;
+  title: string;
 }
+
+export const FailureModal = ({
+  onDismiss,
+  show = true,
+  errorMessage,
+  title,
+}: FailureModalProps) => {
+  return (
+    <Modal
+      show={show}
+      title={title}
+      body={errorMessage}
+      footer={() => (
+        <a
+          href="#"
+          role="button"
+          className="modal-button-primary primary-button"
+          onClick={onDismiss}
+        >
+          Close
+        </a>
+      )}
+      onDismiss={onDismiss}
+    />
+  );
+};
