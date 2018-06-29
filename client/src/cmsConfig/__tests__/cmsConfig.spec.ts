@@ -6,6 +6,7 @@ import {
 } from './cmsConfig.fixture';
 
 import { parseCmsConfig } from '../cmsConfig';
+import { FieldConfigTypes, ReferenceTypes } from '../fieldConfig';
 
 const deepCloneJSON = (o: object) => JSON.parse(JSON.stringify(o));
 
@@ -164,22 +165,28 @@ describe('parseCmsConfig records and association records', () => {
               displayFieldName: '_id',
               label: 'Admin id',
               name: 'admin_id',
-              targetCmsRecord: {
-                name: 'admin',
-                recordType: 'user',
+              reference: {
+                targetCmsRecord: {
+                  name: 'admin',
+                  recordType: 'user',
+                },
+                type: ReferenceTypes.DirectReference,
               },
-              type: 'Reference',
+              type: FieldConfigTypes.Reference,
             },
             {
               compact: false,
               displayFieldName: '_id',
               label: 'Product id',
               name: 'product_id',
-              targetCmsRecord: {
-                name: 'product',
-                recordType: 'product',
+              reference: {
+                targetCmsRecord: {
+                  name: 'product',
+                  recordType: 'product',
+                },
+                type: ReferenceTypes.DirectReference,
               },
-              type: 'Reference',
+              type: FieldConfigTypes.Reference,
             },
           ],
         },

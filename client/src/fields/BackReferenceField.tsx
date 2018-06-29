@@ -2,19 +2,18 @@ import classnames from 'classnames';
 import * as React from 'react';
 import { Record } from 'skygear';
 
-import { BackReferenceFieldConfig } from '../cmsConfig';
+import { BackReferenceListFieldConfig } from '../cmsConfig';
 import { ReferenceLink } from '../components/ReferenceLink';
 import { join } from '../util';
 
-import { BackReferenceSelect } from './BackReferenceSelect';
 import { RequiredFieldProps } from './Field';
 
-export type BackReferenceFieldProps = RequiredFieldProps<
-  BackReferenceFieldConfig
+export type BackReferenceListFieldProps = RequiredFieldProps<
+  BackReferenceListFieldConfig
 >;
 
-export class BackReferenceField extends React.PureComponent<
-  BackReferenceFieldProps
+export class BackReferenceListField extends React.PureComponent<
+  BackReferenceListFieldProps
 > {
   public render() {
     const {
@@ -28,15 +27,6 @@ export class BackReferenceField extends React.PureComponent<
 
     const $transient = context.record.$transient;
 
-    if (config.editable) {
-      return (
-        <BackReferenceSelect
-          {...this.props}
-          className={classnames(className, 'back-ref-select')}
-        />
-      );
-    }
-
     const targetFieldName = config.name;
     const targetRecords = $transient[targetFieldName] as Record[];
 
@@ -44,7 +34,7 @@ export class BackReferenceField extends React.PureComponent<
       return (
         <ReferenceLink
           key={r._id}
-          recordName={config.targetCmsRecord.name}
+          recordName={config.reference.targetCmsRecord.name}
           recordId={r._id}
         >
           {r[config.displayFieldName]}

@@ -2,19 +2,18 @@ import classnames from 'classnames';
 import * as React from 'react';
 import { Record } from 'skygear';
 
-import { AssociationReferenceFieldConfig } from '../cmsConfig';
+import { AssociationReferenceListFieldConfig } from '../cmsConfig';
 import { ReferenceLink } from '../components/ReferenceLink';
 import { join } from '../util';
 
-import { AssociationRecordSelect } from './AssociationRecordSelect';
 import { RequiredFieldProps } from './Field';
 
-export type AssociationReferenceFieldProps = RequiredFieldProps<
-  AssociationReferenceFieldConfig
+export type AssociationReferenceListFieldProps = RequiredFieldProps<
+  AssociationReferenceListFieldConfig
 >;
 
-export class AssociationReferenceField extends React.PureComponent<
-  AssociationReferenceFieldProps
+export class AssociationReferenceListField extends React.PureComponent<
+  AssociationReferenceListFieldProps
 > {
   public render() {
     const {
@@ -27,10 +26,6 @@ export class AssociationReferenceField extends React.PureComponent<
 
     const $transient = context.record.$transient;
 
-    if (config.editable) {
-      return <AssociationRecordSelect {...this.props} />;
-    }
-
     const targetFieldName = config.name;
     const targetRecords = $transient[targetFieldName] as Record[];
 
@@ -38,7 +33,9 @@ export class AssociationReferenceField extends React.PureComponent<
       return (
         <ReferenceLink
           key={r._id}
-          recordName={config.targetReference.targetCmsRecord.name}
+          recordName={
+            config.reference.targetReference.reference.targetCmsRecord.name
+          }
           recordId={r._id}
         >
           {r[config.displayFieldName]}

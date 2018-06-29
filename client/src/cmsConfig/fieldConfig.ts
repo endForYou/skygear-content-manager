@@ -17,11 +17,12 @@ import {
   parseTimezone,
 } from './util';
 
-export type ReferenceConfig =
-  | ReferenceFieldConfig
-  | BackReferenceFieldConfig
-  | AssociationReferenceFieldConfig
-  | EmbeddedBackReferenceFieldConfig;
+export type ReferenceFieldConfig =
+  | ReferenceDisplayFieldConfig
+  | ReferenceDropdownFieldConfig
+  | ReferenceListFieldConfig
+  | ReferenceSelectFieldConfig
+  | EmbeddedReferenceListFieldConfig;
 
 export type EditableFieldConfig =
   | TextInputFieldConfig
@@ -32,10 +33,9 @@ export type EditableFieldConfig =
   | BooleanFieldConfig
   | IntegerInputFieldConfig
   | FloatInputFieldConfig
-  | ReferenceFieldConfig
-  | BackReferenceFieldConfig
-  | AssociationReferenceFieldConfig
-  | EmbeddedBackReferenceFieldConfig
+  | ReferenceDropdownFieldConfig
+  | ReferenceSelectFieldConfig
+  | EmbeddedReferenceListFieldConfig
   | ImageUploaderFieldConfig
   | FileUploaderFieldConfig;
 
@@ -45,6 +45,8 @@ export type FieldConfig =
   | DateTimeDisplayFieldConfig
   | IntegerDisplayFieldConfig
   | FloatDisplayFieldConfig
+  | ReferenceDisplayFieldConfig
+  | ReferenceListFieldConfig
   | ImageDisplayFieldConfig
   | FileDisplayFieldConfig
   // and editable fields
@@ -64,9 +66,10 @@ export enum FieldConfigTypes {
   FloatDisplay = 'FloatDisplay',
   FloatInput = 'FloatInput',
   Reference = 'Reference',
-  BackReference = 'BackReference',
-  AssociationReference = 'AssociationReference',
-  EmbeddedBackReference = 'EmbeddedBackReference',
+  ReferenceDropdown = 'ReferenceDropdown',
+  ReferenceList = 'ReferenceList',
+  ReferenceSelect = 'ReferenceSelect',
+  EmbeddedReferenceList = 'EmbeddedReferenceList',
   ImageDisplay = 'ImageDisplay',
   ImageUploader = 'ImageUploader',
   FileDisplay = 'FileDisplay',
@@ -109,10 +112,9 @@ export function isFieldEditable(config: {
     config.type === FieldConfigTypes.Boolean ||
     config.type === FieldConfigTypes.IntegerInput ||
     config.type === FieldConfigTypes.FloatInput ||
-    config.type === FieldConfigTypes.Reference ||
-    config.type === FieldConfigTypes.BackReference ||
-    config.type === FieldConfigTypes.AssociationReference ||
-    config.type === FieldConfigTypes.EmbeddedBackReference ||
+    config.type === FieldConfigTypes.ReferenceDropdown ||
+    config.type === FieldConfigTypes.ReferenceSelect ||
+    config.type === FieldConfigTypes.EmbeddedReferenceList ||
     config.type === FieldConfigTypes.ImageUploader ||
     config.type === FieldConfigTypes.FileUploader
   );
@@ -185,50 +187,104 @@ export interface FloatInputFieldConfig extends EditableFieldConfigAttrs {
   defaultValue?: number;
 }
 
-export interface ReferenceFieldConfig extends EditableFieldConfigAttrs {
+export interface ReferenceDisplayFieldConfig extends FieldConfigAttrs {
   type: FieldConfigTypes.Reference;
-  targetCmsRecord: CmsRecord;
+  reference: DirectReference;
   displayFieldName: string;
 }
 
-export interface BackReferenceFieldConfig extends EditableFieldConfigAttrs {
-  type: FieldConfigTypes.BackReference;
+export interface ReferenceDropdownFieldConfig extends EditableFieldConfigAttrs {
+  type: FieldConfigTypes.ReferenceDropdown;
+  reference: DirectReference;
+  displayFieldName: string;
+  // TODO: Support defaultValue for ReferenceDropdown
+  defaultValue: undefined;
+}
+
+export type Reference =
+  | DirectReference
+  | ReferenceViaBackReference
+  | ReferenceViaAssociationRecord;
+export enum ReferenceTypes {
+  DirectReference = 'DirectReference',
+  ViaBackReference = 'ViaBackReference',
+  ViaAssociationRecord = 'ViaAssociationRecord',
+}
+
+export interface DirectReference {
+  type: ReferenceTypes.DirectReference;
+  targetCmsRecord: CmsRecord;
+}
+
+export interface ReferenceViaBackReference {
+  type: ReferenceTypes.ViaBackReference;
   sourceFieldName: string;
   targetCmsRecord: CmsRecord;
-  displayFieldName: string;
 }
 
-export interface AssociationReferenceFieldConfig
-  extends EditableFieldConfigAttrs {
-  type: FieldConfigTypes.AssociationReference;
+export interface ReferenceViaAssociationRecord {
+  type: ReferenceTypes.ViaAssociationRecord;
 
   // the AssociationRecordConfig that this reference is made on
   associationRecordConfig: AssociationRecordConfig;
 
-  // source ReferenceFieldConfig for this field in
+  // source ReferenceDisplayFieldConfig for this field in
   // associationRecordConfig.referenceConfigPair
-  sourceReference: ReferenceFieldConfig;
+  sourceReference: ReferenceDisplayFieldConfig;
 
-  // target ReferenceFieldConfig for this field in
+  // target ReferenceDisplayFieldConfig for this field in
   // associationRecordConfig.referenceConfigPair
-  targetReference: ReferenceFieldConfig;
+  targetReference: ReferenceDisplayFieldConfig;
+}
 
-  // display field name in the target record.
-  // override targetReference.displayFieldName
+export interface ReferenceListFieldConfig extends FieldConfigAttrs {
+  type: FieldConfigTypes.ReferenceList;
+  reference: Reference;
   displayFieldName: string;
 }
 
-export interface EmbeddedBackReferenceFieldConfig
+export interface BackReferenceListFieldConfig extends ReferenceListFieldConfig {
+  reference: ReferenceViaBackReference;
+}
+
+export interface AssociationReferenceListFieldConfig
+  extends ReferenceListFieldConfig {
+  reference: ReferenceViaAssociationRecord;
+}
+
+export interface ReferenceSelectFieldConfig extends EditableFieldConfigAttrs {
+  type: FieldConfigTypes.ReferenceSelect;
+  reference: Reference;
+  displayFieldName: string;
+  // TODO: Support defaultValue for ReferenceSelect
+  defaultValue: undefined;
+}
+
+export interface BackReferenceSelectFieldConfig
+  extends ReferenceSelectFieldConfig {
+  reference: ReferenceViaBackReference;
+}
+
+export interface AssociationReferenceSelectFieldConfig
+  extends ReferenceSelectFieldConfig {
+  reference: ReferenceViaAssociationRecord;
+}
+
+export interface EmbeddedReferenceListFieldConfig
   extends EditableFieldConfigAttrs {
-  type: FieldConfigTypes.EmbeddedBackReference;
-  sourceFieldName: string;
-  targetCmsRecord: CmsRecord;
+  type: FieldConfigTypes.EmbeddedReferenceList;
+  reference: Reference;
   displayFields: FieldConfig[];
   positionFieldName?: string;
   sortOrder: SortOrder;
   reorderEnabled: boolean;
-  references: ReferenceConfig[];
+  references: ReferenceFieldConfig[];
   referenceDeleteAction: DeleteAction;
+}
+
+export interface EmbeddedBackReferenceListFieldConfig
+  extends EmbeddedReferenceListFieldConfig {
+  reference: ReferenceViaBackReference;
 }
 
 export interface ImageDisplayFieldConfig extends FieldConfigAttrs {
@@ -272,6 +328,8 @@ export function preprocessFieldAlias(editable: boolean, input: any) {
     Image: ['ImageDisplay', 'ImageUploader'],
     Integer: ['IntegerDisplay', 'IntegerInput'],
     Number: ['FloatDisplay', 'FloatInput'],
+    Reference: ['Reference', 'ReferenceDropdown'],
+    ReferenceList: ['ReferenceList', 'ReferenceSelect'],
     String: ['TextDisplay', 'TextInput'],
     // TODO:
     // Invert the alias if more than one UI for Boolean
@@ -305,21 +363,15 @@ export function parseFieldConfig(
 ): FieldConfig {
   switch (a.type) {
     case 'Reference':
-      if (a.reference_via_association_record) {
-        return parseAssociationReferenceFieldConfig(context, a);
-      } else if (a.reference_via_back_reference) {
-        return parseBackReferenceFieldConfig(context, a);
-      } else {
-        return parseReferenceFieldConfig(context, a);
-      }
-    case 'EmbeddedReference':
-      if (a.reference_via_back_reference) {
-        return parseEmbeddedBackReferenceFieldConfig(context, a);
-      } else {
-        throw new Error(
-          'Only back reference is supported for type EmbeddedReference now'
-        );
-      }
+      return parseReferenceFieldConfig(context, a);
+    case 'ReferenceDropdown':
+      return parseReferenceDropdownFieldConfig(context, a);
+    case 'ReferenceList':
+      return parseReferenceListFieldConfig(context, a);
+    case 'ReferenceSelect':
+      return parseReferenceSelectFieldConfig(context, a);
+    case 'EmbeddedReferenceList':
+      return parseEmbeddedReferenceListFieldConfig(context, a);
     default:
       return parseNonReferenceFieldConfig(context, a);
   }
@@ -539,13 +591,11 @@ function parseFloatInputFieldConfig(
   };
 }
 
-export function parseReferenceFieldConfig(
+function parseReferenceFieldConfigAttrs(
   context: RecordTypeContext,
   input: FieldConfigInput
-): ReferenceFieldConfig {
+): DirectReference {
   const targetRecordName = parseString(input, 'reference_target', 'Reference');
-  const displayFieldName =
-    parseOptionalString(input, 'reference_field_name', 'Reference') || '_id';
 
   const cmsRecordData = context.cmsRecordByName[targetRecordName];
   if (cmsRecordData === undefined) {
@@ -557,17 +607,64 @@ export function parseReferenceFieldConfig(
   const targetCmsRecord = cmsRecordData.record;
 
   return {
-    ...parseEditableConfigAttrs(input, 'Reference'),
-    displayFieldName,
     targetCmsRecord,
+    type: ReferenceTypes.DirectReference,
+  };
+}
+
+export function parseReferenceFieldConfig(
+  context: RecordTypeContext,
+  input: FieldConfigInput
+): ReferenceDisplayFieldConfig {
+  const displayFieldName =
+    parseOptionalString(input, 'reference_field_name', 'Reference') || '_id';
+
+  return {
+    ...parseFieldConfigAttrs(input, 'Reference'),
+    displayFieldName,
+    reference: parseReferenceFieldConfigAttrs(context, input),
     type: FieldConfigTypes.Reference,
   };
 }
 
-function parseBackReferenceFieldConfig(
+export function parseReferenceDropdownFieldConfig(
   context: RecordTypeContext,
   input: FieldConfigInput
-): BackReferenceFieldConfig {
+): ReferenceDropdownFieldConfig {
+  const displayFieldName =
+    parseOptionalString(input, 'reference_field_name', 'Reference') || '_id';
+
+  return {
+    ...parseEditableConfigAttrs(input, 'Reference'),
+    defaultValue: undefined,
+    displayFieldName,
+    reference: parseReferenceFieldConfigAttrs(context, input),
+    type: FieldConfigTypes.ReferenceDropdown,
+  };
+}
+
+function parseReferenceListFieldConfig(
+  context: ConfigContext,
+  input: FieldConfigInput
+): ReferenceListFieldConfig {
+  const displayFieldName = parseString(
+    input,
+    'reference_field_name',
+    'Reference'
+  );
+
+  return {
+    ...parseFieldConfigAttrs(input, 'Reference'),
+    displayFieldName,
+    reference: parseMultiReferenceFieldConfigAttrs(context, input),
+    type: FieldConfigTypes.ReferenceList,
+  };
+}
+
+function parseReferenceSelectFieldConfig(
+  context: ConfigContext,
+  input: FieldConfigInput
+): ReferenceSelectFieldConfig {
   const displayFieldName = parseString(
     input,
     'reference_field_name',
@@ -576,16 +673,24 @@ function parseBackReferenceFieldConfig(
 
   return {
     ...parseEditableConfigAttrs(input, 'Reference'),
-    ...parseBackReferenceFieldConfigAttrs(context, input),
+    defaultValue: undefined,
     displayFieldName,
-    type: FieldConfigTypes.BackReference,
+    reference: parseMultiReferenceFieldConfigAttrs(context, input),
+    type: FieldConfigTypes.ReferenceSelect,
   };
 }
 
-function parseEmbeddedBackReferenceFieldConfig(
+function parseEmbeddedReferenceListFieldConfig(
   context: ConfigContext,
   input: FieldConfigInput
-): EmbeddedBackReferenceFieldConfig {
+): EmbeddedReferenceListFieldConfig {
+  // TODO: support association record
+  if (input.reference_via_association_record) {
+    throw new Error(
+      'Only reference_via_back_reference is supported now in EmbeddedReferenceList'
+    );
+  }
+
   if (!isArray(input.reference_fields)) {
     throw new Error('Expect reference_fields to be array of fields');
   }
@@ -627,21 +732,36 @@ function parseEmbeddedBackReferenceFieldConfig(
 
   return {
     ...parseEditableConfigAttrs(input, 'EmbeddedReference'),
-    ...parseBackReferenceFieldConfigAttrs(context, input),
     displayFields,
     positionFieldName,
+    reference: parseMultiReferenceFieldConfigAttrs(context, input),
     referenceDeleteAction,
     references: filterReferences(displayFields),
     reorderEnabled: reorderEnabled === undefined ? false : reorderEnabled,
     sortOrder,
-    type: FieldConfigTypes.EmbeddedBackReference,
+    type: FieldConfigTypes.EmbeddedReferenceList,
   };
+}
+
+function parseMultiReferenceFieldConfigAttrs(
+  context: ConfigContext,
+  input: FieldConfigInput
+): Reference {
+  if (input.reference_via_back_reference) {
+    return parseBackReferenceFieldConfigAttrs(context, input);
+  } else if (input.reference_via_association_record) {
+    return parseAssociationReferenceFieldConfigAttrs(context, input);
+  } else {
+    throw new Error(
+      `Either 'reference_via_back_reference' or 'reference_via_association_record' must be set`
+    );
+  }
 }
 
 function parseBackReferenceFieldConfigAttrs(
   context: RecordTypeContext,
   input: FieldConfigInput
-): { sourceFieldName: string; targetCmsRecord: CmsRecord } {
+): ReferenceViaBackReference {
   const targetRecordName = parseString(
     input,
     'reference_via_back_reference',
@@ -665,19 +785,15 @@ function parseBackReferenceFieldConfigAttrs(
   return {
     sourceFieldName,
     targetCmsRecord,
+    type: ReferenceTypes.ViaBackReference,
   };
 }
 
-function parseAssociationReferenceFieldConfig(
+function parseAssociationReferenceFieldConfigAttrs(
   context: ConfigContext,
   input: FieldConfigInput
-): AssociationReferenceFieldConfig {
+): ReferenceViaAssociationRecord {
   const targetRecordName = parseString(input, 'reference_target', 'Reference');
-  const displayFieldName = parseString(
-    input,
-    'reference_field_name',
-    'Reference'
-  );
 
   const associationRecordName = parseString(
     input,
@@ -700,24 +816,22 @@ function parseAssociationReferenceFieldConfig(
   );
 
   return {
-    ...parseEditableConfigAttrs(input, 'Reference'),
     associationRecordConfig,
-    displayFieldName,
     sourceReference,
     targetReference,
-    type: FieldConfigTypes.AssociationReference,
+    type: ReferenceTypes.ViaAssociationRecord,
   };
 }
 
-// return a pair of ReferenceFieldConfig in the order of [SourceRef, TargetRef]
+// return a pair of ReferenceDisplayFieldConfig in the order of [SourceRef, TargetRef]
 function deriveReferencesByTargetName(
-  refPair: [ReferenceFieldConfig, ReferenceFieldConfig],
+  refPair: [ReferenceDisplayFieldConfig, ReferenceDisplayFieldConfig],
   targetRecordName: string,
   associationRecordName: string
-): [ReferenceFieldConfig, ReferenceFieldConfig] {
-  if (refPair[0].targetCmsRecord.name === targetRecordName) {
+): [ReferenceDisplayFieldConfig, ReferenceDisplayFieldConfig] {
+  if (refPair[0].reference.targetCmsRecord.name === targetRecordName) {
     return [refPair[1], refPair[0]];
-  } else if (refPair[1].targetCmsRecord.name === targetRecordName) {
+  } else if (refPair[1].reference.targetCmsRecord.name === targetRecordName) {
     return refPair;
   } else {
     throw new Error(
@@ -852,22 +966,20 @@ function parseUpdatedAtFieldConfig(
 
 export function filterReferences(
   fieldConfigs: FieldConfig[]
-): ReferenceConfig[] {
+): ReferenceFieldConfig[] {
   return fieldConfigs.reduce(
     (refs, config) => {
       switch (config.type) {
         case FieldConfigTypes.Reference:
-          return [...refs, config];
-        case FieldConfigTypes.BackReference:
-          return [...refs, config];
-        case FieldConfigTypes.AssociationReference:
-          return [...refs, config];
-        case FieldConfigTypes.EmbeddedBackReference:
+        case FieldConfigTypes.ReferenceDropdown:
+        case FieldConfigTypes.ReferenceList:
+        case FieldConfigTypes.ReferenceSelect:
+        case FieldConfigTypes.EmbeddedReferenceList:
           return [...refs, config];
         default:
           return refs;
       }
     },
-    [] as ReferenceConfig[]
+    [] as ReferenceFieldConfig[]
   );
 }

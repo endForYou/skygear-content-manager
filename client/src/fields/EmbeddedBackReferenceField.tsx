@@ -6,7 +6,7 @@ import skygear, { Record, Reference } from 'skygear';
 
 import {
   DeleteAction,
-  EmbeddedBackReferenceFieldConfig,
+  EmbeddedBackReferenceListFieldConfig,
   FieldConfig,
   SortOrder,
 } from '../cmsConfig';
@@ -28,8 +28,8 @@ import {
   RequiredFieldProps,
 } from './Field';
 
-export type EmbeddedBackReferenceFieldProps = RequiredFieldProps<
-  EmbeddedBackReferenceFieldConfig
+export type EmbeddedBackReferenceListFieldProps = RequiredFieldProps<
+  EmbeddedBackReferenceListFieldConfig
 >;
 
 interface State {
@@ -38,14 +38,14 @@ interface State {
   embeddedRecords: Record[];
 }
 
-export class EmbeddedBackReferenceField extends React.PureComponent<
-  EmbeddedBackReferenceFieldProps,
+export class EmbeddedBackReferenceListField extends React.PureComponent<
+  EmbeddedBackReferenceListFieldProps,
   State
 > {
   private embeddedRecordBeforeEffects: Array<{ [key: string]: Effect }>;
   private embeddedRecordAfterEffects: Array<{ [key: string]: Effect }>;
 
-  constructor(props: EmbeddedBackReferenceFieldProps) {
+  constructor(props: EmbeddedBackReferenceListFieldProps) {
     super(props);
 
     const { context, config } = props;
@@ -116,10 +116,12 @@ export class EmbeddedBackReferenceField extends React.PureComponent<
 
   public handleEmbeddedRecordCreate() {
     const { config, context } = this.props;
-    const RecordCls = Record.extend(config.targetCmsRecord.recordType);
+    const RecordCls = Record.extend(
+      config.reference.targetCmsRecord.recordType
+    );
     this.setState(prevState => {
       prevState.embeddedRecordUpdate.push({
-        [config.sourceFieldName]: new Reference(context.record),
+        [config.reference.sourceFieldName]: new Reference(context.record),
       });
       prevState.embeddedRecords.push(new RecordCls());
       return prevState;
@@ -342,7 +344,7 @@ function FormGroup(props: FieldProps): JSX.Element {
 }
 
 function recordUpdateEffect(
-  config: EmbeddedBackReferenceFieldConfig,
+  config: EmbeddedBackReferenceListFieldConfig,
   updates: RecordChange[],
   embeddedRecords: Record[]
 ): Effect {
@@ -351,7 +353,9 @@ function recordUpdateEffect(
       return Promise.resolve();
     }
 
-    const RecordCls = Record.extend(config.targetCmsRecord.recordType);
+    const RecordCls = Record.extend(
+      config.reference.targetCmsRecord.recordType
+    );
     const recordsToSave = updates.map((change, index) => {
       const recordId = embeddedRecords[index].id;
       const data = { _id: recordId, ...updates[index] };
@@ -371,7 +375,7 @@ function recordUpdateEffect(
 }
 
 function recordDeleteEffect(
-  config: EmbeddedBackReferenceFieldConfig,
+  config: EmbeddedBackReferenceListFieldConfig,
   deletes: Record[]
 ): Effect {
   return () => {
@@ -379,14 +383,16 @@ function recordDeleteEffect(
       return Promise.resolve();
     }
 
-    const RecordCls = Record.extend(config.targetCmsRecord.recordType);
+    const RecordCls = Record.extend(
+      config.reference.targetCmsRecord.recordType
+    );
     if (config.referenceDeleteAction === DeleteAction.NullifyReference) {
       // set reference to null only
       const recordsToDelete = deletes.map(
         record =>
           new RecordCls({
             _id: record.id,
-            [config.sourceFieldName]: null,
+            [config.reference.sourceFieldName]: null,
           })
       );
       return saveRecordsProperly(skygear.publicDB, recordsToDelete);

@@ -7,14 +7,14 @@ import {
 } from 'react-select';
 import skygear, { Query, Record, Reference } from 'skygear';
 
-import { BackReferenceFieldConfig } from '../cmsConfig';
+import { BackReferenceSelectFieldConfig } from '../cmsConfig';
 import { Effect } from '../components/RecordFormPage';
 import { debouncePromise1, makeArray } from '../util';
 
 import { RequiredFieldProps } from './Field';
 
 export type BackReferenceSelectProps = RequiredFieldProps<
-  BackReferenceFieldConfig
+  BackReferenceSelectFieldConfig
 >;
 
 interface State {
@@ -66,12 +66,13 @@ class BackReferenceSelectImpl extends React.PureComponent<
         value={this.state.options}
         loadOptions={this.debouncedLoadOptionsHandler}
         onChange={this.onChange}
+        disabled={!config.editable}
       />
     );
   }
 
   public loadOptionsHandler: LoadOptionsAsyncHandler<string> = value => {
-    const { targetCmsRecord } = this.props.config;
+    const { targetCmsRecord } = this.props.config.reference;
 
     const RecordCls = Record.extend(targetCmsRecord.recordType);
 
@@ -109,14 +110,14 @@ class BackReferenceSelectImpl extends React.PureComponent<
     );
 
     const eff: Effect = () => {
-      const { targetCmsRecord: { recordType } } = config;
+      const { targetCmsRecord: { recordType } } = config.reference;
       const RecordCls = Record.extend(recordType);
 
       const newTargets = newTargetIds.map(
         id =>
           new RecordCls({
             _id: `${recordType}/${id}`,
-            [config.sourceFieldName]: new Reference(context.record),
+            [config.reference.sourceFieldName]: new Reference(context.record),
           })
       );
 
@@ -124,7 +125,7 @@ class BackReferenceSelectImpl extends React.PureComponent<
         id =>
           new RecordCls({
             _id: `${recordType}/${id}`,
-            [config.sourceFieldName]: null,
+            [config.reference.sourceFieldName]: null,
           })
       );
 
@@ -157,7 +158,7 @@ function diffOptions(
 
 function targetToOption(
   target: Record,
-  ref: BackReferenceFieldConfig
+  ref: BackReferenceSelectFieldConfig
 ): TargetOption {
   return TargetOption(target[ref.displayFieldName], target._id);
 }

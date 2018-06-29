@@ -4,6 +4,7 @@ import {
   FieldConfigTypes,
   parseFieldConfig,
 } from '..';
+import { ReferenceTypes } from '../fieldConfig';
 
 const minimalContext: ConfigContext = {
   associationRecordByName: {},
@@ -24,9 +25,12 @@ const context: ConfigContext = {
           displayFieldName: '_id',
           label: 'A id',
           name: 'a_id',
-          targetCmsRecord: {
-            name: 'RecordA',
-            recordType: 'a',
+          reference: {
+            targetCmsRecord: {
+              name: 'RecordA',
+              recordType: 'a',
+            },
+            type: ReferenceTypes.DirectReference,
           },
           type: FieldConfigTypes.Reference,
         },
@@ -35,9 +39,12 @@ const context: ConfigContext = {
           displayFieldName: '_id',
           label: 'B id',
           name: 'b_id',
-          targetCmsRecord: {
-            name: 'RecordB',
-            recordType: 'b',
+          reference: {
+            targetCmsRecord: {
+              name: 'RecordB',
+              recordType: 'b',
+            },
+            type: ReferenceTypes.DirectReference,
           },
           type: FieldConfigTypes.Reference,
         },
@@ -122,9 +129,12 @@ describe('parseFieldConfig Reference', () => {
       displayFieldName: 'field',
       label: 'A',
       name: 'A',
-      targetCmsRecord: {
-        name: 'RecordA',
-        recordType: 'a',
+      reference: {
+        targetCmsRecord: {
+          name: 'RecordA',
+          recordType: 'a',
+        },
+        type: ReferenceTypes.DirectReference,
       },
       type: FieldConfigTypes.Reference,
     });
@@ -142,9 +152,12 @@ describe('parseFieldConfig Reference', () => {
       displayFieldName: '_id',
       label: 'A',
       name: 'A',
-      targetCmsRecord: {
-        name: 'RecordA',
-        recordType: 'a',
+      reference: {
+        targetCmsRecord: {
+          name: 'RecordA',
+          recordType: 'a',
+        },
+        type: ReferenceTypes.DirectReference,
       },
       type: FieldConfigTypes.Reference,
     });
@@ -166,7 +179,7 @@ describe('parseFieldConfig Reference', () => {
       reference_field_name: 'field',
       reference_from_field: 'a_id',
       reference_via_back_reference: 'RecordB',
-      type: 'Reference',
+      type: 'ReferenceList',
     };
     const result = parseFieldConfig(context, input);
     expect(result).toEqual({
@@ -174,12 +187,15 @@ describe('parseFieldConfig Reference', () => {
       displayFieldName: 'field',
       label: 'A',
       name: 'A',
-      sourceFieldName: 'a_id',
-      targetCmsRecord: {
-        name: 'RecordB',
-        recordType: 'b',
+      reference: {
+        sourceFieldName: 'a_id',
+        targetCmsRecord: {
+          name: 'RecordB',
+          recordType: 'b',
+        },
+        type: ReferenceTypes.ViaBackReference,
       },
-      type: FieldConfigTypes.BackReference,
+      type: FieldConfigTypes.ReferenceList,
     });
   });
 
@@ -189,7 +205,7 @@ describe('parseFieldConfig Reference', () => {
       reference_field_name: 'field',
       reference_from_field: 'a_id',
       reference_via_back_reference: 'Unknown',
-      type: 'Reference',
+      type: 'ReferenceList',
     };
     expect(() => parseFieldConfig(context, input)).toThrow();
   });
@@ -200,67 +216,82 @@ describe('parseFieldConfig Reference', () => {
       reference_field_name: 'field',
       reference_target: 'RecordB',
       reference_via_association_record: 'a_has_b',
-      type: 'Reference',
+      type: 'ReferenceList',
     };
     const result = parseFieldConfig(context, input);
     expect(result).toEqual({
-      associationRecordConfig: {
-        cmsRecord: {
-          name: 'a_has_b',
-          recordType: 'a_has_b',
-        },
-        referenceConfigPair: [
-          {
-            compact: false,
-            displayFieldName: '_id',
-            label: 'A id',
-            name: 'a_id',
-            targetCmsRecord: {
-              name: 'RecordA',
-              recordType: 'a',
-            },
-            type: 'Reference',
-          },
-          {
-            compact: false,
-            displayFieldName: '_id',
-            label: 'B id',
-            name: 'b_id',
-            targetCmsRecord: {
-              name: 'RecordB',
-              recordType: 'b',
-            },
-            type: 'Reference',
-          },
-        ],
-      },
       compact: false,
       displayFieldName: 'field',
       label: 'A',
       name: 'A',
-      sourceReference: {
-        compact: false,
-        displayFieldName: '_id',
-        label: 'A id',
-        name: 'a_id',
-        targetCmsRecord: {
-          name: 'RecordA',
-          recordType: 'a',
+      reference: {
+        associationRecordConfig: {
+          cmsRecord: {
+            name: 'a_has_b',
+            recordType: 'a_has_b',
+          },
+          referenceConfigPair: [
+            {
+              compact: false,
+              displayFieldName: '_id',
+              label: 'A id',
+              name: 'a_id',
+              reference: {
+                targetCmsRecord: {
+                  name: 'RecordA',
+                  recordType: 'a',
+                },
+                type: ReferenceTypes.DirectReference,
+              },
+              type: FieldConfigTypes.Reference,
+            },
+            {
+              compact: false,
+              displayFieldName: '_id',
+              label: 'B id',
+              name: 'b_id',
+              reference: {
+                targetCmsRecord: {
+                  name: 'RecordB',
+                  recordType: 'b',
+                },
+                type: ReferenceTypes.DirectReference,
+              },
+              type: FieldConfigTypes.Reference,
+            },
+          ],
         },
-        type: 'Reference',
-      },
-      targetReference: {
-        compact: false,
-        displayFieldName: '_id',
-        label: 'B id',
-        name: 'b_id',
-        targetCmsRecord: {
-          name: 'RecordB',
-          recordType: 'b',
+        sourceReference: {
+          compact: false,
+          displayFieldName: '_id',
+          label: 'A id',
+          name: 'a_id',
+          reference: {
+            targetCmsRecord: {
+              name: 'RecordA',
+              recordType: 'a',
+            },
+            type: ReferenceTypes.DirectReference,
+          },
+          type: FieldConfigTypes.Reference,
         },
-        type: 'Reference',
+        targetReference: {
+          compact: false,
+          displayFieldName: '_id',
+          label: 'B id',
+          name: 'b_id',
+          reference: {
+            targetCmsRecord: {
+              name: 'RecordB',
+              recordType: 'b',
+            },
+            type: ReferenceTypes.DirectReference,
+          },
+          type: FieldConfigTypes.Reference,
+        },
+        type: ReferenceTypes.ViaAssociationRecord,
       },
-      type: FieldConfigTypes.AssociationReference,
+      type: FieldConfigTypes.ReferenceList,
     });
   });
 
@@ -270,7 +301,7 @@ describe('parseFieldConfig Reference', () => {
       reference_field_name: 'field',
       reference_target: 'RecordB',
       reference_via_association_record: 'Unknown',
-      type: 'Reference',
+      type: 'ReferenceList',
     };
     expect(() => parseFieldConfig(context, input)).toThrow();
   });
@@ -281,7 +312,7 @@ describe('parseFieldConfig Reference', () => {
       reference_field_name: 'field',
       reference_target: 'Unknown',
       reference_via_association_record: 'a_has_b',
-      type: 'Reference',
+      type: 'ReferenceList',
     };
     expect(() => parseFieldConfig(context, input)).toThrow();
   });
@@ -299,7 +330,7 @@ describe('parseFieldConfig EmbeddedReference', () => {
       ],
       reference_from_field: 'a_id',
       reference_via_back_reference: 'RecordB',
-      type: 'EmbeddedReference',
+      type: 'EmbeddedReferenceList',
     };
     const result = parseFieldConfig(context, input);
     expect(result).toEqual({
@@ -309,22 +340,25 @@ describe('parseFieldConfig EmbeddedReference', () => {
           compact: false,
           label: 'Name',
           name: 'name',
-          type: 'TextDisplay',
+          type: FieldConfigTypes.TextDisplay,
         },
       ],
       label: 'A',
       name: 'A',
       positionFieldName: undefined,
+      reference: {
+        sourceFieldName: 'a_id',
+        targetCmsRecord: {
+          name: 'RecordB',
+          recordType: 'b',
+        },
+        type: ReferenceTypes.ViaBackReference,
+      },
       referenceDeleteAction: 'NullifyReference',
       references: [],
       reorderEnabled: false,
       sortOrder: 'Asc',
-      sourceFieldName: 'a_id',
-      targetCmsRecord: {
-        name: 'RecordB',
-        recordType: 'b',
-      },
-      type: FieldConfigTypes.EmbeddedBackReference,
+      type: FieldConfigTypes.EmbeddedReferenceList,
     });
   });
 
@@ -334,7 +368,7 @@ describe('parseFieldConfig EmbeddedReference', () => {
       reference_delete_action: 'Unknown',
       reference_from_field: 'a_id',
       reference_via_back_reference: 'RecordB',
-      type: 'EmbeddedReference',
+      type: 'EmbeddedReferenceList',
     };
     expect(() => parseFieldConfig(context, input)).toThrow();
   });
@@ -346,7 +380,7 @@ describe('parseFieldConfig EmbeddedReference', () => {
       reference_fields: [],
       reference_from_field: 'a_id',
       reference_via_back_reference: 'RecordB',
-      type: 'EmbeddedReference',
+      type: 'EmbeddedReferenceList',
     };
     expect(() => parseFieldConfig(context, input)).toThrow();
   });

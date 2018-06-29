@@ -3,20 +3,31 @@ import './Field.scss';
 import * as React from 'react';
 import { Record } from 'skygear';
 
-import { FieldConfig, FieldConfigTypes } from '../cmsConfig';
+import {
+  AssociationReferenceListFieldConfig,
+  AssociationReferenceSelectFieldConfig,
+  BackReferenceListFieldConfig,
+  BackReferenceSelectFieldConfig,
+  EmbeddedBackReferenceListFieldConfig,
+  FieldConfig,
+  FieldConfigTypes,
+  ReferenceTypes,
+} from '../cmsConfig';
 import { Effect } from '../components/RecordFormPage';
 
-import { AssociationReferenceField } from './AssociationReferenceField';
-import { BackReferenceField } from './BackReferenceField';
+import { AssociationRecordSelect } from './AssociationRecordSelect';
+import { AssociationReferenceListField } from './AssociationReferenceField';
+import { BackReferenceListField } from './BackReferenceField';
+import { BackReferenceSelect } from './BackReferenceSelect';
 import { BooleanField } from './BooleanField';
 import { DateTimeDisplayField, DateTimePickerField } from './DateTimeField';
 import { DropdownField } from './DropdownField';
-import { EmbeddedBackReferenceField } from './EmbeddedBackReferenceField';
+import { EmbeddedBackReferenceListField } from './EmbeddedBackReferenceField';
 import { FileDisplayField, FileUploaderField } from './FileField';
 import { ImageDisplayField, ImageUploaderField } from './ImageField';
 import { IntegerDisplayField, IntegerInputField } from './IntegerField';
 import { FloatDisplayField, FloatInputField } from './NumberField';
-import { ReferenceField } from './ReferenceField';
+import { ReferenceDropdownField, ReferenceField } from './ReferenceField';
 import { TextDisplayField, TextInputField } from './StringField';
 import { TextArea } from './TextArea';
 import { WYSIWYGEditor } from './WYSIWYGEditor';
@@ -86,14 +97,6 @@ export class Field extends React.PureComponent<FieldProps> {
         return <FloatDisplayField {...rest} config={config} />;
       case FieldConfigTypes.FloatInput:
         return <FloatInputField {...rest} config={config} />;
-      case FieldConfigTypes.Reference:
-        return <ReferenceField {...rest} config={config} />;
-      case FieldConfigTypes.BackReference:
-        return <BackReferenceField {...rest} config={config} />;
-      case FieldConfigTypes.AssociationReference:
-        return <AssociationReferenceField {...rest} config={config} />;
-      case FieldConfigTypes.EmbeddedBackReference:
-        return <EmbeddedBackReferenceField {...rest} config={config} />;
       case FieldConfigTypes.ImageDisplay:
         return <ImageDisplayField {...rest} config={config} />;
       case FieldConfigTypes.ImageUploader:
@@ -102,6 +105,70 @@ export class Field extends React.PureComponent<FieldProps> {
         return <FileDisplayField {...rest} config={config} />;
       case FieldConfigTypes.FileUploader:
         return <FileUploaderField {...rest} config={config} />;
+      default:
+        return <RefField {...this.props} />;
     }
   }
 }
+
+const RefField: React.SFC<FieldProps> = props => {
+  const { config, ...rest } = props;
+  switch (config.type) {
+    case FieldConfigTypes.Reference:
+      return <ReferenceField {...rest} config={config} />;
+    case FieldConfigTypes.ReferenceDropdown:
+      return <ReferenceDropdownField {...rest} config={config} />;
+    case FieldConfigTypes.ReferenceList:
+      switch (config.reference.type) {
+        case ReferenceTypes.ViaBackReference:
+          return (
+            <BackReferenceListField
+              {...rest}
+              config={config as BackReferenceListFieldConfig}
+            />
+          );
+        case ReferenceTypes.ViaAssociationRecord:
+          return (
+            <AssociationReferenceListField
+              {...rest}
+              config={config as AssociationReferenceListFieldConfig}
+            />
+          );
+        default:
+          throw new Error(`Unexpected config: ${config}`);
+      }
+    case FieldConfigTypes.ReferenceSelect:
+      switch (config.reference.type) {
+        case ReferenceTypes.ViaBackReference:
+          return (
+            <BackReferenceSelect
+              {...rest}
+              config={config as BackReferenceSelectFieldConfig}
+            />
+          );
+        case ReferenceTypes.ViaAssociationRecord:
+          return (
+            <AssociationRecordSelect
+              {...rest}
+              config={config as AssociationReferenceSelectFieldConfig}
+            />
+          );
+        default:
+          throw new Error(`Unexpected config: ${config}`);
+      }
+    case FieldConfigTypes.EmbeddedReferenceList:
+      switch (config.reference.type) {
+        case ReferenceTypes.ViaBackReference:
+          return (
+            <EmbeddedBackReferenceListField
+              {...rest}
+              config={config as EmbeddedBackReferenceListFieldConfig}
+            />
+          );
+        default:
+          throw new Error(`Unexpected config: ${config}`);
+      }
+    default:
+      throw new Error(`Unexpected field type: ${config.type}`);
+  }
+};

@@ -9,15 +9,17 @@ import skygear, {
 } from 'skygear';
 
 import {
-  AssociationReferenceFieldConfig,
-  BackReferenceFieldConfig,
+  AssociationReferenceListFieldConfig,
+  AssociationReferenceSelectFieldConfig,
+  BackReferenceListFieldConfig,
+  BackReferenceSelectFieldConfig,
   BaseFilterQueryType,
   BooleanFilter,
   BooleanFilterQueryType,
   CmsRecord,
   DateTimeFilter,
   DateTimeFilterQueryType,
-  EmbeddedBackReferenceFieldConfig,
+  EmbeddedBackReferenceListFieldConfig,
   FieldConfigTypes,
   Filter,
   FilterType,
@@ -25,10 +27,12 @@ import {
   GeneralFilterQueryType,
   IntegerFilter,
   IntegerFilterQueryType,
-  ReferenceConfig,
   ReferenceFieldConfig,
   ReferenceFilter,
   ReferenceFilterQueryType,
+  ReferenceTypes,
+  ReferenceViaAssociationRecord,
+  ReferenceViaBackReference,
   SortOrder,
   StringFilter,
   StringFilterQueryType,
@@ -298,7 +302,7 @@ function saveRecordFailure(
 
 export function fetchRecord(
   cmsRecord: CmsRecord,
-  references: ReferenceConfig[],
+  references: ReferenceFieldConfig[],
   id: string,
   context: string
 ): ThunkAction<Promise<void>, {}, {}> {
@@ -355,7 +359,7 @@ function saveRecord(
 
 function fetchRecordList(
   cmsRecord: CmsRecord,
-  references: ReferenceConfig[],
+  references: ReferenceFieldConfig[],
   filters: Filter[],
   predicates: Predicate[],
   page: number = 1,
@@ -643,33 +647,47 @@ interface BackReferenceAttrs {
   name: string;
   positionFieldName: string;
   sortOrder: SortOrder;
-  sourceFieldName: string;
-  targetCmsRecord: CmsRecord;
+  reference: ReferenceViaBackReference;
 }
 
-// BackReferenceFieldConfig and EmbeddedBackReferenceFieldConfig are using the
-// same logic to fetch the referent
+// Fields of back reference are using the same logic to fetch the referent
 function BackReferenceAttrs(
-  a: BackReferenceFieldConfig | EmbeddedBackReferenceFieldConfig
+  a:
+    | BackReferenceListFieldConfig
+    | BackReferenceSelectFieldConfig
+    | EmbeddedBackReferenceListFieldConfig
 ): BackReferenceAttrs {
   let positionFieldName: string;
   let sortOrder: SortOrder;
-  if (a.type === FieldConfigTypes.BackReference) {
-    positionFieldName = '_created_at';
-    sortOrder = SortOrder.Desc;
-  } else {
+  if (a.type === FieldConfigTypes.EmbeddedReferenceList) {
     // since EmbeddedBackReference would create new child record
     // to display the new child record at last, the default sorting is asc for _created_at
     positionFieldName = a.positionFieldName || '_created_at';
     sortOrder = a.positionFieldName != null ? a.sortOrder : SortOrder.Asc;
+  } else {
+    positionFieldName = '_created_at';
+    sortOrder = SortOrder.Desc;
   }
 
   return {
     name: a.name,
     positionFieldName,
+    reference: a.reference,
     sortOrder,
-    sourceFieldName: a.sourceFieldName,
-    targetCmsRecord: a.targetCmsRecord,
+  };
+}
+
+interface AssoReferenceAttrs {
+  name: string;
+  reference: ReferenceViaAssociationRecord;
+}
+
+function AssoReferenceAttrs(
+  a: AssociationReferenceListFieldConfig | AssociationReferenceSelectFieldConfig
+): AssoReferenceAttrs {
+  return {
+    name: a.name,
+    reference: a.reference,
   };
 }
 
@@ -678,15 +696,12 @@ function BackReferenceAttrs(
 // recursively for each layer of reference.
 function queryWithTarget(
   query: Query,
-  references: ReferenceConfig[]
+  references: ReferenceFieldConfig[]
 ): Promise<QueryResult<Record>> {
-  const [refs, backRefs, assoRefs, embeddedBackRefs] = separateReferenceConfigs(
-    references
+  const refs = references.filter(
+    r => r.reference.type === ReferenceTypes.DirectReference
   );
-
-  refs.forEach(config => {
-    query.transientInclude(config.name);
-  });
+  refs.forEach(r => query.transientInclude(r.name));
 
   let queryResult: QueryResult<Record>;
   let sources: Record[];
@@ -698,9 +713,26 @@ function queryWithTarget(
       sources = qr.map(r => r);
 
       // group back reference and embedded back reference
-      const backRefsAttrs = [...backRefs, ...embeddedBackRefs].map(
-        BackReferenceAttrs
-      );
+      const backRefsAttrs = references
+        .filter(r => r.reference.type === ReferenceTypes.ViaBackReference)
+        .map(
+          r =>
+            r as
+              | BackReferenceListFieldConfig
+              | BackReferenceSelectFieldConfig
+              | EmbeddedBackReferenceListFieldConfig
+        )
+        .map(BackReferenceAttrs);
+
+      const assoRefs = references
+        .filter(r => r.reference.type === ReferenceTypes.ViaAssociationRecord)
+        .map(
+          r =>
+            r as
+              | AssociationReferenceListFieldConfig
+              | AssociationReferenceSelectFieldConfig
+        )
+        .map(AssoReferenceAttrs);
 
       return Promise.all([
         fetchAllReferentsWithTarget(sources, backRefsAttrs),
@@ -721,54 +753,67 @@ function queryWithTarget(
         distributeAssociationRecords(sourceById, ref, assoRecords);
       });
 
-      // For each embedded reference,
-      // - fetch reference within embedded references
-      // - replace the original record(s) in $transient with the fetched result
-      //   which includes one more level of reference
-      //
-      // TODO (Steven-Chan):
-      // Handle EmbeddedReference for one-to-one and many-to-many
-      const nextLevelQueries = embeddedBackRefs.map(ref => {
-        // const isSingleEmbeddedRef = ref.type === FieldConfigTypes.Reference;
-        const isSingleEmbeddedRef = false;
-        const ids: string[] = [];
-        sources.forEach(r => {
-          if (isSingleEmbeddedRef) {
-            ids.push(r.$transient[ref.name]._id);
-          } else {
-            r.$transient[ref.name].forEach((tr: Record) => ids.push(tr._id));
-          }
-        });
-
-        const recordCls = Record.extend(ref.targetCmsRecord.recordType);
-        const nextLevelQuery = new Query(recordCls);
-        nextLevelQuery.contains('_id', ids);
-        nextLevelQuery.limit = ids.length;
-
-        return queryWithTarget(
-          nextLevelQuery,
-          ref.references
-        ).then(transientQueryResult => {
-          const transientQueryResultById = groupBy(
-            transientQueryResult.map(qr => qr),
-            r => r._id
-          );
-
-          // mutate the original queryResult
-          sources.forEach(r => {
-            const targetEmbeddedRecords = r.$transient[ref.name];
-            r.$transient[ref.name] = isSingleEmbeddedRef
-              ? transientQueryResultById.get(targetEmbeddedRecords._id)![0]
-              : targetEmbeddedRecords.map((embeddedRecord: Record) => {
-                  return transientQueryResultById.get(embeddedRecord._id)![0];
-                });
-          });
-        });
-      });
-
-      return Promise.all(nextLevelQueries);
+      return fetchEmbeddedRecordData(sources, references);
     })
     .then(() => queryResult);
+}
+
+// For each embedded reference,
+// - fetch reference within embedded references
+// - replace the original record(s) in $transient with the fetched result
+//   which includes one more level of reference
+function fetchEmbeddedRecordData(
+  sources: Record[],
+  references: ReferenceFieldConfig[]
+) {
+  const embeddedBackRefs = references
+    .filter(r => r.type === FieldConfigTypes.EmbeddedReferenceList)
+    .filter(r => r.reference.type === ReferenceTypes.ViaBackReference);
+
+  // TODO (Steven-Chan):
+  // Handle EmbeddedReference for one-to-one and many-to-many
+  const nextLevelQueries = embeddedBackRefs.map(f => {
+    const field = f as EmbeddedBackReferenceListFieldConfig;
+    const ref = field.reference;
+
+    // const isSingleEmbeddedRef = ref.type === FieldConfigTypes.Reference;
+    const isSingleEmbeddedRef = false;
+    const ids: string[] = [];
+    sources.forEach(r => {
+      if (isSingleEmbeddedRef) {
+        ids.push(r.$transient[field.name]._id);
+      } else {
+        r.$transient[field.name].forEach((tr: Record) => ids.push(tr._id));
+      }
+    });
+
+    const recordCls = Record.extend(ref.targetCmsRecord.recordType);
+    const nextLevelQuery = new Query(recordCls);
+    nextLevelQuery.contains('_id', ids);
+    nextLevelQuery.limit = ids.length;
+
+    return queryWithTarget(
+      nextLevelQuery,
+      field.references
+    ).then(transientQueryResult => {
+      const transientQueryResultById = groupBy(
+        transientQueryResult.map(qr => qr),
+        r => r._id
+      );
+
+      // mutate the original queryResult
+      sources.forEach(r => {
+        const targetEmbeddedRecords = r.$transient[field.name];
+        r.$transient[field.name] = isSingleEmbeddedRef
+          ? transientQueryResultById.get(targetEmbeddedRecords._id)![0]
+          : targetEmbeddedRecords.map((embeddedRecord: Record) => {
+              return transientQueryResultById.get(embeddedRecord._id)![0];
+            });
+      });
+    });
+  });
+
+  return Promise.all(nextLevelQueries);
 }
 
 function fetchAllReferentsWithTarget(
@@ -796,7 +841,7 @@ function distributeReferents(
   referents: Record[]
 ): void {
   const referentsBySourceId = groupBy(referents, referent => {
-    const sourceRef: Reference = referent[ref.sourceFieldName];
+    const sourceRef: Reference = referent[ref.reference.sourceFieldName];
     return parseReference(sourceRef).recordId;
   });
   sourceById.forEach((source, sourceId) => {
@@ -810,8 +855,8 @@ function fetchReferentsWithTarget(
 ): Promise<Record[]> {
   return fetchReferentRecords(
     sourceIds,
-    backRefConfig.targetCmsRecord.recordType,
-    backRefConfig.sourceFieldName,
+    backRefConfig.reference.targetCmsRecord.recordType,
+    backRefConfig.reference.sourceFieldName,
     {
       sortAscending: backRefConfig.sortOrder === SortOrder.Asc,
       sortByField: backRefConfig.positionFieldName,
@@ -821,8 +866,8 @@ function fetchReferentsWithTarget(
 
 function fetchAllAssociationRecordsWithTarget(
   sources: Record[],
-  refs: AssociationReferenceFieldConfig[]
-): Promise<Array<[AssociationReferenceFieldConfig, Record[]]>> {
+  refs: AssoReferenceAttrs[]
+): Promise<Array<[AssoReferenceAttrs, Record[]]>> {
   if (refs.length === 0) {
     return Promise.resolve([]);
   }
@@ -831,8 +876,7 @@ function fetchAllAssociationRecordsWithTarget(
 
   const assoRecordsPromises = refs.map(ref => {
     return fetchAssociationRecordsWithTarget(sourceIds, ref).then(
-      assoRecords =>
-        [ref, assoRecords] as [AssociationReferenceFieldConfig, Record[]]
+      assoRecords => [ref, assoRecords] as [AssoReferenceAttrs, Record[]]
     );
   });
 
@@ -843,17 +887,17 @@ function fetchAllAssociationRecordsWithTarget(
 // `${ref.name}Associations` and ref.name record.$transient respectively
 function distributeAssociationRecords(
   sourceById: Map<string, Record>,
-  ref: AssociationReferenceFieldConfig,
+  ref: AssoReferenceAttrs,
   associationRecords: Record[]
 ): void {
   const assoRecordsBySourceId = groupBy(associationRecords, assoRecord => {
-    const sourceRef: Reference = assoRecord[ref.sourceReference.name];
+    const sourceRef: Reference = assoRecord[ref.reference.sourceReference.name];
     return parseReference(sourceRef).recordId;
   });
   sourceById.forEach((source, sourceId) => {
     const assoRecords = assoRecordsBySourceId.get(sourceId) || [];
     const targetRecords = assoRecords.map(
-      r => r.$transient[ref.targetReference.name]
+      r => r.$transient[ref.reference.targetReference.name]
     );
 
     source.$transient[ref.name] = targetRecords;
@@ -863,14 +907,14 @@ function distributeAssociationRecords(
 
 function fetchAssociationRecordsWithTarget(
   sourceIds: string[],
-  assoRefConfig: AssociationReferenceFieldConfig
+  assoRefConfig: AssoReferenceAttrs
 ): Promise<Record[]> {
   return fetchReferentRecords(
     sourceIds,
-    assoRefConfig.associationRecordConfig.cmsRecord.recordType,
-    assoRefConfig.sourceReference.name,
+    assoRefConfig.reference.associationRecordConfig.cmsRecord.recordType,
+    assoRefConfig.reference.sourceReference.name,
     {
-      transientIncludeFieldName: assoRefConfig.targetReference.name,
+      transientIncludeFieldName: assoRefConfig.reference.targetReference.name,
     }
   );
 }
@@ -911,49 +955,16 @@ function fetchReferentRecords(
     .then(queryResult => queryResult.map(r => r));
 }
 
-function separateReferenceConfigs(
-  configs: ReferenceConfig[]
-): [
-  ReferenceFieldConfig[],
-  BackReferenceFieldConfig[],
-  AssociationReferenceFieldConfig[],
-  EmbeddedBackReferenceFieldConfig[]
-] {
-  const refs: ReferenceFieldConfig[] = [];
-  const backRefs: BackReferenceFieldConfig[] = [];
-  const assoRefs: AssociationReferenceFieldConfig[] = [];
-  const embeddedBackRefs: EmbeddedBackReferenceFieldConfig[] = [];
-
-  configs.forEach(config => {
-    switch (config.type) {
-      case FieldConfigTypes.Reference:
-        refs.push(config);
-        break;
-      case FieldConfigTypes.BackReference:
-        backRefs.push(config);
-        break;
-      case FieldConfigTypes.AssociationReference:
-        assoRefs.push(config);
-        break;
-      case FieldConfigTypes.EmbeddedBackReference:
-        embeddedBackRefs.push(config);
-        break;
-    }
-  });
-
-  return [refs, backRefs, assoRefs, embeddedBackRefs];
-}
-
 export class RecordActionDispatcher {
   private dispatch: Dispatch<RootState>;
   private cmsRecord: CmsRecord;
-  private references: ReferenceConfig[];
+  private references: ReferenceFieldConfig[];
   private context: string;
 
   constructor(
     dispatch: Dispatch<RootState>,
     cmsRecord: CmsRecord,
-    references: ReferenceConfig[],
+    references: ReferenceFieldConfig[],
     context: string
   ) {
     this.dispatch = dispatch;

@@ -9,7 +9,7 @@ import {
   parseFieldConfig,
   parseReferenceFieldConfig,
   recursivelyPreprocessFieldAlias,
-  ReferenceConfig,
+  ReferenceDisplayFieldConfig,
   ReferenceFieldConfig,
 } from './fieldConfig';
 import { FileImportConfig, parseFileImportConfig } from './fileImportConfig';
@@ -119,7 +119,7 @@ export interface ListPageConfig {
   filters: FilterConfig[];
   predicates: PredicateValue;
   defaultSort: SortState;
-  references: ReferenceConfig[];
+  references: ReferenceFieldConfig[];
   actions: ListActionConfig[];
   itemActions: ListItemActionConfig[];
 }
@@ -128,7 +128,7 @@ export interface ShowPageConfig {
   cmsRecord: CmsRecord;
   label: string;
   fields: FieldConfig[];
-  references: ReferenceConfig[];
+  references: ReferenceFieldConfig[];
   actions: ShowActionConfig[];
 }
 
@@ -136,7 +136,7 @@ export interface RecordFormPageConfig {
   cmsRecord: CmsRecord;
   label: string;
   fields: FieldConfig[];
-  references: ReferenceConfig[];
+  references: ReferenceFieldConfig[];
   actions: RecordFormActionConfig[];
 }
 
@@ -151,7 +151,10 @@ export interface AssociationRecordByName {
 
 export interface AssociationRecordConfig {
   cmsRecord: CmsRecord;
-  referenceConfigPair: [ReferenceFieldConfig, ReferenceFieldConfig];
+  referenceConfigPair: [
+    ReferenceDisplayFieldConfig,
+    ReferenceDisplayFieldConfig
+  ];
 }
 
 export enum RecordPageTypes {
@@ -714,7 +717,11 @@ function makeEditableField(config: FieldConfig): FieldConfig {
 
 // tslint:disable-next-line:no-any
 export function recursivelyApplyFn(input: any, fn: any) {
-  if (input.type === 'EmbeddedReference' && isArray(input.reference_fields)) {
+  if (
+    (input.type === 'EmbeddedReference' ||
+      input.type === 'EmbeddedReferenceList') &&
+    isArray(input.reference_fields)
+  ) {
     const fields = input.reference_fields;
     input = {
       ...input,
@@ -854,10 +861,10 @@ function parseAssociationRecord(
 
   const ref0 = parseReferenceFieldConfig(context, fields[0]);
   const ref1 = parseReferenceFieldConfig(context, fields[1]);
-  const referenceConfigPair: [ReferenceFieldConfig, ReferenceFieldConfig] = [
-    ref0,
-    ref1,
-  ];
+  const referenceConfigPair: [
+    ReferenceDisplayFieldConfig,
+    ReferenceDisplayFieldConfig
+  ] = [ref0, ref1];
 
   return {
     cmsRecord: CmsRecord(recordName, recordType),

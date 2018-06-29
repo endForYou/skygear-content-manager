@@ -20,7 +20,10 @@ test('parseCmsConfig should parse example config', () => {
             name: 'field_demo',
             label: 'Field demo',
             displayFieldName: '_id',
-            targetCmsRecord: { name: 'field_demo', recordType: 'field_demo' },
+            reference: {
+              targetCmsRecord: { name: 'field_demo', recordType: 'field_demo' },
+              type: 'DirectReference',
+            },
             type: 'Reference',
           },
           {
@@ -28,9 +31,12 @@ test('parseCmsConfig should parse example config', () => {
             name: 'asso_ref_demo',
             label: 'Asso ref demo',
             displayFieldName: '_id',
-            targetCmsRecord: {
-              name: 'asso_ref_demo',
-              recordType: 'asso_ref_demo',
+            reference: {
+              targetCmsRecord: {
+                name: 'asso_ref_demo',
+                recordType: 'asso_ref_demo',
+              },
+              type: 'DirectReference',
             },
             type: 'Reference',
           },
@@ -133,31 +139,33 @@ test('parseCmsConfig should parse example config', () => {
               label: 'Reference',
               editable: true,
               displayFieldName: 'name',
-              targetCmsRecord: { name: 'ref_demo', recordType: 'ref_demo' },
-              type: 'Reference',
+              reference: {
+                targetCmsRecord: { name: 'ref_demo', recordType: 'ref_demo' },
+                type: 'DirectReference',
+              },
+              type: 'ReferenceDropdown',
             },
             {
               compact: false,
               name: 'back_refs',
               label: 'Back refs',
               editable: true,
-              sourceFieldName: 'reference',
-              targetCmsRecord: {
-                name: 'back_ref_demo',
-                recordType: 'back_ref_demo',
-              },
               displayFieldName: 'name',
-              type: 'BackReference',
+              reference: {
+                sourceFieldName: 'reference',
+                targetCmsRecord: {
+                  name: 'back_ref_demo',
+                  recordType: 'back_ref_demo',
+                },
+                type: 'ViaBackReference',
+              },
+              type: 'ReferenceSelect',
             },
             {
               compact: false,
               name: 'back_refs_embedded',
               label: 'Back refs embedded',
-              sourceFieldName: 'reference',
-              targetCmsRecord: {
-                name: 'back_ref_demo',
-                recordType: 'back_ref_demo',
-              },
+              editable: true,
               displayFields: [
                 {
                   compact: false,
@@ -174,11 +182,19 @@ test('parseCmsConfig should parse example config', () => {
                 },
               ],
               positionFieldName: 'field_demo_position',
+              reference: {
+                sourceFieldName: 'reference',
+                targetCmsRecord: {
+                  name: 'back_ref_demo',
+                  recordType: 'back_ref_demo',
+                },
+                type: 'ViaBackReference',
+              },
               referenceDeleteAction: 'NullifyReference',
               references: [],
               reorderEnabled: false,
               sortOrder: 'Asc',
-              type: 'EmbeddedBackReference',
+              type: 'EmbeddedReferenceList',
             },
             {
               compact: false,
@@ -214,31 +230,33 @@ test('parseCmsConfig should parse example config', () => {
               label: 'Reference',
               editable: true,
               displayFieldName: 'name',
-              targetCmsRecord: { name: 'ref_demo', recordType: 'ref_demo' },
-              type: 'Reference',
+              reference: {
+                targetCmsRecord: { name: 'ref_demo', recordType: 'ref_demo' },
+                type: 'DirectReference',
+              },
+              type: 'ReferenceDropdown',
             },
             {
               compact: false,
               name: 'back_refs',
               label: 'Back refs',
               editable: true,
-              sourceFieldName: 'reference',
-              targetCmsRecord: {
-                name: 'back_ref_demo',
-                recordType: 'back_ref_demo',
-              },
               displayFieldName: 'name',
-              type: 'BackReference',
+              reference: {
+                sourceFieldName: 'reference',
+                targetCmsRecord: {
+                  name: 'back_ref_demo',
+                  recordType: 'back_ref_demo',
+                },
+                type: 'ViaBackReference',
+              },
+              type: 'ReferenceSelect',
             },
             {
               compact: false,
               name: 'back_refs_embedded',
               label: 'Back refs embedded',
-              sourceFieldName: 'reference',
-              targetCmsRecord: {
-                name: 'back_ref_demo',
-                recordType: 'back_ref_demo',
-              },
+              editable: true,
               displayFields: [
                 {
                   compact: false,
@@ -255,11 +273,19 @@ test('parseCmsConfig should parse example config', () => {
                 },
               ],
               positionFieldName: 'field_demo_position',
+              reference: {
+                sourceFieldName: 'reference',
+                targetCmsRecord: {
+                  name: 'back_ref_demo',
+                  recordType: 'back_ref_demo',
+                },
+                type: 'ViaBackReference',
+              },
               referenceDeleteAction: 'NullifyReference',
               references: [],
               reorderEnabled: false,
               sortOrder: 'Asc',
-              type: 'EmbeddedBackReference',
+              type: 'EmbeddedReferenceList',
             },
           ],
         },
@@ -357,20 +383,26 @@ test('parseCmsConfig should parse example config', () => {
               name: 'reference',
               label: 'Reference',
               displayFieldName: 'name',
-              targetCmsRecord: { name: 'ref_demo', recordType: 'ref_demo' },
+              reference: {
+                targetCmsRecord: { name: 'ref_demo', recordType: 'ref_demo' },
+                type: 'DirectReference',
+              },
               type: 'Reference',
             },
             {
               compact: true,
               name: 'back_refs',
               label: 'Back refs',
-              sourceFieldName: 'reference',
-              targetCmsRecord: {
-                name: 'back_ref_demo',
-                recordType: 'back_ref_demo',
-              },
               displayFieldName: 'name',
-              type: 'BackReference',
+              reference: {
+                sourceFieldName: 'reference',
+                targetCmsRecord: {
+                  name: 'back_ref_demo',
+                  recordType: 'back_ref_demo',
+                },
+                type: 'ViaBackReference',
+              },
+              type: 'ReferenceList',
             },
             {
               compact: true,
@@ -463,20 +495,26 @@ test('parseCmsConfig should parse example config', () => {
               name: 'reference',
               label: 'Reference',
               displayFieldName: 'name',
-              targetCmsRecord: { name: 'ref_demo', recordType: 'ref_demo' },
+              reference: {
+                targetCmsRecord: { name: 'ref_demo', recordType: 'ref_demo' },
+                type: 'DirectReference',
+              },
               type: 'Reference',
             },
             {
               compact: true,
               name: 'back_refs',
               label: 'Back refs',
-              sourceFieldName: 'reference',
-              targetCmsRecord: {
-                name: 'back_ref_demo',
-                recordType: 'back_ref_demo',
-              },
               displayFieldName: 'name',
-              type: 'BackReference',
+              reference: {
+                sourceFieldName: 'reference',
+                targetCmsRecord: {
+                  name: 'back_ref_demo',
+                  recordType: 'back_ref_demo',
+                },
+                type: 'ViaBackReference',
+              },
+              type: 'ReferenceList',
             },
           ],
         },
@@ -566,31 +604,33 @@ test('parseCmsConfig should parse example config', () => {
               label: 'Reference',
               editable: true,
               displayFieldName: 'name',
-              targetCmsRecord: { name: 'ref_demo', recordType: 'ref_demo' },
-              type: 'Reference',
+              reference: {
+                targetCmsRecord: { name: 'ref_demo', recordType: 'ref_demo' },
+                type: 'DirectReference',
+              },
+              type: 'ReferenceDropdown',
             },
             {
               compact: false,
               name: 'back_refs',
               label: 'Back refs',
               editable: true,
-              sourceFieldName: 'reference',
-              targetCmsRecord: {
-                name: 'back_ref_demo',
-                recordType: 'back_ref_demo',
-              },
               displayFieldName: 'name',
-              type: 'BackReference',
+              reference: {
+                sourceFieldName: 'reference',
+                targetCmsRecord: {
+                  name: 'back_ref_demo',
+                  recordType: 'back_ref_demo',
+                },
+                type: 'ViaBackReference',
+              },
+              type: 'ReferenceSelect',
             },
             {
               compact: false,
               name: 'back_refs_embedded',
               label: 'Back refs embedded',
-              sourceFieldName: 'reference',
-              targetCmsRecord: {
-                name: 'back_ref_demo',
-                recordType: 'back_ref_demo',
-              },
+              editable: true,
               displayFields: [
                 {
                   compact: false,
@@ -607,11 +647,19 @@ test('parseCmsConfig should parse example config', () => {
                 },
               ],
               positionFieldName: 'field_demo_position',
+              reference: {
+                sourceFieldName: 'reference',
+                targetCmsRecord: {
+                  name: 'back_ref_demo',
+                  recordType: 'back_ref_demo',
+                },
+                type: 'ViaBackReference',
+              },
               referenceDeleteAction: 'NullifyReference',
               references: [],
               reorderEnabled: false,
               sortOrder: 'Asc',
-              type: 'EmbeddedBackReference',
+              type: 'EmbeddedReferenceList',
             },
             {
               compact: false,
@@ -647,31 +695,33 @@ test('parseCmsConfig should parse example config', () => {
               label: 'Reference',
               editable: true,
               displayFieldName: 'name',
-              targetCmsRecord: { name: 'ref_demo', recordType: 'ref_demo' },
-              type: 'Reference',
+              reference: {
+                targetCmsRecord: { name: 'ref_demo', recordType: 'ref_demo' },
+                type: 'DirectReference',
+              },
+              type: 'ReferenceDropdown',
             },
             {
               compact: false,
               name: 'back_refs',
               label: 'Back refs',
               editable: true,
-              sourceFieldName: 'reference',
-              targetCmsRecord: {
-                name: 'back_ref_demo',
-                recordType: 'back_ref_demo',
-              },
               displayFieldName: 'name',
-              type: 'BackReference',
+              reference: {
+                sourceFieldName: 'reference',
+                targetCmsRecord: {
+                  name: 'back_ref_demo',
+                  recordType: 'back_ref_demo',
+                },
+                type: 'ViaBackReference',
+              },
+              type: 'ReferenceSelect',
             },
             {
               compact: false,
               name: 'back_refs_embedded',
               label: 'Back refs embedded',
-              sourceFieldName: 'reference',
-              targetCmsRecord: {
-                name: 'back_ref_demo',
-                recordType: 'back_ref_demo',
-              },
+              editable: true,
               displayFields: [
                 {
                   compact: false,
@@ -688,11 +738,19 @@ test('parseCmsConfig should parse example config', () => {
                 },
               ],
               positionFieldName: 'field_demo_position',
+              reference: {
+                sourceFieldName: 'reference',
+                targetCmsRecord: {
+                  name: 'back_ref_demo',
+                  recordType: 'back_ref_demo',
+                },
+                type: 'ViaBackReference',
+              },
               referenceDeleteAction: 'NullifyReference',
               references: [],
               reorderEnabled: false,
               sortOrder: 'Asc',
-              type: 'EmbeddedBackReference',
+              type: 'EmbeddedReferenceList',
             },
           ],
         },
@@ -774,89 +832,105 @@ test('parseCmsConfig should parse example config', () => {
               name: 'reference',
               label: 'Reference',
               displayFieldName: 'name',
-              targetCmsRecord: { name: 'ref_demo', recordType: 'ref_demo' },
+              reference: {
+                targetCmsRecord: { name: 'ref_demo', recordType: 'ref_demo' },
+                type: 'DirectReference',
+              },
               type: 'Reference',
             },
             {
               compact: false,
               name: 'back_refs',
               label: 'Back refs',
-              sourceFieldName: 'reference',
-              targetCmsRecord: {
-                name: 'back_ref_demo',
-                recordType: 'back_ref_demo',
-              },
               displayFieldName: 'name',
-              type: 'BackReference',
+              reference: {
+                sourceFieldName: 'reference',
+                targetCmsRecord: {
+                  name: 'back_ref_demo',
+                  recordType: 'back_ref_demo',
+                },
+                type: 'ViaBackReference',
+              },
+              type: 'ReferenceList',
             },
             {
               compact: false,
               name: 'asso_refs',
               label: 'Asso refs',
-              associationRecordConfig: {
-                cmsRecord: {
-                  name: 'field_asso_ref',
-                  recordType: 'field_asso_ref',
+              displayFieldName: 'name',
+              reference: {
+                associationRecordConfig: {
+                  cmsRecord: {
+                    name: 'field_asso_ref',
+                    recordType: 'field_asso_ref',
+                  },
+                  referenceConfigPair: [
+                    {
+                      compact: false,
+                      name: 'field_demo',
+                      label: 'Field demo',
+                      displayFieldName: '_id',
+                      reference: {
+                        targetCmsRecord: {
+                          name: 'field_demo',
+                          recordType: 'field_demo',
+                        },
+                        type: 'DirectReference',
+                      },
+                      type: 'Reference',
+                    },
+                    {
+                      compact: false,
+                      name: 'asso_ref_demo',
+                      label: 'Asso ref demo',
+                      displayFieldName: '_id',
+                      reference: {
+                        targetCmsRecord: {
+                          name: 'asso_ref_demo',
+                          recordType: 'asso_ref_demo',
+                        },
+                        type: 'DirectReference',
+                      },
+                      type: 'Reference',
+                    },
+                  ],
                 },
-                referenceConfigPair: [
-                  {
-                    compact: false,
-                    name: 'field_demo',
-                    label: 'Field demo',
-                    displayFieldName: '_id',
+                sourceReference: {
+                  compact: false,
+                  name: 'field_demo',
+                  label: 'Field demo',
+                  displayFieldName: '_id',
+                  reference: {
                     targetCmsRecord: {
                       name: 'field_demo',
                       recordType: 'field_demo',
                     },
-                    type: 'Reference',
+                    type: 'DirectReference',
                   },
-                  {
-                    compact: false,
-                    name: 'asso_ref_demo',
-                    label: 'Asso ref demo',
-                    displayFieldName: '_id',
+                  type: 'Reference',
+                },
+                targetReference: {
+                  compact: false,
+                  name: 'asso_ref_demo',
+                  label: 'Asso ref demo',
+                  displayFieldName: '_id',
+                  reference: {
                     targetCmsRecord: {
                       name: 'asso_ref_demo',
                       recordType: 'asso_ref_demo',
                     },
-                    type: 'Reference',
+                    type: 'DirectReference',
                   },
-                ],
-              },
-              displayFieldName: 'name',
-              sourceReference: {
-                compact: false,
-                name: 'field_demo',
-                label: 'Field demo',
-                displayFieldName: '_id',
-                targetCmsRecord: {
-                  name: 'field_demo',
-                  recordType: 'field_demo',
+                  type: 'Reference',
                 },
-                type: 'Reference',
+                type: 'ViaAssociationRecord',
               },
-              targetReference: {
-                compact: false,
-                name: 'asso_ref_demo',
-                label: 'Asso ref demo',
-                displayFieldName: '_id',
-                targetCmsRecord: {
-                  name: 'asso_ref_demo',
-                  recordType: 'asso_ref_demo',
-                },
-                type: 'Reference',
-              },
-              type: 'AssociationReference',
+              type: 'ReferenceList',
             },
             {
               compact: false,
               name: 'back_refs_embedded',
               label: 'Back refs embedded',
-              sourceFieldName: 'reference',
-              targetCmsRecord: {
-                name: 'back_ref_demo',
-                recordType: 'back_ref_demo',
-              },
               displayFields: [
                 {
                   compact: false,
@@ -872,11 +946,19 @@ test('parseCmsConfig should parse example config', () => {
                 },
               ],
               positionFieldName: 'field_demo_position',
+              reference: {
+                sourceFieldName: 'reference',
+                targetCmsRecord: {
+                  name: 'back_ref_demo',
+                  recordType: 'back_ref_demo',
+                },
+                type: 'ViaBackReference',
+              },
               referenceDeleteAction: 'NullifyReference',
               references: [],
               reorderEnabled: false,
               sortOrder: 'Desc',
-              type: 'EmbeddedBackReference',
+              type: 'EmbeddedReferenceList',
             },
             {
               compact: false,
@@ -904,89 +986,105 @@ test('parseCmsConfig should parse example config', () => {
               name: 'reference',
               label: 'Reference',
               displayFieldName: 'name',
-              targetCmsRecord: { name: 'ref_demo', recordType: 'ref_demo' },
+              reference: {
+                targetCmsRecord: { name: 'ref_demo', recordType: 'ref_demo' },
+                type: 'DirectReference',
+              },
               type: 'Reference',
             },
             {
               compact: false,
               name: 'back_refs',
               label: 'Back refs',
-              sourceFieldName: 'reference',
-              targetCmsRecord: {
-                name: 'back_ref_demo',
-                recordType: 'back_ref_demo',
-              },
               displayFieldName: 'name',
-              type: 'BackReference',
+              reference: {
+                sourceFieldName: 'reference',
+                targetCmsRecord: {
+                  name: 'back_ref_demo',
+                  recordType: 'back_ref_demo',
+                },
+                type: 'ViaBackReference',
+              },
+              type: 'ReferenceList',
             },
             {
               compact: false,
               name: 'asso_refs',
               label: 'Asso refs',
-              associationRecordConfig: {
-                cmsRecord: {
-                  name: 'field_asso_ref',
-                  recordType: 'field_asso_ref',
+              displayFieldName: 'name',
+              reference: {
+                associationRecordConfig: {
+                  cmsRecord: {
+                    name: 'field_asso_ref',
+                    recordType: 'field_asso_ref',
+                  },
+                  referenceConfigPair: [
+                    {
+                      compact: false,
+                      name: 'field_demo',
+                      label: 'Field demo',
+                      displayFieldName: '_id',
+                      reference: {
+                        targetCmsRecord: {
+                          name: 'field_demo',
+                          recordType: 'field_demo',
+                        },
+                        type: 'DirectReference',
+                      },
+                      type: 'Reference',
+                    },
+                    {
+                      compact: false,
+                      name: 'asso_ref_demo',
+                      label: 'Asso ref demo',
+                      displayFieldName: '_id',
+                      reference: {
+                        targetCmsRecord: {
+                          name: 'asso_ref_demo',
+                          recordType: 'asso_ref_demo',
+                        },
+                        type: 'DirectReference',
+                      },
+                      type: 'Reference',
+                    },
+                  ],
                 },
-                referenceConfigPair: [
-                  {
-                    compact: false,
-                    name: 'field_demo',
-                    label: 'Field demo',
-                    displayFieldName: '_id',
+                sourceReference: {
+                  compact: false,
+                  name: 'field_demo',
+                  label: 'Field demo',
+                  displayFieldName: '_id',
+                  reference: {
                     targetCmsRecord: {
                       name: 'field_demo',
                       recordType: 'field_demo',
                     },
-                    type: 'Reference',
+                    type: 'DirectReference',
                   },
-                  {
-                    compact: false,
-                    name: 'asso_ref_demo',
-                    label: 'Asso ref demo',
-                    displayFieldName: '_id',
+                  type: 'Reference',
+                },
+                targetReference: {
+                  compact: false,
+                  name: 'asso_ref_demo',
+                  label: 'Asso ref demo',
+                  displayFieldName: '_id',
+                  reference: {
                     targetCmsRecord: {
                       name: 'asso_ref_demo',
                       recordType: 'asso_ref_demo',
                     },
-                    type: 'Reference',
+                    type: 'DirectReference',
                   },
-                ],
-              },
-              displayFieldName: 'name',
-              sourceReference: {
-                compact: false,
-                name: 'field_demo',
-                label: 'Field demo',
-                displayFieldName: '_id',
-                targetCmsRecord: {
-                  name: 'field_demo',
-                  recordType: 'field_demo',
+                  type: 'Reference',
                 },
-                type: 'Reference',
+                type: 'ViaAssociationRecord',
               },
-              targetReference: {
-                compact: false,
-                name: 'asso_ref_demo',
-                label: 'Asso ref demo',
-                displayFieldName: '_id',
-                targetCmsRecord: {
-                  name: 'asso_ref_demo',
-                  recordType: 'asso_ref_demo',
-                },
-                type: 'Reference',
-              },
-              type: 'AssociationReference',
+              type: 'ReferenceList',
             },
             {
               compact: false,
               name: 'back_refs_embedded',
               label: 'Back refs embedded',
-              sourceFieldName: 'reference',
-              targetCmsRecord: {
-                name: 'back_ref_demo',
-                recordType: 'back_ref_demo',
-              },
               displayFields: [
                 {
                   compact: false,
@@ -1002,11 +1100,19 @@ test('parseCmsConfig should parse example config', () => {
                 },
               ],
               positionFieldName: 'field_demo_position',
+              reference: {
+                sourceFieldName: 'reference',
+                targetCmsRecord: {
+                  name: 'back_ref_demo',
+                  recordType: 'back_ref_demo',
+                },
+                type: 'ViaBackReference',
+              },
               referenceDeleteAction: 'NullifyReference',
               references: [],
               reorderEnabled: false,
               sortOrder: 'Desc',
-              type: 'EmbeddedBackReference',
+              type: 'EmbeddedReferenceList',
             },
           ],
         },
@@ -1066,10 +1172,16 @@ test('parseCmsConfig should parse example config', () => {
               name: 'field_demos',
               label: 'Field demos',
               editable: true,
-              sourceFieldName: 'reference',
-              targetCmsRecord: { name: 'field_demo', recordType: 'field_demo' },
               displayFieldName: 'name',
-              type: 'BackReference',
+              reference: {
+                sourceFieldName: 'reference',
+                targetCmsRecord: {
+                  name: 'field_demo',
+                  recordType: 'field_demo',
+                },
+                type: 'ViaBackReference',
+              },
+              type: 'ReferenceSelect',
             },
           ],
           label: 'Ref demo',
@@ -1079,10 +1191,16 @@ test('parseCmsConfig should parse example config', () => {
               name: 'field_demos',
               label: 'Field demos',
               editable: true,
-              sourceFieldName: 'reference',
-              targetCmsRecord: { name: 'field_demo', recordType: 'field_demo' },
               displayFieldName: 'name',
-              type: 'BackReference',
+              reference: {
+                sourceFieldName: 'reference',
+                targetCmsRecord: {
+                  name: 'field_demo',
+                  recordType: 'field_demo',
+                },
+                type: 'ViaBackReference',
+              },
+              type: 'ReferenceSelect',
             },
           ],
         },
@@ -1103,10 +1221,16 @@ test('parseCmsConfig should parse example config', () => {
               name: 'field_demos',
               label: 'Field demos',
               editable: true,
-              sourceFieldName: 'reference',
-              targetCmsRecord: { name: 'field_demo', recordType: 'field_demo' },
               displayFieldName: 'name',
-              type: 'BackReference',
+              reference: {
+                sourceFieldName: 'reference',
+                targetCmsRecord: {
+                  name: 'field_demo',
+                  recordType: 'field_demo',
+                },
+                type: 'ViaBackReference',
+              },
+              type: 'ReferenceSelect',
             },
           ],
           label: 'Ref demo',
@@ -1116,10 +1240,16 @@ test('parseCmsConfig should parse example config', () => {
               name: 'field_demos',
               label: 'Field demos',
               editable: true,
-              sourceFieldName: 'reference',
-              targetCmsRecord: { name: 'field_demo', recordType: 'field_demo' },
               displayFieldName: 'name',
-              type: 'BackReference',
+              reference: {
+                sourceFieldName: 'reference',
+                targetCmsRecord: {
+                  name: 'field_demo',
+                  recordType: 'field_demo',
+                },
+                type: 'ViaBackReference',
+              },
+              type: 'ReferenceSelect',
             },
           ],
         },
@@ -1145,10 +1275,16 @@ test('parseCmsConfig should parse example config', () => {
               compact: false,
               name: 'field_references',
               label: 'Field references',
-              sourceFieldName: 'reference',
-              targetCmsRecord: { name: 'field_demo', recordType: 'field_demo' },
               displayFieldName: 'name',
-              type: 'BackReference',
+              reference: {
+                sourceFieldName: 'reference',
+                targetCmsRecord: {
+                  name: 'field_demo',
+                  recordType: 'field_demo',
+                },
+                type: 'ViaBackReference',
+              },
+              type: 'ReferenceList',
             },
           ],
           label: 'Ref demo',
@@ -1157,10 +1293,16 @@ test('parseCmsConfig should parse example config', () => {
               compact: false,
               name: 'field_references',
               label: 'Field references',
-              sourceFieldName: 'reference',
-              targetCmsRecord: { name: 'field_demo', recordType: 'field_demo' },
               displayFieldName: 'name',
-              type: 'BackReference',
+              reference: {
+                sourceFieldName: 'reference',
+                targetCmsRecord: {
+                  name: 'field_demo',
+                  recordType: 'field_demo',
+                },
+                type: 'ViaBackReference',
+              },
+              type: 'ReferenceList',
             },
           ],
         },
@@ -1178,8 +1320,14 @@ test('parseCmsConfig should parse example config', () => {
               label: 'Reference',
               editable: true,
               displayFieldName: 'name',
-              targetCmsRecord: { name: 'field_demo', recordType: 'field_demo' },
-              type: 'Reference',
+              reference: {
+                targetCmsRecord: {
+                  name: 'field_demo',
+                  recordType: 'field_demo',
+                },
+                type: 'DirectReference',
+              },
+              type: 'ReferenceDropdown',
             },
             {
               compact: false,
@@ -1197,8 +1345,14 @@ test('parseCmsConfig should parse example config', () => {
               label: 'Reference',
               editable: true,
               displayFieldName: 'name',
-              targetCmsRecord: { name: 'field_demo', recordType: 'field_demo' },
-              type: 'Reference',
+              reference: {
+                targetCmsRecord: {
+                  name: 'field_demo',
+                  recordType: 'field_demo',
+                },
+                type: 'DirectReference',
+              },
+              type: 'ReferenceDropdown',
             },
           ],
         },
@@ -1213,8 +1367,14 @@ test('parseCmsConfig should parse example config', () => {
               label: 'Reference',
               editable: true,
               displayFieldName: 'name',
-              targetCmsRecord: { name: 'field_demo', recordType: 'field_demo' },
-              type: 'Reference',
+              reference: {
+                targetCmsRecord: {
+                  name: 'field_demo',
+                  recordType: 'field_demo',
+                },
+                type: 'DirectReference',
+              },
+              type: 'ReferenceDropdown',
             },
             {
               compact: false,
@@ -1232,8 +1392,14 @@ test('parseCmsConfig should parse example config', () => {
               label: 'Reference',
               editable: true,
               displayFieldName: 'name',
-              targetCmsRecord: { name: 'field_demo', recordType: 'field_demo' },
-              type: 'Reference',
+              reference: {
+                targetCmsRecord: {
+                  name: 'field_demo',
+                  recordType: 'field_demo',
+                },
+                type: 'DirectReference',
+              },
+              type: 'ReferenceDropdown',
             },
           ],
         },
@@ -1254,7 +1420,13 @@ test('parseCmsConfig should parse example config', () => {
               name: 'reference',
               label: 'Reference',
               displayFieldName: 'name',
-              targetCmsRecord: { name: 'field_demo', recordType: 'field_demo' },
+              reference: {
+                targetCmsRecord: {
+                  name: 'field_demo',
+                  recordType: 'field_demo',
+                },
+                type: 'DirectReference',
+              },
               type: 'Reference',
             },
             {
@@ -1271,7 +1443,13 @@ test('parseCmsConfig should parse example config', () => {
               name: 'reference',
               label: 'Reference',
               displayFieldName: 'name',
-              targetCmsRecord: { name: 'field_demo', recordType: 'field_demo' },
+              reference: {
+                targetCmsRecord: {
+                  name: 'field_demo',
+                  recordType: 'field_demo',
+                },
+                type: 'DirectReference',
+              },
               type: 'Reference',
             },
           ],

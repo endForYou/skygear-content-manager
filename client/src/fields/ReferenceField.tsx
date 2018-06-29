@@ -10,7 +10,10 @@ import {
 import 'react-select/dist/react-select.css';
 import skygear, { Query, Record, Reference } from 'skygear';
 
-import { ReferenceFieldConfig } from '../cmsConfig';
+import {
+  ReferenceDisplayFieldConfig,
+  ReferenceDropdownFieldConfig,
+} from '../cmsConfig';
 import { ReferenceLink } from '../components/ReferenceLink';
 import { parseReference } from '../recordUtil';
 
@@ -18,7 +21,37 @@ import { debouncePromise1, objectFrom } from '../util';
 import { RequiredFieldProps } from './Field';
 import { NullField } from './NullField';
 
-export type ReferenceFieldProps = RequiredFieldProps<ReferenceFieldConfig>;
+export type ReferenceFieldProps = RequiredFieldProps<
+  ReferenceDisplayFieldConfig
+>;
+
+export const ReferenceField: React.SFC<ReferenceFieldProps> = props => {
+  const { className: className, config: config, value } = props;
+
+  const classNames = classnames(className, 'ref-display', {
+    full: !config.compact,
+  });
+  if (value == null) {
+    return <NullField className={classNames} />;
+  } else {
+    const { targetCmsRecord } = config.reference;
+    const recordId = parseReference(value).recordId;
+    const transientRecord = props.context.record.$transient[props.config.name];
+    const label = transientRecord[config.displayFieldName];
+
+    return (
+      <span className={classNames}>
+        <ReferenceLink recordName={targetCmsRecord.name} recordId={recordId}>
+          {label}
+        </ReferenceLink>
+      </span>
+    );
+  }
+};
+
+export type ReferenceDropdownFieldProps = RequiredFieldProps<
+  ReferenceDropdownFieldConfig
+>;
 
 interface RecordsById {
   [recordId: string]: Record;
@@ -37,11 +70,11 @@ interface RefOption {
 type StringSelectAsyncCtor<T> = new () => SelectAsync<T>;
 const StringSelectAsync = SelectAsync as StringSelectAsyncCtor<string>;
 
-class ReferenceFieldImpl extends React.PureComponent<
-  ReferenceFieldProps,
+class ReferenceDropdownFieldImpl extends React.PureComponent<
+  ReferenceDropdownFieldProps,
   State
 > {
-  constructor(props: ReferenceFieldProps) {
+  constructor(props: ReferenceDropdownFieldProps) {
     super(props);
 
     const recordsById: RecordsById = propsMergeRecordsById(props, {});
@@ -52,7 +85,7 @@ class ReferenceFieldImpl extends React.PureComponent<
     };
   }
 
-  public componentWillReceiveProps(nextProps: ReferenceFieldProps) {
+  public componentWillReceiveProps(nextProps: ReferenceDropdownFieldProps) {
     const recordsById: RecordsById = propsMergeRecordsById(
       nextProps,
       this.state.recordsById
@@ -77,41 +110,23 @@ class ReferenceFieldImpl extends React.PureComponent<
 
     const { value } = this.state;
 
-    if (editable) {
-      return (
-        <StringSelectAsync
-          {...rest}
-          className={classnames(className, 'ref-select')}
-          loadOptions={this.debouncedLoadOptions}
-          onChange={this.onChange}
-          value={value || undefined}
-        />
-      );
-    } else {
-      const classNames = classnames(className, 'ref-display', {
-        full: !config.compact,
-      });
-      if (value === null) {
-        return <NullField className={classNames} />;
-      } else {
-        const { targetCmsRecord } = config;
-
-        return (
-          <span className={classNames}>
-            <ReferenceLink
-              recordName={targetCmsRecord.name}
-              recordId={value.value}
-            >
-              {value.label}
-            </ReferenceLink>
-          </span>
-        );
-      }
-    }
+    return (
+      <StringSelectAsync
+        {...rest}
+        className={classnames(className, 'ref-select')}
+        loadOptions={this.debouncedLoadOptions}
+        onChange={this.onChange}
+        value={value || undefined}
+        disabled={!editable}
+      />
+    );
   }
 
   public loadOptions: LoadOptionsAsyncHandler<string> = input => {
-    const { displayFieldName, targetCmsRecord } = this.props.config;
+    const {
+      displayFieldName,
+      reference: { targetCmsRecord },
+    } = this.props.config;
 
     const RecordCls = Record.extend(targetCmsRecord.recordType);
     const query = new Query(RecordCls);
@@ -173,14 +188,14 @@ class ReferenceFieldImpl extends React.PureComponent<
     });
 
     if (this.props.onFieldChange) {
-      const recordType = this.props.config.targetCmsRecord.recordType;
+      const recordType = this.props.config.reference.targetCmsRecord.recordType;
       this.props.onFieldChange(new Reference(`${recordType}/${value.value}`));
     }
   };
 }
 
 function propsToRefOption(
-  props: ReferenceFieldProps,
+  props: ReferenceDropdownFieldProps,
   recordsById: RecordsById
 ): RefOption | null {
   const { config, value } = props;
@@ -219,7 +234,7 @@ function recordsToRecordsById(records: Record[]): RecordsById {
 }
 
 function propsMergeRecordsById(
-  props: ReferenceFieldProps,
+  props: ReferenceDropdownFieldProps,
   recordsById: RecordsById
 ): RecordsById {
   const selectedRecord =
@@ -231,6 +246,6 @@ function propsMergeRecordsById(
   return newRecordsById;
 }
 
-export const ReferenceField: React.ComponentClass<
-  ReferenceFieldProps
-> = ReferenceFieldImpl;
+export const ReferenceDropdownField: React.ComponentClass<
+  ReferenceDropdownFieldProps
+> = ReferenceDropdownFieldImpl;

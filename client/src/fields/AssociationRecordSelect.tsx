@@ -7,7 +7,7 @@ import {
 } from 'react-select';
 import skygear, { Query, Record, Reference } from 'skygear';
 
-import { AssociationReferenceFieldConfig } from '../cmsConfig';
+import { AssociationReferenceSelectFieldConfig } from '../cmsConfig';
 import { Effect } from '../components/RecordFormPage';
 import { deleteRecordsProperly, parseReference } from '../recordUtil';
 import { debouncePromise1, makeArray, objectFrom } from '../util';
@@ -15,7 +15,7 @@ import { debouncePromise1, makeArray, objectFrom } from '../util';
 import { RequiredFieldProps } from './Field';
 
 export type AssociationRecordSelectProps = RequiredFieldProps<
-  AssociationReferenceFieldConfig
+  AssociationReferenceSelectFieldConfig
 >;
 
 interface State {
@@ -47,7 +47,7 @@ class AssociationRecordSelectImpl extends React.PureComponent<
   get targets(): Record[] {
     const { config } = this.props;
     return this.assoRecords.map(
-      assoRecord => assoRecord.$transient[config.targetReference.name]
+      assoRecord => assoRecord.$transient[config.reference.targetReference.name]
     );
   }
 
@@ -80,9 +80,11 @@ class AssociationRecordSelectImpl extends React.PureComponent<
   }
 
   public loadOptionsHandler: LoadOptionsAsyncHandler<string> = value => {
-    const { targetReference } = this.props.config;
+    const { targetReference } = this.props.config.reference;
 
-    const RecordCls = Record.extend(targetReference.targetCmsRecord.recordType);
+    const RecordCls = Record.extend(
+      targetReference.reference.targetCmsRecord.recordType
+    );
 
     const query = new Query(RecordCls);
     if (value !== '') {
@@ -162,15 +164,19 @@ function diffOptions(
 }
 
 function newAssoRecords(
-  config: AssociationReferenceFieldConfig,
+  config: AssociationReferenceSelectFieldConfig,
   sourceRecordId: string,
   targetRecordIds: string[]
 ): Record[] {
-  const { associationRecordConfig, sourceReference, targetReference } = config;
+  const {
+    associationRecordConfig,
+    sourceReference,
+    targetReference,
+  } = config.reference;
 
   const RecordCls = Record.extend(associationRecordConfig.cmsRecord.recordType);
-  const sourceRecordType = sourceReference.targetCmsRecord.recordType;
-  const targetRecordType = targetReference.targetCmsRecord.recordType;
+  const sourceRecordType = sourceReference.reference.targetCmsRecord.recordType;
+  const targetRecordType = targetReference.reference.targetCmsRecord.recordType;
 
   return targetRecordIds.map(
     targetRecordId =>
@@ -186,13 +192,13 @@ function newAssoRecords(
 }
 
 function assoRecordsToDelete(
-  config: AssociationReferenceFieldConfig,
+  config: AssociationReferenceSelectFieldConfig,
   assoRecords: Record[],
   targetRecordIds: string[]
 ): Record[] {
   const recordByTargetId = objectFrom(
     assoRecords.map(r => {
-      const targetRef: Reference = r[config.targetReference.name];
+      const targetRef: Reference = r[config.reference.targetReference.name];
       return [parseReference(targetRef).recordId, r] as [string, Record];
     })
   );
@@ -202,7 +208,7 @@ function assoRecordsToDelete(
 
 function targetToOption(
   target: Record,
-  ref: AssociationReferenceFieldConfig
+  ref: AssociationReferenceSelectFieldConfig
 ): TargetOption {
   return TargetOption(target[ref.displayFieldName], target._id);
 }
