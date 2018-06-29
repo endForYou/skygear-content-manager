@@ -217,7 +217,7 @@ def includeme(settings):
 
     @skygear.handler('cms-api/default-cms-config.yaml')
     def default_cms_config(request):
-        schema = SkygearSchemaSchema().load(get_schema()).data
+        schema = SkygearSchemaSchema().load(get_schema())
         default_config = generate_config(schema)
         response = prepare_file_response('cms-config.yaml', 'text/yaml')
         yaml = YAML()
