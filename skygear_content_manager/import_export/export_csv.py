@@ -1,10 +1,8 @@
 import csv
-import skygear
-
-from werkzeug.wrappers import ResponseStreamMixin
 
 from .csv_serializer import SpreadListSerializer
 from ..models.cms_config import DISPLAY_MODE_GROUPED
+from ..werkzeug_utils import prepare_file_response
 
 
 def render_header(stream, export_config, record_serializer):
@@ -45,10 +43,5 @@ def render_data(stream, csv_datas):
 
 
 def prepare_response(name):
-    filename = name + '.csv'
-    headers = {'Content-disposition': 'attachment; filename=' + filename}
-    return StreamableResponse(mimetype='text/csv', headers=headers)
+    return prepare_file_response(name + '.csv', 'text/csv')
 
-
-class StreamableResponse(skygear.Response, ResponseStreamMixin):
-    pass
