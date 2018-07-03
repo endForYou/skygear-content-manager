@@ -19,7 +19,7 @@ import { ImportedFile } from './types/importedFile';
 export interface RootState {
   adminRole: string;
   appConfig: AppConfig;
-  settings: Settings;
+  settings: Partial<Settings>;
   auth: AuthState;
   cmsConfig: CmsConfigState;
   import: ImportState;
@@ -189,13 +189,13 @@ export const initialFileImportState: FileImportState = {
   list: initialImportedFileListState,
 };
 
-export const initialSettingsState: Settings = getSettings();
+export const initialSettingsState: Partial<Settings> = getSettings();
 
 export function initialRootState(
   adminRole: string,
   appConfig: AppConfig,
   user: Record,
-  settings: Settings
+  settings: Partial<Settings>
 ): RootState {
   return {
     adminRole,

@@ -1,4 +1,6 @@
-timezone: Asia/Hong_Kong
+default_settings:
+  timezone: Asia/Hong_Kong
+
 imports:
   import-field-demo:
     record_type: field_demo

@@ -1,4 +1,5 @@
 import { isArray } from 'util';
+import { Settings } from '../states';
 import { SortOrder, SortState } from '../types';
 import { entriesOf, humanize, isObject, objectFrom } from './../util';
 import { mapDefaultActionToAction } from './defaultActions';
@@ -19,6 +20,7 @@ import {
   parsePushNotificationConfig,
   PushNotificationsConfig,
 } from './pushNotificationsConfig';
+import { parseDefaultSettings } from './settings';
 import {
   parseUserManagementConfig,
   UserManagementConfig,
@@ -37,6 +39,7 @@ export interface CmsConfig {
   pushNotifications: PushNotificationsConfig;
   userManagement: UserManagementConfig;
   fileImport: FileImportConfig;
+  defaultSettings: Partial<Settings>;
 }
 
 export type SiteConfig = SiteItemConfig[];
@@ -226,6 +229,7 @@ export interface LinkActionConfig extends ActionConfigAttrs {
 // tslint:disable-next-line: no-any
 export function parseCmsConfig(input: any): CmsConfig {
   const {
+    default_settings: defaultSettings,
     site,
     records = {},
     association_records: associationRecords,
@@ -249,6 +253,7 @@ export function parseCmsConfig(input: any): CmsConfig {
 
   return {
     associationRecordByName,
+    defaultSettings: parseDefaultSettings(defaultSettings),
     fileImport: parseFileImportConfig(context, fileImport),
     pushNotifications: parsePushNotificationConfig(context, pushNotifications),
     records: entriesOf(

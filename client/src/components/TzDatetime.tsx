@@ -2,6 +2,7 @@ import moment from 'moment-timezone';
 import * as React from 'react';
 import { connect } from 'react-redux';
 
+import { getCombinedSettings } from '../settings';
 import { RootState, Settings } from '../states';
 import { TimezoneValue, utcOffsetOfTimezone } from '../types';
 
@@ -34,5 +35,5 @@ const TzDatetimeImpl: React.SFC<Props> = ({
 };
 
 export const TzDatetime = connect((state: RootState) => ({
-  settings: state.settings,
+  settings: getCombinedSettings(state),
 }))(TzDatetimeImpl);

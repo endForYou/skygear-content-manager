@@ -5,6 +5,7 @@ import * as React from 'react';
 import { connect, Dispatch } from 'react-redux';
 import Select, { Option, OptionValues } from 'react-select';
 import { updateTimezone } from '../actions/settings';
+import { getCombinedSettings } from '../settings';
 import { RootState, Settings } from '../states';
 
 interface DispatchProps {
@@ -82,7 +83,7 @@ class SettingsPage extends React.PureComponent<Props> {
 
 export const SettingsPageFactory = () => {
   function mapStateToProps(state: RootState): Settings {
-    return state.settings;
+    return getCombinedSettings(state);
   }
 
   function mapDispatchToProps(dispatch: Dispatch<RootState>): DispatchProps {

@@ -43,7 +43,12 @@ test('parseCmsConfig should parse example config', () => {
         ],
       },
     },
-    fileImport: { enabled: true },
+    defaultSettings: {
+      timezone: 'Asia/Hong_Kong',
+    },
+    fileImport: {
+      enabled: true,
+    },
     pushNotifications: {
       enabled: true,
       filterUserConfigs: [

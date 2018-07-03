@@ -4,7 +4,7 @@ import { initialSettingsState, Settings } from '../states';
 import { SettingsActionTypes } from '../actions/settings';
 
 export default function settingsReducer(
-  state: Settings = initialSettingsState,
+  state: Partial<Settings> = initialSettingsState,
   action: Actions
 ) {
   switch (action.type) {

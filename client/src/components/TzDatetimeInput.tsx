@@ -4,6 +4,7 @@ import * as Datetime from 'react-datetime';
 import 'react-datetime/css/react-datetime.css';
 import { connect } from 'react-redux';
 
+import { getCombinedSettings } from '../settings';
 import { RootState, Settings } from '../states';
 import { TimezoneValue, utcOffsetOfTimezone } from '../types';
 import { Omit } from '../typeutil';
@@ -24,5 +25,5 @@ export const TzDatetimeInputImpl: React.SFC<Props> = ({
 };
 
 export const TzDatetimeInput = connect((state: RootState) => ({
-  settings: state.settings,
+  settings: getCombinedSettings(state),
 }))(TzDatetimeInputImpl);
