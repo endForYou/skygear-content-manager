@@ -7,6 +7,7 @@ from .generate_config import generate_config
 from .models.cms_config import CMSRecord
 from .schema.cms_config import CMSAssociationRecordSchema, CMSConfigSchema
 from .schema.skygear_schema import SkygearSchemaSchema
+from .settings import CMS_SKYGEAR_ENDPOINT
 from .skygear_utils import get_schema
 
 
@@ -22,6 +23,15 @@ class ConfigLoader:
         self.config_source = config_source
         self.config_data = None
         self.config = None
+
+    def get_config_source(self):
+        """
+        This is for external use only.
+
+        ConfigLoader should generate default config itself if it finds
+        config_source is empty.
+        """
+        return self.config_source or CMS_SKYGEAR_ENDPOINT + 'default-cms-config.yaml'
 
     def reset_schema(self):
         self.schema = None
