@@ -141,9 +141,9 @@ records:
           reference_from_field: reference
           reference_field_name: name
         - name: imageasset
-          type: ImageAsset
+          type: Image
         - name: fileasset
-          type: FileAsset
+          type: Asset
       filters:
         - name: _id
           label: ID
@@ -216,9 +216,9 @@ records:
             - name: name
               type: String
         - name: imageasset
-          type: ImageAsset
+          type: Image
         - name: fileasset
-          type: FileAsset
+          type: Asset
         - name: deleted
           type: Boolean
     edit:
@@ -275,9 +275,9 @@ records:
             - name: name
               type: String
         - name: imageasset
-          type: ImageAsset
+          type: Image
         - name: fileasset
-          type: FileAsset
+          type: Asset
         - name: deleted
           type: Boolean
           default_value: false
@@ -335,9 +335,9 @@ records:
             - name: name
               type: String
         - name: imageasset
-          type: ImageAsset
+          type: Image
         - name: fileasset
-          type: FileAsset
+          type: Asset
         - name: deleted
           type: Boolean
           default_value: false

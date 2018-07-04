@@ -2,12 +2,12 @@ import classnames from 'classnames';
 import * as React from 'react';
 
 import { TextAreaFieldConfig } from '../cmsConfig';
-import { BaseStringField } from './BaseStringField';
+import { BaseStringInputField } from './BaseStringInputField';
 import { RequiredFieldProps } from './Field';
 
 export type TextAreaProps = RequiredFieldProps<TextAreaFieldConfig>;
 
-export class TextArea extends BaseStringField<
+export class TextArea extends BaseStringInputField<
   TextAreaFieldConfig,
   TextAreaProps
 > {

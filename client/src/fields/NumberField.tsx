@@ -1,18 +1,37 @@
 import classnames from 'classnames';
 import * as React from 'react';
 
-import { NumberFieldConfig } from '../cmsConfig';
+import { FloatDisplayFieldConfig, FloatInputFieldConfig } from '../cmsConfig';
 import { RequiredFieldProps } from './Field';
+import { StringDisplay } from './StringDisplay';
 
-export type NumberFieldProps = RequiredFieldProps<NumberFieldConfig>;
+type FloatDisplayFieldProps = RequiredFieldProps<FloatDisplayFieldConfig>;
 
+export const FloatDisplayField: React.SFC<FloatDisplayFieldProps> = ({
+  className,
+  value,
+  ...rest,
+}) => {
+  return (
+    <StringDisplay
+      {...rest}
+      className={classnames(className, 'number-display')}
+      value={`${value == null ? '' : parseFloat(value)}`}
+    />
+  );
+};
+
+type FloatInputFieldProps = RequiredFieldProps<FloatInputFieldConfig>;
 interface State {
   value: number;
   stringValue: string;
 }
 
-class NumberFieldImpl extends React.PureComponent<NumberFieldProps, State> {
-  constructor(props: NumberFieldProps) {
+export class FloatInputField extends React.PureComponent<
+  FloatInputFieldProps,
+  State
+> {
+  constructor(props: FloatInputFieldProps) {
     super(props);
 
     this.state = {
@@ -21,7 +40,7 @@ class NumberFieldImpl extends React.PureComponent<NumberFieldProps, State> {
     };
   }
 
-  public componentWillReceiveProps(nextProps: NumberFieldProps) {
+  public componentWillReceiveProps(nextProps: FloatInputFieldProps) {
     if (nextProps.value !== this.state.value) {
       this.setState({
         ...this.state,
@@ -33,37 +52,26 @@ class NumberFieldImpl extends React.PureComponent<NumberFieldProps, State> {
 
   public render() {
     const {
-      config: { compact, editable, name },
+      config: { editable, name },
       className,
       onFieldChange: _onFieldChange,
       value: _value,
       ...rest,
     } = this.props;
 
-    if (editable) {
-      return (
-        <input
-          {...rest}
-          className={classnames(className, 'number-input')}
-          type="text"
-          id={name}
-          name={name}
-          value={this.state.stringValue}
-          onChange={this.handleChange}
-          placeholder="0"
-        />
-      );
-    } else {
-      return (
-        <div
-          className={classnames(className, 'number-display', {
-            full: !compact,
-          })}
-        >
-          {this.state.value}
-        </div>
-      );
-    }
+    return (
+      <input
+        {...rest}
+        className={classnames(className, 'number-input')}
+        type="text"
+        id={name}
+        name={name}
+        value={this.state.stringValue}
+        onChange={this.handleChange}
+        placeholder="0"
+        disabled={!editable}
+      />
+    );
   }
 
   public handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -90,7 +98,3 @@ class NumberFieldImpl extends React.PureComponent<NumberFieldProps, State> {
     });
   };
 }
-
-export const NumberField: React.ComponentClass<
-  NumberFieldProps
-> = NumberFieldImpl;

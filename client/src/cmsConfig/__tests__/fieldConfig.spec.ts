@@ -1,6 +1,6 @@
 import {
   ConfigContext,
-  DateTimeFieldConfig,
+  DateTimePickerFieldConfig,
   FieldConfigTypes,
   parseFieldConfig,
 } from '..';
@@ -77,14 +77,14 @@ describe('parseFieldConfig DateTime', () => {
   it('should parse DateTime field', () => {
     const input = {
       name: 'datetime',
-      type: 'DateTime',
+      type: 'DateTimePicker',
     };
     const result = parseFieldConfig(minimalContext, input);
     expect(result).toEqual({
       compact: false,
       label: 'Datetime',
       name: 'datetime',
-      type: 'DateTime',
+      type: 'DateTimePicker',
     });
   });
 
@@ -92,18 +92,18 @@ describe('parseFieldConfig DateTime', () => {
     const input = {
       name: 'datetime',
       timezone: 'Asia/Hong_Kong',
-      type: 'DateTime',
+      type: 'DateTimePicker',
     };
     const result = parseFieldConfig(
       minimalContext,
       input
-    ) as DateTimeFieldConfig;
+    ) as DateTimePickerFieldConfig;
     expect(result).toEqual({
       compact: false,
       label: 'Datetime',
       name: 'datetime',
       timezone: 'Asia/Hong_Kong',
-      type: 'DateTime',
+      type: 'DateTimePicker',
     });
   });
 });
@@ -294,7 +294,7 @@ describe('parseFieldConfig EmbeddedReference', () => {
       reference_fields: [
         {
           name: 'name',
-          type: 'String',
+          type: 'TextDisplay',
         },
       ],
       reference_from_field: 'a_id',
@@ -309,7 +309,7 @@ describe('parseFieldConfig EmbeddedReference', () => {
           compact: false,
           label: 'Name',
           name: 'name',
-          type: 'String',
+          type: 'TextDisplay',
         },
       ],
       label: 'A',

@@ -1,48 +1,53 @@
 import classnames from 'classnames';
 import * as React from 'react';
 
-import { BaseStringField } from './BaseStringField';
+import { BaseStringInputField } from './BaseStringInputField';
 import { RequiredFieldProps } from './Field';
 
-import { StringFieldConfig } from '../cmsConfig';
+import { TextDisplayFieldConfig, TextInputFieldConfig } from '../cmsConfig';
+import { StringDisplay } from './StringDisplay';
 
-export type StringFieldProps = RequiredFieldProps<StringFieldConfig>;
+export type TextDisplayFieldProps = RequiredFieldProps<TextDisplayFieldConfig>;
 
-export class StringField extends BaseStringField<
-  StringFieldConfig,
-  StringFieldProps
+export const TextDisplayField: React.SFC<TextDisplayFieldProps> = ({
+  className,
+  ...rest,
+}) => {
+  return (
+    <StringDisplay
+      {...rest}
+      className={classnames(className, 'text-display')}
+    />
+  );
+};
+
+export type TextInputFieldProps = RequiredFieldProps<TextInputFieldConfig>;
+
+export class TextInputField extends BaseStringInputField<
+  TextInputFieldConfig,
+  TextInputFieldProps
 > {
   public render() {
     const {
       className,
-      config: { compact, editable, label, name },
+      config: { editable, label, name },
       onFieldChange: _,
       ...rest,
     } = this.props;
 
-    if (editable) {
-      return (
-        <input
-          {...rest}
-          className={classnames(className, 'text-input')}
-          type="text"
-          id={name}
-          name={name}
-          placeholder={label}
-          value={this.state.value}
-          onChange={this.handleChange}
-        />
-      );
-    } else {
-      return (
-        <span
-          {...rest}
-          className={classnames(className, 'text-display', { full: !compact })}
-        >
-          {this.state.value}
-        </span>
-      );
-    }
+    return (
+      <input
+        {...rest}
+        className={classnames(className, 'text-input')}
+        type="text"
+        id={name}
+        name={name}
+        placeholder={label}
+        value={this.state.value}
+        onChange={this.handleChange}
+        disabled={!editable}
+      />
+    );
   }
 
   private handleChange: React.ChangeEventHandler<HTMLInputElement> = event => {

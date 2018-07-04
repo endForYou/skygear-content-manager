@@ -2,23 +2,52 @@ import classnames from 'classnames';
 import * as moment from 'moment-timezone';
 import * as React from 'react';
 
-import { DateTimeFieldConfig } from '../cmsConfig';
+import {
+  DateTimeDisplayFieldConfig,
+  DateTimePickerFieldConfig,
+} from '../cmsConfig';
 import { TzDatetime } from '../components/TzDatetime';
 import { TzDatetimeInput } from '../components/TzDatetimeInput';
 import { RequiredFieldProps } from './Field';
-
-export type DateTimeFieldProps = RequiredFieldProps<DateTimeFieldConfig>;
-
-interface State {
-  value: Date;
-}
 
 const DATE_FORMAT = 'YYYY-MM-DD';
 const TIME_FORMAT = 'HH:mm:ssZ';
 const DATETIME_FORMAT = 'YYYY-MM-DD HH:mm:ssZ';
 
-class DateTimeFieldImpl extends React.PureComponent<DateTimeFieldProps, State> {
-  constructor(props: DateTimeFieldProps) {
+type DateTimeDisplayFieldProps = RequiredFieldProps<DateTimeDisplayFieldConfig>;
+
+export const DateTimeDisplayField: React.SFC<DateTimeDisplayFieldProps> = ({
+  config: { compact, timezone },
+  className,
+  value,
+  ...rest,
+}) => {
+  return (
+    <TzDatetime
+      {...rest}
+      className={classnames(className, 'datetime-display', {
+        full: !compact,
+      })}
+      datetimeFormat={DATETIME_FORMAT}
+      value={value}
+      timezone={timezone}
+    />
+  );
+};
+
+export type DateTimePickerFieldProps = RequiredFieldProps<
+  DateTimePickerFieldConfig
+>;
+
+interface State {
+  value: Date;
+}
+
+class DateTimePickerFieldImpl extends React.PureComponent<
+  DateTimePickerFieldProps,
+  State
+> {
+  constructor(props: DateTimePickerFieldProps) {
     super(props);
 
     this.state = {
@@ -26,45 +55,33 @@ class DateTimeFieldImpl extends React.PureComponent<DateTimeFieldProps, State> {
     };
   }
 
-  public componentWillReceiveProps(nextProps: DateTimeFieldProps) {
+  public componentWillReceiveProps(nextProps: DateTimePickerFieldProps) {
     this.setState({ ...this.state, value: nextProps.value });
   }
 
   public render() {
     const {
-      config: { compact, editable, timezone },
+      config: { timezone },
       className,
       onFieldChange: _onFieldChange,
       value: _value,
       ...rest,
     } = this.props;
 
-    if (editable) {
-      return (
-        <TzDatetimeInput
-          {...rest}
-          className={classnames(className, 'datetime-input-container')}
-          dateFormat={DATE_FORMAT}
-          timeFormat={TIME_FORMAT}
-          value={this.state.value}
-          onChange={this.handleChange}
-          inputProps={{ className: 'datetime-input' }}
-          timezone={timezone}
-        />
-      );
-    } else {
-      return (
-        <TzDatetime
-          {...rest}
-          className={classnames(className, 'datetime-display', {
-            full: !compact,
-          })}
-          datetimeFormat={DATETIME_FORMAT}
-          value={this.state.value}
-          timezone={timezone}
-        />
-      );
-    }
+    return (
+      <TzDatetimeInput
+        {...rest}
+        className={classnames(className, 'datetime-input-container')}
+        dateFormat={DATE_FORMAT}
+        timeFormat={TIME_FORMAT}
+        value={this.state.value}
+        onChange={this.handleChange}
+        inputProps={{ className: 'datetime-input' }}
+        timezone={timezone}
+        // TODO: handle editable
+        // disabled={!editable}
+      />
+    );
   }
 
   public handleChange: (
@@ -84,6 +101,6 @@ class DateTimeFieldImpl extends React.PureComponent<DateTimeFieldProps, State> {
   };
 }
 
-export const DateTimeField: React.ComponentClass<
-  DateTimeFieldProps
-> = DateTimeFieldImpl;
+export const DateTimePickerField: React.ComponentClass<
+  DateTimePickerFieldProps
+> = DateTimePickerFieldImpl;

@@ -1,18 +1,43 @@
 import classnames from 'classnames';
 import * as React from 'react';
 
-import { IntegerFieldConfig } from '../cmsConfig';
+import {
+  IntegerDisplayFieldConfig,
+  IntegerInputFieldConfig,
+} from '../cmsConfig';
 import { RequiredFieldProps } from './Field';
+import { StringDisplay } from './StringDisplay';
 
-export type IntegerFieldProps = RequiredFieldProps<IntegerFieldConfig>;
+type IntegerDisplayFieldProps = RequiredFieldProps<IntegerDisplayFieldConfig>;
+
+export const IntegerDisplayField: React.SFC<IntegerDisplayFieldProps> = ({
+  className,
+  value,
+  ...rest,
+}) => {
+  return (
+    <StringDisplay
+      {...rest}
+      className={classnames(className, 'number-display')}
+      value={`${value == null ? '' : parseInt(value, 10)}`}
+    />
+  );
+};
+
+export type IntegerInputFieldProps = RequiredFieldProps<
+  IntegerInputFieldConfig
+>;
 
 interface State {
   value: number;
   stringValue: string;
 }
 
-class IntegerFieldImpl extends React.PureComponent<IntegerFieldProps, State> {
-  constructor(props: IntegerFieldProps) {
+class IntegerFieldImpl extends React.PureComponent<
+  IntegerInputFieldProps,
+  State
+> {
+  constructor(props: IntegerInputFieldProps) {
     super(props);
 
     this.state = {
@@ -21,7 +46,7 @@ class IntegerFieldImpl extends React.PureComponent<IntegerFieldProps, State> {
     };
   }
 
-  public componentWillReceiveProps(nextProps: IntegerFieldProps) {
+  public componentWillReceiveProps(nextProps: IntegerInputFieldProps) {
     if (nextProps.value !== this.state.value) {
       this.setState({
         ...this.state,
@@ -91,6 +116,6 @@ class IntegerFieldImpl extends React.PureComponent<IntegerFieldProps, State> {
   };
 }
 
-export const IntegerField: React.ComponentClass<
-  IntegerFieldProps
+export const IntegerInputField: React.ComponentClass<
+  IntegerInputFieldProps
 > = IntegerFieldImpl;

@@ -1,16 +1,18 @@
 import * as React from 'react';
 
-import { ImageAssetFieldConfig } from '../cmsConfig';
+import { ImageUploaderFieldConfig } from '../cmsConfig';
 import { AssetType, AssetUploader } from '../components/AssetUploader';
 import { RequiredFieldProps } from './Field';
 
-export type ImageAssetUploaderProps = RequiredFieldProps<ImageAssetFieldConfig>;
+export type ImageAssetUploaderProps = RequiredFieldProps<
+  ImageUploaderFieldConfig
+>;
 
 class ImageAssetUploaderImpl extends React.PureComponent<
   ImageAssetUploaderProps
 > {
   public render() {
-    const { onFieldChange, ...rest } = this.props;
+    const { config: { editable }, onFieldChange, ...rest } = this.props;
     const {
       preview_height: previewHeight = 200,
       preview_width: previewWidth = 200,
@@ -30,6 +32,7 @@ class ImageAssetUploaderImpl extends React.PureComponent<
           height: previewHeight,
           width: previewWidth,
         }}
+        disabled={!editable}
       />
     );
   }

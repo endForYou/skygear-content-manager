@@ -9,15 +9,15 @@ import { Effect } from '../components/RecordFormPage';
 import { AssociationReferenceField } from './AssociationReferenceField';
 import { BackReferenceField } from './BackReferenceField';
 import { BooleanField } from './BooleanField';
-import { DateTimeField } from './DateTimeField';
+import { DateTimeDisplayField, DateTimePickerField } from './DateTimeField';
 import { DropdownField } from './DropdownField';
 import { EmbeddedBackReferenceField } from './EmbeddedBackReferenceField';
-import { FileAssetField } from './FileAssetField';
-import { ImageAssetField } from './ImageAssetField';
-import { IntegerField } from './IntegerField';
-import { NumberField } from './NumberField';
+import { FileDisplayField, FileUploaderField } from './FileField';
+import { ImageDisplayField, ImageUploaderField } from './ImageField';
+import { IntegerDisplayField, IntegerInputField } from './IntegerField';
+import { FloatDisplayField, FloatInputField } from './NumberField';
 import { ReferenceField } from './ReferenceField';
-import { StringField } from './StringField';
+import { TextDisplayField, TextInputField } from './StringField';
 import { TextArea } from './TextArea';
 import { WYSIWYGEditor } from './WYSIWYGEditor';
 
@@ -62,10 +62,14 @@ export class Field extends React.PureComponent<FieldProps> {
   public render() {
     const { config, ...rest } = this.props;
     switch (config.type) {
-      case FieldConfigTypes.String:
-        return <StringField {...rest} config={config} />;
-      case FieldConfigTypes.DateTime:
-        return <DateTimeField {...rest} config={config} />;
+      case FieldConfigTypes.TextDisplay:
+        return <TextDisplayField {...rest} config={config} />;
+      case FieldConfigTypes.TextInput:
+        return <TextInputField {...rest} config={config} />;
+      case FieldConfigTypes.DateTimeDisplay:
+        return <DateTimeDisplayField {...rest} config={config} />;
+      case FieldConfigTypes.DateTimePicker:
+        return <DateTimePickerField {...rest} config={config} />;
       case FieldConfigTypes.Dropdown:
         return <DropdownField {...rest} config={config} />;
       case FieldConfigTypes.TextArea:
@@ -74,10 +78,14 @@ export class Field extends React.PureComponent<FieldProps> {
         return <WYSIWYGEditor {...rest} config={config} />;
       case FieldConfigTypes.Boolean:
         return <BooleanField {...rest} config={config} />;
-      case FieldConfigTypes.Integer:
-        return <IntegerField {...rest} config={config} />;
-      case FieldConfigTypes.Number:
-        return <NumberField {...rest} config={config} />;
+      case FieldConfigTypes.IntegerDisplay:
+        return <IntegerDisplayField {...rest} config={config} />;
+      case FieldConfigTypes.IntegerInput:
+        return <IntegerInputField {...rest} config={config} />;
+      case FieldConfigTypes.FloatDisplay:
+        return <FloatDisplayField {...rest} config={config} />;
+      case FieldConfigTypes.FloatInput:
+        return <FloatInputField {...rest} config={config} />;
       case FieldConfigTypes.Reference:
         return <ReferenceField {...rest} config={config} />;
       case FieldConfigTypes.BackReference:
@@ -86,10 +94,14 @@ export class Field extends React.PureComponent<FieldProps> {
         return <AssociationReferenceField {...rest} config={config} />;
       case FieldConfigTypes.EmbeddedBackReference:
         return <EmbeddedBackReferenceField {...rest} config={config} />;
-      case FieldConfigTypes.ImageAsset:
-        return <ImageAssetField {...rest} config={config} />;
-      case FieldConfigTypes.FileAsset:
-        return <FileAssetField {...rest} config={config} />;
+      case FieldConfigTypes.ImageDisplay:
+        return <ImageDisplayField {...rest} config={config} />;
+      case FieldConfigTypes.ImageUploader:
+        return <ImageUploaderField {...rest} config={config} />;
+      case FieldConfigTypes.FileDisplay:
+        return <FileDisplayField {...rest} config={config} />;
+      case FieldConfigTypes.FileUploader:
+        return <FileUploaderField {...rest} config={config} />;
     }
   }
 }

@@ -22,6 +22,7 @@ interface Props {
   previewStyle?: object;
   value?: Asset;
   onChange?: (asset: Asset) => void;
+  disabled?: boolean;
 }
 
 function DroppedFile(file: File, previewURL: string): DroppedFile {
@@ -129,6 +130,7 @@ export class AssetUploader extends React.PureComponent<Props> {
       previewStyle,
       style,
       value,
+      disabled,
       ...rest,
     } = this.props;
 
@@ -143,6 +145,7 @@ export class AssetUploader extends React.PureComponent<Props> {
         disablePreview={true}
         onDropAccepted={this.onDropAccepted}
         style={style}
+        disabled={disabled}
       >
         <DropArea
           value={value}

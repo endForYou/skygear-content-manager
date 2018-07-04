@@ -6,6 +6,7 @@ import {
   CmsRecord,
   ConfigContext,
   RecordTypeContext,
+  recursivelyApplyFn,
 } from './cmsConfig';
 import {
   parseOptionalBoolean,
@@ -22,36 +23,54 @@ export type ReferenceConfig =
   | AssociationReferenceFieldConfig
   | EmbeddedBackReferenceFieldConfig;
 
-export type FieldConfig =
-  | StringFieldConfig
+export type EditableFieldConfig =
+  | TextInputFieldConfig
   | TextAreaFieldConfig
   | DropdownFieldConfig
   | WYSIWYGFieldConfig
-  | DateTimeFieldConfig
+  | DateTimePickerFieldConfig
   | BooleanFieldConfig
-  | IntegerFieldConfig
-  | NumberFieldConfig
+  | IntegerInputFieldConfig
+  | FloatInputFieldConfig
   | ReferenceFieldConfig
   | BackReferenceFieldConfig
   | AssociationReferenceFieldConfig
   | EmbeddedBackReferenceFieldConfig
-  | ImageAssetFieldConfig
-  | FileAssetFieldConfig;
+  | ImageUploaderFieldConfig
+  | FileUploaderFieldConfig;
+
+export type FieldConfig =
+  // non editable fields
+  | TextDisplayFieldConfig
+  | DateTimeDisplayFieldConfig
+  | IntegerDisplayFieldConfig
+  | FloatDisplayFieldConfig
+  | ImageDisplayFieldConfig
+  | FileDisplayFieldConfig
+  // and editable fields
+  | EditableFieldConfig;
+
 export enum FieldConfigTypes {
-  String = 'String',
+  TextDisplay = 'TextDisplay',
+  TextInput = 'TextInput',
   TextArea = 'TextArea',
   Dropdown = 'Dropdown',
   WYSIWYG = 'WYSIWYG',
-  DateTime = 'DateTime',
+  DateTimeDisplay = 'DateTimeDisplay',
+  DateTimePicker = 'DateTimePicker',
   Boolean = 'Boolean',
-  Integer = 'Integer',
-  Number = 'Number',
+  IntegerDisplay = 'IntegerDisplay',
+  IntegerInput = 'IntegerInput',
+  FloatDisplay = 'FloatDisplay',
+  FloatInput = 'FloatInput',
   Reference = 'Reference',
   BackReference = 'BackReference',
   AssociationReference = 'AssociationReference',
   EmbeddedBackReference = 'EmbeddedBackReference',
-  ImageAsset = 'ImageAsset',
-  FileAsset = 'FileAsset',
+  ImageDisplay = 'ImageDisplay',
+  ImageUploader = 'ImageUploader',
+  FileDisplay = 'FileDisplay',
+  FileUploader = 'FileUploader',
 }
 
 export enum SortOrder {
@@ -70,21 +89,49 @@ export interface FieldConfigAttrs {
 
   // derived attrs depending on which page the field lives in
   compact: boolean;
+}
+
+export interface EditableFieldConfigAttrs extends FieldConfigAttrs {
   defaultValue?: any; // tslint:disable-line: no-any
   editable?: boolean;
 }
 
-export interface StringFieldConfig extends FieldConfigAttrs {
-  type: FieldConfigTypes.String;
-  defaultValue?: string;
+// tslint:disable-next-line:no-any
+export function isFieldEditable(config: {
+  type: FieldConfigTypes;
+}): config is EditableFieldConfig {
+  return (
+    config.type === FieldConfigTypes.TextInput ||
+    config.type === FieldConfigTypes.TextArea ||
+    config.type === FieldConfigTypes.Dropdown ||
+    config.type === FieldConfigTypes.WYSIWYG ||
+    config.type === FieldConfigTypes.DateTimeDisplay ||
+    config.type === FieldConfigTypes.Boolean ||
+    config.type === FieldConfigTypes.IntegerInput ||
+    config.type === FieldConfigTypes.FloatInput ||
+    config.type === FieldConfigTypes.Reference ||
+    config.type === FieldConfigTypes.BackReference ||
+    config.type === FieldConfigTypes.AssociationReference ||
+    config.type === FieldConfigTypes.EmbeddedBackReference ||
+    config.type === FieldConfigTypes.ImageUploader ||
+    config.type === FieldConfigTypes.FileUploader
+  );
 }
 
-export interface TextAreaFieldConfig extends FieldConfigAttrs {
+export interface TextDisplayFieldConfig extends FieldConfigAttrs {
+  type: FieldConfigTypes.TextDisplay;
+}
+
+export interface TextInputFieldConfig extends EditableFieldConfigAttrs {
+  type: FieldConfigTypes.TextInput;
+}
+
+export interface TextAreaFieldConfig extends EditableFieldConfigAttrs {
   type: FieldConfigTypes.TextArea;
   defaultValue?: string;
 }
 
-export interface DropdownFieldConfig extends FieldConfigAttrs {
+export interface DropdownFieldConfig extends EditableFieldConfigAttrs {
   type: FieldConfigTypes.Dropdown;
   defaultValue?: string;
   nullOption: {
@@ -98,47 +145,61 @@ export interface DropdownFieldConfig extends FieldConfigAttrs {
   options: DropdownOption[];
 }
 
-export interface WYSIWYGFieldConfig extends FieldConfigAttrs {
+export interface WYSIWYGFieldConfig extends EditableFieldConfigAttrs {
   type: FieldConfigTypes.WYSIWYG;
   defaultValue?: string;
   config?: any; // tslint:disable-line: no-any
 }
 
-export interface DateTimeFieldConfig extends FieldConfigAttrs {
-  type: FieldConfigTypes.DateTime;
+export interface DateTimeDisplayFieldConfig extends FieldConfigAttrs {
+  type: FieldConfigTypes.DateTimeDisplay;
+  timezone?: TimezoneValue;
+}
+
+export interface DateTimePickerFieldConfig extends EditableFieldConfigAttrs {
+  type: FieldConfigTypes.DateTimePicker;
   defaultValue?: Date;
   timezone?: TimezoneValue;
 }
 
-export interface BooleanFieldConfig extends FieldConfigAttrs {
+export interface BooleanFieldConfig extends EditableFieldConfigAttrs {
   type: FieldConfigTypes.Boolean;
   defaultValue?: boolean;
 }
 
-export interface IntegerFieldConfig extends FieldConfigAttrs {
-  type: FieldConfigTypes.Integer;
+export interface IntegerDisplayFieldConfig extends FieldConfigAttrs {
+  type: FieldConfigTypes.IntegerDisplay;
+}
+
+export interface IntegerInputFieldConfig extends EditableFieldConfigAttrs {
+  type: FieldConfigTypes.IntegerInput;
   defaultValue?: number;
 }
 
-export interface NumberFieldConfig extends FieldConfigAttrs {
-  type: FieldConfigTypes.Number;
+export interface FloatDisplayFieldConfig extends FieldConfigAttrs {
+  type: FieldConfigTypes.FloatDisplay;
+}
+
+export interface FloatInputFieldConfig extends EditableFieldConfigAttrs {
+  type: FieldConfigTypes.FloatInput;
   defaultValue?: number;
 }
 
-export interface ReferenceFieldConfig extends FieldConfigAttrs {
+export interface ReferenceFieldConfig extends EditableFieldConfigAttrs {
   type: FieldConfigTypes.Reference;
   targetCmsRecord: CmsRecord;
   displayFieldName: string;
 }
 
-export interface BackReferenceFieldConfig extends FieldConfigAttrs {
+export interface BackReferenceFieldConfig extends EditableFieldConfigAttrs {
   type: FieldConfigTypes.BackReference;
   sourceFieldName: string;
   targetCmsRecord: CmsRecord;
   displayFieldName: string;
 }
 
-export interface AssociationReferenceFieldConfig extends FieldConfigAttrs {
+export interface AssociationReferenceFieldConfig
+  extends EditableFieldConfigAttrs {
   type: FieldConfigTypes.AssociationReference;
 
   // the AssociationRecordConfig that this reference is made on
@@ -157,7 +218,8 @@ export interface AssociationReferenceFieldConfig extends FieldConfigAttrs {
   displayFieldName: string;
 }
 
-export interface EmbeddedBackReferenceFieldConfig extends FieldConfigAttrs {
+export interface EmbeddedBackReferenceFieldConfig
+  extends EditableFieldConfigAttrs {
   type: FieldConfigTypes.EmbeddedBackReference;
   sourceFieldName: string;
   targetCmsRecord: CmsRecord;
@@ -169,14 +231,23 @@ export interface EmbeddedBackReferenceFieldConfig extends FieldConfigAttrs {
   referenceDeleteAction: DeleteAction;
 }
 
-export interface ImageAssetFieldConfig extends FieldConfigAttrs {
-  type: FieldConfigTypes.ImageAsset;
+export interface ImageDisplayFieldConfig extends FieldConfigAttrs {
+  type: FieldConfigTypes.ImageDisplay;
+  config?: any; // tslint:disable-line: no-any
+}
+
+export interface ImageUploaderFieldConfig extends EditableFieldConfigAttrs {
+  type: FieldConfigTypes.ImageUploader;
   nullable: boolean;
   config?: any; // tslint:disable-line: no-any
 }
 
-export interface FileAssetFieldConfig extends FieldConfigAttrs {
-  type: FieldConfigTypes.FileAsset;
+export interface FileDisplayFieldConfig extends FieldConfigAttrs {
+  type: FieldConfigTypes.FileDisplay;
+}
+
+export interface FileUploaderFieldConfig extends EditableFieldConfigAttrs {
+  type: FieldConfigTypes.FileUploader;
   nullable: boolean;
   accept: string;
 }
@@ -192,8 +263,46 @@ interface FieldConfigInput {
   [key: string]: any;
 }
 
-// tslint:disable-next-line: no-any
-export function parseFieldConfig(context: ConfigContext, a: any): FieldConfig {
+// tslint:disable-next-line:no-any
+export function preprocessFieldAlias(editable: boolean, input: any) {
+  const map = {
+    Asset: ['FileDisplay', 'FileUploader'],
+    DateTime: ['DateTimeDisplay', 'DateTimePicker'],
+    Float: ['FloatDisplay', 'FloatInput'],
+    Image: ['ImageDisplay', 'ImageUploader'],
+    Integer: ['IntegerDisplay', 'IntegerInput'],
+    Number: ['FloatDisplay', 'FloatInput'],
+    String: ['TextDisplay', 'TextInput'],
+    // TODO:
+    // Invert the alias if more than one UI for Boolean
+    Switch: ['Boolean', 'Boolean'],
+  };
+
+  const match = map[input.type];
+  if (match == null) {
+    return input;
+  }
+
+  const type = match[editable ? 1 : 0];
+  return {
+    ...input,
+    type,
+  };
+}
+
+// tslint:disable-next-line:no-any
+export function recursivelyPreprocessFieldAlias(editable: boolean, input: any) {
+  // tslint:disable-next-line:no-any
+  return recursivelyApplyFn(input, (i: any) =>
+    preprocessFieldAlias(editable, i)
+  );
+}
+
+export function parseFieldConfig(
+  context: ConfigContext,
+  // tslint:disable-next-line:no-any
+  a: any
+): FieldConfig {
   switch (a.type) {
     case 'Reference':
       if (a.reference_via_association_record) {
@@ -232,26 +341,38 @@ export function parseNonReferenceFieldConfig(
   }
 
   switch (a.type) {
-    case 'String':
-      return parseStringFieldConfig(a);
+    case 'TextDisplay':
+      return parseTextDisplayFieldConfig(a);
+    case 'TextInput':
+      return parseTextInputFieldConfig(a);
     case 'TextArea':
       return parseTextAreaFieldConfig(a);
     case 'Dropdown':
       return parseDropdownFieldConfig(a);
     case 'WYSIWYG':
       return parseWYSIWYGFieldConfig(a);
-    case 'DateTime':
-      return parseDateTimeFieldConfig(a, context);
+    case 'DateTimeDisplay':
+      return parseDateTimeDisplayFieldConfig(a, context);
+    case 'DateTimePicker':
+      return parseDateTimePickerFieldConfig(a, context);
     case 'Boolean':
       return parseBooleanFieldConfig(a);
-    case 'Integer':
-      return parseIntegerFieldConfig(a);
-    case 'Number':
-      return parseNumberFieldConfig(a);
-    case 'ImageAsset':
-      return parseImageAssetFieldConfig(a);
-    case 'FileAsset':
-      return parseFileAssetFieldConfig(a);
+    case 'IntegerDisplay':
+      return parseIntegerDisplayFieldConfig(a);
+    case 'IntegerInput':
+      return parseIntegerInputFieldConfig(a);
+    case 'FloatDisplay':
+      return parseFloatDisplayFieldConfig(a);
+    case 'FloatInput':
+      return parseFloatInputFieldConfig(a);
+    case 'ImageDisplay':
+      return parseImageDisplayFieldConfig(a);
+    case 'ImageUploader':
+      return parseImageUploaderFieldConfig(a);
+    case 'FileDisplay':
+      return parseFileDisplayFieldConfig(a);
+    case 'FileUploader':
+      return parseFileUploaderFieldConfig(a);
 
     // backward compatible
     case '_id':
@@ -269,11 +390,22 @@ export function parseNonReferenceFieldConfig(
   }
 }
 
-function parseStringFieldConfig(input: FieldConfigInput): StringFieldConfig {
+function parseTextDisplayFieldConfig(
+  input: FieldConfigInput
+): TextDisplayFieldConfig {
   return {
-    ...parseFieldConfigAttrs(input, 'String'),
-    defaultValue: parseOptionalString(input, 'default_value', 'String'),
-    type: FieldConfigTypes.String,
+    ...parseFieldConfigAttrs(input, 'TextDisplay'),
+    type: FieldConfigTypes.TextDisplay,
+  };
+}
+
+function parseTextInputFieldConfig(
+  input: FieldConfigInput
+): TextInputFieldConfig {
+  return {
+    ...parseEditableConfigAttrs(input, 'TextInput'),
+    defaultValue: parseOptionalString(input, 'default_value', 'TextInput'),
+    type: FieldConfigTypes.TextInput,
   };
 }
 
@@ -281,7 +413,7 @@ function parseTextAreaFieldConfig(
   input: FieldConfigInput
 ): TextAreaFieldConfig {
   return {
-    ...parseFieldConfigAttrs(input, 'TextArea'),
+    ...parseEditableConfigAttrs(input, 'TextArea'),
     defaultValue: parseOptionalString(input, 'default_value', 'TextArea'),
     type: FieldConfigTypes.TextArea,
   };
@@ -318,7 +450,7 @@ function parseDropdownFieldConfig(
   customOption.label = customOption.label || 'Others';
 
   return {
-    ...parseFieldConfigAttrs(input, 'Dropdown'),
+    ...parseEditableConfigAttrs(input, 'Dropdown'),
     customOption,
     defaultValue:
       parseOptionalString(input, 'default_value', 'Dropdown') ||
@@ -331,46 +463,79 @@ function parseDropdownFieldConfig(
 
 function parseWYSIWYGFieldConfig(input: FieldConfigInput): WYSIWYGFieldConfig {
   return {
-    ...parseFieldConfigAttrs(input, 'WYSIWYG'),
+    ...parseEditableConfigAttrs(input, 'WYSIWYG'),
     config: input.config,
     defaultValue: parseOptionalString(input, 'default_value', 'WYSIWYG'),
     type: FieldConfigTypes.WYSIWYG,
   };
 }
 
-function parseDateTimeFieldConfig(
+function parseDateTimeDisplayFieldConfig(
   input: FieldConfigInput,
   context: RecordTypeContext
-): DateTimeFieldConfig {
+): DateTimeDisplayFieldConfig {
   return {
-    ...parseFieldConfigAttrs(input, 'DateTime'),
-    defaultValue: parseOptionalDate(input, 'default_value', 'DateTime'),
+    ...parseFieldConfigAttrs(input, 'DateTimeDisplay'),
     timezone: parseTimezone(input, 'timezone'),
-    type: FieldConfigTypes.DateTime,
+    type: FieldConfigTypes.DateTimeDisplay,
+  };
+}
+
+function parseDateTimePickerFieldConfig(
+  input: FieldConfigInput,
+  context: RecordTypeContext
+): DateTimePickerFieldConfig {
+  return {
+    ...parseEditableConfigAttrs(input, 'DateTimePicker'),
+    defaultValue: parseOptionalDate(input, 'default_value', 'DateTimePicker'),
+    timezone: parseTimezone(input, 'timezone'),
+    type: FieldConfigTypes.DateTimePicker,
   };
 }
 
 function parseBooleanFieldConfig(input: FieldConfigInput): BooleanFieldConfig {
   return {
-    ...parseFieldConfigAttrs(input, 'Boolean'),
+    ...parseEditableConfigAttrs(input, 'Boolean'),
     defaultValue: parseOptionalBoolean(input, 'default_value', 'Boolean'),
     type: FieldConfigTypes.Boolean,
   };
 }
 
-function parseIntegerFieldConfig(input: FieldConfigInput): IntegerFieldConfig {
+function parseIntegerDisplayFieldConfig(
+  input: FieldConfigInput
+): IntegerDisplayFieldConfig {
   return {
-    ...parseFieldConfigAttrs(input, 'Integer'),
-    defaultValue: parseOptionalNumber(input, 'default_value', 'Integer'),
-    type: FieldConfigTypes.Integer,
+    ...parseFieldConfigAttrs(input, 'IntegerDisplay'),
+    type: FieldConfigTypes.IntegerDisplay,
   };
 }
 
-function parseNumberFieldConfig(input: FieldConfigInput): NumberFieldConfig {
+function parseIntegerInputFieldConfig(
+  input: FieldConfigInput
+): IntegerInputFieldConfig {
   return {
-    ...parseFieldConfigAttrs(input, 'Number'),
-    defaultValue: parseOptionalNumber(input, 'default_value', 'Number'),
-    type: FieldConfigTypes.Number,
+    ...parseEditableConfigAttrs(input, 'IntegerInput'),
+    defaultValue: parseOptionalNumber(input, 'default_value', 'IntegerInput'),
+    type: FieldConfigTypes.IntegerInput,
+  };
+}
+
+function parseFloatDisplayFieldConfig(
+  input: FieldConfigInput
+): FloatDisplayFieldConfig {
+  return {
+    ...parseFieldConfigAttrs(input, 'FloatDisplay'),
+    type: FieldConfigTypes.FloatDisplay,
+  };
+}
+
+function parseFloatInputFieldConfig(
+  input: FieldConfigInput
+): FloatInputFieldConfig {
+  return {
+    ...parseEditableConfigAttrs(input, 'FloatInput'),
+    defaultValue: parseOptionalNumber(input, 'default_value', 'FloatInput'),
+    type: FieldConfigTypes.FloatInput,
   };
 }
 
@@ -392,7 +557,7 @@ export function parseReferenceFieldConfig(
   const targetCmsRecord = cmsRecordData.record;
 
   return {
-    ...parseFieldConfigAttrs(input, 'Reference'),
+    ...parseEditableConfigAttrs(input, 'Reference'),
     displayFieldName,
     targetCmsRecord,
     type: FieldConfigTypes.Reference,
@@ -410,7 +575,7 @@ function parseBackReferenceFieldConfig(
   );
 
   return {
-    ...parseFieldConfigAttrs(input, 'Reference'),
+    ...parseEditableConfigAttrs(input, 'Reference'),
     ...parseBackReferenceFieldConfigAttrs(context, input),
     displayFieldName,
     type: FieldConfigTypes.BackReference,
@@ -425,10 +590,9 @@ function parseEmbeddedBackReferenceFieldConfig(
     throw new Error('Expect reference_fields to be array of fields');
   }
 
-  // tslint:disable-next-line: no-any
-  const displayFields = input.reference_fields.map((f: any) =>
-    parseFieldConfig(context, f)
-  ) as FieldConfig[];
+  const displayFields = input.reference_fields
+    // tslint:disable-next-line: no-any
+    .map((f: any) => parseFieldConfig(context, f)) as FieldConfig[];
 
   const positionFieldName = parseOptionalString(
     input,
@@ -462,7 +626,7 @@ function parseEmbeddedBackReferenceFieldConfig(
   );
 
   return {
-    ...parseFieldConfigAttrs(input, 'EmbeddedReference'),
+    ...parseEditableConfigAttrs(input, 'EmbeddedReference'),
     ...parseBackReferenceFieldConfigAttrs(context, input),
     displayFields,
     positionFieldName,
@@ -536,7 +700,7 @@ function parseAssociationReferenceFieldConfig(
   );
 
   return {
-    ...parseFieldConfigAttrs(input, 'Reference'),
+    ...parseEditableConfigAttrs(input, 'Reference'),
     associationRecordConfig,
     displayFieldName,
     sourceReference,
@@ -562,29 +726,48 @@ function deriveReferencesByTargetName(
   }
 }
 
-function parseImageAssetFieldConfig(
+function parseImageDisplayFieldConfig(
   input: FieldConfigInput
-): ImageAssetFieldConfig {
-  const nullable = parseOptionalBoolean(input, 'nullable', 'ImageAsset');
-
+): ImageDisplayFieldConfig {
   return {
-    ...parseFieldConfigAttrs(input, 'ImageAsset'),
+    ...parseFieldConfigAttrs(input, 'ImageDisplay'),
     config: input.config,
-    nullable: nullable == null ? true : nullable,
-    type: FieldConfigTypes.ImageAsset,
+    type: FieldConfigTypes.ImageDisplay,
   };
 }
 
-function parseFileAssetFieldConfig(
+function parseImageUploaderFieldConfig(
   input: FieldConfigInput
-): FileAssetFieldConfig {
-  const nullable = parseOptionalBoolean(input, 'nullable', 'FileAsset');
+): ImageUploaderFieldConfig {
+  const nullable = parseOptionalBoolean(input, 'nullable', 'ImageUploader');
 
   return {
-    ...parseFieldConfigAttrs(input, 'FileAsset'),
-    accept: parseOptionalString(input, 'accept', 'FileAsset') || '',
+    ...parseEditableConfigAttrs(input, 'ImageUploader'),
+    config: input.config,
     nullable: nullable == null ? true : nullable,
-    type: FieldConfigTypes.FileAsset,
+    type: FieldConfigTypes.ImageUploader,
+  };
+}
+
+function parseFileDisplayFieldConfig(
+  input: FieldConfigInput
+): FileDisplayFieldConfig {
+  return {
+    ...parseFieldConfigAttrs(input, 'FileDisplay'),
+    type: FieldConfigTypes.FileDisplay,
+  };
+}
+
+function parseFileUploaderFieldConfig(
+  input: FieldConfigInput
+): FileUploaderFieldConfig {
+  const nullable = parseOptionalBoolean(input, 'nullable', 'FileUploader');
+
+  return {
+    ...parseEditableConfigAttrs(input, 'FileUploader'),
+    accept: parseOptionalString(input, 'accept', 'FileUploader') || '',
+    nullable: nullable == null ? true : nullable,
+    type: FieldConfigTypes.FileUploader,
   };
 }
 
@@ -597,6 +780,14 @@ function parseFieldConfigAttrs(
   const label =
     parseOptionalString(input, 'label', fieldType) || humanize(name);
 
+  return { compact: false, name, label };
+}
+
+function parseEditableConfigAttrs(
+  // tslint:disable-next-line: no-any
+  input: any,
+  fieldType: string
+): EditableFieldConfigAttrs {
   const optionalAttrs: { editable?: boolean } = {};
 
   const maybeEditable = parseOptionalBoolean(input, 'editable', fieldType);
@@ -604,27 +795,29 @@ function parseFieldConfigAttrs(
     optionalAttrs.editable = maybeEditable;
   }
 
-  return { compact: false, name, label, ...optionalAttrs };
+  return {
+    ...parseFieldConfigAttrs(input, fieldType),
+    ...optionalAttrs,
+  };
 }
 
-function parseIdFieldConfig(input: FieldConfigInput): StringFieldConfig {
+function parseIdFieldConfig(input: FieldConfigInput): TextDisplayFieldConfig {
   if (input.type) {
     console.log(`Type (${input.type}) is ignored in _id field.`);
   }
 
   return {
     compact: false,
-    editable: false,
     label: parseOptionalString(input, 'label', 'ID') || 'ID',
     name: '_id',
-    type: FieldConfigTypes.String,
+    type: FieldConfigTypes.TextDisplay,
   };
 }
 
 function parseCreatedAtFieldConfig(
   input: FieldConfigInput,
   context: RecordTypeContext
-): DateTimeFieldConfig {
+): DateTimeDisplayFieldConfig {
   if (input.type) {
     // TODO: allow other DateTime field type
     console.log(`Type (${input.type}) is ignored in _created_at field.`);
@@ -632,18 +825,17 @@ function parseCreatedAtFieldConfig(
 
   return {
     compact: false,
-    editable: false,
     label: parseOptionalString(input, 'label', '_created_at') || 'Created at',
     name: 'createdAt',
     timezone: parseTimezone(input, 'timezone'),
-    type: FieldConfigTypes.DateTime,
+    type: FieldConfigTypes.DateTimeDisplay,
   };
 }
 
 function parseUpdatedAtFieldConfig(
   input: FieldConfigInput,
   context: RecordTypeContext
-): DateTimeFieldConfig {
+): DateTimeDisplayFieldConfig {
   if (input.type) {
     // TODO: allow other DateTime field type
     console.log(`Type (${input.type}) is ignored in _updated_at field.`);
@@ -651,11 +843,10 @@ function parseUpdatedAtFieldConfig(
 
   return {
     compact: false,
-    editable: false,
     label: parseOptionalString(input, 'label', '_updated_at') || 'Updated at',
     name: 'updatedAt',
     timezone: parseTimezone(input, 'timezone'),
-    type: FieldConfigTypes.DateTime,
+    type: FieldConfigTypes.DateTimeDisplay,
   };
 }
 
