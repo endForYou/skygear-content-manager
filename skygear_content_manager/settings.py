@@ -18,9 +18,7 @@ CMS_STATIC_URL = \
     os.environ.get('CMS_STATIC_URL', 'http://localhost:3001/static/')
 CMS_SITE_TITLE = \
     os.environ.get('CMS_SITE_TITLE', 'Skygear CMS')
-CMS_CONFIG_FILE_URL = \
-    os.environ.get('CMS_CONFIG_FILE_URL',
-                   'http://localhost:3002/cms-config.yaml')
+CMS_CONFIG_FILE_URL = os.environ.get('CMS_CONFIG_FILE_URL')
 
 # cms theme params
 
