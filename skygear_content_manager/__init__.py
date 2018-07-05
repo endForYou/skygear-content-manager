@@ -36,6 +36,8 @@ from .werkzeug_utils import prepare_file_response
 
 cms_config_file_url = CMS_CONFIG_FILE_URL
 cms_config_loader = ConfigLoader()
+cms_config_loader.set_config_source(cms_config_file_url)
+
 logger = logging.getLogger(__name__)
 try:
     # Available in py-skygear v1.6
@@ -53,11 +55,6 @@ def includeme(settings):
     @skygear.event("before-plugins-ready")
     def before_plugins_ready(config):
         cms_db_init(config)
-
-
-    @skygear.event('after-plugins-ready')
-    def after_plugins_ready(config):
-        cms_config_loader.set_config_source(cms_config_file_url)
 
 
     @skygear.event('schema-changed')
