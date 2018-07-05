@@ -93,7 +93,7 @@ def generate_field_config(record, field):
     elif field.type == 'integer':
         field_config['type'] = 'Integer'
     elif field.type == 'asset':
-        field_config['type'] = 'FileAsset'
+        field_config['type'] = 'Asset'
     else:
         # skip for other field types
         return None
