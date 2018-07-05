@@ -97,7 +97,7 @@ class ConfigLoader:
             'cms_records': cms_records,
         }
 
-        cms_config = config_schema.load(config)
+        cms_config = config_schema.load(config_data)
         cms_config.association_records = association_records
         cms_config.cms_records = cms_records
         return cms_config
