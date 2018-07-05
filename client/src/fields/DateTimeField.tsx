@@ -40,7 +40,7 @@ export type DateTimePickerFieldProps = RequiredFieldProps<
 >;
 
 interface State {
-  value: Date;
+  value: Date | null;
 }
 
 class DateTimePickerFieldImpl extends React.PureComponent<
@@ -74,7 +74,7 @@ class DateTimePickerFieldImpl extends React.PureComponent<
         className={classnames(className, 'datetime-input-container')}
         dateFormat={DATE_FORMAT}
         timeFormat={TIME_FORMAT}
-        value={this.state.value}
+        value={this.state.value || undefined}
         onChange={this.handleChange}
         inputProps={{ className: 'datetime-input' }}
         timezone={timezone}
@@ -88,17 +88,26 @@ class DateTimePickerFieldImpl extends React.PureComponent<
     // tslint:disable-next-line: no-any
     event: string | moment.Moment | React.ChangeEvent<any>
   ) => void = event => {
+    // treat empty datetime value as null
+    if (event === '') {
+      this.updateValue(null);
+      return;
+    }
+
     if (!moment.isMoment(event)) {
       return;
     }
 
     const d = event.toDate();
-
-    this.setState({ ...this.state, value: d });
-    if (this.props.onFieldChange) {
-      this.props.onFieldChange(d);
-    }
+    this.updateValue(d);
   };
+
+  public updateValue(value: Date | null) {
+    this.setState({ ...this.state, value });
+    if (this.props.onFieldChange) {
+      this.props.onFieldChange(value);
+    }
+  }
 }
 
 export const DateTimePickerField: React.ComponentClass<
