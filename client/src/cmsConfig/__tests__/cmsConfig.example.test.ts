@@ -5,7 +5,7 @@ import { parseCmsConfig } from '..';
 
 // tslint:disable:object-literal-sort-keys
 test('parseCmsConfig should parse example config', () => {
-  const text = fs.readFileSync(process.cwd() + '/example/cms-config.yaml', {
+  const text = fs.readFileSync(process.cwd() + '/example/dev-config.yaml', {
     encoding: 'utf-8',
   });
   const parsed = yaml.safeLoad(text);
