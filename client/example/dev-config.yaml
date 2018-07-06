@@ -1,4 +1,6 @@
-timezone: Asia/Hong_Kong
+default_settings:
+  timezone: Asia/Hong_Kong
+
 imports:
   import-field-demo:
     record_type: field_demo
@@ -91,6 +93,10 @@ records:
           name: import-field-demo
           label: Import records
         - type: Import
+          name: import-field-demo
+          label: Import (Atomic)
+          atomic: true
+        - type: Import
           name: import-asset-demo
           label: Import with asset
         - type: Export
@@ -129,14 +135,14 @@ records:
           reference_target: ref_demo
           reference_field_name: name
         - name: back_refs
-          type: Reference
+          type: ReferenceList
           reference_via_back_reference: back_ref_demo
           reference_from_field: reference
           reference_field_name: name
         - name: imageasset
-          type: ImageAsset
+          type: Image
         - name: fileasset
-          type: FileAsset
+          type: Asset
       filters:
         - name: _id
           label: ID
@@ -189,17 +195,17 @@ records:
           reference_target: ref_demo
           reference_field_name: name
         - name: back_refs
-          type: Reference
+          type: ReferenceList
           reference_via_back_reference: back_ref_demo
           reference_from_field: reference
           reference_field_name: name
         - name: asso_refs
-          type: Reference
+          type: ReferenceList
           reference_via_association_record: field_asso_ref
           reference_target: asso_ref_demo
           reference_field_name: name
         - name: back_refs_embedded
-          type: EmbeddedReference
+          type: EmbeddedReferenceList
           reference_via_back_reference: back_ref_demo
           reference_from_field: reference
           reference_position_field: field_demo_position
@@ -209,9 +215,9 @@ records:
             - name: name
               type: String
         - name: imageasset
-          type: ImageAsset
+          type: Image
         - name: fileasset
-          type: FileAsset
+          type: Asset
         - name: deleted
           type: Boolean
     edit:
@@ -253,12 +259,12 @@ records:
           reference_target: ref_demo
           reference_field_name: name
         - name: back_refs
-          type: Reference
+          type: ReferenceList
           reference_via_back_reference: back_ref_demo
           reference_from_field: reference
           reference_field_name: name
         - name: back_refs_embedded
-          type: EmbeddedReference
+          type: EmbeddedReferenceList
           reference_via_back_reference: back_ref_demo
           reference_from_field: reference
           reference_position_field: field_demo_position
@@ -268,9 +274,9 @@ records:
             - name: name
               type: String
         - name: imageasset
-          type: ImageAsset
+          type: Image
         - name: fileasset
-          type: FileAsset
+          type: Asset
         - name: deleted
           type: Boolean
           default_value: false
@@ -313,12 +319,12 @@ records:
           reference_target: ref_demo
           reference_field_name: name
         - name: back_refs
-          type: Reference
+          type: ReferenceList
           reference_via_back_reference: back_ref_demo
           reference_from_field: reference
           reference_field_name: name
         - name: back_refs_embedded
-          type: EmbeddedReference
+          type: EmbeddedReferenceList
           reference_via_back_reference: back_ref_demo
           reference_from_field: reference
           reference_position_field: field_demo_position
@@ -328,9 +334,9 @@ records:
             - name: name
               type: String
         - name: imageasset
-          type: ImageAsset
+          type: Image
         - name: fileasset
-          type: FileAsset
+          type: Asset
         - name: deleted
           type: Boolean
           default_value: false
@@ -356,7 +362,7 @@ records:
           label: Name
           type: String
         - name: field_references
-          type: Reference
+          type: ReferenceList
           reference_via_back_reference: field_demo
           reference_from_field: reference
           reference_field_name: name
@@ -367,7 +373,7 @@ records:
           label: Name
           type: String
         - name: field_demos
-          type: Reference
+          type: ReferenceList
           reference_via_back_reference: field_demo
           reference_from_field: reference
           reference_field_name: name
@@ -378,7 +384,7 @@ records:
           label: Name
           type: String
         - name: field_demos
-          type: Reference
+          type: ReferenceList
           reference_via_back_reference: field_demo
           reference_from_field: reference
           reference_field_name: name

@@ -24,7 +24,7 @@ services:
       file: docker-compose.yml
       service: plugin
     environment:
-      CMS_CONFIG_FILE_URL: http://cms-client:8080/cms-config.yaml
+      CMS_CONFIG_FILE_URL: http://cms-client:8080/dev-config.yaml
       CLIENT_SKYGEAR_ENDPOINT: http://localhost:3001/
       ASSET_STORE_URL_PREFIX: http://localhost:3001/files
 
@@ -41,7 +41,7 @@ services:
       BROWSER: none
       PORT: 80
       PUBLIC_URL: .
-      REACT_APP_CMS_CONFIG_URL: /cms-config.yaml
+      REACT_APP_CMS_CONFIG_URL: /dev-config.yaml
       REACT_APP_SKYGEAR_API_KEY: my_skygear_key
       REACT_APP_SKYGEAR_ENDPOINT: http://localhost:3001/cms-api/
       REACT_APP_ADMIN_ROLE: Admin
