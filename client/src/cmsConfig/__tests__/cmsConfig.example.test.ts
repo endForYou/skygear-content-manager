@@ -43,12 +43,8 @@ test('parseCmsConfig should parse example config', () => {
         ],
       },
     },
-    defaultSettings: {
-      timezone: 'Asia/Hong_Kong',
-    },
-    fileImport: {
-      enabled: true,
-    },
+    defaultSettings: { timezone: 'Asia/Hong_Kong' },
+    fileImport: { enabled: true },
     pushNotifications: {
       enabled: true,
       filterUserConfigs: [
@@ -1144,7 +1140,14 @@ test('parseCmsConfig should parse example config', () => {
             },
             { compact: true, name: 'name', label: 'Name', type: 'TextDisplay' },
           ],
-          itemActions: [],
+          itemActions: [
+            {
+              href: '/record/{record.id}',
+              label: 'Show',
+              target: '',
+              type: 'Link',
+            },
+          ],
           label: 'Field demo deleted',
           perPage: 25,
           predicates: [
@@ -1155,6 +1158,40 @@ test('parseCmsConfig should parse example config', () => {
               valueType: 'JSONValue',
             },
           ],
+          references: [],
+        },
+        show: {
+          actions: [
+            {
+              href: '/record/{record.id}/edit',
+              label: 'Edit',
+              target: '',
+              type: 'Link',
+            },
+          ],
+          cmsRecord: { name: 'field_demo_deleted', recordType: 'field_demo' },
+          fields: [
+            { compact: false, label: 'ID', name: '_id', type: 'TextDisplay' },
+            {
+              compact: false,
+              label: 'Created at',
+              name: 'createdAt',
+              type: 'DateTimeDisplay',
+            },
+            {
+              compact: false,
+              label: 'Updated at',
+              name: 'updatedAt',
+              type: 'DateTimeDisplay',
+            },
+            {
+              compact: false,
+              name: 'name',
+              label: 'Name',
+              type: 'TextDisplay',
+            },
+          ],
+          label: 'Field demo deleted',
           references: [],
         },
       },
