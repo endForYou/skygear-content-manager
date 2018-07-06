@@ -161,10 +161,10 @@ export interface AssociationRecordConfig {
 }
 
 export enum RecordPageTypes {
-  List = 'List',
-  Show = 'Show',
-  Edit = 'Edit',
-  New = 'New',
+  List = 'list',
+  Show = 'show',
+  Edit = 'edit',
+  New = 'new',
 }
 const recordPages: RecordPageTypes[] = [
   RecordPageTypes.List,
