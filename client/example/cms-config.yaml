@@ -72,13 +72,13 @@ records:
         - *user_field_email
         - &user_field_profile_picture
           name: profile_picture
-          type: ImageAsset
+          type: Image
         - &user_field_address
           name: address
           type: TextArea
         - &user_field_payment_methods
           name: payment_methods
-          type: EmbeddedReference
+          type: EmbeddedReferenceList
           reference_via_back_reference: payment_method
           reference_from_field: user
           reference_position_field: payment_priority
@@ -192,7 +192,7 @@ records:
           type: TextArea
         - &order_field_products
           name: products
-          type: Reference
+          type: ReferenceList
           reference_via_association_record: order_product
           reference_target: product
           reference_field_name: name
@@ -250,7 +250,7 @@ records:
           type: TextArea
         - &product_field_picture
           name: picture
-          type: ImageAsset
+          type: Image
         - *product_field_active
     edit:
       fields:
