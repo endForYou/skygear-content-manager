@@ -80,7 +80,7 @@ records:
           name: payment_methods
           type: EmbeddedReferenceList
           reference_via_back_reference: payment_method
-          reference_from_field: user
+          reference_from_field: customer
           reference_position_field: payment_priority
           reference_reorder_enabled: true
           reference_fields:
