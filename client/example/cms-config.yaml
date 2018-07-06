@@ -101,8 +101,6 @@ records:
               type: String
             - name: active
               type: Boolean
-            # - name: data
-            #   type: JSON
     edit:
       fields: *user_detail_fields
     new:
