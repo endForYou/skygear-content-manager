@@ -3,7 +3,8 @@ sudo: false
 
 stages:
   - test
-  - deploy
+  - name: deploy
+    if: type != pull_request
 
 jobs:
   include:
