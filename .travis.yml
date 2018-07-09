@@ -35,7 +35,7 @@ jobs:
     # deploy
     - &deploy_client
       stage: deploy
-      if: branch = test-travis
+      if: branch = master
       language: node_js
       node_js: "8"
       cache: *node_cache
@@ -49,8 +49,8 @@ jobs:
           skip_cleanup: true
           local_dir: client/build
           on:
-            branch: test-travis
-          upload_dir: js/content-manager/test-travis-branch
+            branch: master
+          upload_dir: js/content-manager/$(git describe --always --tags)
 
     - <<: *deploy_client
       if: tag IS present
@@ -61,7 +61,7 @@ jobs:
           upload_dir: js/content-manager/${TRAVIS_TAG}
 
     - stage: deploy
-      if: branch = test-travis
+      if: branch = master
       language: node_js
       node_js: "8"
       install: echo skip install
