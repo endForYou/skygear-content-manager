@@ -10,8 +10,6 @@ from .db import cms_db_init
 from .file_import import register_lambda as register_file_import_lambda
 from .generate_config import generate_config
 from .import_export import register_lambdas as register_import_export_lambdas
-from .models.cms_config import CMSRecordAssociationReference
-from .models.cms_config import CMSRecordBackReference
 from .push_notifications import \
     register_lambda as register_push_notifications_lambda
 from .schema.skygear_schema import SkygearSchemaSchema
@@ -29,15 +27,10 @@ from .settings import CMS_USER_PERMITTED_ROLE
 from .skygear_utils import AuthData
 from .skygear_utils import SkygearRequest
 from .skygear_utils import SkygearResponse
-from .skygear_utils import eq_predicate
-from .skygear_utils import fetch_records
 from .skygear_utils import get_schema
 from .skygear_utils import request_skygear
 from .skygear_utils import validate_master_user
 from .werkzeug_utils import prepare_file_response
-
-cms_config_loader = ConfigLoader()
-cms_config_loader.set_config_source(CMS_CONFIG_FILE_URL)
 
 logger = logging.getLogger(__name__)
 try:
@@ -61,7 +54,7 @@ def includeme(settings):
 
     @skygear.event('schema-changed')
     def schema_change(config):
-        cms_config_loader.reset_schema()
+        ConfigLoader.get_instance().reset_schema()
 
     @skygear.handler('cms/')
     def index(request):
@@ -77,7 +70,7 @@ def includeme(settings):
             'CMS_PUBLIC_URL':
             CMS_PUBLIC_URL,
             'CMS_CONFIG_FILE_URL':
-            cms_config_loader.get_config_source(),
+            ConfigLoader.get_instance().get_config_source(),
             'CMS_THEME_PRIMARY_COLOR':
             CMS_THEME_PRIMARY_COLOR,
             'CMS_THEME_SIDEBAR_COLOR':
@@ -140,7 +133,7 @@ def register_cms_config_lambdas(settings):
     @skygear.handler('cms-api/reload-cms-config')
     def cms_config_file_url_api(request):
         validate_master_user()
-        cms_config_loader.set_config_source(CMS_CONFIG_FILE_URL)
+        ConfigLoader.get_instance().set_config_source(CMS_CONFIG_FILE_URL)
         return {'result': 'OK'}
 
 
@@ -230,50 +223,3 @@ def get_roles(json_body):
         return None
 
     return roles
-
-
-def transient_foreign_records(record, export_config, association_records):
-    """
-    Fetch and embed foreign records, with one-to-many or many-to-many
-    relationship, to _transient of the record.
-
-    For example, each "user" record has many "skill", with config field
-    name "user_has_skill". This function would fetch "skill" records that
-    are referenced by the "user" record, and embed the "skill" record list in
-    user['_transient']['user_has_skill'].
-    """
-    reference_fields = export_config.get_many_reference_fields()
-    record_id = record['_id'].split('/')[1]
-
-    for field in reference_fields:
-        reference = field.reference
-        records = None
-
-        if isinstance(reference, CMSRecordAssociationReference):
-            association_record = association_records[
-                reference.association_record.name]
-
-            foreign_field = \
-                [f for f in association_record.fields
-                 if f.target_cms_record.name == reference.target_reference][0]
-
-            self_field = \
-                [f for f in association_record.fields
-                 if f.target_cms_record.name != reference.target_reference][0]
-
-            predicate = eq_predicate(self_field.name, record_id)
-            foreign_records = fetch_records(
-                reference.association_record.record_type,
-                predicate=predicate,
-                includes=[foreign_field.name])
-            records = \
-                [r['_transient'][foreign_field.name] for r in foreign_records]
-        elif isinstance(reference, CMSRecordBackReference):
-            predicate = eq_predicate(reference.source_reference, record_id)
-            records = fetch_records(
-                reference.target_cms_record.record_type, predicate=predicate)
-        else:
-            # skip for direct reference
-            continue
-
-        record['_transient'][field.name] = records

@@ -4,8 +4,8 @@ from urllib.parse import parse_qs
 
 import skygear
 
-from .. import cms_config_loader
-from .. import transient_foreign_records
+from ..config_loader import ConfigLoader
+from ..record_utils import transient_foreign_records
 from ..skygear_utils import AuthData
 from ..skygear_utils import SkygearResponse
 from ..skygear_utils import fetch_records
@@ -37,7 +37,7 @@ def register_export_lambdas(settings):
         if not authdata:
             return SkygearResponse.access_token_not_accepted().to_werkzeug()
 
-        cms_config = cms_config_loader.get_config()
+        cms_config = ConfigLoader.get_instance().get_config()
         export_config = cms_config.get_export_config(name)
         if not export_config:
             return skygear.Response('Export config not found', 404)
@@ -95,7 +95,7 @@ def register_import_lambdas(settings):
         file = files['file']
         name = form.get('import_name')
 
-        cms_config = cms_config_loader.get_config()
+        cms_config = ConfigLoader.get_instance().get_config()
         import_config = cms_config.get_import_config(name)
 
         if not import_config:

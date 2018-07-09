@@ -6,8 +6,11 @@ from .models.cms_config import CMSRecord
 from .schema.cms_config import CMSAssociationRecordSchema
 from .schema.cms_config import CMSConfigSchema
 from .schema.skygear_schema import SkygearSchemaSchema
+from .settings import CMS_CONFIG_FILE_URL
 from .settings import CMS_SKYGEAR_ENDPOINT
 from .skygear_utils import get_schema
+
+cms_config_loader = None
 
 
 class ConfigLoader:
@@ -16,6 +19,15 @@ class ConfigLoader:
         self.config_data = None
         self.schema = None
         self.config = None
+
+    @classmethod
+    def get_instance(cls):
+        global cms_config_loader
+        if cms_config_loader is None:
+            cms_config_loader = ConfigLoader()
+            cms_config_loader.set_config_source(CMS_CONFIG_FILE_URL)
+
+        return cms_config_loader
 
     def set_config_source(self, config_source):
         self.config_source = config_source
