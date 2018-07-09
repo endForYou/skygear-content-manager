@@ -34,6 +34,11 @@ const TzDatetimeImpl: React.SFC<Props> = ({
   );
 };
 
-export const TzDatetime = connect((state: RootState) => ({
-  settings: getCombinedSettings(state),
-}))(TzDatetimeImpl);
+export const mapDispatchNoOp = () => ({});
+
+export const TzDatetime = connect(
+  (state: RootState) => ({
+    settings: getCombinedSettings(state),
+  }),
+  mapDispatchNoOp
+)(TzDatetimeImpl);

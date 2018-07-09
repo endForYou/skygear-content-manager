@@ -8,6 +8,7 @@ import { getCombinedSettings } from '../settings';
 import { RootState, Settings } from '../states';
 import { TimezoneValue, utcOffsetOfTimezone } from '../types';
 import { Omit } from '../typeutil';
+import { mapDispatchNoOp } from './TzDatetime';
 
 interface Props extends Omit<Datetime.DatetimepickerProps, 'utcOffset'> {
   settings: Settings;
@@ -24,6 +25,9 @@ export const TzDatetimeInputImpl: React.SFC<Props> = ({
   return <Datetime {...rest} utcOffset={utcOffset} />;
 };
 
-export const TzDatetimeInput = connect((state: RootState) => ({
-  settings: getCombinedSettings(state),
-}))(TzDatetimeInputImpl);
+export const TzDatetimeInput = connect(
+  (state: RootState) => ({
+    settings: getCombinedSettings(state),
+  }),
+  mapDispatchNoOp
+)(TzDatetimeInputImpl);
