@@ -1,42 +1,43 @@
-import json
 import logging
-import tempfile
-from ruamel.yaml import YAML
 
-import requests
 import skygear
-from skygear import static_assets
+from ruamel.yaml import YAML
 from skygear.options import options
-from skygear.utils.assets import directory_assets
-from urllib.parse import parse_qs
 
+from .cms_index_html import INDEX_HTML_FORMAT
 from .config_loader import ConfigLoader
 from .db import cms_db_init
 from .file_import import register_lambda as register_file_import_lambda
 from .generate_config import generate_config
-from .import_export import (RecordSerializer, RecordDeserializer,
-                            RecordIdentifierMap, render_header,
-                            render_data,
-                            prepare_import_records, import_records)
-from .import_export import prepare_response as prepare_export_response
-from .models.cms_config import (CMSRecordBackReference,
-                                CMSRecordAssociationReference)
-from .push_notifications import register_lambda as register_push_notifications_lambda
+from .import_export import register_lambdas as register_import_export_lambdas
+from .models.cms_config import CMSRecordAssociationReference
+from .models.cms_config import CMSRecordBackReference
+from .push_notifications import \
+    register_lambda as register_push_notifications_lambda
 from .schema.skygear_schema import SkygearSchemaSchema
-from .settings import (CMS_USER_PERMITTED_ROLE, CMS_SKYGEAR_ENDPOINT,
-                       CMS_SKYGEAR_API_KEY, CMS_PUBLIC_URL, CMS_STATIC_URL,
-                       CMS_SITE_TITLE, CMS_CONFIG_FILE_URL,
-                       CMS_THEME_PRIMARY_COLOR, CMS_THEME_SIDEBAR_COLOR,
-                       CMS_THEME_LOGO, CLIENT_SKYGEAR_ENDPOINT)
-from .skygear_utils import (SkygearRequest, SkygearResponse, AuthData,
-                            request_skygear, get_schema, save_records,
-                            fetch_records, eq_predicate, validate_master_user)
+from .settings import CLIENT_SKYGEAR_ENDPOINT
+from .settings import CMS_CONFIG_FILE_URL
+from .settings import CMS_PUBLIC_URL
+from .settings import CMS_SITE_TITLE
+from .settings import CMS_SKYGEAR_API_KEY
+from .settings import CMS_SKYGEAR_ENDPOINT
+from .settings import CMS_STATIC_URL
+from .settings import CMS_THEME_LOGO
+from .settings import CMS_THEME_PRIMARY_COLOR
+from .settings import CMS_THEME_SIDEBAR_COLOR
+from .settings import CMS_USER_PERMITTED_ROLE
+from .skygear_utils import AuthData
+from .skygear_utils import SkygearRequest
+from .skygear_utils import SkygearResponse
+from .skygear_utils import eq_predicate
+from .skygear_utils import fetch_records
+from .skygear_utils import get_schema
+from .skygear_utils import request_skygear
+from .skygear_utils import validate_master_user
 from .werkzeug_utils import prepare_file_response
 
-
-cms_config_file_url = CMS_CONFIG_FILE_URL
 cms_config_loader = ConfigLoader()
-cms_config_loader.set_config_source(cms_config_file_url)
+cms_config_loader.set_config_source(CMS_CONFIG_FILE_URL)
 
 logger = logging.getLogger(__name__)
 try:
@@ -48,33 +49,43 @@ except ImportError:
 
 
 def includeme(settings):
+    register_cms_config_lambdas(settings)
     register_push_notifications_lambda(settings)
     register_file_import_lambda(settings)
-
+    register_import_export_lambdas(settings)
+    register_cms_proxy_handler(settings)
 
     @skygear.event("before-plugins-ready")
     def before_plugins_ready(config):
         cms_db_init(config)
 
-
     @skygear.event('schema-changed')
     def schema_change(config):
         cms_config_loader.reset_schema()
 
-
     @skygear.handler('cms/')
     def index(request):
         context = {
-            'CMS_SKYGEAR_ENDPOINT': CMS_SKYGEAR_ENDPOINT,
-            'CMS_SKYGEAR_API_KEY': CMS_SKYGEAR_API_KEY,
-            'CMS_SITE_TITLE': CMS_SITE_TITLE,
-            'CMS_STATIC_URL': CMS_STATIC_URL,
-            'CMS_PUBLIC_URL': CMS_PUBLIC_URL,
-            'CMS_CONFIG_FILE_URL': cms_config_loader.get_config_source(),
-            'CMS_THEME_PRIMARY_COLOR': CMS_THEME_PRIMARY_COLOR,
-            'CMS_THEME_SIDEBAR_COLOR': CMS_THEME_SIDEBAR_COLOR,
-            'CMS_THEME_LOGO': CMS_THEME_LOGO if CMS_THEME_LOGO is not None else '',
-            'CMS_USER_PERMITTED_ROLE': CMS_USER_PERMITTED_ROLE,
+            'CMS_SKYGEAR_ENDPOINT':
+            CMS_SKYGEAR_ENDPOINT,
+            'CMS_SKYGEAR_API_KEY':
+            CMS_SKYGEAR_API_KEY,
+            'CMS_SITE_TITLE':
+            CMS_SITE_TITLE,
+            'CMS_STATIC_URL':
+            CMS_STATIC_URL,
+            'CMS_PUBLIC_URL':
+            CMS_PUBLIC_URL,
+            'CMS_CONFIG_FILE_URL':
+            cms_config_loader.get_config_source(),
+            'CMS_THEME_PRIMARY_COLOR':
+            CMS_THEME_PRIMARY_COLOR,
+            'CMS_THEME_SIDEBAR_COLOR':
+            CMS_THEME_SIDEBAR_COLOR,
+            'CMS_THEME_LOGO':
+            CMS_THEME_LOGO if CMS_THEME_LOGO is not None else '',
+            'CMS_USER_PERMITTED_ROLE':
+            CMS_USER_PERMITTED_ROLE,
         }
         return skygear.Response(
             INDEX_HTML_FORMAT.format(**context),
@@ -82,6 +93,7 @@ def includeme(settings):
         )
 
 
+def register_cms_proxy_handler(settings):
     @skygear.handler('cms-api/')
     def api(request):
         # log_request(request)
@@ -115,100 +127,7 @@ def includeme(settings):
         return request_skygear(req).to_werkzeug()
 
 
-    @skygear.handler('cms-api/export')
-    def export(request):
-        data = parse_qs(request.query_string.decode())
-        name = data.get('export_name', [None])[0]
-        key = data.get('key', [None])[0]
-        predicate_string = data.get('predicate', [None])[0]
-
-        if not key:
-            return SkygearResponse.access_token_not_accepted().to_werkzeug()
-
-        authdata = AuthData.from_cms_token(key)
-        if not authdata:
-            return SkygearResponse.access_token_not_accepted().to_werkzeug()
-
-        cms_config = cms_config_loader.get_config()
-        export_config = cms_config.get_export_config(name)
-        if not export_config:
-            return skygear.Response('Export config not found', 404)
-
-        record_type = export_config.record_type
-        includes = export_config.get_direct_reference_fields()
-
-        predicate = None
-        if predicate_string:
-            try:
-                predicate = json.loads(predicate_string)
-            except Exception:
-                return skygear.Response('Invalid predicate', 400)
-
-        records = fetch_records(record_type,
-                                includes=includes,
-                                predicate=predicate)
-
-        csv_datas = []
-        for record in records:
-            transient_foreign_records(
-                record,
-                export_config,
-                cms_config.association_records
-            )
-            csv_data = record_to_csv_data(record, export_config.fields)
-            csv_datas.append(csv_data)
-
-        serializer = RecordSerializer(export_config.fields)
-        serializer.walk_through(csv_datas)
-        serialized_data = [serializer.serialize(d) for d in csv_datas]
-
-        response = prepare_export_response(name)
-        render_header(response.stream, export_config, serializer)
-        render_data(response.stream, serialized_data)
-        return response
-
-
-    @skygear.handler('cms-api/import')
-    def import_data(request):
-        files = request.files
-        form = request.form
-        key = form.get('key')
-        options = json.loads(form.get('options', '{}'))
-
-        atomic = options.get('atomic', False)
-
-        if not key:
-            return SkygearResponse.access_token_not_accepted().to_werkzeug()
-
-        authdata = AuthData.from_cms_token(key)
-        if not authdata:
-            return SkygearResponse.access_token_not_accepted().to_werkzeug()
-
-        if 'file' not in files:
-            return skygear.Response('Missing file', 400)
-
-        file = files['file']
-        name = form.get('import_name')
-
-        cms_config = cms_config_loader.get_config()
-        import_config = cms_config.get_import_config(name)
-
-        if not import_config:
-            return skygear.Response('Import config not found', 404)
-
-        temp_file = tempfile.NamedTemporaryFile(suffix='.csv')
-        file.save(temp_file.name)
-
-        records = None
-        with open(temp_file.name, 'r') as fp:
-            # skip first row
-            next(fp)
-            records = prepare_import_records(fp, import_config, atomic)
-
-        resp = import_records(records, atomic)
-        return resp
-
-
+def register_cms_config_lambdas(settings):
     @skygear.handler('cms-api/default-cms-config.yaml')
     def default_cms_config(request):
         schema = SkygearSchemaSchema().load(get_schema())
@@ -218,11 +137,10 @@ def includeme(settings):
         yaml.dump(default_config, response.stream)
         return response
 
-
     @skygear.handler('cms-api/reload-cms-config')
     def cms_config_file_url_api(request):
         validate_master_user()
-        cms_config_loader.set_config_source(cms_config_file_url)
+        cms_config_loader.set_config_source(CMS_CONFIG_FILE_URL)
         return {'result': 'OK'}
 
 
@@ -314,33 +232,6 @@ def get_roles(json_body):
     return roles
 
 
-def record_to_csv_data(record, fields):
-    """
-    From dictionary to array based on field config
-    """
-    data = []
-    for field in fields:
-        if field.reference:
-            if field.reference.is_many:
-                ref_record = record['_transient'].get(field.name, []) or []
-                ref_data = [record_to_csv_data(r, field.reference.target_fields) for r in ref_record]
-            else:
-                ref_record = record['_transient'].get(field.name, {}) or {}
-                ref_data = record_to_csv_data(ref_record, field.reference.target_fields)
-
-            data.append(ref_data)
-        elif field.name == '_created_at' or field.name == '_updated_at':
-            date_data = {
-                '$type': 'date',
-                '$date': record.get(field.name),
-            }
-            data.append(date_data)
-        else:
-            data.append(record.get(field.name))
-
-    return data
-
-
 def transient_foreign_records(record, export_config, association_records):
     """
     Fetch and embed foreign records, with one-to-many or many-to-many
@@ -359,7 +250,8 @@ def transient_foreign_records(record, export_config, association_records):
         records = None
 
         if isinstance(reference, CMSRecordAssociationReference):
-            association_record = association_records[reference.association_record.name]
+            association_record = association_records[
+                reference.association_record.name]
 
             foreign_field = \
                 [f for f in association_record.fields
@@ -370,55 +262,18 @@ def transient_foreign_records(record, export_config, association_records):
                  if f.target_cms_record.name != reference.target_reference][0]
 
             predicate = eq_predicate(self_field.name, record_id)
-            foreign_records = fetch_records(reference.association_record.record_type,
-                                            predicate=predicate,
-                                            includes=[foreign_field.name])
+            foreign_records = fetch_records(
+                reference.association_record.record_type,
+                predicate=predicate,
+                includes=[foreign_field.name])
             records = \
                 [r['_transient'][foreign_field.name] for r in foreign_records]
         elif isinstance(reference, CMSRecordBackReference):
             predicate = eq_predicate(reference.source_reference, record_id)
-            records = fetch_records(reference.target_cms_record.record_type,
-                                    predicate=predicate)
+            records = fetch_records(
+                reference.target_cms_record.record_type, predicate=predicate)
         else:
             # skip for direct reference
             continue
 
         record['_transient'][field.name] = records
-
-
-INDEX_HTML_FORMAT = """<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="theme-color" content="#000000">
-    <link rel="manifest" href="{CMS_STATIC_URL}manifest.json">
-    <link rel="stylesheet" href="{CMS_STATIC_URL}css/bootstrap.min.css">
-    <link rel="stylesheet" href="{CMS_STATIC_URL}static/css/main.css">
-    <title>{CMS_SITE_TITLE}</title>
-  </head>
-  <body>
-    <noscript>
-      You need to enable JavaScript to run this app.
-    </noscript>
-    <div id="root"></div>
-    <script type="text/javascript" src="{CMS_STATIC_URL}tinymce/tinymce.min.js"></script>
-    <script type="text/javascript" src="{CMS_STATIC_URL}static/js/main.js"></script>
-    <script type="text/javascript">
-      skygearCMS.start({{
-        skygearEndpoint: "{CMS_SKYGEAR_ENDPOINT}",
-        skygearApiKey: "{CMS_SKYGEAR_API_KEY}",
-        cmsConfigUrl: "{CMS_CONFIG_FILE_URL}",
-        publicUrl: "{CMS_PUBLIC_URL}",
-        staticUrl: "{CMS_STATIC_URL}",
-        adminRole: "{CMS_USER_PERMITTED_ROLE}",
-        style: {{
-            primaryColor: "{CMS_THEME_PRIMARY_COLOR}",
-            sidebarColor: "{CMS_THEME_SIDEBAR_COLOR}",
-            logoPath: "{CMS_THEME_LOGO}",
-        }},
-      }});
-    </script>
-  </body>
-</html>
-"""

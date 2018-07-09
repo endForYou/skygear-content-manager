@@ -1,3 +1,5 @@
+from ..schema.skygear_schema import SkygearDatabaseSchema
+
 # constants
 reserved_fields = {
     '_id': {
@@ -16,7 +18,6 @@ reserved_fields = {
 
 
 class SkygearSchema:
-
     def __init__(self, record_types):
         self.record_types = record_types
 
@@ -29,20 +30,20 @@ class SkygearSchema:
         if field_name in reserved_fields:
             return SkygearField.from_dict(reserved_fields[field_name])
 
-        fields = [t for t in self.record_types[record_type].fields
-                  if t.name == field_name]
+        fields = [
+            t for t in self.record_types[record_type].fields
+            if t.name == field_name
+        ]
         return fields[0] if len(fields) > 0 else None
 
 
 class SkygearRecord:
-
     def __init__(self, record_type, fields):
         self.record_type = record_type
         self.fields = fields
 
 
 class SkygearField:
-
     def __init__(self, name, type):
         self.name = name
         self.type = type

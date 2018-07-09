@@ -1,18 +1,16 @@
 import requests
-
-from marshmallow import ValidationError
 from ruamel.yaml import YAML
 
 from .generate_config import generate_config
 from .models.cms_config import CMSRecord
-from .schema.cms_config import CMSAssociationRecordSchema, CMSConfigSchema
+from .schema.cms_config import CMSAssociationRecordSchema
+from .schema.cms_config import CMSConfigSchema
 from .schema.skygear_schema import SkygearSchemaSchema
 from .settings import CMS_SKYGEAR_ENDPOINT
 from .skygear_utils import get_schema
 
 
 class ConfigLoader:
-
     def __init__(self):
         self.config_source = None
         self.config_data = None
@@ -31,7 +29,8 @@ class ConfigLoader:
         ConfigLoader should generate default config itself if it finds
         config_source is empty.
         """
-        return self.config_source or CMS_SKYGEAR_ENDPOINT + 'default-cms-config.yaml'
+        default_source = CMS_SKYGEAR_ENDPOINT + 'default-cms-config.yaml'
+        return self.config_source or default_source
 
     def reset_schema(self):
         self.schema = None
@@ -42,13 +41,13 @@ class ConfigLoader:
         if not config_source:
             return self._get_default_config()
 
-        if self.config_data == None:
+        if self.config_data is None:
             self.config_data = self._download_config_data(self.config_source)
 
-        if self.schema == None:
+        if self.schema is None:
             self.schema = self._download_schema()
 
-        if self.config == None:
+        if self.config is None:
             self.config = self._parse_config(self.schema, self.config_data)
 
         return self.config
@@ -71,10 +70,10 @@ class ConfigLoader:
 
     def _parse_config(self, schema, config_data):
         association_records_data = config_data['association_records'] \
-                                if 'association_records' in config_data \
-                                else {}
-        cms_records_data = config_data['records'] \
-                           if 'records' in config_data else {}
+                                   if 'association_records' in config_data \
+                                   else {}
+        cms_records_data = \
+            config_data['records'] if 'records' in config_data else {}
 
         cms_records = {}
         for key, value in cms_records_data.items():
@@ -101,4 +100,3 @@ class ConfigLoader:
         cms_config.association_records = association_records
         cms_config.cms_records = cms_records
         return cms_config
-

@@ -25,12 +25,12 @@ jobs:
     - stage: test
       language: python
       python: 3.5
-      before_install:
-        - pip install --upgrade pip setuptools
       install:
-        - pip install -r requirements.txt
+        - pip install -r test_requirements.txt
       script:
-        - ls -al
+        - isort -c -rc -sl skygear_content_manager
+        - yapf -d -r skygear_content_manager
+        - pylama skygear_content_manager
 
     # deploy
     - &deploy_client

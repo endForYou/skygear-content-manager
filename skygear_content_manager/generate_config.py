@@ -10,7 +10,7 @@ def generate_config(schema):
 
 def generate_site_config(schema):
     non_record_pages = [{
-       'type': 'UserManagement',
+        'type': 'UserManagement',
     }]
 
     if has_asset_field(schema):
@@ -48,7 +48,7 @@ def generate_fields_config(record):
     field_configs = []
     for field in record.fields:
         field_config = generate_field_config(record, field)
-        if field_config != None:
+        if field_config is not None:
             field_configs.append(field_config)
 
     reserved_field_configs = [{
@@ -58,9 +58,7 @@ def generate_fields_config(record):
     }, {
         'name': '_updated_at',
     }]
-    return {
-        'fields': reserved_field_configs + field_configs
-    }
+    return {'fields': reserved_field_configs + field_configs}
 
 
 def generate_field_config(record, field):

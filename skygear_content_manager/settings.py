@@ -1,6 +1,5 @@
 import os
 
-
 CLIENT_SKYGEAR_ENDPOINT = os.environ.get('CLIENT_SKYGEAR_ENDPOINT')
 
 CMS_USER_PERMITTED_ROLE = os.environ.get('CMS_USER_PERMITTED_ROLE', 'Admin')

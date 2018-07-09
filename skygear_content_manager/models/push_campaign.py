@@ -1,7 +1,12 @@
-from uuid import uuid4
 from datetime import datetime
+from uuid import uuid4
+
+from sqlalchemy import Boolean
+from sqlalchemy import Column
+from sqlalchemy import DateTime
+from sqlalchemy import Integer
+from sqlalchemy import Text
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Text, Boolean, DateTime, Integer
 
 Base = declarative_base()
 

@@ -1,5 +1,4 @@
 import skygear
-
 from werkzeug.wrappers import ResponseStreamMixin
 
 

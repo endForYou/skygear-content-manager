@@ -8,9 +8,12 @@ DUPLICATION_HANDLING_USE_FIRST = 'use-first'
 # Throw error when duplicated data is found
 DUPLICATION_HANDLING_THROW_ERROR = 'throw-error'
 
-class CMSConfig:
 
-    def __init__(self, imports={}, exports={}, cms_records={},
+class CMSConfig:
+    def __init__(self,
+                 imports={},
+                 exports={},
+                 cms_records={},
                  association_records={}):
         self.imports = imports
         self.exports = exports
@@ -34,22 +37,21 @@ class CMSConfig:
 
 
 class CMSRecord:
-
     def __init__(self, name, record_type):
         self.name = name
         self.record_type = record_type
 
 
 class CMSRecordExport:
-
     def __init__(self, record_type, name, fields):
         self.record_type = record_type
         self.name = name
         self.fields = fields
 
     def get_direct_reference_fields(self):
-        fields = [f for f in self.fields
-                  if f.reference and not f.reference.is_many]
+        fields = [
+            f for f in self.fields if f.reference and not f.reference.is_many
+        ]
         targets = set()
 
         for field in fields:
@@ -58,14 +60,17 @@ class CMSRecordExport:
         return list(targets)
 
     def get_many_reference_fields(self):
-        return [f for f in self.fields
-                if f.reference and f.reference.is_many]
+        return [f for f in self.fields if f.reference and f.reference.is_many]
 
 
 class CMSRecordExportField:
-
-    def __init__(self, record_type, name, label, type, format = None,
-                 reference = None):
+    def __init__(self,
+                 record_type,
+                 name,
+                 label,
+                 type,
+                 format=None,
+                 reference=None):
         self.record_type = record_type
         self.name = name
         self.label = label
@@ -75,9 +80,11 @@ class CMSRecordExportField:
 
 
 class CMSRecordReference:
-
-    def __init__(self, target_cms_record, target_fields,
-                 many_fields = False, display_mode = DISPLAY_MODE_GROUPED):
+    def __init__(self,
+                 target_cms_record,
+                 target_fields,
+                 many_fields=False,
+                 display_mode=DISPLAY_MODE_GROUPED):
         self.target_cms_record = target_cms_record
         self.target_fields = target_fields
         self.many_fields = many_fields
@@ -93,7 +100,6 @@ class CMSRecordReference:
 
 
 class CMSRecordDirectReference(CMSRecordReference):
-
     @property
     def is_many(self):
         return False
@@ -109,8 +115,12 @@ class CMSRecordBackReference(CMSRecordReference):
     source_reference: "parent"
     """
 
-    def __init__(self, source_reference, target_cms_record, target_fields,
-                 many_fields = False, display_mode = DISPLAY_MODE_GROUPED):
+    def __init__(self,
+                 source_reference,
+                 target_cms_record,
+                 target_fields,
+                 many_fields=False,
+                 display_mode=DISPLAY_MODE_GROUPED):
         super(CMSRecordBackReference, self)\
             .__init__(target_cms_record, target_fields, many_fields,
                       display_mode)
@@ -131,9 +141,13 @@ class CMSRecordAssociationReference(CMSRecordReference):
     target_reference: "parent"
     """
 
-    def __init__(self, association_record, target_reference, target_cms_record,
-                 target_fields, many_fields = False,
-                 display_mode = DISPLAY_MODE_GROUPED):
+    def __init__(self,
+                 association_record,
+                 target_reference,
+                 target_cms_record,
+                 target_fields,
+                 many_fields=False,
+                 display_mode=DISPLAY_MODE_GROUPED):
         super(CMSRecordAssociationReference, self)\
             .__init__(target_cms_record, target_fields, many_fields,
                       display_mode)
@@ -146,7 +160,6 @@ class CMSRecordAssociationReference(CMSRecordReference):
 
 
 class CMSAssociationRecord:
-
     def __init__(self, name, record_type, fields):
         self.name = name
         self.record_type = record_type
@@ -154,17 +167,18 @@ class CMSAssociationRecord:
 
 
 class CMSAssociationRecordField:
-
     def __init__(self, name, target_cms_record):
         self.name = name
         self.target_cms_record = target_cms_record
 
 
 class CMSRecordImport:
-
-    def __init__(self, record_type, name, fields,
-                 handle_duplicated_identifier = DUPLICATION_HANDLING_USE_FIRST,
-                 identifier = None):
+    def __init__(self,
+                 record_type,
+                 name,
+                 fields,
+                 handle_duplicated_identifier=DUPLICATION_HANDLING_USE_FIRST,
+                 identifier=None):
         self.record_type = record_type
         self.name = name
         self.handle_duplicated_identifier = handle_duplicated_identifier
@@ -176,9 +190,13 @@ class CMSRecordImport:
 
 
 class CMSRecordImportField:
-
-    def __init__(self, record_type, name, label, type, reference = None,
-                 handle_duplicated_reference = DUPLICATION_HANDLING_USE_FIRST):
+    def __init__(self,
+                 record_type,
+                 name,
+                 label,
+                 type,
+                 reference=None,
+                 handle_duplicated_reference=DUPLICATION_HANDLING_USE_FIRST):
         self.record_type = record_type
         self.name = name
         self.label = label
@@ -188,7 +206,6 @@ class CMSRecordImportField:
 
 
 class CMSRecordImportReference:
-
     def __init__(self, name, target_cms_record, target_field):
         self.name = name
         self.target_cms_record = target_cms_record

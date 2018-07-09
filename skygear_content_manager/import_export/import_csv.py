@@ -3,14 +3,15 @@ import uuid
 
 from skygear.error import SkygearException
 
-from .csv_deserializer import RecordDeserializer
 from ..db_session import scoped_session
-from ..skygear_utils import (save_records, fetch_records, eq_predicate,
-                             or_predicate)
-
-from ..models.cms_config import CMSRecordImport, DUPLICATION_HANDLING_USE_FIRST
 from ..models.asset import Asset
+from ..models.cms_config import DUPLICATION_HANDLING_USE_FIRST
 from ..models.imported_file import CmsImportedFile
+from ..skygear_utils import eq_predicate
+from ..skygear_utils import fetch_records
+from ..skygear_utils import or_predicate
+from ..skygear_utils import save_records
+from .csv_deserializer import RecordDeserializer
 
 
 class RecordIdentifierMap:
@@ -21,7 +22,7 @@ class RecordIdentifierMap:
     of a certain value.
     """
 
-    def __init__(self, allow_duplicate_value = True):
+    def __init__(self, allow_duplicate_value=True):
         self.backup = {}
         self.allow_duplicate_value = allow_duplicate_value
 
@@ -39,7 +40,7 @@ class RecordIdentifierMap:
             return None
 
         if len(record_ids) > 1 and not self.allow_duplicate_value:
-            raise(DuplicateIdentifierValueException(record_type, key, value))
+            raise (DuplicateIdentifierValueException(record_type, key, value))
 
         return record_ids[0]
 
@@ -62,7 +63,6 @@ class RecordIdentifierMap:
 
 
 class ImportRecordException(SkygearException):
-
     def __init__(self, record_data, underlying_error):
         message = str(underlying_error)
         super(ImportRecordException, self).__init__(message)
@@ -93,7 +93,6 @@ class ImportRecordException(SkygearException):
 
 
 class DuplicateIdentifierValueException(Exception):
-
     def __init__(self, record_type, key, value):
         message = 'duplicate identifier value for "{}.{} == {}"' \
                   .format(record_type, key, value)
@@ -101,7 +100,6 @@ class DuplicateIdentifierValueException(Exception):
 
 
 class AssetNotFoundException(Exception):
-
     def __init__(self, filename):
         message = '"{}" not found in imported file or asset'.format(filename)
         super(AssetNotFoundException, self).__init__(message)
@@ -116,11 +114,12 @@ def prepare_import_records(stream, import_config, atomic):
         data_list.append(data)
 
     identifier_map = RecordIdentifierMap()
-    if import_config.identifier != None and import_config.identifier != '_id':
-        identifier_map = create_identifier_map([r[import_config.identifier] for r in data_list],
-                                               import_config.record_type,
-                                               import_config.identifier,
-                                               import_config.handle_duplicated_identifier)
+    if import_config.identifier is not None and \
+       import_config.identifier != '_id':
+        identifier_map = create_identifier_map(
+            [r[import_config.identifier] for r in data_list],
+            import_config.record_type, import_config.identifier,
+            import_config.handle_duplicated_identifier)
 
     reference_fields = import_config.get_reference_fields()
     reference_identifier_maps = {}
@@ -133,7 +132,8 @@ def prepare_import_records(stream, import_config, atomic):
         reference_identifier_maps[reference_field.name] = m
 
     data_list = populate_record_id(data_list, import_config, identifier_map)
-    data_list = populate_record_reference(data_list, import_config, reference_identifier_maps)
+    data_list = populate_record_reference(data_list, import_config,
+                                          reference_identifier_maps)
     data_list = inject_asset(data_list, import_config)
 
     deserializer = RecordDeserializer(import_config.fields)
@@ -195,14 +195,16 @@ def import_records(records, atomic):
 
 
 def project_csv_data(row, import_config):
-    return {import_config.fields[i].name: row[i]
-            for i in range(len(import_config.fields))}
+    return {
+        import_config.fields[i].name: row[i]
+        for i in range(len(import_config.fields))
+    }
 
 
 def create_identifier_map(values, record_type, key, duplication_handling):
     identifier_map = RecordIdentifierMap(
-        allow_duplicate_value=duplication_handling == DUPLICATION_HANDLING_USE_FIRST
-    )
+        allow_duplicate_value=duplication_handling ==
+        DUPLICATION_HANDLING_USE_FIRST)
 
     records = fetch_records_by_values_in_key(record_type, key, values)
     for record in records:
@@ -210,8 +212,7 @@ def create_identifier_map(values, record_type, key, duplication_handling):
             record_type=record_type,
             key=key,
             value=record[key],
-            record_id=record['_id']
-        )
+            record_id=record['_id'])
 
     return identifier_map
 
@@ -237,8 +238,7 @@ def populate_record_reference(data_list, import_config, identifier_maps):
                     data[reference_field.name] = identifier_map.get(
                         record_type=reference.target_cms_record.record_type,
                         key=field.name,
-                        value=data[reference_field.name]
-                    )
+                        value=data[reference_field.name])
             result.append(data)
         except Exception as e:
             result.append(ImportRecordException(data, e))
@@ -258,7 +258,7 @@ def populate_record_id(data_list, import_config, identifier_map):
             result.append(data)
             continue
 
-        if import_config.identifier == None:
+        if import_config.identifier is None:
             """
             Always create new record if identifier not specified
             """
@@ -276,8 +276,7 @@ def populate_record_id(data_list, import_config, identifier_map):
             data['_id'] = identifier_map.get(
                 record_type=record_type,
                 key=import_config.identifier,
-                value=data[import_config.identifier]
-            )
+                value=data[import_config.identifier])
             result.append(data)
         except Exception as e:
             result.append(ImportRecordException(data, e))
@@ -324,7 +323,8 @@ def inject_asset(data_list, import_config):
         for asset in assets:
             assets_map[asset.id] = asset
 
-        return replace_assets_in_record_data(data_list, asset_fields, assets_map)
+        return replace_assets_in_record_data(data_list, asset_fields,
+                                             assets_map)
 
 
 def find_files_in_record_data(data_list, fields):
@@ -343,7 +343,7 @@ def replace_assets_in_record_data(data_list, fields, file_assets):
             for field in fields:
                 file_id = data[field.name]
                 asset = file_assets.get(file_id)
-                if asset == None:
+                if asset is None:
                     raise AssetNotFoundException(file_id)
 
                 data[field.name] = asset.id

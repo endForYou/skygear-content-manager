@@ -1,7 +1,12 @@
-from marshmallow import Schema, fields, pre_load, post_load
+from marshmallow import Schema
+from marshmallow import fields
+from marshmallow import post_load
+from marshmallow import pre_load
 
+from ..models.skygear_schema import SkygearField
+from ..models.skygear_schema import SkygearRecord
+from ..models.skygear_schema import SkygearSchema
 from .nested_dict import NestedDict
-from ..models.skygear_schema import SkygearSchema, SkygearRecord, SkygearField
 
 
 class SkygearSchemaSchema(Schema):
