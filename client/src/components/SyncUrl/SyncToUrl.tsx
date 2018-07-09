@@ -5,7 +5,7 @@ import { push } from 'react-router-redux';
 import { Dispatch } from 'redux';
 
 import { RootState } from '../../states';
-import { shallowCompare } from '../../util';
+import { debounce, shallowCompare } from '../../util';
 
 interface SearchParams {
   [key: string]: string;
@@ -15,6 +15,7 @@ interface SyncToUrlProps {
   value: SearchParams;
   location: Location;
   dispatch: Dispatch<RootState>;
+  debounced?: number;
 }
 
 interface SyncToUrlState {
@@ -30,18 +31,17 @@ export class SyncToUrl extends React.PureComponent<
     this.state = {
       value: props.value,
     };
+
+    if (props.debounced) {
+      this.updateUrl = debounce(this.updateUrl, props.debounced);
+    }
   }
 
   public componentWillReceiveProps(nextProps: SyncToUrlProps) {
     if (!shallowCompare(this.state.value, nextProps.value)) {
-      this.setState({ value: nextProps.value }, () => {
-        const search = this.mergeLocationSearch(
-          nextProps.location,
-          nextProps.searchKeys,
-          nextProps.value
-        );
-        this.props.dispatch(push({ search: qs.stringify(search) }));
-      });
+      this.setState({ value: nextProps.value }, () =>
+        this.updateUrl(nextProps)
+      );
     }
   }
 
@@ -64,4 +64,13 @@ export class SyncToUrl extends React.PureComponent<
       return acc;
     }, search);
   }
+
+  private updateUrl = (props: SyncToUrlProps) => {
+    const search = this.mergeLocationSearch(
+      props.location,
+      props.searchKeys,
+      props.value
+    );
+    this.props.dispatch(push({ search: qs.stringify(search) }));
+  };
 }

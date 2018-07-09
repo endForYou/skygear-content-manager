@@ -12,6 +12,7 @@ import {
   FilterConfig,
   filterFactory,
   FilterType,
+  isFilterListEqual,
 } from '../../cmsConfig';
 import { RootState } from '../../states';
 import { Omit } from '../../typeutil';
@@ -123,16 +124,18 @@ export function syncFilterWithUrl<P extends InjectedProps>(
           searchKeys={['filter']}
           location={location}
           dispatch={dispatch}
+          debounced={300}
         />,
         <SearchParamsObserver
           key="seach-params-observer"
           location={location}
           searchKeys={['filter']}
           onChange={(oldValue, newValue) => {
-            const newFilterString = newValue.filter || '[]';
-            this.onFilterChange(
-              urlStringToFilter(newFilterString, filterConfigs)
-            );
+            const newFilterStr = newValue.filter || '[]';
+            const newFilters = urlStringToFilter(newFilterStr, filterConfigs);
+            if (!isFilterListEqual(this.state.filters, newFilters)) {
+              this.onFilterChange(newFilters);
+            }
           }}
         />,
         <WrappedComponent

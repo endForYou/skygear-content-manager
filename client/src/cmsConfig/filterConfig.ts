@@ -364,3 +364,53 @@ export function filterFactory(filterConfig: FilterConfig): Filter {
       throw new Error(`unsupported FilterConfigTypes in filterFactory`);
   }
 }
+
+export function isFilterEqual(f1: Filter, f2: Filter): boolean {
+  // skip checking id
+  const { id: id1, ...f1Value } = f1;
+  const { id: id2, ...f2Value } = f2;
+
+  const keys1 = Object.keys(f1Value);
+  const keys2 = Object.keys(f2Value);
+
+  if (keys1.length !== keys2.length) {
+    return false;
+  }
+
+  const sortedKeys1 = keys1.sort();
+  const sortedKeys2 = keys2.sort();
+
+  for (let j = 0; j < sortedKeys1.length; j++) {
+    const k1 = sortedKeys1[j];
+    const k2 = sortedKeys2[j];
+
+    if (k1 !== k2 || typeof f1Value[k1] !== typeof f2Value[k1]) {
+      return false;
+    }
+
+    if (typeof f1Value[k1] === 'object') {
+      // no deep equal for object
+      if (JSON.stringify(f1Value[k1]) !== JSON.stringify(f2Value[k1])) {
+        return false;
+      }
+    } else if (f1Value[k1] !== f2Value[k1]) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+export function isFilterListEqual(f1: Filter[], f2: Filter[]): boolean {
+  if (f1.length !== f2.length) {
+    return false;
+  }
+
+  for (let i = 0; i < f1.length; i++) {
+    if (!isFilterEqual(f1[i], f2[i])) {
+      return false;
+    }
+  }
+
+  return true;
+}
