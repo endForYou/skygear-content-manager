@@ -20,6 +20,7 @@ import {
   DateTimeFilter,
   DateTimeFilterQueryType,
   EmbeddedBackReferenceListFieldConfig,
+  EmbeddedReferenceListFieldConfig,
   FieldConfigTypes,
   Filter,
   FilterType,
@@ -766,14 +767,14 @@ function fetchEmbeddedRecordData(
   sources: Record[],
   references: ReferenceFieldConfig[]
 ) {
-  const embeddedBackRefs = references
-    .filter(r => r.type === FieldConfigTypes.EmbeddedReferenceList)
-    .filter(r => r.reference.type === ReferenceTypes.ViaBackReference);
+  const embeddedRefs = references.filter(
+    r => r.type === FieldConfigTypes.EmbeddedReferenceList
+  );
 
   // TODO (Steven-Chan):
-  // Handle EmbeddedReference for one-to-one and many-to-many
-  const nextLevelQueries = embeddedBackRefs.map(f => {
-    const field = f as EmbeddedBackReferenceListFieldConfig;
+  // Handle EmbeddedReference for one-to-one
+  const nextLevelQueries = embeddedRefs.map(f => {
+    const field = f as EmbeddedReferenceListFieldConfig;
     const ref = field.reference;
 
     // const isSingleEmbeddedRef = ref.type === FieldConfigTypes.Reference;
@@ -787,7 +788,12 @@ function fetchEmbeddedRecordData(
       }
     });
 
-    const recordCls = Record.extend(ref.targetCmsRecord.recordType);
+    const targetCmsRecord =
+      ref.type === ReferenceTypes.ViaAssociationRecord
+        ? ref.targetReference.reference.targetCmsRecord
+        : ref.targetCmsRecord;
+    const recordCls = Record.extend(targetCmsRecord.recordType);
+
     const nextLevelQuery = new Query(recordCls);
     nextLevelQuery.contains('_id', ids);
     nextLevelQuery.limit = ids.length;
