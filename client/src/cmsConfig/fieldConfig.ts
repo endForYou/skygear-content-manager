@@ -287,6 +287,11 @@ export interface EmbeddedBackReferenceListFieldConfig
   reference: ReferenceViaBackReference;
 }
 
+export interface EmbeddedAssociationReferenceListFieldConfig
+  extends EmbeddedReferenceListFieldConfig {
+  reference: ReferenceViaAssociationRecord;
+}
+
 export interface ImageDisplayFieldConfig extends FieldConfigAttrs {
   type: FieldConfigTypes.ImageDisplay;
   config?: any; // tslint:disable-line: no-any
@@ -684,13 +689,6 @@ function parseEmbeddedReferenceListFieldConfig(
   context: ConfigContext,
   input: FieldConfigInput
 ): EmbeddedReferenceListFieldConfig {
-  // TODO: support association record
-  if (input.reference_via_association_record) {
-    throw new Error(
-      'Only reference_via_back_reference is supported now in EmbeddedReferenceList'
-    );
-  }
-
   if (!isArray(input.reference_fields)) {
     throw new Error('Expect reference_fields to be array of fields');
   }

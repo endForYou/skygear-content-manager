@@ -43,12 +43,8 @@ test('parseCmsConfig should parse example config', () => {
         ],
       },
     },
-    defaultSettings: {
-      timezone: 'Asia/Hong_Kong',
-    },
-    fileImport: {
-      enabled: true,
-    },
+    defaultSettings: { timezone: 'Asia/Hong_Kong' },
+    fileImport: { enabled: true },
     pushNotifications: {
       enabled: true,
       filterUserConfigs: [
@@ -203,6 +199,99 @@ test('parseCmsConfig should parse example config', () => {
             },
             {
               compact: false,
+              name: 'asso_refs_embedded',
+              label: 'Asso refs embedded',
+              editable: true,
+              displayFields: [
+                {
+                  compact: false,
+                  label: 'ID',
+                  name: '_id',
+                  type: 'TextDisplay',
+                },
+                {
+                  compact: false,
+                  name: 'name',
+                  label: 'Name',
+                  editable: true,
+                  type: 'TextInput',
+                },
+              ],
+              reference: {
+                associationRecordConfig: {
+                  cmsRecord: {
+                    name: 'field_asso_ref',
+                    recordType: 'field_asso_ref',
+                  },
+                  referenceConfigPair: [
+                    {
+                      compact: false,
+                      name: 'field_demo',
+                      label: 'Field demo',
+                      displayFieldName: '_id',
+                      reference: {
+                        targetCmsRecord: {
+                          name: 'field_demo',
+                          recordType: 'field_demo',
+                        },
+                        type: 'DirectReference',
+                      },
+                      type: 'Reference',
+                    },
+                    {
+                      compact: false,
+                      name: 'asso_ref_demo',
+                      label: 'Asso ref demo',
+                      displayFieldName: '_id',
+                      reference: {
+                        targetCmsRecord: {
+                          name: 'asso_ref_demo',
+                          recordType: 'asso_ref_demo',
+                        },
+                        type: 'DirectReference',
+                      },
+                      type: 'Reference',
+                    },
+                  ],
+                },
+                sourceReference: {
+                  compact: false,
+                  name: 'field_demo',
+                  label: 'Field demo',
+                  displayFieldName: '_id',
+                  reference: {
+                    targetCmsRecord: {
+                      name: 'field_demo',
+                      recordType: 'field_demo',
+                    },
+                    type: 'DirectReference',
+                  },
+                  type: 'Reference',
+                },
+                targetReference: {
+                  compact: false,
+                  name: 'asso_ref_demo',
+                  label: 'Asso ref demo',
+                  displayFieldName: '_id',
+                  reference: {
+                    targetCmsRecord: {
+                      name: 'asso_ref_demo',
+                      recordType: 'asso_ref_demo',
+                    },
+                    type: 'DirectReference',
+                  },
+                  type: 'Reference',
+                },
+                type: 'ViaAssociationRecord',
+              },
+              referenceDeleteAction: 'NullifyReference',
+              references: [],
+              reorderEnabled: false,
+              sortOrder: 'Asc',
+              type: 'EmbeddedReferenceList',
+            },
+            {
+              compact: false,
               name: 'imageasset',
               label: 'Imageasset',
               editable: true,
@@ -285,6 +374,99 @@ test('parseCmsConfig should parse example config', () => {
                   recordType: 'back_ref_demo',
                 },
                 type: 'ViaBackReference',
+              },
+              referenceDeleteAction: 'NullifyReference',
+              references: [],
+              reorderEnabled: false,
+              sortOrder: 'Asc',
+              type: 'EmbeddedReferenceList',
+            },
+            {
+              compact: false,
+              name: 'asso_refs_embedded',
+              label: 'Asso refs embedded',
+              editable: true,
+              displayFields: [
+                {
+                  compact: false,
+                  label: 'ID',
+                  name: '_id',
+                  type: 'TextDisplay',
+                },
+                {
+                  compact: false,
+                  name: 'name',
+                  label: 'Name',
+                  editable: true,
+                  type: 'TextInput',
+                },
+              ],
+              reference: {
+                associationRecordConfig: {
+                  cmsRecord: {
+                    name: 'field_asso_ref',
+                    recordType: 'field_asso_ref',
+                  },
+                  referenceConfigPair: [
+                    {
+                      compact: false,
+                      name: 'field_demo',
+                      label: 'Field demo',
+                      displayFieldName: '_id',
+                      reference: {
+                        targetCmsRecord: {
+                          name: 'field_demo',
+                          recordType: 'field_demo',
+                        },
+                        type: 'DirectReference',
+                      },
+                      type: 'Reference',
+                    },
+                    {
+                      compact: false,
+                      name: 'asso_ref_demo',
+                      label: 'Asso ref demo',
+                      displayFieldName: '_id',
+                      reference: {
+                        targetCmsRecord: {
+                          name: 'asso_ref_demo',
+                          recordType: 'asso_ref_demo',
+                        },
+                        type: 'DirectReference',
+                      },
+                      type: 'Reference',
+                    },
+                  ],
+                },
+                sourceReference: {
+                  compact: false,
+                  name: 'field_demo',
+                  label: 'Field demo',
+                  displayFieldName: '_id',
+                  reference: {
+                    targetCmsRecord: {
+                      name: 'field_demo',
+                      recordType: 'field_demo',
+                    },
+                    type: 'DirectReference',
+                  },
+                  type: 'Reference',
+                },
+                targetReference: {
+                  compact: false,
+                  name: 'asso_ref_demo',
+                  label: 'Asso ref demo',
+                  displayFieldName: '_id',
+                  reference: {
+                    targetCmsRecord: {
+                      name: 'asso_ref_demo',
+                      recordType: 'asso_ref_demo',
+                    },
+                    type: 'DirectReference',
+                  },
+                  type: 'Reference',
+                },
+                type: 'ViaAssociationRecord',
               },
               referenceDeleteAction: 'NullifyReference',
               references: [],
@@ -668,6 +850,99 @@ test('parseCmsConfig should parse example config', () => {
             },
             {
               compact: false,
+              name: 'asso_refs_embedded',
+              label: 'Asso refs embedded',
+              editable: true,
+              displayFields: [
+                {
+                  compact: false,
+                  label: 'ID',
+                  name: '_id',
+                  type: 'TextDisplay',
+                },
+                {
+                  compact: false,
+                  name: 'name',
+                  label: 'Name',
+                  editable: true,
+                  type: 'TextInput',
+                },
+              ],
+              reference: {
+                associationRecordConfig: {
+                  cmsRecord: {
+                    name: 'field_asso_ref',
+                    recordType: 'field_asso_ref',
+                  },
+                  referenceConfigPair: [
+                    {
+                      compact: false,
+                      name: 'field_demo',
+                      label: 'Field demo',
+                      displayFieldName: '_id',
+                      reference: {
+                        targetCmsRecord: {
+                          name: 'field_demo',
+                          recordType: 'field_demo',
+                        },
+                        type: 'DirectReference',
+                      },
+                      type: 'Reference',
+                    },
+                    {
+                      compact: false,
+                      name: 'asso_ref_demo',
+                      label: 'Asso ref demo',
+                      displayFieldName: '_id',
+                      reference: {
+                        targetCmsRecord: {
+                          name: 'asso_ref_demo',
+                          recordType: 'asso_ref_demo',
+                        },
+                        type: 'DirectReference',
+                      },
+                      type: 'Reference',
+                    },
+                  ],
+                },
+                sourceReference: {
+                  compact: false,
+                  name: 'field_demo',
+                  label: 'Field demo',
+                  displayFieldName: '_id',
+                  reference: {
+                    targetCmsRecord: {
+                      name: 'field_demo',
+                      recordType: 'field_demo',
+                    },
+                    type: 'DirectReference',
+                  },
+                  type: 'Reference',
+                },
+                targetReference: {
+                  compact: false,
+                  name: 'asso_ref_demo',
+                  label: 'Asso ref demo',
+                  displayFieldName: '_id',
+                  reference: {
+                    targetCmsRecord: {
+                      name: 'asso_ref_demo',
+                      recordType: 'asso_ref_demo',
+                    },
+                    type: 'DirectReference',
+                  },
+                  type: 'Reference',
+                },
+                type: 'ViaAssociationRecord',
+              },
+              referenceDeleteAction: 'NullifyReference',
+              references: [],
+              reorderEnabled: false,
+              sortOrder: 'Asc',
+              type: 'EmbeddedReferenceList',
+            },
+            {
+              compact: false,
               name: 'imageasset',
               label: 'Imageasset',
               editable: true,
@@ -750,6 +1025,99 @@ test('parseCmsConfig should parse example config', () => {
                   recordType: 'back_ref_demo',
                 },
                 type: 'ViaBackReference',
+              },
+              referenceDeleteAction: 'NullifyReference',
+              references: [],
+              reorderEnabled: false,
+              sortOrder: 'Asc',
+              type: 'EmbeddedReferenceList',
+            },
+            {
+              compact: false,
+              name: 'asso_refs_embedded',
+              label: 'Asso refs embedded',
+              editable: true,
+              displayFields: [
+                {
+                  compact: false,
+                  label: 'ID',
+                  name: '_id',
+                  type: 'TextDisplay',
+                },
+                {
+                  compact: false,
+                  name: 'name',
+                  label: 'Name',
+                  editable: true,
+                  type: 'TextInput',
+                },
+              ],
+              reference: {
+                associationRecordConfig: {
+                  cmsRecord: {
+                    name: 'field_asso_ref',
+                    recordType: 'field_asso_ref',
+                  },
+                  referenceConfigPair: [
+                    {
+                      compact: false,
+                      name: 'field_demo',
+                      label: 'Field demo',
+                      displayFieldName: '_id',
+                      reference: {
+                        targetCmsRecord: {
+                          name: 'field_demo',
+                          recordType: 'field_demo',
+                        },
+                        type: 'DirectReference',
+                      },
+                      type: 'Reference',
+                    },
+                    {
+                      compact: false,
+                      name: 'asso_ref_demo',
+                      label: 'Asso ref demo',
+                      displayFieldName: '_id',
+                      reference: {
+                        targetCmsRecord: {
+                          name: 'asso_ref_demo',
+                          recordType: 'asso_ref_demo',
+                        },
+                        type: 'DirectReference',
+                      },
+                      type: 'Reference',
+                    },
+                  ],
+                },
+                sourceReference: {
+                  compact: false,
+                  name: 'field_demo',
+                  label: 'Field demo',
+                  displayFieldName: '_id',
+                  reference: {
+                    targetCmsRecord: {
+                      name: 'field_demo',
+                      recordType: 'field_demo',
+                    },
+                    type: 'DirectReference',
+                  },
+                  type: 'Reference',
+                },
+                targetReference: {
+                  compact: false,
+                  name: 'asso_ref_demo',
+                  label: 'Asso ref demo',
+                  displayFieldName: '_id',
+                  reference: {
+                    targetCmsRecord: {
+                      name: 'asso_ref_demo',
+                      recordType: 'asso_ref_demo',
+                    },
+                    type: 'DirectReference',
+                  },
+                  type: 'Reference',
+                },
+                type: 'ViaAssociationRecord',
               },
               referenceDeleteAction: 'NullifyReference',
               references: [],
@@ -967,6 +1335,97 @@ test('parseCmsConfig should parse example config', () => {
             },
             {
               compact: false,
+              name: 'asso_refs_embedded',
+              label: 'Asso refs embedded',
+              displayFields: [
+                {
+                  compact: false,
+                  label: 'ID',
+                  name: '_id',
+                  type: 'TextDisplay',
+                },
+                {
+                  compact: false,
+                  name: 'name',
+                  label: 'Name',
+                  type: 'TextDisplay',
+                },
+              ],
+              reference: {
+                associationRecordConfig: {
+                  cmsRecord: {
+                    name: 'field_asso_ref',
+                    recordType: 'field_asso_ref',
+                  },
+                  referenceConfigPair: [
+                    {
+                      compact: false,
+                      name: 'field_demo',
+                      label: 'Field demo',
+                      displayFieldName: '_id',
+                      reference: {
+                        targetCmsRecord: {
+                          name: 'field_demo',
+                          recordType: 'field_demo',
+                        },
+                        type: 'DirectReference',
+                      },
+                      type: 'Reference',
+                    },
+                    {
+                      compact: false,
+                      name: 'asso_ref_demo',
+                      label: 'Asso ref demo',
+                      displayFieldName: '_id',
+                      reference: {
+                        targetCmsRecord: {
+                          name: 'asso_ref_demo',
+                          recordType: 'asso_ref_demo',
+                        },
+                        type: 'DirectReference',
+                      },
+                      type: 'Reference',
+                    },
+                  ],
+                },
+                sourceReference: {
+                  compact: false,
+                  name: 'field_demo',
+                  label: 'Field demo',
+                  displayFieldName: '_id',
+                  reference: {
+                    targetCmsRecord: {
+                      name: 'field_demo',
+                      recordType: 'field_demo',
+                    },
+                    type: 'DirectReference',
+                  },
+                  type: 'Reference',
+                },
+                targetReference: {
+                  compact: false,
+                  name: 'asso_ref_demo',
+                  label: 'Asso ref demo',
+                  displayFieldName: '_id',
+                  reference: {
+                    targetCmsRecord: {
+                      name: 'asso_ref_demo',
+                      recordType: 'asso_ref_demo',
+                    },
+                    type: 'DirectReference',
+                  },
+                  type: 'Reference',
+                },
+                type: 'ViaAssociationRecord',
+              },
+              referenceDeleteAction: 'NullifyReference',
+              references: [],
+              reorderEnabled: false,
+              sortOrder: 'Asc',
+              type: 'EmbeddedReferenceList',
+            },
+            {
+              compact: false,
               name: 'imageasset',
               label: 'Imageasset',
               type: 'ImageDisplay',
@@ -1117,6 +1576,97 @@ test('parseCmsConfig should parse example config', () => {
               references: [],
               reorderEnabled: false,
               sortOrder: 'Desc',
+              type: 'EmbeddedReferenceList',
+            },
+            {
+              compact: false,
+              name: 'asso_refs_embedded',
+              label: 'Asso refs embedded',
+              displayFields: [
+                {
+                  compact: false,
+                  label: 'ID',
+                  name: '_id',
+                  type: 'TextDisplay',
+                },
+                {
+                  compact: false,
+                  name: 'name',
+                  label: 'Name',
+                  type: 'TextDisplay',
+                },
+              ],
+              reference: {
+                associationRecordConfig: {
+                  cmsRecord: {
+                    name: 'field_asso_ref',
+                    recordType: 'field_asso_ref',
+                  },
+                  referenceConfigPair: [
+                    {
+                      compact: false,
+                      name: 'field_demo',
+                      label: 'Field demo',
+                      displayFieldName: '_id',
+                      reference: {
+                        targetCmsRecord: {
+                          name: 'field_demo',
+                          recordType: 'field_demo',
+                        },
+                        type: 'DirectReference',
+                      },
+                      type: 'Reference',
+                    },
+                    {
+                      compact: false,
+                      name: 'asso_ref_demo',
+                      label: 'Asso ref demo',
+                      displayFieldName: '_id',
+                      reference: {
+                        targetCmsRecord: {
+                          name: 'asso_ref_demo',
+                          recordType: 'asso_ref_demo',
+                        },
+                        type: 'DirectReference',
+                      },
+                      type: 'Reference',
+                    },
+                  ],
+                },
+                sourceReference: {
+                  compact: false,
+                  name: 'field_demo',
+                  label: 'Field demo',
+                  displayFieldName: '_id',
+                  reference: {
+                    targetCmsRecord: {
+                      name: 'field_demo',
+                      recordType: 'field_demo',
+                    },
+                    type: 'DirectReference',
+                  },
+                  type: 'Reference',
+                },
+                targetReference: {
+                  compact: false,
+                  name: 'asso_ref_demo',
+                  label: 'Asso ref demo',
+                  displayFieldName: '_id',
+                  reference: {
+                    targetCmsRecord: {
+                      name: 'asso_ref_demo',
+                      recordType: 'asso_ref_demo',
+                    },
+                    type: 'DirectReference',
+                  },
+                  type: 'Reference',
+                },
+                type: 'ViaAssociationRecord',
+              },
+              referenceDeleteAction: 'NullifyReference',
+              references: [],
+              reorderEnabled: false,
+              sortOrder: 'Asc',
               type: 'EmbeddedReferenceList',
             },
           ],
