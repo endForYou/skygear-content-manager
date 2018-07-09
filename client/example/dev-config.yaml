@@ -354,6 +354,14 @@ records:
         - name: name
           label: Name
           type: String
+    show:
+      fields:
+        - name: _id
+        - name: _created_at
+        - name: _updated_at
+        - name: name
+          label: Name
+          type: String
   ref_demo:
     show:
       fields:
