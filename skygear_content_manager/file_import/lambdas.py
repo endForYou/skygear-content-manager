@@ -1,14 +1,12 @@
 import skygear
-from sqlalchemy import not_
-from sqlalchemy.exc import IntegrityError
-
-from marshmallow import Schema, fields
+from marshmallow import Schema
+from marshmallow import fields
 from skygear.asset import get_signer
-
-from ..models.asset import Asset
-from ..models.imported_file import CmsImportedFile
+from sqlalchemy import not_
 
 from ..db_session import scoped_session
+from ..models.asset import Asset
+from ..models.imported_file import CmsImportedFile
 from ..skygear_utils import validate_master_user
 
 PAGE_SIZE = 25
@@ -57,7 +55,6 @@ def register_lambda(settings):
                 'importedFiles': files,
                 'totalCount': total_count,
             }
-
 
     @skygear.op("imported_file:create", user_required=True)
     def create_imported_file(**kwargs):
@@ -144,7 +141,7 @@ def ensure_unique_file_name(session, files):
 
 
 class DuplicatedFileException(Exception):
-
     def __init__(self, duplicated_names):
-        message = 'File name ({}) existed already.'.format(', '.join(duplicated_names))
+        message = 'File name ({}) existed already.'.format(
+            ', '.join(duplicated_names))
         super(DuplicatedFileException, self).__init__(message)

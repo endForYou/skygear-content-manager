@@ -16,6 +16,7 @@ class NestedDict(fields.Nested):
         for key, item in value.items():
             item[self.key] = key
             raw_list.append(item)
-        nested_list = super(NestedDict, self)._deserialize(raw_list, attr, data)
+        nested_list = super(NestedDict, self)._deserialize(
+            raw_list, attr, data)
         nested_dict = {getattr(item, self.key): item for item in nested_list}
         return nested_dict

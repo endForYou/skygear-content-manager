@@ -1,10 +1,8 @@
-import arrow
 import json
 
-from ..models.cms_config import (CMSRecordReference,
-                                 CMSRecordBackReference,
-                                 CMSRecordAssociationReference,
-                                 DISPLAY_MODE_GROUPED)
+import arrow
+
+from ..models.cms_config import DISPLAY_MODE_GROUPED
 
 
 # TODO (Steven-Chan):
@@ -35,15 +33,13 @@ class RecordSerializer:
                 if not field_config.reference:
                     continue
 
-                key = field_config.name
                 field_counts[i] = len(field_config.reference.target_fields)
                 if field_config.reference.is_many:
                     record_counts[i] = max(len(data[i]), record_counts[i])
 
         for i in range(0, len(self.field_configs)):
-            self.serializers[i] = FieldSerializer(self.field_configs[i],
-                                                  field_counts[i],
-                                                  record_counts[i])
+            self.serializers[i] = FieldSerializer(
+                self.field_configs[i], field_counts[i], record_counts[i])
 
     def serialize(self, csv_data):
         result = []
@@ -64,39 +60,43 @@ class FieldSerializer:
     def __init__(self, field_config, field_count, record_count):
         serializer = None
         if not field_config.reference:
-            serializer = self.get_serializer(field_config.type, field_config.format)
+            serializer = self.get_serializer(field_config.type,
+                                             field_config.format)
         else:
             # TODO (Steven-Chan):
             # DISPLAY_MODE_GROUPED now only supports single field
             if field_config.reference.display_mode == DISPLAY_MODE_GROUPED:
-                serializer = ListSerializer(multiple_data=field_config.reference.is_many)
+                serializer = ListSerializer(
+                    multiple_data=field_config.reference.is_many)
                 target_field = field_config.reference.target_fields[0]
                 # Does not support nested reference
-                serializer.field_serializer = FieldSerializer(target_field, 1, 1)
+                serializer.field_serializer = FieldSerializer(
+                    target_field, 1, 1)
             else:
                 serializer = SpreadListSerializer(
                     multiple_data=field_config.reference.is_many,
                     field_count=field_count,
-                    record_count=record_count
-                )
+                    record_count=record_count)
                 target_fields = field_config.reference.target_fields
                 # Does not support nested reference
-                serializer.field_serializers = [FieldSerializer(field, 1, 1) for field in target_fields]
+                serializer.field_serializers = [
+                    FieldSerializer(field, 1, 1) for field in target_fields
+                ]
 
         if not serializer:
             field_name = field_config.name \
                          if not field_config.reference \
                          else field_config.reference.field_name
 
-            raise Exception((
-                'field "{}" has unsupported field type "{}"'
-            ).format(field_name, field_config.type))
+            raise Exception(
+                ('field "{}" has unsupported field type "{}"').format(
+                    field_name, field_config.type))
 
         self.field_config = field_config
         self.value_serializer = serializer
 
     def serialize(self, value):
-        if value == None:
+        if value is None:
             return ['']
 
         serialized_value = self.value_serializer.serialize(value)
@@ -150,8 +150,8 @@ class SpreadListSerializer(BaseValueSerializer):
     """
     Return a list of value, each occupies a column
     """
-    def __init__(self, multiple_data = False, field_count = -1,
-                 record_count = -1):
+
+    def __init__(self, multiple_data=False, field_count=-1, record_count=-1):
         super().__init__()
         self.multiple_data = multiple_data
         self.field_count = field_count
@@ -185,8 +185,7 @@ class SpreadListSerializer(BaseValueSerializer):
 
 
 class ListSerializer(BaseValueSerializer):
-
-    def __init__(self, multiple_data = False):
+    def __init__(self, multiple_data=False):
         super().__init__()
         self.multiple_data = multiple_data
 
@@ -196,7 +195,9 @@ class ListSerializer(BaseValueSerializer):
 
         flattened_value = [v[0] for v in value]
         # Now assume that only single-column value in serialized value
-        result = [self.field_serializer.serialize(v)[0] for v in flattened_value]
+        result = [
+            self.field_serializer.serialize(v)[0] for v in flattened_value
+        ]
         result = [v.replace("'", "\\'") for v in result]
         result = ["'" + v + "'" for v in result]
         result = ','.join(result)
@@ -204,13 +205,11 @@ class ListSerializer(BaseValueSerializer):
 
 
 class StringSerializer(BaseValueSerializer):
-
     def serialize(self, value):
         return str(value)
 
 
 class BooleanSerializer(BaseValueSerializer):
-
     def __init__(self, format):
         super().__init__(format)
 
@@ -251,19 +250,16 @@ class BooleanSerializer(BaseValueSerializer):
 
 
 class JSONSerializer(BaseValueSerializer):
-
     def serialize(self, value):
         return json.dumps(value)
 
 
 class LocationSerializer(BaseValueSerializer):
-
     def serialize(self, value):
         return '(' + str(value['$lat']) + ',' + str(value['$lng']) + ')'
 
 
 class DatetimeSerializer(BaseValueSerializer):
-
     @property
     def default_format(self):
         return 'YYYY-MM-DDTHH:MM:SS.mmmmmm'
@@ -274,6 +270,5 @@ class DatetimeSerializer(BaseValueSerializer):
 
 
 class AssetSerializer(BaseValueSerializer):
-
     def serialize(self, value):
         return value['$name']

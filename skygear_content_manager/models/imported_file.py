@@ -1,5 +1,9 @@
 from datetime import datetime
-from sqlalchemy import Column, Text, DateTime, ForeignKey
+
+from sqlalchemy import Column
+from sqlalchemy import DateTime
+from sqlalchemy import ForeignKey
+from sqlalchemy import Text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
@@ -16,14 +20,10 @@ class CmsImportedFile(Base):
 
     asset = relationship(Asset)
 
-
     def __init__(self, id, asset_id):
         self.id = id
         self.asset_id = asset_id
 
     @classmethod
     def from_dict(cls, dict):
-        return CmsImportedFile(
-            id=dict['id'],
-            asset_id=dict['asset']
-        )
+        return CmsImportedFile(id=dict['id'], asset_id=dict['asset'])

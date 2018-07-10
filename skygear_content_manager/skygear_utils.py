@@ -1,15 +1,16 @@
 import json
+
 import requests
 import skygear
-
-from jose import JWTError, jwt
-from skygear.error import \
-    AccessTokenNotAccepted, PermissionDenied, SkygearException
+from jose import JWTError
+from jose import jwt
+from skygear.error import AccessTokenNotAccepted
+from skygear.error import PermissionDenied
+from skygear.error import SkygearException
 from skygear.options import options
 from skygear.utils.context import current_context
 
 from .settings import CMS_AUTH_SECRET
-
 
 REQUEST_HEADER_BLACKLIST = [
     'Host',
@@ -24,7 +25,6 @@ RESPONSE_HEADER_BLACKLIST = [
 
 
 class SkygearRequest:
-
     def __init__(self, method, headers, body):
         self.method = method
         self.headers = headers
@@ -38,7 +38,8 @@ class SkygearRequest:
         return cls(
             method=req.method,
             body=Body(req.data),
-            headers={k: v for k, v in req.headers},
+            headers={k: v
+                     for k, v in req.headers},
         )
 
     @property
@@ -182,11 +183,8 @@ class SkygearResponse:
         if self.error_code:
             return SkygearResponse.error_werkzeug(self.error_code)
 
-        filtered_headers = [
-            (k, v)
-            for k, v in self.headers.items()
-            if k not in RESPONSE_HEADER_BLACKLIST
-        ]
+        filtered_headers = [(k, v) for k, v in self.headers.items()
+                            if k not in RESPONSE_HEADER_BLACKLIST]
 
         return skygear.Response(
             response=self.body.to_data(),
@@ -239,7 +237,6 @@ class Body:
 
 
 class AuthData:
-
     def __init__(self, is_admin, skygear_token):
         self.is_admin = is_admin
         self.skygear_token = skygear_token
@@ -257,15 +254,17 @@ class AuthData:
 
         return cls(
             is_admin=authdict.get('is_admin', False),
-            skygear_token=authdict.get('skygear_access_token', None)
-        )
+            skygear_token=authdict.get('skygear_access_token', None))
 
     def to_cms_token(self):
-        return jwt.encode({
-            'iss': 'skygear-content-manager',
-            'skygear_access_token': self.skygear_token,
-            'is_admin': self.is_admin,
-        }, CMS_AUTH_SECRET, algorithm='HS256')
+        return jwt.encode(
+            {
+                'iss': 'skygear-content-manager',
+                'skygear_access_token': self.skygear_token,
+                'is_admin': self.is_admin,
+            },
+            CMS_AUTH_SECRET,
+            algorithm='HS256')
 
 
 # req: SkygearRequest
@@ -292,22 +291,30 @@ def get_schema():
     return resp.body.data['result']
 
 
-def save_records(records, database_id = '_public', atomic = False):
-    resp = request_skygear_api('record:save', data={
-        'database_id': database_id,
-        'records': records,
-        'atomic': atomic,
-    })
+def save_records(records, database_id='_public', atomic=False):
+    resp = request_skygear_api(
+        'record:save',
+        data={
+            'database_id': database_id,
+            'records': records,
+            'atomic': atomic,
+        })
     return resp.body.data['result']
 
 
-def fetch_records(record_type, predicate = None, includes = []):
-    resp = request_skygear_api('record:query', data={
-        'record_type': record_type,
-        'database_id': '_union',
-        'include': {i: {'$type': 'keypath', '$val': i} for i in includes},
-        'predicate': predicate,
-    })
+def fetch_records(record_type, predicate=None, includes=[]):
+    resp = request_skygear_api(
+        'record:query',
+        data={
+            'record_type': record_type,
+            'database_id': '_union',
+            'include': {i: {
+                '$type': 'keypath',
+                '$val': i
+            }
+                        for i in includes},
+            'predicate': predicate,
+        })
     return resp.body.data['result']
 
 

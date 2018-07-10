@@ -1,8 +1,8 @@
 import csv
 
-from .csv_serializer import SpreadListSerializer
 from ..models.cms_config import DISPLAY_MODE_GROUPED
 from ..werkzeug_utils import prepare_file_response
+from .csv_serializer import SpreadListSerializer
 
 
 def render_header(stream, export_config, record_serializer):
@@ -19,19 +19,25 @@ def render_header(stream, export_config, record_serializer):
             continue
 
         if not field.reference.is_many:
-            column_names = column_names + [ref_field.label for ref_field in field.reference.target_fields]
+            column_names = column_names + [
+                ref_field.label for ref_field in field.reference.target_fields
+            ]
             continue
 
         # handle many records with many fields
         serializer = field_serializers[i].value_serializer
         if not isinstance(serializer, SpreadListSerializer):
-            raise Exception('Unexpected serializer for field {}'.format(field.name))
+            raise Exception('Unexpected serializer for field {}'.format(
+                field.name))
 
         for j in range(0, serializer.record_count):
             context = {
                 'index': j,
             }
-            column_names = column_names + [ref_field.label.format(**context) for ref_field in field.reference.target_fields]
+            column_names = column_names + [
+                ref_field.label.format(**context)
+                for ref_field in field.reference.target_fields
+            ]
 
     writer.writerow(column_names)
 
@@ -44,4 +50,3 @@ def render_data(stream, csv_datas):
 
 def prepare_response(name):
     return prepare_file_response(name + '.csv', 'text/csv')
-

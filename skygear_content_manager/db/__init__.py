@@ -1,18 +1,21 @@
 from skygear.utils import db
 
-from .migrations import *
+from .migrations import migration_1
+from .migrations import migration_2
+
 
 # _cms_version table will keep the number of migrations run
-get_migrations = lambda: [
-    ##
-    #  Initialize _cms_push_campaign and _cms_push_campaign_user
-    ##
-    migration_1,
-    ##
-    # Initialize _cms_imported_file
-    ##
-    migration_2,
-]
+def get_migrations():
+    return [
+        ##
+        #  Initialize _cms_push_campaign and _cms_push_campaign_user
+        ##
+        migration_1,
+        ##
+        # Initialize _cms_imported_file
+        ##
+        migration_2,
+    ]
 
 
 def cms_db_init(config):
@@ -23,7 +26,7 @@ def cms_db_init(config):
             for version in next_version(conn):
                 run_migration(conn, version)
             trans.commit()
-        except:
+        except Exception:
             trans.rollback()
             raise
 
