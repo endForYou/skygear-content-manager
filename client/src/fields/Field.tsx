@@ -8,6 +8,7 @@ import {
   AssociationReferenceSelectFieldConfig,
   BackReferenceListFieldConfig,
   BackReferenceSelectFieldConfig,
+  EmbeddedAssociationReferenceListFieldConfig,
   EmbeddedBackReferenceListFieldConfig,
   FieldConfig,
   FieldConfigTypes,
@@ -22,6 +23,7 @@ import { BackReferenceSelect } from './BackReferenceSelect';
 import { BooleanField } from './BooleanField';
 import { DateTimeDisplayField, DateTimePickerField } from './DateTimeField';
 import { DropdownField } from './DropdownField';
+import { EmbeddedAssociationReferenceField } from './EmbeddedAssociationReferenceField';
 import { EmbeddedBackReferenceListField } from './EmbeddedBackReferenceField';
 import { FileDisplayField, FileUploaderField } from './FileField';
 import { ImageDisplayField, ImageUploaderField } from './ImageField';
@@ -163,6 +165,13 @@ const RefField: React.SFC<FieldProps> = props => {
             <EmbeddedBackReferenceListField
               {...rest}
               config={config as EmbeddedBackReferenceListFieldConfig}
+            />
+          );
+        case ReferenceTypes.ViaAssociationRecord:
+          return (
+            <EmbeddedAssociationReferenceField
+              {...rest}
+              config={config as EmbeddedAssociationReferenceListFieldConfig}
             />
           );
         default:

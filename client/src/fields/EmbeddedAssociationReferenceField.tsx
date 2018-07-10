@@ -5,13 +5,11 @@ import * as React from 'react';
 import skygear, { Record, Reference } from 'skygear';
 
 import {
-  DeleteAction,
-  EmbeddedBackReferenceListFieldConfig,
+  EmbeddedAssociationReferenceListFieldConfig,
   FieldConfig,
   SortOrder,
 } from '../cmsConfig';
 import { Arrow, ArrowDirection } from '../components/Arrow';
-import { PrimaryButton } from '../components/PrimaryButton';
 import {
   Effect,
   EffectAll,
@@ -20,6 +18,7 @@ import {
 } from '../components/RecordFormPage';
 import { objectValues, swap } from '../util';
 
+import { PrimaryButton } from '../components/PrimaryButton';
 import { deleteRecordsProperly, saveRecordsProperly } from '../recordUtil';
 import {
   Field,
@@ -28,31 +27,35 @@ import {
   RequiredFieldProps,
 } from './Field';
 
-export type EmbeddedBackReferenceListFieldProps = RequiredFieldProps<
-  EmbeddedBackReferenceListFieldConfig
+export type EmbeddedAssociationReferenceFieldProps = RequiredFieldProps<
+  EmbeddedAssociationReferenceListFieldConfig
 >;
 
 interface State {
   embeddedRecordUpdate: RecordChange[];
   embeddedRecordDelete: Record[];
   embeddedRecords: Record[];
+  assoRecords: Record[];
 }
 
-export class EmbeddedBackReferenceListField extends React.PureComponent<
-  EmbeddedBackReferenceListFieldProps,
+export class EmbeddedAssociationReferenceField extends React.PureComponent<
+  EmbeddedAssociationReferenceFieldProps,
   State
 > {
   private embeddedRecordBeforeEffects: Array<{ [key: string]: Effect }>;
   private embeddedRecordAfterEffects: Array<{ [key: string]: Effect }>;
 
-  constructor(props: EmbeddedBackReferenceListFieldProps) {
+  constructor(props: EmbeddedAssociationReferenceFieldProps) {
     super(props);
 
     const { context, config } = props;
     const $transient = context.record.$transient;
     const embeddedRecords = ($transient[config.name] as Record[]) || [];
+    const assoRecords =
+      ($transient[`${config.name}Associations`] as Record[]) || [];
 
     this.state = {
+      assoRecords,
       embeddedRecordDelete: [],
       embeddedRecordUpdate: embeddedRecords.map(() => ({})),
       embeddedRecords: [...embeddedRecords],
@@ -82,10 +85,10 @@ export class EmbeddedBackReferenceListField extends React.PureComponent<
     afterEffect?: Effect
   ) {
     if (value !== undefined) {
-      this.setState(prevState => {
-        prevState.embeddedRecordUpdate[index][name] = value;
-        prevState.embeddedRecords[index][name] = value;
-        return prevState;
+      this.setState(pState => {
+        pState.embeddedRecordUpdate[index][name] = value;
+        pState.embeddedRecords[index][name] = value;
+        return pState;
       });
     }
 
@@ -101,11 +104,12 @@ export class EmbeddedBackReferenceListField extends React.PureComponent<
   }
 
   public handleEmbeddedRecordRemove(index: number) {
-    this.setState(prevState => {
-      prevState.embeddedRecordDelete.push(prevState.embeddedRecords[index]);
-      prevState.embeddedRecordUpdate.splice(index, 1);
-      prevState.embeddedRecords.splice(index, 1);
-      return prevState;
+    this.setState(pState => {
+      pState.embeddedRecordDelete.push(pState.assoRecords[index]);
+      pState.embeddedRecordUpdate.splice(index, 1);
+      pState.embeddedRecords.splice(index, 1);
+      pState.assoRecords.splice(index, 1);
+      return pState;
     });
 
     this.embeddedRecordBeforeEffects.splice(index, 1);
@@ -115,16 +119,31 @@ export class EmbeddedBackReferenceListField extends React.PureComponent<
   }
 
   public handleEmbeddedRecordCreate() {
-    const { config, context } = this.props;
-    const RecordCls = Record.extend(
-      config.reference.targetCmsRecord.recordType
+    const { config: { reference }, context } = this.props;
+    const AssocRecordCls = Record.extend(
+      reference.associationRecordConfig.cmsRecord.recordType
     );
-    this.setState(prevState => {
-      prevState.embeddedRecordUpdate.push({
-        [config.reference.sourceFieldName]: new Reference(context.record),
+    const sourceRecordType =
+      reference.sourceReference.reference.targetCmsRecord.recordType;
+    const targetRecordType =
+      reference.targetReference.reference.targetCmsRecord.recordType;
+    const RecordCls = Record.extend(
+      reference.targetReference.reference.targetCmsRecord.recordType
+    );
+    this.setState(pState => {
+      const newRecord = new RecordCls();
+      const assoRecord = new AssocRecordCls({
+        [reference.sourceReference.name]: new Reference(
+          `${sourceRecordType}/${context.record._id}`
+        ),
+        [reference.targetReference.name]: new Reference(
+          `${targetRecordType}/${newRecord._id}`
+        ),
       });
-      prevState.embeddedRecords.push(new RecordCls());
-      return prevState;
+      pState.assoRecords.push(assoRecord);
+      pState.embeddedRecordUpdate.push({});
+      pState.embeddedRecords.push(newRecord);
+      return pState;
     });
 
     this.embeddedRecordBeforeEffects.push({});
@@ -134,10 +153,11 @@ export class EmbeddedBackReferenceListField extends React.PureComponent<
   }
 
   public handleEmbeddedRecordMove(from: number, to: number) {
-    this.setState(prevState => {
-      swap(prevState.embeddedRecordUpdate, from, to);
-      swap(prevState.embeddedRecords, from, to);
-      return prevState;
+    this.setState(pState => {
+      swap(pState.assoRecords, from, to);
+      swap(pState.embeddedRecordUpdate, from, to);
+      swap(pState.embeddedRecords, from, to);
+      return pState;
     });
 
     swap(this.embeddedRecordBeforeEffects, from, to);
@@ -149,7 +169,6 @@ export class EmbeddedBackReferenceListField extends React.PureComponent<
   public render() {
     const { config, className } = this.props;
     const { embeddedRecords } = this.state;
-
     const items = embeddedRecords.map((r, index) => {
       return (
         <EmbeddedRecordView
@@ -158,20 +177,9 @@ export class EmbeddedBackReferenceListField extends React.PureComponent<
             editable: config.editable,
           })}
           fieldConfigs={config.displayFields}
-          onRecordChange={(
-            name: string,
-            // tslint:disable-next-line: no-any
-            value: any,
-            beforeEffect?: Effect,
-            afterEffect?: Effect
-          ) => {
-            this.handleEmbeddedRecordChange(
-              index,
-              name,
-              value,
-              beforeEffect,
-              afterEffect
-            );
+          // tslint:disable-next-line: no-any
+          onRecordChange={(name: string, value: any, effect?: Effect) => {
+            this.handleEmbeddedRecordChange(index, name, value, effect);
           }}
           onRecordMoveDown={() =>
             this.handleEmbeddedRecordMove(index, index + 1)}
@@ -179,17 +187,11 @@ export class EmbeddedBackReferenceListField extends React.PureComponent<
           onRecordRemove={() => this.handleEmbeddedRecordRemove(index)}
           record={r}
           upMovable={
-            !!(
-              config.editable &&
-              config.reorderEnabled &&
-              config.positionFieldName != null &&
-              index > 0
-            )
+            !!(config.editable && config.positionFieldName != null && index > 0)
           }
           downMovable={
             !!(
               config.editable &&
-              config.reorderEnabled &&
               config.positionFieldName != null &&
               index < embeddedRecords.length - 1
             )
@@ -224,12 +226,18 @@ export class EmbeddedBackReferenceListField extends React.PureComponent<
       onFieldChange(undefined, undefined, () => {
         const {
           embeddedRecordDelete,
-          embeddedRecords,
           embeddedRecordUpdate,
+          embeddedRecords,
+          assoRecords,
         } = this.state;
 
-        const mainEffect = EffectAll([
-          recordUpdateEffect(config, embeddedRecordUpdate, embeddedRecords),
+        const updateEffect = recordUpdateEffect(
+          config,
+          embeddedRecordUpdate,
+          embeddedRecords
+        );
+        const assoRecordEffect = EffectAll([
+          assoRecordSaveEffect(config, embeddedRecordUpdate, assoRecords),
           recordDeleteEffect(config, embeddedRecordDelete),
         ]);
 
@@ -239,7 +247,8 @@ export class EmbeddedBackReferenceListField extends React.PureComponent<
               EffectAll(objectValues(effectsByName))()
             )
           )
-          .then(() => mainEffect())
+          .then(() => updateEffect())
+          .then(() => assoRecordEffect())
           .then(() =>
             this.embeddedRecordAfterEffects.map(effectsByName =>
               EffectAll(objectValues(effectsByName))()
@@ -280,8 +289,8 @@ function EmbeddedRecordView({
       <FormGroup
         key={index}
         fieldConfig={fieldConfig}
-        onFieldChange={(value, beforeEffect, affterEffect) =>
-          onRecordChange(fieldConfig.name, value, beforeEffect, affterEffect)}
+        onFieldChange={(value, effect) =>
+          onRecordChange(fieldConfig.name, value, effect)}
         record={record}
       />
     );
@@ -344,7 +353,7 @@ function FormGroup(props: FieldProps): JSX.Element {
 }
 
 function recordUpdateEffect(
-  config: EmbeddedBackReferenceListFieldConfig,
+  config: EmbeddedAssociationReferenceListFieldConfig,
   updates: RecordChange[],
   embeddedRecords: Record[]
 ): Effect {
@@ -354,28 +363,48 @@ function recordUpdateEffect(
     }
 
     const RecordCls = Record.extend(
-      config.reference.targetCmsRecord.recordType
+      config.reference.targetReference.reference.targetCmsRecord.recordType
     );
+
     const recordsToSave = updates.map((change, index) => {
       const recordId = embeddedRecords[index].id;
-      const data = { _id: recordId, ...updates[index] };
-
-      // Inject position data if positionFieldName given
-      if (config.reorderEnabled && config.positionFieldName != null) {
-        const positionIndex =
-          config.sortOrder === SortOrder.Asc
-            ? index
-            : updates.length - index - 1;
-        data[config.positionFieldName] = positionIndex;
-      }
-      return new RecordCls(data);
+      return new RecordCls({
+        _id: recordId,
+        ...updates[index],
+      });
     });
     return saveRecordsProperly(skygear.publicDB, recordsToSave);
   };
 }
 
+function assoRecordSaveEffect(
+  config: EmbeddedAssociationReferenceListFieldConfig,
+  updates: RecordChange[],
+  assoRecords: Record[]
+): Effect {
+  return () => {
+    if (assoRecords.length === 0) {
+      return Promise.resolve();
+    }
+
+    if (config.positionFieldName != null) {
+      // Reassign config.positionFieldName to bypass typescript bug
+      const fieldName = config.positionFieldName;
+      assoRecords.forEach((record, index) => {
+        // Inject position data if positionFieldName given
+        const positionIndex =
+          config.sortOrder === SortOrder.Asc
+            ? index
+            : updates.length - index - 1;
+        record[fieldName] = positionIndex;
+      });
+    }
+    return saveRecordsProperly(skygear.publicDB, assoRecords);
+  };
+}
+
 function recordDeleteEffect(
-  config: EmbeddedBackReferenceListFieldConfig,
+  config: EmbeddedAssociationReferenceListFieldConfig,
   deletes: Record[]
 ): Effect {
   return () => {
@@ -383,22 +412,6 @@ function recordDeleteEffect(
       return Promise.resolve();
     }
 
-    const RecordCls = Record.extend(
-      config.reference.targetCmsRecord.recordType
-    );
-    if (config.referenceDeleteAction === DeleteAction.NullifyReference) {
-      // set reference to null only
-      const recordsToDelete = deletes.map(
-        record =>
-          new RecordCls({
-            _id: record.id,
-            [config.reference.sourceFieldName]: null,
-          })
-      );
-      return saveRecordsProperly(skygear.publicDB, recordsToDelete);
-    } else {
-      // delete the child record
-      return deleteRecordsProperly(skygear.publicDB, deletes);
-    }
+    return deleteRecordsProperly(skygear.publicDB, deletes);
   };
 }

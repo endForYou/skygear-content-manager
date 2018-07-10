@@ -214,6 +214,14 @@ records:
             - name: _id
             - name: name
               type: String
+        - name: asso_refs_embedded
+          type: EmbeddedReferenceList
+          reference_via_association_record: field_asso_ref
+          reference_target: asso_ref_demo
+          reference_fields:
+            - name: _id
+            - name: name
+              type: String
         - name: imageasset
           type: Image
         - name: fileasset
@@ -269,6 +277,15 @@ records:
           reference_from_field: reference
           reference_position_field: field_demo_position
           reference_position_ascending: true
+          reference_fields:
+            - name: _id
+            - name: name
+              type: String
+        - name: asso_refs_embedded
+          type: EmbeddedReferenceList
+          reference_via_association_record: field_asso_ref
+          reference_target: asso_ref_demo
+          reference_reorder_enabled: false
           reference_fields:
             - name: _id
             - name: name
@@ -329,6 +346,15 @@ records:
           reference_from_field: reference
           reference_position_field: field_demo_position
           reference_position_ascending: true
+          reference_fields:
+            - name: _id
+            - name: name
+              type: String
+        - name: asso_refs_embedded
+          type: EmbeddedReferenceList
+          reference_via_association_record: field_asso_ref
+          reference_target: asso_ref_demo
+          reference_reorder_enabled: false
           reference_fields:
             - name: _id
             - name: name
