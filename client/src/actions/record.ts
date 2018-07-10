@@ -19,6 +19,7 @@ import {
   CmsRecord,
   DateTimeFilter,
   DateTimeFilterQueryType,
+  EmbeddedAssociationReferenceListFieldConfig,
   EmbeddedBackReferenceListFieldConfig,
   EmbeddedReferenceListFieldConfig,
   FieldConfigTypes,
@@ -680,15 +681,32 @@ function BackReferenceAttrs(
 
 interface AssoReferenceAttrs {
   name: string;
+  positionFieldName: string;
+  sortOrder: SortOrder;
   reference: ReferenceViaAssociationRecord;
 }
 
 function AssoReferenceAttrs(
-  a: AssociationReferenceListFieldConfig | AssociationReferenceSelectFieldConfig
+  a:
+    | AssociationReferenceListFieldConfig
+    | AssociationReferenceSelectFieldConfig
+    | EmbeddedAssociationReferenceListFieldConfig
 ): AssoReferenceAttrs {
+  let positionFieldName: string;
+  let sortOrder: SortOrder;
+  if (a.type === FieldConfigTypes.EmbeddedReferenceList) {
+    positionFieldName = a.positionFieldName || '_created_at';
+    sortOrder = a.positionFieldName != null ? a.sortOrder : SortOrder.Asc;
+  } else {
+    positionFieldName = '_created_at';
+    sortOrder = SortOrder.Desc;
+  }
+
   return {
     name: a.name,
+    positionFieldName,
     reference: a.reference,
+    sortOrder,
   };
 }
 
@@ -732,6 +750,7 @@ function queryWithTarget(
             r as
               | AssociationReferenceListFieldConfig
               | AssociationReferenceSelectFieldConfig
+              | EmbeddedAssociationReferenceListFieldConfig
         )
         .map(AssoReferenceAttrs);
 
@@ -920,6 +939,8 @@ function fetchAssociationRecordsWithTarget(
     assoRefConfig.reference.associationRecordConfig.cmsRecord.recordType,
     assoRefConfig.reference.sourceReference.name,
     {
+      sortAscending: assoRefConfig.sortOrder === SortOrder.Asc,
+      sortByField: assoRefConfig.positionFieldName,
       transientIncludeFieldName: assoRefConfig.reference.targetReference.name,
     }
   );
