@@ -159,6 +159,8 @@ declare module 'skygear' {
     public logout(): Promise<null>;
 
     public adminResetPassword(user: Record | string, newPassword: string): Promise<string>;
+    public adminEnableUser(user: Record | string): Promise<string>;
+    public adminDisableUser(user: Record | string, message: string, expiry: Date): Promise<string>;
 
     public fetchUserRole(users: Record[] | string[]): Promise<{[id: string]: Role[]}>;
     public assignUserRole(users: Record[] | string[], roles: Role[] | string[]): Promise<'OK'>;
