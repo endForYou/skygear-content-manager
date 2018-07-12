@@ -115,10 +115,7 @@ const TableRow: React.SFC<TableRowProps> = ({
         {user.isRolesUpdating && <LoadingSpinner />}
       </div>
       <div className="table-cell">
-        <Link
-          className="item-action"
-          to={`/user-management/${user.id}`}
-        >
+        <Link className="item-action" to={`/user-management/${user.id}`}>
           Manage
         </Link>
       </div>

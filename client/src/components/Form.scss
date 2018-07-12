@@ -1,0 +1,33 @@
+@import 'styleUtils/common.scss';
+
+.form-container {
+  .body {
+    @include record-form;
+    margin: to-rem(20px) to-rem(32px);
+  }
+
+  .form-title {
+    font-weight: 700;
+    color: #999999;
+  }
+
+  .footer {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    margin-top: to-rem(10px);
+    padding: 0 to-rem(32px);
+  }
+
+  .btn-submit {
+    @include btn;
+    @include btn-primary;
+    font-size: to-rem(14px);
+    padding: to-rem(5px) to-rem(9px);
+  }
+
+  .submit-message {
+    margin-right: to-rem(10px);
+  }
+}

@@ -3,7 +3,7 @@ import './PasswordForm.scss';
 import * as React from 'react';
 
 import { changePassword } from '../../actions/user';
-import { PrimaryButton } from '../../components/PrimaryButton';
+import { Form } from '../../components/Form';
 import { isOutlawError } from '../../recordUtil';
 
 interface PasswordFormProps {
@@ -50,62 +50,51 @@ export class PasswordForm extends React.PureComponent<
     } = this.state;
 
     return (
-      <form className="password-form-container" onSubmit={this.onFormSubmit}>
-        <div className="password-form">
-          <div className="password-form-title">Change Password</div>
-          <div className="password-form-group">
-            <div className="password-form-label">
-              <label>User ID</label>
-            </div>
-            <div className="password-form-field static">{userId}</div>
+      <Form
+        className="password-form"
+        title="Change Password"
+        successMessage={successMessage}
+        errorMessage={errorMessage}
+        submitDisabled={!this.canSubmitPassword() || isSubmitting}
+        onSubmit={this.onFormSubmit}
+      >
+        <div className="password-form-group">
+          <div className="password-form-label">
+            <label>User ID</label>
           </div>
-
-          <div className="password-form-group">
-            <div className="password-form-label">
-              <label htmlFor="password">Password</label>
-            </div>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              className="password-form-field"
-              placeholder="Password"
-              value={password}
-              onChange={this.onPasswordChange}
-            />
-          </div>
-
-          <div className="password-form-group">
-            <div className="password-form-label">
-              <label htmlFor="confirmPassword">Confirm Password</label>
-            </div>
-            <input
-              type="password"
-              id="confirmPassword"
-              name="confirmPassword"
-              className="password-form-field"
-              placeholder="Confirm Password"
-              value={confirmPassword}
-              onChange={this.onConfirmPasswordChange}
-            />
-          </div>
+          <div className="password-form-field static">{userId}</div>
         </div>
 
-        <PrimaryButton
-          type="submit"
-          className="btn-submit"
-          disabled={!this.canSubmitPassword() || isSubmitting}
-        >
-          Submit
-        </PrimaryButton>
+        <div className="password-form-group">
+          <div className="password-form-label">
+            <label htmlFor="password">Password</label>
+          </div>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            className="password-form-field"
+            placeholder="Password"
+            value={password}
+            onChange={this.onPasswordChange}
+          />
+        </div>
 
-        {successMessage.length > 0 && (
-          <div className="text-success submit-message">{successMessage}</div>
-        )}
-        {errorMessage.length > 0 && (
-          <div className="text-danger submit-message">{errorMessage}</div>
-        )}
-      </form>
+        <div className="password-form-group">
+          <div className="password-form-label">
+            <label htmlFor="confirmPassword">Confirm Password</label>
+          </div>
+          <input
+            type="password"
+            id="confirmPassword"
+            name="confirmPassword"
+            className="password-form-field"
+            placeholder="Confirm Password"
+            value={confirmPassword}
+            onChange={this.onConfirmPasswordChange}
+          />
+        </div>
+      </Form>
     );
   }
 

@@ -46,4 +46,4 @@ const ConnectedEditPageContainer = connect(mapStateToProps, mapDispatchToProps)(
 
 export const UserPageContainer: React.ComponentType<
   UserPageContainerProps
-  > = ConnectedEditPageContainer;
+> = ConnectedEditPageContainer;
