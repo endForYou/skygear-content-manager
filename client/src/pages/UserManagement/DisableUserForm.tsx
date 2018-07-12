@@ -5,9 +5,11 @@ import ReactToggle, { ReactToggleElement } from 'react-toggle';
 
 import { Form } from '../../components/Form';
 import { TzDatetimeInput } from '../../components/TzDatetimeInput';
+import { SkygearUser } from '../../types';
 
 interface DisableUserFormProps {
   className?: string;
+  user: SkygearUser;
 }
 
 interface DisableUserFormState {
@@ -25,12 +27,14 @@ export class DisableUserForm extends React.PureComponent<
   constructor(props: DisableUserFormProps) {
     super(props);
 
+    const { user } = props;
+
     this.state = {
       errorMessage: '',
       successMessage: '',
-      userDisabled: false,
-      userDisabledExpiry: undefined,
-      userDisabledMessage: '',
+      userDisabled: user.userDisable.disabled || false,
+      userDisabledExpiry: user.userDisable.expiry || undefined,
+      userDisabledMessage: user.userDisable.message || '',
     };
   }
 

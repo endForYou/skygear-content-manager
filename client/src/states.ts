@@ -148,10 +148,12 @@ export const initialPushCampaignState: PushCampaignState = {
 
 export interface UserState extends ListStateAttrs {
   users: SkygearUser[];
+  user: Remote<SkygearUser>;
 }
 
 export const initialUserState: UserState = {
   ...initialListStateAttrs,
+  user: RemoteLoading,
   users: [],
 };
 
