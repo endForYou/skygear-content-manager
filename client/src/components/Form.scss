@@ -3,7 +3,7 @@
 .form-container {
   .body {
     @include record-form;
-    margin: to-rem(20px) to-rem(32px);
+    margin: to-rem(20px) 0;
   }
 
   .form-title {
@@ -17,7 +17,6 @@
     align-items: center;
     justify-content: flex-end;
     margin-top: to-rem(10px);
-    padding: 0 to-rem(32px);
   }
 
   .btn-submit {

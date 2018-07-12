@@ -1,5 +1,6 @@
 import './PasswordForm.scss';
 
+import classnames from 'classnames';
 import * as React from 'react';
 
 import { changePassword } from '../../actions/user';
@@ -7,6 +8,7 @@ import { Form } from '../../components/Form';
 import { isOutlawError } from '../../recordUtil';
 
 interface PasswordFormProps {
+  className?: string;
   userId: string;
 }
 
@@ -39,7 +41,7 @@ export class PasswordForm extends React.PureComponent<
   }
 
   public render() {
-    const { userId } = this.props;
+    const { className, userId } = this.props;
 
     const {
       confirmPassword,
@@ -51,7 +53,7 @@ export class PasswordForm extends React.PureComponent<
 
     return (
       <Form
-        className="password-form"
+        className={classnames('password-form', className)}
         title="Change Password"
         successMessage={successMessage}
         errorMessage={errorMessage}

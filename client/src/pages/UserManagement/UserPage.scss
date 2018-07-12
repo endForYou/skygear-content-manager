@@ -8,4 +8,8 @@
   .title {
     @include record-topbar-title;
   }
+
+  .user-page-section {
+    margin: to-rem(20px) to-rem(32px);
+  }
 }

@@ -24,7 +24,7 @@ const UserPageImpl: React.SFC<Props> = ({ userId }) => {
       <div className="topbar">
         <div className="title">User Management</div>
       </div>
-      <PasswordForm userId={userId} />
+      <PasswordForm className="user-page-section" userId={userId} />
     </div>
   );
 };
