@@ -117,9 +117,9 @@ const TableRow: React.SFC<TableRowProps> = ({
       <div className="table-cell">
         <Link
           className="item-action"
-          to={`/user-management/${user.id}/change-password`}
+          to={`/user-management/${user.id}`}
         >
-          Change Password
+          Manage
         </Link>
       </div>
     </div>

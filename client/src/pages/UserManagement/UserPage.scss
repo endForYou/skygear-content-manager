@@ -1,0 +1,11 @@
+@import 'styleUtils/common.scss';
+
+.user-page {
+  .topbar {
+    @include record-topbar(to-rem(32px));
+  }
+
+  .title {
+    @include record-topbar-title;
+  }
+}

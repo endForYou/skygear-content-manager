@@ -18,8 +18,8 @@ import { NewPushNotificationPageContainer } from '../../push_notifications/NewPu
 import { PushNotificationListPageFactory } from '../../push_notifications/PushNotificationListPage';
 
 import { FileImportPageFactory } from '../../pages/FileImport/FileImportPage';
-import { ChangePasswordPageContainer } from '../../pages/UserManagement/ChangePasswordPage';
 import { UserListPageFactory } from '../../pages/UserManagement/UserListPage';
+import { UserPageContainer } from '../../pages/UserManagement/UserPage';
 
 const defaultFirstPage = '/settings';
 
@@ -189,9 +189,9 @@ function makeChangePasswordRoute(): JSX.Element {
     <Route
       key="change-password"
       exact={true}
-      path="/user-management/:userId/change-password"
+      path="/user-management/:userId"
       render={routeProps => (
-        <ChangePasswordPageContainer userId={routeProps.match.params.userId} />
+        <UserPageContainer userId={routeProps.match.params.userId} />
       )}
     />
   );

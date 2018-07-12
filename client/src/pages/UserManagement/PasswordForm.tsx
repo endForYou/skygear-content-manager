@@ -1,23 +1,10 @@
-import './ChangePasswordPage.scss';
+import './PasswordForm.scss';
 
 import * as React from 'react';
-import { connect } from 'react-redux';
-import { Dispatch } from 'redux';
 
 import { changePassword } from '../../actions/user';
 import { PrimaryButton } from '../../components/PrimaryButton';
 import { isOutlawError } from '../../recordUtil';
-import { RootState } from '../../states';
-
-interface ChangePasswordPageContainerProps {
-  userId: string;
-}
-
-interface DispatchProps {
-  dispatch: Dispatch<RootState>;
-}
-
-type Props = ChangePasswordPageContainerProps & DispatchProps;
 
 interface PasswordFormProps {
   userId: string;
@@ -31,7 +18,7 @@ interface PasswordFormState {
   errorMessage: string;
 }
 
-class PasswordForm extends React.PureComponent<
+export class PasswordForm extends React.PureComponent<
   PasswordFormProps,
   PasswordFormState
 > {
@@ -63,8 +50,9 @@ class PasswordForm extends React.PureComponent<
     } = this.state;
 
     return (
-      <form className="password-form-page" onSubmit={this.onFormSubmit}>
+      <form className="password-form-container" onSubmit={this.onFormSubmit}>
         <div className="password-form">
+          <div className="password-form-title">Change Password</div>
           <div className="password-form-group">
             <div className="password-form-label">
               <label>User ID</label>
@@ -160,33 +148,3 @@ class PasswordForm extends React.PureComponent<
       });
   }
 }
-
-const ChangePasswordPageImpl: React.SFC<Props> = ({ userId }) => {
-  return (
-    <div className="change-password">
-      <div className="topbar">
-        <div className="title">Change Password</div>
-      </div>
-      <PasswordForm userId={userId} />
-    </div>
-  );
-};
-
-function mapStateToProps(
-  state: RootState,
-  ownProps: ChangePasswordPageContainerProps
-): ChangePasswordPageContainerProps {
-  return { ...ownProps };
-}
-
-function mapDispatchToProps(dispatch: Dispatch<RootState>): DispatchProps {
-  return { dispatch };
-}
-
-const ConnectedEditPageContainer = connect(mapStateToProps, mapDispatchToProps)(
-  ChangePasswordPageImpl
-);
-
-export const ChangePasswordPageContainer: React.ComponentType<
-  ChangePasswordPageContainerProps
-> = ConnectedEditPageContainer;
