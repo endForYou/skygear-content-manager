@@ -24,7 +24,7 @@ class CmsImportedFileSchema(Schema):
     id = fields.String()
     asset = fields.Method('get_asset', deserialize='load_asset')
     url = fields.String(dump_only=True)
-    uploaded_at = fields.DateTime(format="%Y-%m-%d %H:%M:%S", dump_only=True)
+    uploaded_at = fields.DateTime(format="%Y-%m-%dT%H:%M:%SZ", dump_only=True)
     size = fields.Method('get_size')
 
     def get_asset(self, obj):
