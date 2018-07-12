@@ -4,12 +4,10 @@ from sqlalchemy import Column
 from sqlalchemy import DateTime
 from sqlalchemy import ForeignKey
 from sqlalchemy import Text
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
 from .asset import Asset
-
-Base = declarative_base()
+from .meta import Base
 
 
 class CmsImportedFile(Base):

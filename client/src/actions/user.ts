@@ -1,6 +1,6 @@
 import { Dispatch } from 'redux';
 import { ThunkAction } from 'redux-thunk';
-import skygear, { QueryResult, Record, Role } from 'skygear';
+import skygear, { Role } from 'skygear';
 
 import { queryWithFilters } from './record';
 
@@ -168,6 +168,12 @@ function fetchUsersImpl(
   perPage: number = 25,
   filters: Filter[]
 ): Promise<UserQueryResult> {
+  const params = {
+    // filter: getImportedFileFilter(filters),
+    page,
+    perPage,
+  };
+
   const recordCls = skygear.UserRecord;
   const query = queryWithFilters(filters, recordCls);
 
@@ -176,26 +182,17 @@ function fetchUsersImpl(
   query.offset = (page - 1) * perPage;
   query.addDescending('_created_at');
 
-  let userRecords: Record[];
-  let overallCount: number;
-
-  return skygear.publicDB
-    .query(query)
-    .then((queryResult: QueryResult<Record>) => {
-      userRecords = queryResult.map((r: Record) => r);
-      if (userRecords.length === 0) {
-        return Promise.resolve({});
-      }
-
-      overallCount = queryResult.overallCount;
-      return skygear.auth.fetchUserRole(userRecords);
-    })
-    .then((userRoles: { [id: string]: Role[] }) => ({
-      overallCount,
-      users: userRecords.map((record: Record) =>
-        SkygearUser(record, userRoles)
-      ),
-    }));
+  return (
+    skygear
+      .lambda('user:get_all', params)
+      // tslint:disable-next-line:no-any
+      .then((result: any) => {
+        return {
+          overallCount: result.totalCount,
+          users: result.users.map(SkygearUser),
+        };
+      })
+  );
 }
 
 function fetchUsers(

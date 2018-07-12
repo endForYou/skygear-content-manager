@@ -99,9 +99,11 @@ const TableRow: React.SFC<TableRowProps> = ({
 
   return (
     <div className="table-row">
-      <div className="table-cell">{user.record._id}</div>
-      <div className="table-cell">{user.record.username}</div>
-      <div className="table-cell">{user.record.email}</div>
+      <div className="table-cell">{user.id}</div>
+      <div className="table-cell">
+        {user.record ? user.record.username : ''}
+      </div>
+      <div className="table-cell">{user.record ? user.record.email : ''}</div>
       <div className="table-cell">
         {showCMSAccess && (
           <ReactToggle
@@ -115,7 +117,7 @@ const TableRow: React.SFC<TableRowProps> = ({
       <div className="table-cell">
         <Link
           className="item-action"
-          to={`/user-management/${user.record._id}/change-password`}
+          to={`/user-management/${user.id}/change-password`}
         >
           Change Password
         </Link>
