@@ -1,5 +1,3 @@
-import './PasswordForm.scss';
-
 import classnames from 'classnames';
 import * as React from 'react';
 
@@ -60,37 +58,37 @@ export class PasswordForm extends React.PureComponent<
         submitDisabled={!this.canSubmitPassword() || isSubmitting}
         onSubmit={this.onFormSubmit}
       >
-        <div className="password-form-group">
-          <div className="password-form-label">
+        <div className="user-page-form-group">
+          <div className="user-page-form-label">
             <label>User ID</label>
           </div>
-          <div className="password-form-field static">{userId}</div>
+          <div className="user-page-form-field text static">{userId}</div>
         </div>
 
-        <div className="password-form-group">
-          <div className="password-form-label">
+        <div className="user-page-form-group">
+          <div className="user-page-form-label">
             <label htmlFor="password">Password</label>
           </div>
           <input
             type="password"
             id="password"
             name="password"
-            className="password-form-field"
+            className="user-page-form-field text"
             placeholder="Password"
             value={password}
             onChange={this.onPasswordChange}
           />
         </div>
 
-        <div className="password-form-group">
-          <div className="password-form-label">
+        <div className="user-page-form-group">
+          <div className="user-page-form-label">
             <label htmlFor="confirmPassword">Confirm Password</label>
           </div>
           <input
             type="password"
             id="confirmPassword"
             name="confirmPassword"
-            className="password-form-field"
+            className="user-page-form-field text"
             placeholder="Confirm Password"
             value={confirmPassword}
             onChange={this.onConfirmPasswordChange}

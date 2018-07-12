@@ -6,6 +6,7 @@ import { Dispatch } from 'redux';
 
 import { RootState } from '../../states';
 
+import { DisableUserForm } from './DisableUserForm';
 import { PasswordForm } from './PasswordForm';
 
 interface UserPageContainerProps {
@@ -24,7 +25,8 @@ const UserPageImpl: React.SFC<Props> = ({ userId }) => {
       <div className="topbar">
         <div className="title">User Management</div>
       </div>
-      <PasswordForm className="user-page-section" userId={userId} />
+      <PasswordForm className="user-page-form" userId={userId} />
+      <DisableUserForm className="user-page-form" />
     </div>
   );
 };
