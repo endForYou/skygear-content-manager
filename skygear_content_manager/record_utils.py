@@ -1,9 +1,10 @@
+from sqlalchemy import not_
+
 from .models.cms_config import CMSRecordAssociationReference
 from .models.cms_config import CMSRecordBackReference
 from .skygear_utils import eq_predicate
 from .skygear_utils import fetch_records
 from .skygear_utils import or_predicate
-from sqlalchemy import not_
 
 
 def get_order_by(col_map, name, is_ascending):

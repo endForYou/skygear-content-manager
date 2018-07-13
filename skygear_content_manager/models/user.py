@@ -6,7 +6,7 @@ from sqlalchemy import Text
 from sqlalchemy.orm import relationship
 
 from .meta import Base
-from .role import Role # noqa
+from .role import Role  # noqa
 
 
 class Auth(Base):
