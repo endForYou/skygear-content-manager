@@ -232,27 +232,6 @@ function FormField(props: FieldProps): JSX.Element {
   );
 }
 
-// interface SubmitProps {
-//   savingRecord?: Remote<Record>;
-// }
-
-// function SubmitButton(props: SubmitProps): JSX.Element {
-//   const { savingRecord } = props;
-//   if (savingRecord !== undefined && savingRecord.type === RemoteType.Loading) {
-//     return (
-//       <PrimaryButton type="submit" className="btn-submit" disabled={true}>
-//         Save
-//       </PrimaryButton>
-//     );
-//   } else {
-//     return (
-//       <PrimaryButton type="submit" className="btn-submit">
-//         Save
-//       </PrimaryButton>
-//     );
-//   }
-// }
-
 function mergeRecordChange(record: Record, change: RecordChange) {
   entriesOf(change).forEach(([key, value]) => {
     record[key] = value;
