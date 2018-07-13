@@ -3,8 +3,10 @@ import moment from 'moment';
 import * as React from 'react';
 import ReactToggle, { ReactToggleElement } from 'react-toggle';
 
+import { disableUser, enableUser } from '../../actions/user';
 import { Form } from '../../components/Form';
 import { TzDatetimeInput } from '../../components/TzDatetimeInput';
+import { isOutlawError } from '../../recordUtil';
 import { SkygearUser } from '../../types';
 
 interface DisableUserFormProps {
@@ -18,6 +20,7 @@ interface DisableUserFormState {
   userDisabledMessage: string;
   successMessage: string;
   errorMessage: string;
+  isSubmitting: boolean;
 }
 
 export class DisableUserForm extends React.PureComponent<
@@ -31,6 +34,7 @@ export class DisableUserForm extends React.PureComponent<
 
     this.state = {
       errorMessage: '',
+      isSubmitting: false,
       successMessage: '',
       userDisabled: user.userDisable.disabled || false,
       userDisabledExpiry: user.userDisable.expiry || undefined,
@@ -47,6 +51,7 @@ export class DisableUserForm extends React.PureComponent<
       userDisabled,
       userDisabledExpiry,
       userDisabledMessage,
+      isSubmitting,
     } = this.state;
 
     return (
@@ -55,7 +60,7 @@ export class DisableUserForm extends React.PureComponent<
         title="Disable User"
         successMessage={successMessage}
         errorMessage={errorMessage}
-        submitDisabled={false}
+        submitDisabled={!this.canSubmit() || isSubmitting}
         onSubmit={this.onFormSubmit}
       >
         <div className="user-page-form-group">
@@ -102,6 +107,11 @@ export class DisableUserForm extends React.PureComponent<
     );
   }
 
+  private canSubmit = () => {
+    const { userDisabled, userDisabledExpiry } = this.state;
+    return !(userDisabled && userDisabledExpiry == null);
+  };
+
   private handleDisabledChange: React.ReactEventHandler<
     ReactToggleElement
   > = event => {
@@ -134,5 +144,35 @@ export class DisableUserForm extends React.PureComponent<
 
   private onFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    const { user } = this.props;
+    const {
+      userDisabled,
+      userDisabledExpiry,
+      userDisabledMessage,
+    } = this.state;
+
+    if (userDisabled && userDisabledExpiry == null) {
+      return;
+    }
+
+    return Promise.resolve()
+      .then(() => {
+        return userDisabled
+          ? disableUser(user.id, userDisabledMessage, userDisabledExpiry!)
+          : enableUser(user.id);
+      })
+      .then(() =>
+        this.setState({ isSubmitting: false, successMessage: 'Success!' })
+      )
+      .catch(error => {
+        const message = isOutlawError(error)
+          ? `${error.error.message}`
+          : `${error}`;
+        this.setState({
+          errorMessage: `Failed: ${message}`,
+          isSubmitting: false,
+        });
+      });
   };
 }

@@ -349,6 +349,18 @@ export function fetchUser(userId: string): ThunkAction<Promise<void>, {}, {}> {
   };
 }
 
+export function enableUser(userId: string): Promise<string> {
+  return skygear.auth.adminEnableUser(userId);
+}
+
+export function disableUser(
+  userId: string,
+  message: string,
+  expiry: Date
+): Promise<string> {
+  return skygear.auth.adminDisableUser(userId, message, expiry);
+}
+
 export class UserActionDispatcher {
   private dispatch: Dispatch<RootState>;
 
