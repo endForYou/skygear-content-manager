@@ -1,3 +1,8 @@
+import random
+import string
+import urllib.parse as urlparse
+from urllib.parse import urlencode
+
 import requests
 from ruamel.yaml import YAML
 
@@ -29,7 +34,10 @@ class ConfigLoader:
 
         return cms_config_loader
 
-    def set_config_source(self, config_source):
+    def set_config_source(self, config_source, add_random_string=True):
+        if add_random_string:
+            config_source = add_random_string_to_query_params(config_source)
+
         self.config_source = config_source
         self.config_data = None
         self.config = None
@@ -112,3 +120,15 @@ class ConfigLoader:
         cms_config.association_records = association_records
         cms_config.cms_records = cms_records
         return cms_config
+
+
+def add_random_string_to_query_params(url):
+    random_str = ''.join(
+        random.choices(string.ascii_lowercase + string.digits, k=6))
+
+    url_parts = list(urlparse.urlparse(url))
+    query = dict(urlparse.parse_qsl(url_parts[4]))
+    query.update({'rand': random_str})
+    url_parts[4] = urlencode(query)
+
+    return urlparse.urlunparse(url_parts)
