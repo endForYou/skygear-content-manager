@@ -37,12 +37,12 @@ export class VerificationForm extends React.PureComponent<
   }
 
   public render() {
-    const { className } = this.props;
+    const { className, config } = this.props;
 
     const {
       errorMessage,
       successMessage,
-      // userVerificationFields,
+      userVerificationFields,
       userVerified,
       isSubmitting,
     } = this.state;
@@ -69,6 +69,22 @@ export class VerificationForm extends React.PureComponent<
             </div>
           </div>
         </div>
+
+        {config.fields.map(f => (
+          <div key={f.name} className="user-page-form-group">
+            <div className="user-page-form-label">
+              <label htmlFor="password">{f.label} verified</label>
+            </div>
+            <div className="user-page-form-field toggle">
+              <div className="toggle-container">
+                <ReactToggle
+                  checked={userVerificationFields[f.name]}
+                  onChange={e => this.handleVerifiedFieldChange(e, f)}
+                />
+              </div>
+            </div>
+          </div>
+        ))}
       </Form>
     );
   }
@@ -82,6 +98,19 @@ export class VerificationForm extends React.PureComponent<
   > = event => {
     const checked = event.currentTarget.checked;
     this.setState({ ...this.state, userVerified: checked });
+  };
+
+  private handleVerifiedFieldChange = (
+    event: React.SyntheticEvent<ReactToggleElement>,
+    field: UserVerificationFieldConfig
+  ) => {
+    const checked = event.currentTarget.checked;
+    this.setState({
+      userVerificationFields: {
+        ...this.state.userVerificationFields,
+        [field.name]: checked,
+      },
+    });
   };
 
   private onFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
