@@ -1,10 +1,16 @@
 import classnames from 'classnames';
 import * as React from 'react';
 import ReactToggle, { ReactToggleElement } from 'react-toggle';
+import skygear, { Record } from 'skygear';
 
-import { UserVerificationConfig } from '../../cmsConfig/userManagementConfig';
+import {
+  UserVerificationConfig,
+  UserVerificationFieldConfig,
+} from '../../cmsConfig/userManagementConfig';
 import { Form } from '../../components/Form';
+import { isOutlawError } from '../../recordUtil';
 import { SkygearUser } from '../../types';
+import { objectFrom } from '../../util';
 
 interface VerificationFormProps {
   className?: string;
@@ -31,8 +37,10 @@ export class VerificationForm extends React.PureComponent<
       errorMessage: '',
       isSubmitting: false,
       successMessage: '',
-      userVerificationFields: {},
-      userVerified: false,
+      ...this.deriveVerificationStateFromUserRecord(
+        props.config,
+        props.user.record
+      ),
     };
   }
 
@@ -89,8 +97,28 @@ export class VerificationForm extends React.PureComponent<
     );
   }
 
+  private deriveVerificationStateFromUserRecord = (
+    config: UserVerificationConfig,
+    record?: Record
+  ) => {
+    if (record == null) {
+      return {
+        userVerificationFields: {},
+        userVerified: false,
+      };
+    }
+
+    const fields = config.fields.map(
+      f => [f.name, !!record[`${f.name}_verified`]] as [string, boolean]
+    );
+    return {
+      userVerificationFields: objectFrom(fields),
+      userVerified: record.is_verified,
+    };
+  };
+
   private canSubmit = () => {
-    return true;
+    return !this.state.isSubmitting;
   };
 
   private handleVerifiedChange: React.ReactEventHandler<
@@ -115,6 +143,45 @@ export class VerificationForm extends React.PureComponent<
 
   private onFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    console.log(this.state);
+
+    this.setState({ isSubmitting: true });
+
+    const { config, user } = this.props;
+    const { userVerificationFields, userVerified } = this.state;
+
+    const fieldVerificationData = config.fields.reduce(
+      (acc, f) => ({
+        ...acc,
+        [`${f.name}_verified`]: userVerificationFields[f.name],
+      }),
+      {}
+    );
+
+    const userRecord = new skygear.UserRecord({
+      _id: `user/${user.id}`,
+      is_verified: userVerified,
+      ...fieldVerificationData,
+    });
+
+    // TODO:
+    // Move this part to redux store if other component requires these updates
+    skygear.publicDB
+      .save(userRecord)
+      .then(record => {
+        this.setState({
+          isSubmitting: false,
+          successMessage: 'Success!',
+          ...this.deriveVerificationStateFromUserRecord(config, record),
+        });
+      })
+      .catch(error => {
+        const message = isOutlawError(error)
+          ? `${error.error.message}`
+          : `${error}`;
+        this.setState({
+          errorMessage: `Failed: ${message}`,
+          isSubmitting: false,
+        });
+      });
   };
 }
