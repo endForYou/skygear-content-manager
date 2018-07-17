@@ -42,17 +42,17 @@ describe('parseCmsConfig site', () => {
       site: [
         {
           label: 'User Management',
-          type: 'UserManagement',
+          type: 'user_management',
         },
         {
           label: 'RecordA',
           name: 'RecordA',
-          type: 'Record',
+          type: 'record',
         },
         {
           label: 'RecordB',
           name: 'RecordB',
-          type: 'Record',
+          type: 'record',
         },
       ],
       userManagement: {
@@ -101,7 +101,7 @@ describe('parseCmsConfig push notifications', () => {
             label: 'name',
             name: 'name',
             nullable: false,
-            type: 'String',
+            type: 'string',
           },
         ],
       },

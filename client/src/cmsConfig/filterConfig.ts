@@ -20,12 +20,12 @@ export type FilterConfig =
   | ReferenceFilterConfig;
 
 export enum FilterConfigTypes {
-  String = 'String',
-  DateTime = 'DateTime',
-  Boolean = 'Boolean',
-  Integer = 'Integer',
-  General = 'General',
-  Reference = 'Reference',
+  String = 'string',
+  DateTime = 'date_time',
+  Boolean = 'boolean',
+  Integer = 'integer',
+  General = 'general',
+  Reference = 'reference',
 }
 
 export interface FilterConfigAttrs {
@@ -80,17 +80,17 @@ export function parseFilterConfig(
   context: ConfigContext
 ): FilterConfig {
   switch (a.type) {
-    case 'String':
+    case 'string':
       return parseStringFilterConfig(a);
-    case 'Integer':
+    case 'integer':
       return parseIntegerFilterConfig(a);
-    case 'Boolean':
+    case 'boolean':
       return parseBooleanFilterConfig(a);
-    case 'DateTime':
+    case 'date_time':
       return parseDateTimeFilterConfig(a, context);
-    case 'General':
+    case 'general':
       return parseGeneralFilterConfig(a);
-    case 'Reference':
+    case 'reference':
       return parseReferenceFilterConfig(a, context);
     default:
       throw new Error(`Received unknown filter config type: ${a.type}`);
@@ -112,7 +112,7 @@ function parseFilterConfigAttrs(
 
 function parseStringFilterConfig(input: FilterConfigInput): StringFilterConfig {
   return {
-    ...parseFilterConfigAttrs(input, 'String'),
+    ...parseFilterConfigAttrs(input, 'string'),
     type: FilterConfigTypes.String,
   };
 }
@@ -121,7 +121,7 @@ function parseIntegerFilterConfig(
   input: FilterConfigInput
 ): IntegerFilterConfig {
   return {
-    ...parseFilterConfigAttrs(input, 'Integer'),
+    ...parseFilterConfigAttrs(input, 'integer'),
     type: FilterConfigTypes.Integer,
   };
 }
@@ -130,7 +130,7 @@ function parseBooleanFilterConfig(
   input: FilterConfigInput
 ): BooleanFilterConfig {
   return {
-    ...parseFilterConfigAttrs(input, 'Boolean'),
+    ...parseFilterConfigAttrs(input, 'boolean'),
     type: FilterConfigTypes.Boolean,
   };
 }
@@ -141,7 +141,7 @@ function parseDateTimeFilterConfig(
   context: RecordTypeContext
 ): DateTimeFilterConfig {
   return {
-    ...parseFilterConfigAttrs(input, 'DateTime'),
+    ...parseFilterConfigAttrs(input, 'date_time'),
     timezone: parseTimezone(input, 'timezone'),
     type: FilterConfigTypes.DateTime,
   };
@@ -151,9 +151,9 @@ function parseGeneralFilterConfig(
   input: FilterConfigInput
 ): GeneralFilterConfig {
   const label =
-    parseOptionalString(input, 'label', 'General') || humanize(name);
-  const names = parseStringArray(input, 'name', 'General');
-  const nullable = parseOptionalBoolean(input, 'nullable', 'General') || false;
+    parseOptionalString(input, 'label', 'general') || humanize(name);
+  const names = parseStringArray(input, 'name', 'general');
+  const nullable = parseOptionalBoolean(input, 'nullable', 'general') || false;
   return {
     label,
     name: names.join(','),
@@ -167,20 +167,20 @@ function parseReferenceFilterConfig(
   input: FilterConfigInput,
   context: ConfigContext
 ): ReferenceFilterConfig {
-  const targetRecordName = parseString(input, 'reference_target', 'Reference');
+  const targetRecordName = parseString(input, 'reference_target', 'reference');
   const displayFieldName =
-    parseOptionalString(input, 'reference_field_name', 'Reference') || '_id';
+    parseOptionalString(input, 'reference_field_name', 'reference') || '_id';
   const cmsRecordData = context.cmsRecordByName[targetRecordName];
 
   if (cmsRecordData === undefined) {
     throw new Error(
-      `Couldn't find configuration of Reference.reference_target = ${targetRecordName}`
+      `Couldn't find configuration of reference.reference_target = ${targetRecordName}`
     );
   }
   const targetCmsRecord = cmsRecordData.record;
 
   return {
-    ...parseFilterConfigAttrs(input, 'Reference'),
+    ...parseFilterConfigAttrs(input, 'reference'),
     displayFieldName,
     targetCmsRecord,
     type: FilterConfigTypes.Reference,
@@ -188,42 +188,42 @@ function parseReferenceFilterConfig(
 }
 
 export enum BaseFilterQueryType {
-  IsNull = 'IsNull',
-  IsNotNull = 'IsNotNull',
+  IsNull = 'is_null',
+  IsNotNull = 'is_not_null',
 }
 
 export enum StringFilterQueryType {
-  EqualTo = 'EqualTo',
-  NotEqualTo = 'NotEqualTo',
-  Contain = 'Contain',
-  NotContain = 'NotContain',
+  EqualTo = 'equal_to',
+  NotEqualTo = 'not_equal_to',
+  Contain = 'contain',
+  NotContain = 'not_contain',
 }
 
 export enum IntegerFilterQueryType {
-  EqualTo = 'EqualTo',
-  NotEqualTo = 'NotEqualTo',
-  LessThan = 'LessThan',
-  GreaterThan = 'GreaterThan',
-  LessThanOrEqualTo = 'LessThanOrEqualTo',
-  GreaterThanOrEqualTo = 'GreaterThanOrEqualTo',
+  EqualTo = 'equal_to',
+  NotEqualTo = 'not_equal_to',
+  LessThan = 'less_than',
+  GreaterThan = 'greater_than',
+  LessThanOrEqualTo = 'less_than_or_equal_to',
+  GreaterThanOrEqualTo = 'greater_than_or_equal_to',
 }
 
 export enum BooleanFilterQueryType {
-  True = 'True',
-  False = 'False',
+  True = 'true',
+  False = 'false',
 }
 
 export enum DateTimeFilterQueryType {
-  Before = 'Before',
-  After = 'After',
+  Before = 'before',
+  After = 'after',
 }
 
 export enum GeneralFilterQueryType {
-  Contains = 'Contains',
+  Contains = 'contains',
 }
 
 export enum ReferenceFilterQueryType {
-  Contains = 'Contains',
+  Contains = 'contains',
 }
 
 export type Filter =

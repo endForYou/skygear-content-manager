@@ -5,7 +5,7 @@ imports:
   import-field-demo:
     record_type: field_demo
     identifier: name
-    duplicate_reference_handling: throw-error
+    duplicate_reference_handling: throw_error
     fields:
       - name: name
         label: Name
@@ -59,53 +59,53 @@ push_notifications:
   enabled: true
   filters:
     - name: name
-      type: String
+      type: string
       label: Name
 
 site:
-  - type: UserManagement
+  - type: user_management
     label: USER
-  - type: PushNotifications
+  - type: push_notifications
     label: PUSH
-  - type: FileImport
+  - type: file_import
     label: FILE
-  - type: Space
-  - type: Record
+  - type: space
+  - type: record
     name: field_demo
-  - type: Record
+  - type: record
     name: field_demo_deleted
-  - type: Space
-    size: Large
+  - type: space
+    size: large
 
 records:
   field_demo:
     list:
       predicates:
         - name: deleted
-          predicate: NotEqualTo
+          predicate: not_equal_to
           value: true
       default_sort:
         name: name
         ascending: false
       actions:
-        - type: AddButton
-        - type: Import
+        - type: add_button
+        - type: import
           name: import-field-demo
           label: Import records
-        - type: Import
+        - type: import
           name: import-field-demo
           label: Import (Atomic)
           atomic: true
-        - type: Import
+        - type: import
           name: import-asset-demo
           label: Import with asset
-        - type: Export
+        - type: export
           name: export-field-demo
           label: Export records
       item_actions:
-        - type: ShowButton
-        - type: EditButton
-        - type: Link
+        - type: show_button
+        - type: edit_button
+        - type: link
           label: Search
           href: https://www.google.com/search?q={record.name}
           target: _blank
@@ -115,55 +115,55 @@ records:
         - name: _updated_at
         - name: name
           label: Name
-          type: String
+          type: string
         - name: textarea
-          type: TextArea
+          type: text_area
         - name: dropdown
-          type: String
+          type: string
         - name: wysiwyg
-          type: WYSIWYG
+          type: wysiwyg
         - name: datetime
-          type: DateTime
+          type: date_time
         - name: boolean
-          type: Boolean
+          type: boolean
         - name: integer
-          type: Integer
+          type: integer
         - name: number
-          type: Number
+          type: number
         - name: reference
-          type: Reference
+          type: reference
           reference_target: ref_demo
           reference_field_name: name
         - name: back_refs
-          type: ReferenceList
+          type: reference_list
           reference_via_back_reference: back_ref_demo
           reference_from_field: reference
           reference_field_name: name
         - name: imageasset
-          type: Image
+          type: image
         - name: fileasset
-          type: Asset
+          type: asset
       filters:
         - name: _id
           label: ID
-          type: String
+          type: string
         - name: _created_at
           label: CreatedAt
-          type: DateTime
+          type: date_time
         - name: _updated_at
           label: UpdatedAt
-          type: DateTime
+          type: date_time
         - name: name
           label: Name
-          type: String
+          type: string
         - name: datetime
-          type: DateTime
+          type: date_time
         - name: boolean
-          type: Boolean
+          type: boolean
         - name: integer
-          type: Integer
+          type: integer
         - name: reference
-          type: Reference
+          type: reference
           reference_target: ref_demo
           reference_field_name: name
           nullable: true
@@ -174,38 +174,38 @@ records:
         - name: _updated_at
         - name: name
           label: Name
-          type: String
+          type: string
         - name: textarea
-          type: TextArea
+          type: text_area
         - name: dropdown
-          type: String
+          type: string
         - name: wysiwyg
-          type: WYSIWYG
+          type: wysiwyg
         - name: datetime
-          type: DateTime
+          type: date_time
           timezone: America/New_York
         - name: boolean
-          type: Boolean
+          type: boolean
         - name: integer
-          type: Integer
+          type: integer
         - name: number
-          type: Number
+          type: number
         - name: reference
-          type: Reference
+          type: reference
           reference_target: ref_demo
           reference_field_name: name
         - name: back_refs
-          type: ReferenceList
+          type: reference_list
           reference_via_back_reference: back_ref_demo
           reference_from_field: reference
           reference_field_name: name
         - name: asso_refs
-          type: ReferenceList
+          type: reference_list
           reference_via_association_record: field_asso_ref
           reference_target: asso_ref_demo
           reference_field_name: name
         - name: back_refs_embedded
-          type: EmbeddedReferenceList
+          type: embedded_reference_list
           reference_via_back_reference: back_ref_demo
           reference_from_field: reference
           reference_position_field: field_demo_position
@@ -213,21 +213,21 @@ records:
           reference_fields:
             - name: _id
             - name: name
-              type: String
+              type: string
         - name: asso_refs_embedded
-          type: EmbeddedReferenceList
+          type: embedded_reference_list
           reference_via_association_record: field_asso_ref
           reference_target: asso_ref_demo
           reference_fields:
             - name: _id
             - name: name
-              type: String
+              type: string
         - name: imageasset
-          type: Image
+          type: image
         - name: fileasset
-          type: Asset
+          type: asset
         - name: deleted
-          type: Boolean
+          type: boolean
     edit:
       fields:
         - name: _id
@@ -235,11 +235,11 @@ records:
         - name: _updated_at
         - name: name
           label: Name
-          type: String
+          type: string
         - name: textarea
-          type: TextArea
+          type: text_area
         - name: dropdown
-          type: Dropdown
+          type: dropdown
           null:
             enabled: false
             label: Undefined
@@ -253,26 +253,26 @@ records:
             - label: Option S
               value: S
         - name: wysiwyg
-          type: WYSIWYG
+          type: wysiwyg
         - name: datetime
-          type: DateTime
+          type: date_time
         - name: boolean
-          type: Boolean
+          type: boolean
         - name: integer
-          type: Integer
+          type: integer
         - name: number
-          type: Number
+          type: number
         - name: reference
-          type: Reference
+          type: reference
           reference_target: ref_demo
           reference_field_name: name
         - name: back_refs
-          type: ReferenceList
+          type: reference_list
           reference_via_back_reference: back_ref_demo
           reference_from_field: reference
           reference_field_name: name
         - name: back_refs_embedded
-          type: EmbeddedReferenceList
+          type: embedded_reference_list
           reference_via_back_reference: back_ref_demo
           reference_from_field: reference
           reference_position_field: field_demo_position
@@ -280,22 +280,22 @@ records:
           reference_fields:
             - name: _id
             - name: name
-              type: String
+              type: string
         - name: asso_refs_embedded
-          type: EmbeddedReferenceList
+          type: embedded_reference_list
           reference_via_association_record: field_asso_ref
           reference_target: asso_ref_demo
           reference_reorder_enabled: false
           reference_fields:
             - name: _id
             - name: name
-              type: String
+              type: string
         - name: imageasset
-          type: Image
+          type: image
         - name: fileasset
-          type: Asset
+          type: asset
         - name: deleted
-          type: Boolean
+          type: boolean
           default_value: false
     new:
       fields:
@@ -304,11 +304,11 @@ records:
         - name: _updated_at
         - name: name
           label: Name
-          type: String
+          type: string
         - name: textarea
-          type: TextArea
+          type: text_area
         - name: dropdown
-          type: Dropdown
+          type: dropdown
           null:
             enabled: false
             label: Undefined
@@ -322,26 +322,26 @@ records:
             - label: Option S
               value: S
         - name: wysiwyg
-          type: WYSIWYG
+          type: wysiwyg
         - name: datetime
-          type: DateTime
+          type: date_time
         - name: boolean
-          type: Boolean
+          type: boolean
         - name: integer
-          type: Integer
+          type: integer
         - name: number
-          type: Number
+          type: number
         - name: reference
-          type: Reference
+          type: reference
           reference_target: ref_demo
           reference_field_name: name
         - name: back_refs
-          type: ReferenceList
+          type: reference_list
           reference_via_back_reference: back_ref_demo
           reference_from_field: reference
           reference_field_name: name
         - name: back_refs_embedded
-          type: EmbeddedReferenceList
+          type: embedded_reference_list
           reference_via_back_reference: back_ref_demo
           reference_from_field: reference
           reference_position_field: field_demo_position
@@ -349,29 +349,29 @@ records:
           reference_fields:
             - name: _id
             - name: name
-              type: String
+              type: string
         - name: asso_refs_embedded
-          type: EmbeddedReferenceList
+          type: embedded_reference_list
           reference_via_association_record: field_asso_ref
           reference_target: asso_ref_demo
           reference_reorder_enabled: false
           reference_fields:
             - name: _id
             - name: name
-              type: String
+              type: string
         - name: imageasset
-          type: Image
+          type: image
         - name: fileasset
-          type: Asset
+          type: asset
         - name: deleted
-          type: Boolean
+          type: boolean
           default_value: false
   field_demo_deleted:
     record_type: field_demo
     list:
       predicates:
         - name: deleted
-          predicate: EqualTo
+          predicate: equal_to
           value: true
       fields:
         - name: _id
@@ -379,7 +379,7 @@ records:
         - name: _updated_at
         - name: name
           label: Name
-          type: String
+          type: string
     show:
       fields:
         - name: _id
@@ -387,16 +387,16 @@ records:
         - name: _updated_at
         - name: name
           label: Name
-          type: String
+          type: string
   ref_demo:
     show:
       fields:
         - name: _id
         - name: name
           label: Name
-          type: String
+          type: string
         - name: field_references
-          type: ReferenceList
+          type: reference_list
           reference_via_back_reference: field_demo
           reference_from_field: reference
           reference_field_name: name
@@ -405,9 +405,9 @@ records:
         - name: _id
         - name: name
           label: Name
-          type: String
+          type: string
         - name: field_demos
-          type: ReferenceList
+          type: reference_list
           reference_via_back_reference: field_demo
           reference_from_field: reference
           reference_field_name: name
@@ -416,9 +416,9 @@ records:
         - name: _id
         - name: name
           label: Name
-          type: String
+          type: string
         - name: field_demos
-          type: ReferenceList
+          type: reference_list
           reference_via_back_reference: field_demo
           reference_from_field: reference
           reference_field_name: name
@@ -427,46 +427,46 @@ records:
       fields:
         - name: _id
         - name: reference
-          type: Reference
+          type: reference
           reference_target: field_demo
           reference_field_name: name
         - name: name
           label: Name
-          type: String
+          type: string
     edit:
       fields:
         - name: _id
         - name: reference
-          type: Reference
+          type: reference
           reference_target: field_demo
           reference_field_name: name
         - name: name
           label: Name
-          type: String
+          type: string
     new:
       fields:
         - name: _id
         - name: reference
-          type: Reference
+          type: reference
           reference_target: field_demo
           reference_field_name: name
         - name: name
           label: Name
-          type: String
+          type: string
   asso_ref_demo:
     show:
       fields:
         - name: _id
         - name: name
           label: Name
-          type: String
+          type: string
 
 association_records:
   field_asso_ref:
     fields:
       - name: field_demo
-        type: Reference
+        type: reference
         reference_target: field_demo
       - name: asso_ref_demo
-        type: Reference
+        type: reference
         reference_target: asso_ref_demo

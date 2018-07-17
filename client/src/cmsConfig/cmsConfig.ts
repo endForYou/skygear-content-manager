@@ -50,11 +50,11 @@ export type SiteItemConfig =
   | FileImportSiteItemConfig
   | SpaceSiteItemConfig;
 export enum SiteItemConfigTypes {
-  Record = 'Record',
-  UserManagement = 'UserManagement',
-  PushNotifications = 'PushNotifications',
-  FileImport = 'FileImport',
-  Space = 'Space',
+  Record = 'record',
+  UserManagement = 'user_management',
+  PushNotifications = 'push_notifications',
+  FileImport = 'file_import',
+  Space = 'space',
 }
 
 export interface SiteItemConfigAttrs {
@@ -80,9 +80,9 @@ export interface FileImportSiteItemConfig extends SiteItemConfigAttrs {
 }
 
 export enum SpaceSizeType {
-  Small = 'Small',
-  Medium = 'Medium',
-  Large = 'Large',
+  Small = 'small',
+  Medium = 'medium',
+  Large = 'large',
 }
 
 export interface SpaceSiteItemConfig {
@@ -144,8 +144,8 @@ export interface RecordFormPageConfig {
 }
 
 enum RecordFormPageConfigType {
-  New = 'New',
-  Edit = 'Edit',
+  New = 'new',
+  Edit = 'edit',
 }
 
 export interface AssociationRecordByName {
@@ -199,14 +199,14 @@ export type ListItemActionConfig = LinkActionConfig;
 export type ShowActionConfig = LinkActionConfig;
 export type RecordFormActionConfig = LinkActionConfig;
 export enum ActionConfigTypes {
-  Export = 'Export',
-  Import = 'Import',
-  Link = 'Link',
+  Export = 'export',
+  Import = 'import',
+  Link = 'link',
 
   // Default actions
-  AddButton = 'AddButton',
-  ShowButton = 'ShowButton',
-  EditButton = 'EditButton',
+  AddButton = 'add_button',
+  ShowButton = 'show_button',
+  EditButton = 'edit_button',
 }
 export interface ActionConfigAttrs {
   label: string;
@@ -342,7 +342,7 @@ function parseSiteSpaceConfig(
   input: any
 ): SpaceSiteItemConfig {
   const { type } = input;
-  const sizeInput = parseOptionalString(input, 'size', 'Space') || 'Medium';
+  const sizeInput = parseOptionalString(input, 'size', 'Space') || 'medium';
   let size: SpaceSizeType;
   switch (sizeInput) {
     case SpaceSizeType.Small:
@@ -723,8 +723,8 @@ function makeEditableField(config: FieldConfig): FieldConfig {
 // tslint:disable-next-line:no-any
 export function recursivelyApplyFn(input: any, fn: any) {
   if (
-    (input.type === 'EmbeddedReference' ||
-      input.type === 'EmbeddedReferenceList') &&
+    (input.type === 'embedded_reference' ||
+      input.type === 'embedded_reference_list') &&
     isArray(input.reference_fields)
   ) {
     const fields = input.reference_fields;

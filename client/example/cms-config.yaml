@@ -15,35 +15,35 @@ exports:
 
 
 site:
-  - type: UserManagement
+  - type: user_management
     label: USER
-  - type: PushNotifications
+  - type: push_notifications
     label: PUSH
-  - type: FileImport
+  - type: file_import
     label: FILE
-  - type: Space
-  - type: Record
+  - type: space
+  - type: record
     name: user
-  - type: Record
+  - type: record
     name: payment
-  - type: Record
+  - type: record
     name: order
-  - type: Record
+  - type: record
     name: shipping_order
-  - type: Record
+  - type: record
     name: product
 
 records:
   user:
     list:
       item_actions:
-        - type: ShowButton
-        - type: EditButton
-        - type: Link
+        - type: show_button
+        - type: edit_button
+        - type: link
           label: View Orders
           href: /records/order?filter=%5B%7B"name"%3A"customer"%2C"query"%3A"Contains"%2C"value"%3A%5B"{record.contact_name}"%5D%7D%5D
       filters:
-        - type: General
+        - type: general
           label: Customer data
           name:
             - _id
@@ -53,13 +53,13 @@ records:
       fields:
         - &user_field_contact_name
           name: contact_name
-          type: String
+          type: string
         - &user_field_phone
           name: phone
-          type: String
+          type: string
         - &user_field_email
           name: email
-          type: String
+          type: string
     show:
       fields: &user_detail_fields
         - name: _id
@@ -67,25 +67,25 @@ records:
         - *user_field_contact_name
         - &user_field_username
           name: username
-          type: String
+          type: string
         - *user_field_phone
         - *user_field_email
         - &user_field_profile_picture
           name: profile_picture
-          type: Image
+          type: image
         - &user_field_address
           name: address
-          type: TextArea
+          type: text_area
         - &user_field_payment_methods
           name: payment_methods
-          type: EmbeddedReferenceList
+          type: embedded_reference_list
           reference_via_back_reference: payment_method
           reference_from_field: customer
           reference_position_field: payment_priority
           reference_reorder_enabled: true
           reference_fields:
             - name: type
-              type: Dropdown
+              type: dropdown
               null:
                 enabled: false
                 label: Unknown
@@ -98,9 +98,9 @@ records:
                 - label: Paypal
                   value: paypal
             - name: account_id
-              type: String
+              type: string
             - name: active
-              type: Boolean
+              type: boolean
     edit:
       fields: *user_detail_fields
     new:
@@ -111,7 +111,7 @@ records:
     list:
       filters:
         - name: payment_method
-          type: Reference
+          type: reference
           reference_target: payment_method
           reference_field_name: type
           nullable: false
@@ -119,17 +119,17 @@ records:
         - name: _created_at
         - &payment_field_user_contact_name
           name: customer
-          type: Reference
+          type: reference
           reference_target: user
           reference_field_name: contact_name
         - &payment_field_user_payment_method
           name: payment_method
-          type: Reference
+          type: reference
           reference_target: payment_method
           reference_field_name: type
         - &payment_field_amount
           name: amount
-          type: Number
+          type: number
     show:
       fields:
         - name: _created_at
@@ -143,7 +143,7 @@ records:
     list:
       filters: &order_list_filters
         - name: customer
-          type: Reference
+          type: reference
           reference_target: user
           reference_field_name: contact_name
           nullable: false
@@ -153,7 +153,7 @@ records:
           label: Order Number
         - &order_field_user_contact_name
           name: customer
-          type: Reference
+          type: reference
           reference_target: user
           reference_field_name: contact_name
         - &order_field_order_date
@@ -162,10 +162,10 @@ records:
         - &order_field_due_date
           name: due_date
           label: Due date
-          type: DateTime
+          type: date_time
         - &order_field_status
           name: status
-          type: Dropdown
+          type: dropdown
           null:
             enabled: false
             label: Unknown
@@ -187,10 +187,10 @@ records:
         - *order_field_status
         - &order_field_comment
           name: comment
-          type: TextArea
+          type: text_area
         - &order_field_products
           name: products
-          type: ReferenceList
+          type: reference_list
           reference_via_association_record: order_product
           reference_target: product
           reference_field_name: name
@@ -211,7 +211,7 @@ records:
     list:
       predicates:
         - name: status
-          predicate: EqualTo
+          predicate: equal_to
           value: shipping
       filters: *order_list_filters
       fields: *order_fields
@@ -221,34 +221,34 @@ records:
   product:
     list:
       actions:
-        - type: Import
+        - type: import
           name: import-product
           label: Import
-        - type: Export
+        - type: export
           name: export-product
           label: Export
       filters:
         - name: name
-          type: String
+          type: string
         - name: active
-          type: Boolean
+          type: boolean
       fields:
         - &product_field_name
           name: name
-          type: String
+          type: string
         - &product_field_active
           name: active
-          type: Boolean
+          type: boolean
     show:
       fields:
         - name: _id
         - *product_field_name
         - &product_field_description
           name: description
-          type: TextArea
+          type: text_area
         - &product_field_picture
           name: picture
-          type: Image
+          type: image
         - *product_field_active
     edit:
       fields:
@@ -264,8 +264,8 @@ association_records:
   order_product:
     fields:
       - name: order
-        type: Reference
+        type: reference
         reference_target: order
       - name: product
-        type: Reference
+        type: reference
         reference_target: product

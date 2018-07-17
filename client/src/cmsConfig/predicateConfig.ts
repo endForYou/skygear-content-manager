@@ -4,26 +4,26 @@ import { CmsRecord, ConfigContext } from '.';
 import { parseString } from './util';
 
 export enum PredicateTypes {
-  Like = 'Like',
-  NotLike = 'NotLike',
-  CaseInsensitiveLike = 'CaseInsensitiveLike',
-  CaseInsensitiveNotLike = 'CaseInsensitiveNotLike',
-  EqualTo = 'EqualTo',
-  NotEqualTo = 'NotEqualTo',
-  GreaterThan = 'GreaterThan',
-  GreaterThanOrEqualTo = 'GreaterThanOrEqualTo',
-  LessThan = 'LessThan',
-  LessThanOrEqualTo = 'LessThanOrEqualTo',
-  Contains = 'Contains',
-  NotContains = 'NotContains',
-  ContainsValue = 'ContainsValue',
-  NotContainsValue = 'NotContainsValue',
+  Like = 'like',
+  NotLike = 'not_like',
+  CaseInsensitiveLike = 'case_insensitive_like',
+  CaseInsensitiveNotLike = 'case_insensitive_not_like',
+  EqualTo = 'equal_to',
+  NotEqualTo = 'not_equal_to',
+  GreaterThan = 'greater_than',
+  GreaterThanOrEqualTo = 'greater_than_or_equal_to',
+  LessThan = 'less_than',
+  LessThanOrEqualTo = 'less_than_or_equal_to',
+  Contains = 'contains',
+  NotContains = 'not_contains',
+  ContainsValue = 'contains_value',
+  NotContainsValue = 'not_contains_value',
 }
 
 export enum PredicateValueTypes {
-  JSONValue = 'JSONValue',
-  DateTime = 'DateTime',
-  Reference = 'Reference',
+  JSONValue = 'json_value',
+  DateTime = 'date_time',
+  Reference = 'reference',
 }
 
 export type PredicateValue = Predicate[];
@@ -75,9 +75,9 @@ function parsePredicateValue(
     }
 
     switch (i.valueType) {
-      case 'JSONValue':
+      case 'json_value':
         return parseJSONValuePredicate(i);
-      case 'Reference':
+      case 'reference':
         return parseReferencePredicate(i, context);
       default:
         throw new Error(`Unexpected predicate value type: ${i.valueType}`);
@@ -89,46 +89,46 @@ function parsePredicateValue(
 function parsePredicateAttrs(input: any): PredicateAttrs {
   let type: PredicateTypes;
   switch (input.predicate) {
-    case 'Like':
+    case 'like':
       type = PredicateTypes.Like;
       break;
-    case 'NotLike':
+    case 'not_like':
       type = PredicateTypes.NotLike;
       break;
-    case 'CaseInsensitiveLike':
+    case 'case_insensitive_like':
       type = PredicateTypes.CaseInsensitiveLike;
       break;
-    case 'CaseInsensitiveNotLike':
+    case 'case_insensitive_not_like':
       type = PredicateTypes.CaseInsensitiveNotLike;
       break;
-    case 'EqualTo':
+    case 'equal_to':
       type = PredicateTypes.EqualTo;
       break;
-    case 'NotEqualTo':
+    case 'not_equal_to':
       type = PredicateTypes.NotEqualTo;
       break;
-    case 'GreaterThan':
+    case 'greater_than':
       type = PredicateTypes.GreaterThan;
       break;
-    case 'GreaterThanOrEqualTo':
+    case 'greater_than_or_equal_to':
       type = PredicateTypes.GreaterThanOrEqualTo;
       break;
-    case 'LessThan':
+    case 'less_than':
       type = PredicateTypes.LessThan;
       break;
-    case 'LessThanOrEqualTo':
+    case 'less_than_or_equal_to':
       type = PredicateTypes.LessThanOrEqualTo;
       break;
-    case 'Contains':
+    case 'contains':
       type = PredicateTypes.Contains;
       break;
-    case 'NotContains':
+    case 'not_contains':
       type = PredicateTypes.NotContains;
       break;
-    case 'ContainsValue':
+    case 'contains_value':
       type = PredicateTypes.ContainsValue;
       break;
-    case 'NotContainsValue':
+    case 'not_contains_value':
       type = PredicateTypes.NotContainsValue;
       break;
     default:

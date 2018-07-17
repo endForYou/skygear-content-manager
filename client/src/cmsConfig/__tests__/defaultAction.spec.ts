@@ -3,13 +3,13 @@ import { mapDefaultActionToAction } from '../defaultActions';
 describe('mapDefaultActionToAction', () => {
   it('should replace default action', () => {
     const input = {
-      type: 'AddButton',
+      type: 'add_button',
     };
     const result = mapDefaultActionToAction(input);
     expect(result).toEqual({
       href: '/records/{record_type}/new',
       label: 'Add',
-      type: 'Link',
+      type: 'link',
     });
   });
 
@@ -24,26 +24,26 @@ describe('mapDefaultActionToAction', () => {
   it('should replace default action, with customized value', () => {
     const input = {
       label: 'Customized',
-      type: 'AddButton',
+      type: 'add_button',
     };
     const result = mapDefaultActionToAction(input);
     expect(result).toEqual({
       href: '/records/{record_type}/new',
       label: 'Customized',
-      type: 'Link',
+      type: 'link',
     });
   });
 
   it('should replace default aciton, but ignore unrecognizable custom key', () => {
     const input = {
       $label: 'Customized',
-      type: 'AddButton',
+      type: 'add_button',
     };
     const result = mapDefaultActionToAction(input);
     expect(result).toEqual({
       href: '/records/{record_type}/new',
       label: 'Add',
-      type: 'Link',
+      type: 'link',
     });
   });
 });

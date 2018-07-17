@@ -1,15 +1,15 @@
 export const cmsConfigWithSiteItemsOnly = {
   site: [
     {
-      type: 'UserManagement',
+      type: 'user_management',
     },
     {
       name: 'RecordA',
-      type: 'Record',
+      type: 'record',
     },
     {
       name: 'RecordB',
-      type: 'Record',
+      type: 'record',
     },
   ],
 };
@@ -21,7 +21,7 @@ export const cmsConfigWithPushNotificationOnly = {
       {
         label: 'name',
         name: 'name',
-        type: 'String',
+        type: 'string',
       },
     ],
   },
@@ -47,12 +47,12 @@ export const cmsConfigWithAssociationRecord = {
         {
           name: 'admin_id',
           reference_target: 'admin',
-          type: 'Reference',
+          type: 'reference',
         },
         {
           name: 'product_id',
           reference_target: 'product',
-          type: 'Reference',
+          type: 'reference',
         },
       ],
     },

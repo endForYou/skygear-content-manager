@@ -84,14 +84,14 @@ describe('parseFieldConfig DateTime', () => {
   it('should parse DateTime field', () => {
     const input = {
       name: 'datetime',
-      type: 'DateTimePicker',
+      type: 'date_time_picker',
     };
     const result = parseFieldConfig(minimalContext, input);
     expect(result).toEqual({
       compact: false,
       label: 'Datetime',
       name: 'datetime',
-      type: 'DateTimePicker',
+      type: 'date_time_picker',
     });
   });
 
@@ -99,7 +99,7 @@ describe('parseFieldConfig DateTime', () => {
     const input = {
       name: 'datetime',
       timezone: 'Asia/Hong_Kong',
-      type: 'DateTimePicker',
+      type: 'date_time_picker',
     };
     const result = parseFieldConfig(
       minimalContext,
@@ -110,7 +110,7 @@ describe('parseFieldConfig DateTime', () => {
       label: 'Datetime',
       name: 'datetime',
       timezone: 'Asia/Hong_Kong',
-      type: 'DateTimePicker',
+      type: 'date_time_picker',
     });
   });
 });
@@ -121,7 +121,7 @@ describe('parseFieldConfig Reference', () => {
       name: 'A',
       reference_field_name: 'field',
       reference_target: 'RecordA',
-      type: 'Reference',
+      type: 'reference',
     };
     const result = parseFieldConfig(context, input);
     expect(result).toEqual({
@@ -144,7 +144,7 @@ describe('parseFieldConfig Reference', () => {
     const input = {
       name: 'A',
       reference_target: 'RecordA',
-      type: 'Reference',
+      type: 'reference',
     };
     const result = parseFieldConfig(context, input);
     expect(result).toEqual({
@@ -168,7 +168,7 @@ describe('parseFieldConfig Reference', () => {
       name: 'A',
       reference_field_name: 'field',
       reference_target: 'Unknown',
-      type: 'Reference',
+      type: 'reference',
     };
     expect(() => parseFieldConfig(context, input)).toThrow();
   });
@@ -179,7 +179,7 @@ describe('parseFieldConfig Reference', () => {
       reference_field_name: 'field',
       reference_from_field: 'a_id',
       reference_via_back_reference: 'RecordB',
-      type: 'ReferenceList',
+      type: 'reference_list',
     };
     const result = parseFieldConfig(context, input);
     expect(result).toEqual({
@@ -205,7 +205,7 @@ describe('parseFieldConfig Reference', () => {
       reference_field_name: 'field',
       reference_from_field: 'a_id',
       reference_via_back_reference: 'Unknown',
-      type: 'ReferenceList',
+      type: 'reference_list',
     };
     expect(() => parseFieldConfig(context, input)).toThrow();
   });
@@ -216,7 +216,7 @@ describe('parseFieldConfig Reference', () => {
       reference_field_name: 'field',
       reference_target: 'RecordB',
       reference_via_association_record: 'a_has_b',
-      type: 'ReferenceList',
+      type: 'reference_list',
     };
     const result = parseFieldConfig(context, input);
     expect(result).toEqual({
@@ -301,7 +301,7 @@ describe('parseFieldConfig Reference', () => {
       reference_field_name: 'field',
       reference_target: 'RecordB',
       reference_via_association_record: 'Unknown',
-      type: 'ReferenceList',
+      type: 'reference_list',
     };
     expect(() => parseFieldConfig(context, input)).toThrow();
   });
@@ -312,7 +312,7 @@ describe('parseFieldConfig Reference', () => {
       reference_field_name: 'field',
       reference_target: 'Unknown',
       reference_via_association_record: 'a_has_b',
-      type: 'ReferenceList',
+      type: 'reference_list',
     };
     expect(() => parseFieldConfig(context, input)).toThrow();
   });
@@ -325,12 +325,12 @@ describe('parseFieldConfig EmbeddedReference', () => {
       reference_fields: [
         {
           name: 'name',
-          type: 'TextDisplay',
+          type: 'text_display',
         },
       ],
       reference_from_field: 'a_id',
       reference_via_back_reference: 'RecordB',
-      type: 'EmbeddedReferenceList',
+      type: 'embedded_reference_list',
     };
     const result = parseFieldConfig(context, input);
     expect(result).toEqual({
@@ -354,7 +354,7 @@ describe('parseFieldConfig EmbeddedReference', () => {
         },
         type: ReferenceTypes.ViaBackReference,
       },
-      referenceDeleteAction: 'NullifyReference',
+      referenceDeleteAction: 'nullify_reference',
       references: [],
       reorderEnabled: false,
       sortOrder: 'Asc',
@@ -368,7 +368,7 @@ describe('parseFieldConfig EmbeddedReference', () => {
       reference_delete_action: 'Unknown',
       reference_from_field: 'a_id',
       reference_via_back_reference: 'RecordB',
-      type: 'EmbeddedReferenceList',
+      type: 'embedded_reference_list',
     };
     expect(() => parseFieldConfig(context, input)).toThrow();
   });
@@ -380,7 +380,7 @@ describe('parseFieldConfig EmbeddedReference', () => {
       reference_fields: [],
       reference_from_field: 'a_id',
       reference_via_back_reference: 'RecordB',
-      type: 'EmbeddedReferenceList',
+      type: 'embedded_reference_list',
     };
     expect(() => parseFieldConfig(context, input)).toThrow();
   });

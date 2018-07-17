@@ -53,27 +53,27 @@ export type FieldConfig =
   | EditableFieldConfig;
 
 export enum FieldConfigTypes {
-  TextDisplay = 'TextDisplay',
-  TextInput = 'TextInput',
-  TextArea = 'TextArea',
-  Dropdown = 'Dropdown',
-  WYSIWYG = 'WYSIWYG',
-  DateTimeDisplay = 'DateTimeDisplay',
-  DateTimePicker = 'DateTimePicker',
-  Boolean = 'Boolean',
-  IntegerDisplay = 'IntegerDisplay',
-  IntegerInput = 'IntegerInput',
-  FloatDisplay = 'FloatDisplay',
-  FloatInput = 'FloatInput',
-  Reference = 'Reference',
-  ReferenceDropdown = 'ReferenceDropdown',
-  ReferenceList = 'ReferenceList',
-  ReferenceSelect = 'ReferenceSelect',
-  EmbeddedReferenceList = 'EmbeddedReferenceList',
-  ImageDisplay = 'ImageDisplay',
-  ImageUploader = 'ImageUploader',
-  FileDisplay = 'FileDisplay',
-  FileUploader = 'FileUploader',
+  TextDisplay = 'text_display',
+  TextInput = 'text_input',
+  TextArea = 'text_area',
+  Dropdown = 'dropdown',
+  WYSIWYG = 'wysiwyg',
+  DateTimeDisplay = 'date_time_display',
+  DateTimePicker = 'date_time_picker',
+  Boolean = 'boolean',
+  IntegerDisplay = 'integer_display',
+  IntegerInput = 'integer_input',
+  FloatDisplay = 'float_display',
+  FloatInput = 'float_input',
+  Reference = 'reference',
+  ReferenceDropdown = 'reference_dropdown',
+  ReferenceList = 'reference_list',
+  ReferenceSelect = 'reference_select',
+  EmbeddedReferenceList = 'embedded_reference_list',
+  ImageDisplay = 'image_display',
+  ImageUploader = 'image_uploader',
+  FileDisplay = 'file_display',
+  FileUploader = 'file_uploader',
 }
 
 export enum SortOrder {
@@ -82,8 +82,8 @@ export enum SortOrder {
 }
 
 export enum DeleteAction {
-  NullifyReference = 'NullifyReference',
-  DeleteRecord = 'DeleteRecord',
+  NullifyReference = 'nullify_reference',
+  DeleteRecord = 'delete_record',
 }
 
 export interface FieldConfigAttrs {
@@ -327,18 +327,18 @@ interface FieldConfigInput {
 // tslint:disable-next-line:no-any
 export function preprocessFieldAlias(editable: boolean, input: any) {
   const map = {
-    Asset: ['FileDisplay', 'FileUploader'],
-    DateTime: ['DateTimeDisplay', 'DateTimePicker'],
-    Float: ['FloatDisplay', 'FloatInput'],
-    Image: ['ImageDisplay', 'ImageUploader'],
-    Integer: ['IntegerDisplay', 'IntegerInput'],
-    Number: ['FloatDisplay', 'FloatInput'],
-    Reference: ['Reference', 'ReferenceDropdown'],
-    ReferenceList: ['ReferenceList', 'ReferenceSelect'],
-    String: ['TextDisplay', 'TextInput'],
+    asset: ['file_display', 'file_uploader'],
+    date_time: ['date_time_display', 'date_time_picker'],
+    float: ['float_display', 'float_input'],
+    image: ['image_display', 'image_uploader'],
+    integer: ['integer_display', 'integer_input'],
+    number: ['float_display', 'float_input'],
+    reference: ['reference', 'reference_dropdown'],
+    reference_list: ['reference_list', 'reference_select'],
+    string: ['text_display', 'text_input'],
     // TODO:
     // Invert the alias if more than one UI for Boolean
-    Switch: ['Boolean', 'Boolean'],
+    switch: ['boolean', 'boolean'],
   };
 
   const match = map[input.type];
@@ -367,15 +367,15 @@ export function parseFieldConfig(
   a: any
 ): FieldConfig {
   switch (a.type) {
-    case 'Reference':
+    case 'reference':
       return parseReferenceFieldConfig(context, a);
-    case 'ReferenceDropdown':
+    case 'reference_dropdown':
       return parseReferenceDropdownFieldConfig(context, a);
-    case 'ReferenceList':
+    case 'reference_list':
       return parseReferenceListFieldConfig(context, a);
-    case 'ReferenceSelect':
+    case 'reference_select':
       return parseReferenceSelectFieldConfig(context, a);
-    case 'EmbeddedReferenceList':
+    case 'embedded_reference_list':
       return parseEmbeddedReferenceListFieldConfig(context, a);
     default:
       return parseNonReferenceFieldConfig(context, a);
@@ -398,37 +398,37 @@ export function parseNonReferenceFieldConfig(
   }
 
   switch (a.type) {
-    case 'TextDisplay':
+    case 'text_display':
       return parseTextDisplayFieldConfig(a);
-    case 'TextInput':
+    case 'text_input':
       return parseTextInputFieldConfig(a);
-    case 'TextArea':
+    case 'text_area':
       return parseTextAreaFieldConfig(a);
-    case 'Dropdown':
+    case 'dropdown':
       return parseDropdownFieldConfig(a);
-    case 'WYSIWYG':
+    case 'wysiwyg':
       return parseWYSIWYGFieldConfig(a);
-    case 'DateTimeDisplay':
+    case 'date_time_display':
       return parseDateTimeDisplayFieldConfig(a, context);
-    case 'DateTimePicker':
+    case 'date_time_picker':
       return parseDateTimePickerFieldConfig(a, context);
-    case 'Boolean':
+    case 'boolean':
       return parseBooleanFieldConfig(a);
-    case 'IntegerDisplay':
+    case 'integer_display':
       return parseIntegerDisplayFieldConfig(a);
-    case 'IntegerInput':
+    case 'integer_input':
       return parseIntegerInputFieldConfig(a);
-    case 'FloatDisplay':
+    case 'float_display':
       return parseFloatDisplayFieldConfig(a);
-    case 'FloatInput':
+    case 'float_input':
       return parseFloatInputFieldConfig(a);
-    case 'ImageDisplay':
+    case 'image_display':
       return parseImageDisplayFieldConfig(a);
-    case 'ImageUploader':
+    case 'image_uploader':
       return parseImageUploaderFieldConfig(a);
-    case 'FileDisplay':
+    case 'file_display':
       return parseFileDisplayFieldConfig(a);
-    case 'FileUploader':
+    case 'file_uploader':
       return parseFileUploaderFieldConfig(a);
 
     // backward compatible
@@ -451,7 +451,7 @@ function parseTextDisplayFieldConfig(
   input: FieldConfigInput
 ): TextDisplayFieldConfig {
   return {
-    ...parseFieldConfigAttrs(input, 'TextDisplay'),
+    ...parseFieldConfigAttrs(input, 'text_display'),
     type: FieldConfigTypes.TextDisplay,
   };
 }
@@ -460,8 +460,8 @@ function parseTextInputFieldConfig(
   input: FieldConfigInput
 ): TextInputFieldConfig {
   return {
-    ...parseEditableConfigAttrs(input, 'TextInput'),
-    defaultValue: parseOptionalString(input, 'default_value', 'TextInput'),
+    ...parseEditableConfigAttrs(input, 'text_input'),
+    defaultValue: parseOptionalString(input, 'default_value', 'text_input'),
     type: FieldConfigTypes.TextInput,
   };
 }
@@ -470,8 +470,8 @@ function parseTextAreaFieldConfig(
   input: FieldConfigInput
 ): TextAreaFieldConfig {
   return {
-    ...parseEditableConfigAttrs(input, 'TextArea'),
-    defaultValue: parseOptionalString(input, 'default_value', 'TextArea'),
+    ...parseEditableConfigAttrs(input, 'text_area'),
+    defaultValue: parseOptionalString(input, 'default_value', 'text_area'),
     type: FieldConfigTypes.TextArea,
   };
 }
@@ -507,10 +507,10 @@ function parseDropdownFieldConfig(
   customOption.label = customOption.label || 'Others';
 
   return {
-    ...parseEditableConfigAttrs(input, 'Dropdown'),
+    ...parseEditableConfigAttrs(input, 'dropdown'),
     customOption,
     defaultValue:
-      parseOptionalString(input, 'default_value', 'Dropdown') ||
+      parseOptionalString(input, 'default_value', 'dropdown') ||
       options[0].value,
     nullOption,
     options,
@@ -520,9 +520,9 @@ function parseDropdownFieldConfig(
 
 function parseWYSIWYGFieldConfig(input: FieldConfigInput): WYSIWYGFieldConfig {
   return {
-    ...parseEditableConfigAttrs(input, 'WYSIWYG'),
+    ...parseEditableConfigAttrs(input, 'wysiwyg'),
     config: input.config,
-    defaultValue: parseOptionalString(input, 'default_value', 'WYSIWYG'),
+    defaultValue: parseOptionalString(input, 'default_value', 'wysiwyg'),
     type: FieldConfigTypes.WYSIWYG,
   };
 }
@@ -532,7 +532,7 @@ function parseDateTimeDisplayFieldConfig(
   context: RecordTypeContext
 ): DateTimeDisplayFieldConfig {
   return {
-    ...parseFieldConfigAttrs(input, 'DateTimeDisplay'),
+    ...parseFieldConfigAttrs(input, 'date_time_display'),
     timezone: parseTimezone(input, 'timezone'),
     type: FieldConfigTypes.DateTimeDisplay,
   };
@@ -543,8 +543,8 @@ function parseDateTimePickerFieldConfig(
   context: RecordTypeContext
 ): DateTimePickerFieldConfig {
   return {
-    ...parseEditableConfigAttrs(input, 'DateTimePicker'),
-    defaultValue: parseOptionalDate(input, 'default_value', 'DateTimePicker'),
+    ...parseEditableConfigAttrs(input, 'date_time_picker'),
+    defaultValue: parseOptionalDate(input, 'default_value', 'date_time_picker'),
     timezone: parseTimezone(input, 'timezone'),
     type: FieldConfigTypes.DateTimePicker,
   };
@@ -552,8 +552,8 @@ function parseDateTimePickerFieldConfig(
 
 function parseBooleanFieldConfig(input: FieldConfigInput): BooleanFieldConfig {
   return {
-    ...parseEditableConfigAttrs(input, 'Boolean'),
-    defaultValue: parseOptionalBoolean(input, 'default_value', 'Boolean'),
+    ...parseEditableConfigAttrs(input, 'boolean'),
+    defaultValue: parseOptionalBoolean(input, 'default_value', 'boolean'),
     type: FieldConfigTypes.Boolean,
   };
 }
@@ -562,7 +562,7 @@ function parseIntegerDisplayFieldConfig(
   input: FieldConfigInput
 ): IntegerDisplayFieldConfig {
   return {
-    ...parseFieldConfigAttrs(input, 'IntegerDisplay'),
+    ...parseFieldConfigAttrs(input, 'integer_display'),
     type: FieldConfigTypes.IntegerDisplay,
   };
 }
@@ -571,8 +571,8 @@ function parseIntegerInputFieldConfig(
   input: FieldConfigInput
 ): IntegerInputFieldConfig {
   return {
-    ...parseEditableConfigAttrs(input, 'IntegerInput'),
-    defaultValue: parseOptionalNumber(input, 'default_value', 'IntegerInput'),
+    ...parseEditableConfigAttrs(input, 'integer_input'),
+    defaultValue: parseOptionalNumber(input, 'default_value', 'integer_input'),
     type: FieldConfigTypes.IntegerInput,
   };
 }
@@ -581,7 +581,7 @@ function parseFloatDisplayFieldConfig(
   input: FieldConfigInput
 ): FloatDisplayFieldConfig {
   return {
-    ...parseFieldConfigAttrs(input, 'FloatDisplay'),
+    ...parseFieldConfigAttrs(input, 'float_display'),
     type: FieldConfigTypes.FloatDisplay,
   };
 }
@@ -590,8 +590,8 @@ function parseFloatInputFieldConfig(
   input: FieldConfigInput
 ): FloatInputFieldConfig {
   return {
-    ...parseEditableConfigAttrs(input, 'FloatInput'),
-    defaultValue: parseOptionalNumber(input, 'default_value', 'FloatInput'),
+    ...parseEditableConfigAttrs(input, 'float_input'),
+    defaultValue: parseOptionalNumber(input, 'default_value', 'float_input'),
     type: FieldConfigTypes.FloatInput,
   };
 }
@@ -600,12 +600,12 @@ function parseReferenceFieldConfigAttrs(
   context: RecordTypeContext,
   input: FieldConfigInput
 ): DirectReference {
-  const targetRecordName = parseString(input, 'reference_target', 'Reference');
+  const targetRecordName = parseString(input, 'reference_target', 'reference');
 
   const cmsRecordData = context.cmsRecordByName[targetRecordName];
   if (cmsRecordData === undefined) {
     throw new Error(
-      `Couldn't find configuration of Reference.reference_target = ${targetRecordName}`
+      `Couldn't find configuration of reference.reference_target = ${targetRecordName}`
     );
   }
 
@@ -622,10 +622,10 @@ export function parseReferenceFieldConfig(
   input: FieldConfigInput
 ): ReferenceDisplayFieldConfig {
   const displayFieldName =
-    parseOptionalString(input, 'reference_field_name', 'Reference') || '_id';
+    parseOptionalString(input, 'reference_field_name', 'reference') || '_id';
 
   return {
-    ...parseFieldConfigAttrs(input, 'Reference'),
+    ...parseFieldConfigAttrs(input, 'reference'),
     displayFieldName,
     reference: parseReferenceFieldConfigAttrs(context, input),
     type: FieldConfigTypes.Reference,
@@ -637,10 +637,10 @@ export function parseReferenceDropdownFieldConfig(
   input: FieldConfigInput
 ): ReferenceDropdownFieldConfig {
   const displayFieldName =
-    parseOptionalString(input, 'reference_field_name', 'Reference') || '_id';
+    parseOptionalString(input, 'reference_field_name', 'reference') || '_id';
 
   return {
-    ...parseEditableConfigAttrs(input, 'Reference'),
+    ...parseEditableConfigAttrs(input, 'reference'),
     defaultValue: undefined,
     displayFieldName,
     reference: parseReferenceFieldConfigAttrs(context, input),
@@ -659,7 +659,7 @@ function parseReferenceListFieldConfig(
   );
 
   return {
-    ...parseFieldConfigAttrs(input, 'Reference'),
+    ...parseFieldConfigAttrs(input, 'reference'),
     displayFieldName,
     reference: parseMultiReferenceFieldConfigAttrs(context, input),
     type: FieldConfigTypes.ReferenceList,
@@ -677,7 +677,7 @@ function parseReferenceSelectFieldConfig(
   );
 
   return {
-    ...parseEditableConfigAttrs(input, 'Reference'),
+    ...parseEditableConfigAttrs(input, 'reference'),
     defaultValue: undefined,
     displayFieldName,
     reference: parseMultiReferenceFieldConfigAttrs(context, input),
@@ -700,7 +700,7 @@ function parseEmbeddedReferenceListFieldConfig(
   const positionFieldName = parseOptionalString(
     input,
     'reference_position_field',
-    'Reference'
+    'reference'
   );
 
   let sortOrder: SortOrder = SortOrder.Asc;
@@ -711,10 +711,10 @@ function parseEmbeddedReferenceListFieldConfig(
   let referenceDeleteAction: DeleteAction;
   if (
     input.reference_delete_action == null ||
-    input.reference_delete_action === 'nullify-reference'
+    input.reference_delete_action === DeleteAction.NullifyReference
   ) {
     referenceDeleteAction = DeleteAction.NullifyReference;
-  } else if (input.reference_delete_action === 'delete-record') {
+  } else if (input.reference_delete_action === DeleteAction.DeleteRecord) {
     referenceDeleteAction = DeleteAction.DeleteRecord;
   } else {
     throw new Error(
@@ -725,11 +725,11 @@ function parseEmbeddedReferenceListFieldConfig(
   const reorderEnabled = parseOptionalBoolean(
     input,
     'reference_reorder_enabled',
-    'Reference'
+    'reference'
   );
 
   return {
-    ...parseEditableConfigAttrs(input, 'EmbeddedReference'),
+    ...parseEditableConfigAttrs(input, 'embedded_reference'),
     displayFields,
     positionFieldName,
     reference: parseMultiReferenceFieldConfigAttrs(context, input),
@@ -763,12 +763,12 @@ function parseBackReferenceFieldConfigAttrs(
   const targetRecordName = parseString(
     input,
     'reference_via_back_reference',
-    'Reference'
+    'reference'
   );
   const cmsRecordData = context.cmsRecordByName[targetRecordName];
   if (cmsRecordData === undefined) {
     throw new Error(
-      `Couldn't find configuration of Reference.reference_from_field = ${targetRecordName}`
+      `Couldn't find configuration of reference.reference_from_field = ${targetRecordName}`
     );
   }
 
@@ -777,7 +777,7 @@ function parseBackReferenceFieldConfigAttrs(
   const sourceFieldName = parseString(
     input,
     'reference_from_field',
-    'Reference'
+    'reference'
   );
 
   return {
@@ -791,12 +791,12 @@ function parseAssociationReferenceFieldConfigAttrs(
   context: ConfigContext,
   input: FieldConfigInput
 ): ReferenceViaAssociationRecord {
-  const targetRecordName = parseString(input, 'reference_target', 'Reference');
+  const targetRecordName = parseString(input, 'reference_target', 'reference');
 
   const associationRecordName = parseString(
     input,
     'reference_via_association_record',
-    'Reference'
+    'reference'
   );
   const associationRecordConfig =
     context.associationRecordByName[associationRecordName];
@@ -833,7 +833,7 @@ function deriveReferencesByTargetName(
     return refPair;
   } else {
     throw new Error(
-      `Couldn't find Reference.target = ${targetRecordName} in AssociationRecord.name = ${associationRecordName}`
+      `Couldn't find reference.target = ${targetRecordName} in AssociationRecord.name = ${associationRecordName}`
     );
   }
 }
@@ -842,7 +842,7 @@ function parseImageDisplayFieldConfig(
   input: FieldConfigInput
 ): ImageDisplayFieldConfig {
   return {
-    ...parseFieldConfigAttrs(input, 'ImageDisplay'),
+    ...parseFieldConfigAttrs(input, 'image_display'),
     config: input.config,
     type: FieldConfigTypes.ImageDisplay,
   };
@@ -851,10 +851,10 @@ function parseImageDisplayFieldConfig(
 function parseImageUploaderFieldConfig(
   input: FieldConfigInput
 ): ImageUploaderFieldConfig {
-  const nullable = parseOptionalBoolean(input, 'nullable', 'ImageUploader');
+  const nullable = parseOptionalBoolean(input, 'nullable', 'image_uploader');
 
   return {
-    ...parseEditableConfigAttrs(input, 'ImageUploader'),
+    ...parseEditableConfigAttrs(input, 'image_uploader'),
     config: input.config,
     nullable: nullable == null ? true : nullable,
     type: FieldConfigTypes.ImageUploader,
@@ -865,7 +865,7 @@ function parseFileDisplayFieldConfig(
   input: FieldConfigInput
 ): FileDisplayFieldConfig {
   return {
-    ...parseFieldConfigAttrs(input, 'FileDisplay'),
+    ...parseFieldConfigAttrs(input, 'file_display'),
     type: FieldConfigTypes.FileDisplay,
   };
 }
@@ -873,11 +873,11 @@ function parseFileDisplayFieldConfig(
 function parseFileUploaderFieldConfig(
   input: FieldConfigInput
 ): FileUploaderFieldConfig {
-  const nullable = parseOptionalBoolean(input, 'nullable', 'FileUploader');
+  const nullable = parseOptionalBoolean(input, 'nullable', 'file_uploader');
 
   return {
-    ...parseEditableConfigAttrs(input, 'FileUploader'),
-    accept: parseOptionalString(input, 'accept', 'FileUploader') || '',
+    ...parseEditableConfigAttrs(input, 'file_uploader'),
+    accept: parseOptionalString(input, 'accept', 'file_uploader') || '',
     nullable: nullable == null ? true : nullable,
     type: FieldConfigTypes.FileUploader,
   };

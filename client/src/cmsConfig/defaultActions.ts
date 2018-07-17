@@ -5,28 +5,28 @@ interface DefaultAction {
 }
 
 const defaultActionMap: { [key: string]: DefaultAction } = {
-  AddButton: {
+  add_button: {
     configurableKeys: ['label'],
     value: {
       href: '/records/{record_type}/new',
       label: 'Add',
-      type: 'Link',
+      type: 'link',
     },
   },
-  EditButton: {
+  edit_button: {
     configurableKeys: ['label'],
     value: {
       href: '/record/{record.id}/edit',
       label: 'Edit',
-      type: 'Link',
+      type: 'link',
     },
   },
-  ShowButton: {
+  show_button: {
     configurableKeys: ['label'],
     value: {
       href: '/record/{record.id}',
       label: 'Show',
-      type: 'Link',
+      type: 'link',
     },
   },
 };
