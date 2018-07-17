@@ -61,6 +61,7 @@ export class VerificationForm extends React.PureComponent<
         title="User Verification"
         successMessage={successMessage}
         errorMessage={errorMessage}
+        submitable={this.formSubmittable()}
         submitDisabled={!this.canSubmit() || isSubmitting}
         onSubmit={this.onFormSubmit}
       >
@@ -117,6 +118,18 @@ export class VerificationForm extends React.PureComponent<
       userVerificationFields: objectFrom(fields),
       userVerified: record.is_verified,
     };
+  };
+
+  /**
+   * The form is not submittable if all toggle are not editable
+   */
+  private formSubmittable = () => {
+    const { config } = this.props;
+    const inputEditable = [
+      config.editable,
+      ...config.fields.map(f => f.editable),
+    ];
+    return inputEditable.find(e => e === true) != null;
   };
 
   private canSubmit = () => {
