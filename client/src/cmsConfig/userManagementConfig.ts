@@ -22,6 +22,7 @@ const defaultUserVerificationConfig = {
 export interface UserVerificationFieldConfig {
   name: string;
   label: string;
+  editable: boolean;
 }
 
 export function parseUserManagementConfig(
@@ -45,24 +46,36 @@ function parseUserVerificationConfig(input: any): UserVerificationConfig {
     return { ...defaultUserVerificationConfig };
   }
 
-  const editable = parseOptionalBoolean(input, 'editable', 'verification');
+  const editableInput = parseOptionalBoolean(input, 'editable', 'verification');
+  const editable = editableInput != null ? editableInput : true;
 
   return {
-    editable: editable != null ? editable : true,
+    editable,
     enabled: true,
-    fields: input.fields.map(parseUserVerificationFieldConfig),
+    // tslint:disable-next-line:no-any
+    fields: input.fields.map((f: any) =>
+      parseUserVerificationFieldConfig(f, { editable })
+    ),
   };
 }
 
 function parseUserVerificationFieldConfig(
   // tslint:disable-next-line:no-any
-  input: any
+  input: any,
+  context: { editable: boolean }
 ): UserVerificationFieldConfig {
   const name = parseString(input, 'name', 'verification.fields');
   const label =
     parseOptionalString(input, 'label', 'verification.fields') ||
     humanize(name);
+  const editableInput = parseOptionalBoolean(
+    input,
+    'editable',
+    'verification.fields'
+  );
+  const editable = editableInput != null ? editableInput : context.editable;
   return {
+    editable,
     label,
     name,
   };

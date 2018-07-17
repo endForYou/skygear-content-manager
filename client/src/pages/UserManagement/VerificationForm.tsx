@@ -73,6 +73,7 @@ export class VerificationForm extends React.PureComponent<
               <ReactToggle
                 checked={userVerified}
                 onChange={this.handleVerifiedChange}
+                disabled={!config.editable}
               />
             </div>
           </div>
@@ -88,6 +89,7 @@ export class VerificationForm extends React.PureComponent<
                 <ReactToggle
                   checked={userVerificationFields[f.name]}
                   onChange={e => this.handleVerifiedFieldChange(e, f)}
+                  disabled={!f.editable}
                 />
               </div>
             </div>

@@ -3,11 +3,13 @@ default_settings:
 
 user_management:
   verification:
-    # editable: false
+    editable: false
     fields:
       - name: email
+        editable: true
       - name: phone
         label: Phone number
+        editable: true
 
 imports:
   import-field-demo:
