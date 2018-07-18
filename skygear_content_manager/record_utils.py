@@ -1,7 +1,58 @@
+from sqlalchemy import not_
+
 from .models.cms_config import CMSRecordAssociationReference
 from .models.cms_config import CMSRecordBackReference
 from .skygear_utils import eq_predicate
 from .skygear_utils import fetch_records
+from .skygear_utils import or_predicate
+
+
+def get_order_by(col_map, name, is_ascending):
+    col = col_map.get(name)
+    if not col:
+        raise Exception('Unexpected field name: {}'.format(name))
+
+    return col.asc() if is_ascending else col.desc()
+
+
+def get_filter_func(col_map, name, query, value):
+    col = col_map.get(name)
+    if not col:
+        raise Exception('Unexpected field name: {}'.format(name))
+
+    if query == 'EqualTo':
+        return col == value
+    elif query == 'NotEqualTo':
+        return col != value
+    elif query == 'Contain':
+        return col.ilike(value)
+    elif query == 'NotContain':
+        return not_(col.ilike(value))
+    elif query == 'Before' or query == 'LessThan':
+        return col < value
+    elif query == 'After' or query == 'GreaterThan':
+        return col > value
+    elif query == 'LessThanOrEqualTo':
+        return col <= value
+    elif query == 'GreaterThanOrEqualTo':
+        return col >= value
+    else:
+        raise Exception('Unexpected query type: {}', format(query))
+
+
+def apply_filters(query, filters, col_map):
+    for filter in filters:
+        query = query.filter(
+            get_filter_func(col_map, filter['name'], filter['query'],
+                            filter['value']))
+
+    return query
+
+
+def fetch_records_by_values_in_key(record_type, key, values):
+    value_predicates = [eq_predicate(key, v) for v in values]
+    predicate = or_predicate(value_predicates)
+    return fetch_records(record_type, predicate)
 
 
 def transient_foreign_records(record, export_config, association_records):

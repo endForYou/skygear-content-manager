@@ -1,0 +1,87 @@
+@import 'styleUtils/common.scss';
+
+.user-page {
+  .topbar {
+    @include record-topbar(to-rem(32px));
+  }
+
+  .title {
+    @include record-topbar-title;
+  }
+
+  .user-page-form {
+    margin: to-rem(20px) to-rem(32px);
+  }
+}
+
+.user-page-form {
+  &.loading,
+  &.error {
+    @include record-form;
+    font-weight: 300;
+    font-size: 18px;
+    line-height: 18px;
+    margin: 0 to-rem(32px);
+  }
+
+  .user-page-form-group {
+    display: flex;
+    width: 100%;
+  }
+
+  .user-page-form-group:not(:first-child) {
+    margin-top: to-rem(10px);
+  }
+
+  .user-page-form-label {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow-x: hidden;
+    width: to-rem(200px);
+    line-height: to-rem(38px);
+    vertical-align: top;
+    flex-shrink: 0;
+
+    label {
+      margin-bottom: 0;
+    }
+  }
+
+  .user-page-form-field {
+    width: 100%;
+
+    &.text {
+      @include text-input;
+      height: to-rem(38px);
+
+      &.static {
+        border-color: rgba(#CCC, 0.3);
+        display: flex;
+        align-items: center;
+      }
+    }
+
+    &.datetime-input {
+      @include text-input;
+      height: to-rem(38px);
+      vertical-align: middle;
+    }
+
+    &.toggle {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+
+      .toggle-container {
+        display: flex;
+      }
+    }
+
+    &.textarea {
+      @include text-input;
+      height: to-rem(200px);
+      padding-top: to-rem(12px);
+      padding-bottom: to-rem(12px);
+    }
+  }
+}

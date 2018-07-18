@@ -30,6 +30,7 @@ from .skygear_utils import SkygearResponse
 from .skygear_utils import get_schema
 from .skygear_utils import request_skygear
 from .skygear_utils import validate_master_user
+from .user import register_lambdas as register_user_lambdas
 from .werkzeug_utils import prepare_file_response
 
 logger = logging.getLogger(__name__)
@@ -47,6 +48,7 @@ def includeme(settings):
     register_file_import_lambda(settings)
     register_import_export_lambdas(settings)
     register_cms_proxy_handler(settings)
+    register_user_lambdas(settings)
 
     @skygear.event("before-plugins-ready")
     def before_plugins_ready(config):

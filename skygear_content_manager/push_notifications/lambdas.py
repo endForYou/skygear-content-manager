@@ -16,7 +16,7 @@ PAGE = 1
 class CmsPushCampaignSchema(Schema):
     id = fields.String()
     content = fields.String()
-    send_time = fields.DateTime(format="%Y-%m-%d %H:%M:%S")
+    send_time = fields.DateTime(format="%Y-%m-%dT%H:%M:%SZ")
     type = fields.String()
     sent = fields.Boolean()
     number_of_audiences = fields.Integer()

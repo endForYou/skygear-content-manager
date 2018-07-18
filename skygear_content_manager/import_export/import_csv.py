@@ -7,9 +7,7 @@ from ..db_session import scoped_session
 from ..models.asset import Asset
 from ..models.cms_config import DUPLICATION_HANDLING_USE_FIRST
 from ..models.imported_file import CmsImportedFile
-from ..skygear_utils import eq_predicate
-from ..skygear_utils import fetch_records
-from ..skygear_utils import or_predicate
+from ..record_utils import fetch_records_by_values_in_key
 from ..skygear_utils import save_records
 from .csv_deserializer import RecordDeserializer
 
@@ -298,12 +296,6 @@ def deserialize_record_data(data_list, deserializer):
         records.append(record)
 
     return records
-
-
-def fetch_records_by_values_in_key(record_type, key, values):
-    value_predicates = [eq_predicate(key, v) for v in values]
-    predicate = or_predicate(value_predicates)
-    return fetch_records(record_type, predicate)
 
 
 def inject_asset(data_list, import_config):

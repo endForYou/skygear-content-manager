@@ -8,12 +8,12 @@ import { Record } from 'skygear';
 
 import { RecordActionDispatcher } from '../actions/record';
 import { FieldConfig, RecordFormPageConfig } from '../cmsConfig';
-import { PrimaryButton } from '../components/PrimaryButton';
 import { Field, FieldContext } from '../fields';
 import { errorMessageFromError, isRecordsOperationError } from '../recordUtil';
 import { RootState } from '../states';
 import { Remote, RemoteType } from '../types';
 import { entriesOf, objectValues } from '../util';
+import { Form } from './Form';
 
 // TODO: Reduce reused components between edit and new page
 // in order to support future requirements such as custom input validation during
@@ -125,16 +125,18 @@ class RecordFormPageImpl extends React.PureComponent<
     });
 
     return (
-      <form
+      <Form
         className={classnames(className, 'record-form-page')}
+        submitDisabled={
+          savingRecord !== undefined && savingRecord.type === RemoteType.Loading
+        }
         onSubmit={this.handleSubmit}
       >
         <div className="record-form-groups">
           {formGroups}
           {this.renderErrorMessage()}
         </div>
-        <SubmitButton savingRecord={savingRecord} />
-      </form>
+      </Form>
     );
   }
 
@@ -228,27 +230,6 @@ function FormField(props: FieldProps): JSX.Element {
         onRecordChange(name, value, beforeEffect, afterEffect)}
     />
   );
-}
-
-interface SubmitProps {
-  savingRecord?: Remote<Record>;
-}
-
-function SubmitButton(props: SubmitProps): JSX.Element {
-  const { savingRecord } = props;
-  if (savingRecord !== undefined && savingRecord.type === RemoteType.Loading) {
-    return (
-      <PrimaryButton type="submit" className="btn-submit" disabled={true}>
-        Save
-      </PrimaryButton>
-    );
-  } else {
-    return (
-      <PrimaryButton type="submit" className="btn-submit">
-        Save
-      </PrimaryButton>
-    );
-  }
 }
 
 function mergeRecordChange(record: Record, change: RecordChange) {

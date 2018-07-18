@@ -3,7 +3,12 @@ import { Role } from 'skygear';
 import { Actions } from '../actions';
 import { UserActionTypes } from '../actions/user';
 import { initialUserState, UserState } from '../states';
-import { SkygearUser } from '../types';
+import {
+  RemoteFailure,
+  RemoteLoading,
+  RemoteSuccess,
+  SkygearUser,
+} from '../types';
 import { update } from '../util';
 
 export default function userReducer(
@@ -81,6 +86,21 @@ export default function userReducer(
         ),
       };
     }
+    case UserActionTypes.FetchUserRequest:
+      return {
+        ...state,
+        user: RemoteLoading,
+      };
+    case UserActionTypes.FetchUserSuccess:
+      return {
+        ...state,
+        user: RemoteSuccess<SkygearUser>(action.payload.user),
+      };
+    case UserActionTypes.FetchUserFailure:
+      return {
+        ...state,
+        user: RemoteFailure(action.payload.error),
+      };
     default:
       return state;
   }

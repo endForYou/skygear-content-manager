@@ -1,9 +1,8 @@
 from sqlalchemy import BigInteger
 from sqlalchemy import Column
 from sqlalchemy import Text
-from sqlalchemy.ext.declarative import declarative_base
 
-Base = declarative_base()
+from .meta import Base
 
 
 class Asset(Base):
