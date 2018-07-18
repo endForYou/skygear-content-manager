@@ -356,7 +356,7 @@ export function enableUser(userId: string): Promise<string> {
 export function disableUser(
   userId: string,
   message: string,
-  expiry: Date
+  expiry?: Date
 ): Promise<string> {
   return skygear.auth.adminDisableUser(userId, message, expiry);
 }

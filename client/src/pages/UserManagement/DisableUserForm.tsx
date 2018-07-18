@@ -108,8 +108,7 @@ export class DisableUserForm extends React.PureComponent<
   }
 
   private canSubmit = () => {
-    const { userDisabled, userDisabledExpiry } = this.state;
-    return !(userDisabled && userDisabledExpiry == null);
+    return true;
   };
 
   private handleDisabledChange: React.ReactEventHandler<
@@ -152,14 +151,10 @@ export class DisableUserForm extends React.PureComponent<
       userDisabledMessage,
     } = this.state;
 
-    if (userDisabled && userDisabledExpiry == null) {
-      return;
-    }
-
     return Promise.resolve()
       .then(() => {
         return userDisabled
-          ? disableUser(user.id, userDisabledMessage, userDisabledExpiry!)
+          ? disableUser(user.id, userDisabledMessage, userDisabledExpiry)
           : enableUser(user.id);
       })
       .then(() =>
