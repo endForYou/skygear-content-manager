@@ -24,6 +24,11 @@ const emptyCmsConfig = {
   site: [],
   userManagement: {
     enabled: false,
+    verification: {
+      editable: false,
+      enabled: false,
+      fields: [],
+    },
   },
 };
 
@@ -57,6 +62,11 @@ describe('parseCmsConfig site', () => {
       ],
       userManagement: {
         enabled: true,
+        verification: {
+          editable: false,
+          enabled: false,
+          fields: [],
+        },
       },
     });
   });
