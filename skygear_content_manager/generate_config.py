@@ -10,20 +10,20 @@ def generate_config(schema):
 
 def generate_site_config(schema):
     non_record_pages = [{
-        'type': 'UserManagement',
+        'type': 'user_management',
     }]
 
     if has_asset_field(schema):
         non_record_pages = non_record_pages + [{
-            'type': 'FileImport',
+            'type': 'file_import',
         }]
 
     record_pages = [{
-        'type': 'Record',
+        'type': 'record',
         'name': r,
     } for r in schema.record_types]
 
-    return non_record_pages + [{'type': 'Space'}] + record_pages
+    return non_record_pages + [{'type': 'space'}] + record_pages
 
 
 def generate_records_config(schema):
@@ -67,15 +67,15 @@ def generate_field_config(record, field):
     }
 
     if field.is_ref:
-        field_config['type'] = 'Reference'
+        field_config['type'] = 'reference'
         field_config['reference_target'] = field.ref_target
         field_config['reference_field_name'] = '_id'
     elif field.type == 'string':
-        field_config['type'] = 'String'
+        field_config['type'] = 'string'
     elif field.type in 'number':
-        field_config['type'] = 'Number'
+        field_config['type'] = 'number'
     elif field.type == 'boolean':
-        field_config['type'] = 'Boolean'
+        field_config['type'] = 'boolean'
     elif field.type == 'json':
         # TODO:
         # Need JSON support
@@ -87,11 +87,11 @@ def generate_field_config(record, field):
         # field_config['type'] = 'Location'
         return None
     elif field.type == 'datetime':
-        field_config['type'] = 'DateTime'
+        field_config['type'] = 'date_time'
     elif field.type == 'integer':
-        field_config['type'] = 'Integer'
+        field_config['type'] = 'integer'
     elif field.type == 'asset':
-        field_config['type'] = 'Asset'
+        field_config['type'] = 'asset'
     else:
         # skip for other field types
         return None
