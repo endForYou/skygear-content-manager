@@ -35,7 +35,7 @@ class ConfigLoader:
         return cms_config_loader
 
     def set_config_source(self, config_source, add_random_string=True):
-        if add_random_string:
+        if add_random_string and config_source:
             config_source = add_random_string_to_query_params(config_source)
 
         self.config_source = config_source
