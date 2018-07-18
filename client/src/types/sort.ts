@@ -15,3 +15,7 @@ export function SortState(): SortState {
     order: SortOrder.Undefined,
   };
 }
+
+export function isSortStateEqual(s1: SortState, s2: SortState): boolean {
+  return s1.fieldName === s2.fieldName && s1.order === s2.order;
+}

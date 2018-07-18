@@ -51,7 +51,7 @@ import {
 import { ToggleButton } from '../components/ToggleButton';
 import { Field, FieldContext } from '../fields';
 import { getCmsConfig, ImportState, RootState, RouteProps } from '../states';
-import { RemoteType, SortOrder, SortState } from '../types';
+import { isSortStateEqual, RemoteType, SortOrder, SortState } from '../types';
 import { debounce } from '../util';
 
 export type SortButtonClickHandler = (name: string) => void;
@@ -275,7 +275,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
   }
 
   public componentWillReceiveProps(nextProps: ListPageProps) {
-    const { filters, import: { importResult }, page } = this.props;
+    const { filters, import: { importResult }, page, sortState } = this.props;
     // Refresh list after import success
     if (
       (importResult &&
@@ -283,7 +283,9 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
         nextProps.import.importResult &&
         nextProps.import.importResult.type === RemoteType.Success) ||
       // Handle filters & page change by browser navigation
-      (filters !== nextProps.filters || page !== nextProps.page)
+      (filters !== nextProps.filters ||
+        page !== nextProps.page ||
+        !isSortStateEqual(sortState, nextProps.sortState))
     ) {
       this.reloadList(nextProps);
     }

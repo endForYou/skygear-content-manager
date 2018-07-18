@@ -23,7 +23,7 @@ import {
 } from '../../components/SyncUrl/SyncUrlSort';
 import { TzDatetime } from '../../components/TzDatetime';
 import { RootState, RouteProps } from '../../states';
-import { SortOrder, SortState } from '../../types';
+import { isSortStateEqual, SortOrder, SortState } from '../../types';
 import { ImportedFile } from '../../types/importedFile';
 import { debounce } from '../../util';
 
@@ -180,9 +180,13 @@ class FileImportPage extends React.Component<FileImportPageProps, State> {
   }
 
   public componentWillReceiveProps(nextProps: FileImportPageProps) {
-    const { filters, page } = this.props;
+    const { filters, page, sortState } = this.props;
     // Handle filters & page change by browser navigation
-    if (filters !== nextProps.filters || page !== nextProps.page) {
+    if (
+      filters !== nextProps.filters ||
+      page !== nextProps.page ||
+      !isSortStateEqual(sortState, nextProps.sortState)
+    ) {
       this.reloadList(nextProps);
     }
   }
