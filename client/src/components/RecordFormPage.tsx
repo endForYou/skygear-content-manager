@@ -13,6 +13,7 @@ import { errorMessageFromError, isRecordsOperationError } from '../recordUtil';
 import { RootState } from '../states';
 import { Remote, RemoteType } from '../types';
 import { entriesOf, objectValues } from '../util';
+import { validateField } from '../validation';
 import { Form } from './Form';
 
 // TODO: Reduce reused components between edit and new page
@@ -179,6 +180,10 @@ class RecordFormPageImpl extends React.PureComponent<
 
     mergeRecordChange(record, recordChange);
 
+    if (!this.validateFields()) {
+      return;
+    }
+
     Promise.resolve()
       .then(() => EffectAll(objectValues(beforeEffectChange))())
       .then(() =>
@@ -193,6 +198,42 @@ class RecordFormPageImpl extends React.PureComponent<
       })
       .catch(effectError => this.setState({ effectError }));
   };
+
+  public validateFields(): boolean {
+    const { config: { fields }, record } = this.props;
+
+    const isValid = fields
+      .filter(
+        field => field.validations != null && field.validations.length > 0
+      )
+      .map(field => {
+        const validations = field.validations!;
+        const result = validations
+          .map(validation => ({
+            valid: validateField(record[field.name], field, validation),
+            validation,
+          }))
+          .find(({ valid }) => !valid);
+
+        if (result == null) {
+          return { field, errorMessage: undefined };
+        }
+
+        const failedValidation = result.validation;
+        return {
+          errorMessage: failedValidation.message || 'Invalid data',
+          field,
+        };
+      })
+      .map(({ field, errorMessage }) => {
+        // TODO: display error message
+        console.log('Failed validation:', field.name, errorMessage);
+        return errorMessage == null;
+      })
+      .reduce((acc, valid) => acc && valid, true);
+
+    return isValid;
+  }
 }
 
 interface FieldProps {
