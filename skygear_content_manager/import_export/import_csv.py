@@ -103,10 +103,21 @@ class AssetNotFoundException(Exception):
         super(AssetNotFoundException, self).__init__(message)
 
 
-class ColumnNotFoundException(Exception):
+class ColumnNotFoundException(SkygearException):
     def __init__(self, column_name):
         message = 'field "{}" not found in the csv header'.format(column_name)
         super(ColumnNotFoundException, self).__init__(message)
+
+    def to_dict(self):
+        return {
+            '_type': 'error',
+            'code': 108,
+            'message': self.message,
+            'name': self.__class__.__name__,
+        }
+
+    def as_dict(self):
+        return self.to_dict()
 
 
 def prepare_import_records(stream, import_config, atomic):
