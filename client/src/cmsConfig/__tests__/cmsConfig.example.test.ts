@@ -77,6 +77,12 @@ test('parseCmsConfig should parse example config', () => {
               label: 'Name',
               editable: true,
               type: 'text_input',
+              validations: [
+                {
+                  expression: 'value not in ("admin", "god")',
+                  message: 'Reserved name.',
+                },
+              ],
             },
             {
               compact: false,

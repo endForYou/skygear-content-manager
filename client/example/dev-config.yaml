@@ -236,6 +236,9 @@ records:
         - name: name
           label: Name
           type: string
+          validations:
+            - expression: value not in ("admin", "god")
+              message: Reserved name.
         - name: textarea
           type: text_area
         - name: dropdown
