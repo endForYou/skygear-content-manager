@@ -106,8 +106,6 @@ def register_import_lambdas(settings):
 
         records = None
         with open(temp_file.name, 'r', encoding='utf-8') as fp:
-            # skip first row
-            next(fp)
             records = prepare_import_records(fp, import_config, atomic)
 
         resp = import_records(records, atomic)
