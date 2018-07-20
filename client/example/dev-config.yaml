@@ -237,7 +237,9 @@ records:
           label: Name
           type: string
           validations:
-            - expression: value not in ("admin", "god")
+            - expression: length(value) < 10
+              message: Too long.
+            - expression: lower(value) not in ("admin", "god")
               message: Reserved name.
         - name: textarea
           type: text_area
@@ -297,6 +299,8 @@ records:
           type: image
         - name: fileasset
           type: asset
+          validations:
+            - expression: regex(get(value, "content_type"), "^(audio|video)")
         - name: deleted
           type: boolean
           default_value: false

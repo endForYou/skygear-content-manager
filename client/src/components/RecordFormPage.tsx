@@ -13,7 +13,7 @@ import { errorMessageFromError, isRecordsOperationError } from '../recordUtil';
 import { RootState } from '../states';
 import { Remote, RemoteType } from '../types';
 import { entriesOf, objectValues } from '../util';
-import { validateField } from '../validation';
+import { validateField } from '../validation/validation';
 import { Form } from './Form';
 
 // TODO: Reduce reused components between edit and new page

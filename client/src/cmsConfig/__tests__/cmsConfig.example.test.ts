@@ -75,14 +75,15 @@ test('parseCmsConfig should parse example config', () => {
               compact: false,
               name: 'name',
               label: 'Name',
-              editable: true,
-              type: 'text_input',
               validations: [
+                { expression: 'length(value) < 10', message: 'Too long.' },
                 {
-                  expression: 'value not in ("admin", "god")',
+                  expression: 'lower(value) not in ("admin", "god")',
                   message: 'Reserved name.',
                 },
               ],
+              editable: true,
+              type: 'text_input',
             },
             {
               compact: false,
@@ -308,6 +309,12 @@ test('parseCmsConfig should parse example config', () => {
               compact: false,
               name: 'fileasset',
               label: 'Fileasset',
+              validations: [
+                {
+                  expression:
+                    'regex(get(value, "content_type"), "^(audio|video)")',
+                },
+              ],
               editable: true,
               accept: '',
               nullable: true,
