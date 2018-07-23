@@ -32,6 +32,8 @@ export function parseValidationConfig(input: any): ValidationConfig {
     bypassNull = false;
   } else if (input.regex != null) {
     config = regexValidation(input);
+  } else if (input.pattern != null) {
+    config = patternValidation(input);
   } else {
     config = {
       expression: parseString(input, 'expression', 'validation'),
@@ -70,6 +72,24 @@ function regexValidation(input: any): ValidationConfig {
   return {
     expression: `regex(value, "${regex}")`,
     message: parseOptionalString(input, 'message', 'validation'),
+  };
+}
+
+// tslint:disable-next-line:no-any
+function patternValidation(input: any): ValidationConfig {
+  const patterns = ['credit_card', 'email', 'url'];
+  const pattern = parseString(input, 'pattern', 'validation');
+  if (patterns.indexOf(pattern) === -1) {
+    throw new Error(
+      `Invalid pattern: ${pattern}, should be one of ${patterns.join(', ')}`
+    );
+  }
+
+  return {
+    expression: `match_pattern(value, "${pattern}")`,
+    message:
+      parseOptionalString(input, 'message', 'validation') ||
+      `Require valid ${pattern.replace('_', ' ')} input.`,
   };
 }
 
