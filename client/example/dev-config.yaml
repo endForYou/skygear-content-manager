@@ -237,7 +237,8 @@ records:
           label: Name
           type: string
           validations:
-            - expression: length(value) < 10
+            - when: substring(value, 0, 1) != "_"
+              expression: length(value) < 10
               message: Too long.
             - expression: lower(value) not in ("admin", "god")
               message: Reserved name.

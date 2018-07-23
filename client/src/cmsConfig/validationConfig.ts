@@ -25,8 +25,11 @@ export function parseValidationConfigs(
 
 // tslint:disable-next-line:no-any
 export function parseValidationConfig(input: any): ValidationConfig {
-  const expression = parseString(input, 'expression', 'validation');
+  let expression = parseString(input, 'expression', 'validation');
   const message = parseOptionalString(input, 'message', 'validation');
+
+  const when = parseOptionalString(input, 'when', 'validation');
+  expression = combineExpressionWithWhen(expression, when);
 
   // try to compile the expression here
   compileExpression(expression);
@@ -35,4 +38,12 @@ export function parseValidationConfig(input: any): ValidationConfig {
     expression,
     message,
   };
+}
+
+function combineExpressionWithWhen(expression: string, when?: string): string {
+  if (when == null || when.length === 0) {
+    return expression;
+  }
+
+  return `not (${when}) or (${expression})`;
 }

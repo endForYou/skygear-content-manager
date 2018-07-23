@@ -76,7 +76,11 @@ test('parseCmsConfig should parse example config', () => {
               name: 'name',
               label: 'Name',
               validations: [
-                { expression: 'length(value) < 10', message: 'Too long.' },
+                {
+                  expression:
+                    'not (substring(value, 0, 1) != "_") or (length(value) < 10)',
+                  message: 'Too long.',
+                },
                 {
                   expression: 'lower(value) not in ("admin", "god")',
                   message: 'Reserved name.',
