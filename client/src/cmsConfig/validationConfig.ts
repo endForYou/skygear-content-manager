@@ -30,6 +30,8 @@ export function parseValidationConfig(input: any): ValidationConfig {
   if (input.required != null) {
     config = requiredValidation(input);
     bypassNull = false;
+  } else if (input.regex != null) {
+    config = regexValidation(input);
   } else {
     config = {
       expression: parseString(input, 'expression', 'validation'),
@@ -59,6 +61,15 @@ function requiredValidation(input: any): ValidationConfig {
       : `true`,
     message:
       parseOptionalString(input, 'message', 'validation') || 'Required field.',
+  };
+}
+
+// tslint:disable-next-line:no-any
+function regexValidation(input: any): ValidationConfig {
+  const regex = parseString(input, 'regex', 'validation');
+  return {
+    expression: `regex(value, "${regex}")`,
+    message: parseOptionalString(input, 'message', 'validation'),
   };
 }
 
