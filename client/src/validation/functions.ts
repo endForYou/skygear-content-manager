@@ -22,6 +22,8 @@ enum ValueTypes {
   undefined = 'undefined',
 }
 
+const NoArgs = 'NoArgs';
+
 function _typeof(value: any): ValueTypes {
   const tests: Array<[(value: any) => boolean, ValueTypes]> = [
     [isString, ValueTypes.string],
@@ -61,6 +63,9 @@ const predefinedFunctions = {
       value: string,
       regex: string
     ) => value.match(new RegExp(regex)) != null,
+  },
+  now: {
+    [NoArgs]: () => new Date(),
   },
   datetime: {
     [ValueTypes.string]: (value: string) => new Date(value),
@@ -121,7 +126,8 @@ export const functions = (() => {
       return predefinedFunctions[funcName](...values);
     }
 
-    const paramTypes = values.map(_typeof).join(',');
+    const paramTypes =
+      values.length === 0 ? NoArgs : values.map(_typeof).join(',');
     const func = predefinedFunctions[funcName][paramTypes];
     if (func == null) {
       throw new Error(
