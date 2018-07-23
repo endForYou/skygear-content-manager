@@ -12,7 +12,7 @@ import { Field, FieldContext } from '../fields';
 import { errorMessageFromError, isRecordsOperationError } from '../recordUtil';
 import { RootState } from '../states';
 import { Remote, RemoteType } from '../types';
-import { entriesOf, objectValues } from '../util';
+import { entriesOf, objectFrom, objectValues } from '../util';
 import { validateField } from '../validation/validation';
 import { Form } from './Form';
 
@@ -33,8 +33,13 @@ export interface RecordFormPageProps {
 // tslint:disable-next-line: no-any
 export type Effect = () => Promise<any>;
 
+interface FieldValidationError {
+  [field: string]: string;
+}
+
 interface State {
   recordChange: RecordChange;
+  fieldValidationError: FieldValidationError;
 
   // Side effects produced by fields. They will get executed after record is
   // saved successfully.
@@ -73,6 +78,7 @@ class RecordFormPageImpl extends React.PureComponent<
     this.state = {
       afterEffectChange: {},
       beforeEffectChange: {},
+      fieldValidationError: {},
       recordChange: {},
     };
   }
@@ -112,6 +118,7 @@ class RecordFormPageImpl extends React.PureComponent<
 
   public render() {
     const { className, config, record, savingRecord } = this.props;
+    const { fieldValidationError } = this.state;
 
     const formGroups = config.fields.map((fieldConfig, index) => {
       return (
@@ -121,6 +128,7 @@ class RecordFormPageImpl extends React.PureComponent<
           record={record}
           recordChange={this.state.recordChange}
           onRecordChange={this.handleRecordChange}
+          validationError={fieldValidationError[fieldConfig.name] || ''}
         />
       );
     });
@@ -180,7 +188,9 @@ class RecordFormPageImpl extends React.PureComponent<
 
     mergeRecordChange(record, recordChange);
 
-    if (!this.validateFields()) {
+    const fieldValidationResult = this.validateFields();
+    this.setState({ fieldValidationError: fieldValidationResult });
+    if (Object.keys(fieldValidationResult).length > 0) {
       return;
     }
 
@@ -199,10 +209,13 @@ class RecordFormPageImpl extends React.PureComponent<
       .catch(effectError => this.setState({ effectError }));
   };
 
-  public validateFields(): boolean {
+  /**
+   * Return dictionary of validation errors, empty if no errors.
+   */
+  public validateFields(): FieldValidationError {
     const { config: { fields }, record } = this.props;
 
-    const isValid = fields
+    const validationErrors = fields
       .filter(
         field => field.validations != null && field.validations.length > 0
       )
@@ -215,24 +228,14 @@ class RecordFormPageImpl extends React.PureComponent<
           }))
           .find(({ valid }) => !valid);
 
-        if (result == null) {
-          return { field, errorMessage: undefined };
-        }
-
-        const failedValidation = result.validation;
-        return {
-          errorMessage: failedValidation.message || 'Invalid data',
-          field,
-        };
+        return [
+          field.name,
+          result ? result.validation.message || 'Invalid data' : undefined,
+        ] as [string, string];
       })
-      .map(({ field, errorMessage }) => {
-        // TODO: display error message
-        console.log('Failed validation:', field.name, errorMessage);
-        return errorMessage == null;
-      })
-      .reduce((acc, valid) => acc && valid, true);
+      .filter(([fieldName, errorMessage]) => errorMessage != null);
 
-    return isValid;
+    return objectFrom(validationErrors);
   }
 }
 
@@ -241,16 +244,24 @@ interface FieldProps {
   record: Record;
   recordChange: RecordChange;
   onRecordChange: RecordChangeHandler;
+  validationError: string;
 }
 
 function FormGroup(props: FieldProps): JSX.Element {
-  const { fieldConfig } = props;
+  const { fieldConfig, validationError } = props;
   return (
     <div className="record-form-group">
       <div className="record-form-label">
         <label htmlFor={fieldConfig.name}>{fieldConfig.label}</label>
       </div>
-      <FormField {...props} />
+      <div className="record-form-field-with-error">
+        <FormField {...props} />
+        {validationError.length > 0 && (
+          <div className="text-danger record-form-validation-error">
+            {validationError}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
