@@ -1,2 +1,2 @@
-name,textarea,dropdown,wysiwyg,datetime,boolean,integer,number,reference
-abc,abc,abc,abc,2018-01-02,True,1,1,ref_name1
+Name,reference,textarea,dropdown,wysiwyg,datetime,boolean,integer,number
+abc,ref_name1,abc,abc,abc,2018-01-02,True,1,1

@@ -103,12 +103,32 @@ class AssetNotFoundException(Exception):
         super(AssetNotFoundException, self).__init__(message)
 
 
-def prepare_import_records(stream, import_config, atomic):
-    data_list = []
-    reader = csv.reader(stream)
+class ColumnNotFoundException(SkygearException):
+    def __init__(self, column_name):
+        message = 'field "{}" not found in the csv header'.format(column_name)
+        super(ColumnNotFoundException, self).__init__(message)
 
+    def to_dict(self):
+        return {
+            '_type': 'error',
+            'code': 108,
+            'message': self.message,
+            'name': self.__class__.__name__,
+        }
+
+    def as_dict(self):
+        return self.to_dict()
+
+
+def prepare_import_records(stream, import_config, atomic):
+    reader = csv.reader(stream)
+    header = next(reader)
+
+    column_mapping = find_column_mapping(header, import_config)
+
+    data_list = []
     for row in reader:
-        data = project_csv_data(row, import_config)
+        data = project_csv_data(row, column_mapping)
         data_list.append(data)
 
     identifier_map = RecordIdentifierMap()
@@ -192,10 +212,27 @@ def import_records(records, atomic):
     return resp
 
 
-def project_csv_data(row, import_config):
+def find_column_mapping(header, import_config):
+    """
+    Return a column mapping [column_index:field_name].
+    Throw error if column name not found in header.
+    """
+    mapping = {}
+    for field in import_config.fields:
+        name = field.label or field.name
+        try:
+            index = header.index(name)
+            mapping[index] = field.name
+        except ValueError:
+            raise ColumnNotFoundException(name)
+
+    return mapping
+
+
+def project_csv_data(row, column_mapping):
     return {
-        import_config.fields[i].name: row[i]
-        for i in range(len(import_config.fields))
+        field_name: row[index]
+        for index, field_name in column_mapping.items()
     }
 
 
