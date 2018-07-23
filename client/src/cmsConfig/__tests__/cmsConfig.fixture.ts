@@ -2,6 +2,11 @@ export const cmsConfigWithSiteItemsOnly = {
   site: [
     {
       type: 'user_management',
+      verification: {
+        editable: false,
+        enabled: false,
+        fields: [],
+      },
     },
     {
       name: 'RecordA',

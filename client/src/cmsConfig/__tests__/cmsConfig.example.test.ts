@@ -2100,7 +2100,25 @@ test('parseCmsConfig should parse example config', () => {
       },
       { type: 'space', size: 'large' },
     ],
-    userManagement: { enabled: true },
+    userManagement: {
+      enabled: true,
+      verification: {
+        editable: false,
+        enabled: true,
+        fields: [
+          {
+            name: 'email',
+            label: 'Email',
+            editable: true,
+          },
+          {
+            name: 'phone',
+            label: 'Phone number',
+            editable: true,
+          },
+        ],
+      },
+    },
   });
 });
 // tslint:enable:object-literal-sort-keys

@@ -1,6 +1,16 @@
 default_settings:
   timezone: Asia/Hong_Kong
 
+user_management:
+  verification:
+    editable: false
+    fields:
+      - name: email
+        editable: true
+      - name: phone
+        label: Phone number
+        editable: true
+
 imports:
   import-field-demo:
     record_type: field_demo

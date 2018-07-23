@@ -4,15 +4,18 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 
-import { RootState } from '../../states';
+import { getCmsConfig, RootState } from '../../states';
 
 import { UserActionDispatcher } from '../../actions/user';
+import { UserManagementConfig } from '../../cmsConfig/userManagementConfig';
 import { Remote, RemoteType, SkygearUser } from '../../types';
 import { DisableUserForm } from './DisableUserForm';
 import { PasswordForm } from './PasswordForm';
+import { VerificationForm } from './VerificationForm';
 
 interface StateProps {
   user: Remote<SkygearUser>;
+  config: UserManagementConfig;
 }
 
 interface UserPageContainerProps {
@@ -40,7 +43,7 @@ class UserPageImpl extends React.PureComponent<Props> {
   }
 
   public render() {
-    const { user, userId } = this.props;
+    const { config, user, userId } = this.props;
 
     let body;
 
@@ -53,6 +56,13 @@ class UserPageImpl extends React.PureComponent<Props> {
           <div>
             <PasswordForm className="user-page-form" userId={userId} />
             <DisableUserForm className="user-page-form" user={user.value} />
+            {config.verification.enabled && (
+              <VerificationForm
+                className="user-page-form"
+                user={user.value}
+                config={config.verification}
+              />
+            )}
           </div>
         );
         break;
@@ -83,7 +93,7 @@ class UserPageImpl extends React.PureComponent<Props> {
 }
 
 function mapStateToProps(state: RootState): StateProps {
-  return { user: state.user.user };
+  return { user: state.user.user, config: getCmsConfig(state).userManagement };
 }
 
 function mapDispatchToProps(dispatch: Dispatch<RootState>): DispatchProps {

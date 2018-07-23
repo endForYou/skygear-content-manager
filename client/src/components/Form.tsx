@@ -9,6 +9,7 @@ interface FormProps {
   title?: string;
   successMessage?: string;
   errorMessage?: string;
+  submitable?: boolean;
   submitTitle?: string;
   submitDisabled?: boolean;
   onSubmit?: (event: React.FormEvent<HTMLFormElement>) => void;
@@ -22,6 +23,7 @@ export class Form extends React.PureComponent<FormProps> {
       onSubmit,
       successMessage = '',
       errorMessage = '',
+      submitable = true,
       submitDisabled = false,
       submitTitle = 'Submit',
       title = '',
@@ -44,7 +46,7 @@ export class Form extends React.PureComponent<FormProps> {
             <div className="text-danger submit-message">{errorMessage}</div>
           )}
 
-          {submitTitle.length > 0 && (
+          {submitable && (
             <PrimaryButton
               type="submit"
               className="btn-submit"
