@@ -60,7 +60,7 @@ const predefinedFunctions = {
     [`${ValueTypes.string},${ValueTypes.string}`]: (
       value: string,
       regex: string
-    ) => value.match(new RegExp(regex)),
+    ) => value.match(new RegExp(regex)) != null,
   },
   datetime: {
     [ValueTypes.string]: (value: string) => new Date(value),

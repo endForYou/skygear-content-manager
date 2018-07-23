@@ -1,7 +1,7 @@
 import compileExpression from 'filtrex';
 import { isArray } from 'util';
 
-import { parseOptionalString, parseString } from './util';
+import { parseBoolean, parseOptionalString, parseString } from './util';
 
 export interface ValidationConfig {
   expression: string;
@@ -25,18 +25,40 @@ export function parseValidationConfigs(
 
 // tslint:disable-next-line:no-any
 export function parseValidationConfig(input: any): ValidationConfig {
-  let expression = parseString(input, 'expression', 'validation');
-  const message = parseOptionalString(input, 'message', 'validation');
+  let config: ValidationConfig;
+  let bypassNull = true;
+  if (input.required != null) {
+    config = requiredValidation(input);
+    bypassNull = false;
+  } else {
+    config = {
+      expression: parseString(input, 'expression', 'validation'),
+      message: parseOptionalString(input, 'message', 'validation'),
+    };
+  }
 
-  const when = parseOptionalString(input, 'when', 'validation');
-  expression = combineExpressionWithWhen(expression, when);
+  let when = parseOptionalString(input, 'when', 'validation');
+  if (when == null && bypassNull) {
+    when = 'value != null';
+  }
+  config.expression = combineExpressionWithWhen(config.expression, when);
 
   // try to compile the expression here
-  compileExpression(expression);
+  compileExpression(config.expression);
 
+  return config;
+}
+
+// tslint:disable-next-line:no-any
+function requiredValidation(input: any): ValidationConfig {
+  const required = parseBoolean(input, 'required', 'validation');
   return {
-    expression,
-    message,
+    expression: required
+      ? `(typeof(value) in ("string", "array") and length(value) > 0) or ` +
+        `value != null`
+      : `true`,
+    message:
+      parseOptionalString(input, 'message', 'validation') || 'Required field.',
   };
 }
 

@@ -82,7 +82,8 @@ test('parseCmsConfig should parse example config', () => {
                   message: 'Too long.',
                 },
                 {
-                  expression: 'lower(value) not in ("admin", "god")',
+                  expression:
+                    'not (value != null) or (lower(value) not in ("admin", "god"))',
                   message: 'Reserved name.',
                 },
               ],
@@ -316,7 +317,12 @@ test('parseCmsConfig should parse example config', () => {
               validations: [
                 {
                   expression:
-                    'regex(get(value, "content_type"), "^(audio|video)")',
+                    '(typeof(value) in ("string", "array") and length(value) > 0) or value != null',
+                  message: 'Required field.',
+                },
+                {
+                  expression:
+                    'not (value != null) or (regex(get(value, "content_type"), "^(image|video)"))',
                 },
               ],
               editable: true,

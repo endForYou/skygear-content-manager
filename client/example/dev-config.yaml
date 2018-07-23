@@ -301,7 +301,8 @@ records:
         - name: fileasset
           type: asset
           validations:
-            - expression: regex(get(value, "content_type"), "^(audio|video)")
+            - required: true
+            - expression: regex(get(value, "content_type"), "^(image|video)")
         - name: deleted
           type: boolean
           default_value: false
