@@ -79,7 +79,7 @@ test('parseCmsConfig should parse example config', () => {
                 {
                   expression:
                     'not (substring(value, 0, 1) != "_") or (length(value) < 10)',
-                  message: 'Too long.',
+                  message: 'Length should be smaller than 10.',
                 },
                 {
                   expression:

@@ -1,7 +1,13 @@
 import compileExpression from 'filtrex';
 import { isArray } from 'util';
 
-import { parseBoolean, parseOptionalString, parseString } from './util';
+import {
+  parseBoolean,
+  parseOptionalBoolean,
+  parseOptionalNumber,
+  parseOptionalString,
+  parseString,
+} from './util';
 
 export interface ValidationConfig {
   expression: string;
@@ -34,6 +40,8 @@ export function parseValidationConfig(input: any): ValidationConfig {
     config = regexValidation(input);
   } else if (input.pattern != null) {
     config = patternValidation(input);
+  } else if (input.length != null) {
+    config = lengthValidation(input);
   } else {
     config = {
       expression: parseString(input, 'expression', 'validation'),
@@ -90,6 +98,40 @@ function patternValidation(input: any): ValidationConfig {
     message:
       parseOptionalString(input, 'message', 'validation') ||
       `Require valid ${pattern.replace('_', ' ')} input.`,
+  };
+}
+
+// tslint:disable-next-line:no-any
+function lengthValidation(input: any): ValidationConfig {
+  let inclusive = parseOptionalBoolean(input, 'inclusive', 'validation');
+  if (inclusive == null) {
+    inclusive = true;
+  }
+
+  const expressions = [];
+  const messages = [];
+  const min = parseOptionalNumber(input.length, 'min', 'validation');
+  const max = parseOptionalNumber(input.length, 'max', 'validation');
+
+  if (min != null) {
+    expressions.push(`length(value) >${inclusive ? '=' : ''} ${min}`);
+    messages.push(`larger than ${inclusive ? 'or equal to ' : ''}${min}`);
+  }
+
+  if (max != null) {
+    expressions.push(`length(value) <${inclusive ? '=' : ''} ${max}`);
+    messages.push(`smaller than ${inclusive ? 'or equal to ' : ''}${max}`);
+  }
+
+  if (expressions.length === 0) {
+    throw new Error(
+      `Validtion with length must contains "min" and / or "max".`
+    );
+  }
+
+  return {
+    expression: expressions.join(' and '),
+    message: `Length should be ${messages.join(' and ')}.`,
   };
 }
 
