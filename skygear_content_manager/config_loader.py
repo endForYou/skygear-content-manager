@@ -1,6 +1,5 @@
-import random
-import string
 import urllib.parse as urlparse
+from datetime import datetime
 from urllib.parse import urlencode
 
 import requests
@@ -123,9 +122,7 @@ class ConfigLoader:
 
 
 def add_random_string_to_query_params(url):
-    random_str = ''.join(
-        random.choices(string.ascii_lowercase + string.digits, k=6))
-
+    random_str = int(datetime.now().timestamp())
     url_parts = list(urlparse.urlparse(url))
     query = dict(urlparse.parse_qsl(url_parts[4]))
     query.update({'rand': random_str})
