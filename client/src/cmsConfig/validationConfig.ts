@@ -1,4 +1,5 @@
 import compileExpression from 'filtrex';
+import moment from 'moment';
 import { isArray, isDate } from 'util';
 
 import {
@@ -118,6 +119,7 @@ function lengthOrRangeValidation(input: any): ValidationConfig | undefined {
   let min;
   let max;
   let value;
+  let isDateValue = false;
   let type;
 
   if (input.length != null) {
@@ -130,10 +132,11 @@ function lengthOrRangeValidation(input: any): ValidationConfig | undefined {
   if (input.range != null) {
     min = input.range.min;
     max = input.range.max;
-    if (isDate(min)) {
+    if (isDate(min) || isDate(max)) {
+      isDateValue = true;
       value = 'timestamp(value)';
-      min = min != null ? new Date(min).getTime() : undefined;
-      max = max != null ? new Date(max).getTime() : undefined;
+      min = min != null ? min.getTime() : undefined;
+      max = max != null ? max.getTime() : undefined;
     } else {
       value = 'value';
     }
@@ -149,18 +152,21 @@ function lengthOrRangeValidation(input: any): ValidationConfig | undefined {
     inclusive = true;
   }
 
-  const expressions = [];
-  const messages = [];
+  const expressions = [
+    min == null ? undefined : `${value} >${inclusive ? '=' : ''} ${min}`,
+    max == null ? undefined : `${value} <${inclusive ? '=' : ''} ${max}`,
+  ].filter(a => a != null);
 
-  if (min != null) {
-    expressions.push(`${value} >${inclusive ? '=' : ''} ${min}`);
-    messages.push(`larger than ${inclusive ? 'or equal to ' : ''}${min}`);
-  }
-
-  if (max != null) {
-    expressions.push(`${value} <${inclusive ? '=' : ''} ${max}`);
-    messages.push(`smaller than ${inclusive ? 'or equal to ' : ''}${max}`);
-  }
+  const messages = [
+    min == null
+      ? undefined
+      : `larger than ${inclusive ? 'or equal to ' : ''}` +
+        `${isDateValue ? moment(min).toISOString() : min}`,
+    max == null
+      ? undefined
+      : `smaller than ${inclusive ? 'or equal to ' : ''}` +
+        `${isDateValue ? moment(max).toISOString() : max}`,
+  ].filter(a => a != null);
 
   if (expressions.length === 0) {
     throw new Error(
@@ -225,7 +231,7 @@ function comparisonValidation(input: any): ValidationConfig | undefined {
   if (target) {
     return {
       expression: isDate(target)
-        ? `timestamp(value) ${op} ${new Date(target).getTime()}`
+        ? `timestamp(value) ${op} ${target.getTime()}`
         : `value ${op} ${target}`,
     };
   }
