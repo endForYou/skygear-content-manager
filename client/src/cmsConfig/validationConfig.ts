@@ -1,5 +1,5 @@
 import compileExpression from 'filtrex';
-import { isArray } from 'util';
+import { isArray, isDate } from 'util';
 
 import {
   parseBoolean,
@@ -31,7 +31,7 @@ export function parseValidationConfigs(
 
 // tslint:disable-next-line:no-any
 export function parseValidationConfig(input: any): ValidationConfig {
-  let config: ValidationConfig;
+  let config: ValidationConfig | undefined;
   let bypassNull = true;
   if (input.required != null) {
     config = requiredValidation(input);
@@ -40,9 +40,21 @@ export function parseValidationConfig(input: any): ValidationConfig {
     config = regexValidation(input);
   } else if (input.pattern != null) {
     config = patternValidation(input);
-  } else if (input.length != null) {
-    config = lengthValidation(input);
-  } else {
+  }
+
+  const parsingFuncs = [
+    lengthOrRangeValidation,
+    containValidation,
+    comparisonValidation,
+  ];
+
+  for (const parsingFunc of parsingFuncs) {
+    if (!config) {
+      config = parsingFunc(input);
+    }
+  }
+
+  if (!config) {
     config = {
       expression: parseString(input, 'expression', 'validation'),
       message: parseOptionalString(input, 'message', 'validation'),
@@ -102,7 +114,36 @@ function patternValidation(input: any): ValidationConfig {
 }
 
 // tslint:disable-next-line:no-any
-function lengthValidation(input: any): ValidationConfig {
+function lengthOrRangeValidation(input: any): ValidationConfig | undefined {
+  let min;
+  let max;
+  let value;
+  let type;
+
+  if (input.length != null) {
+    min = parseOptionalNumber(input.length, 'min', 'validation');
+    max = parseOptionalNumber(input.length, 'max', 'validation');
+    value = 'length(value)';
+    type = 'length';
+  }
+
+  if (input.range != null) {
+    min = input.range.min;
+    max = input.range.max;
+    if (isDate(min)) {
+      value = 'timestamp(value)';
+      min = min != null ? new Date(min).getTime() : undefined;
+      max = max != null ? new Date(max).getTime() : undefined;
+    } else {
+      value = 'value';
+    }
+    type = 'range';
+  }
+
+  if (type == null) {
+    return undefined;
+  }
+
   let inclusive = parseOptionalBoolean(input, 'inclusive', 'validation');
   if (inclusive == null) {
     inclusive = true;
@@ -110,16 +151,14 @@ function lengthValidation(input: any): ValidationConfig {
 
   const expressions = [];
   const messages = [];
-  const min = parseOptionalNumber(input.length, 'min', 'validation');
-  const max = parseOptionalNumber(input.length, 'max', 'validation');
 
   if (min != null) {
-    expressions.push(`length(value) >${inclusive ? '=' : ''} ${min}`);
+    expressions.push(`${value} >${inclusive ? '=' : ''} ${min}`);
     messages.push(`larger than ${inclusive ? 'or equal to ' : ''}${min}`);
   }
 
   if (max != null) {
-    expressions.push(`length(value) <${inclusive ? '=' : ''} ${max}`);
+    expressions.push(`${value} <${inclusive ? '=' : ''} ${max}`);
     messages.push(`smaller than ${inclusive ? 'or equal to ' : ''}${max}`);
   }
 
@@ -131,8 +170,67 @@ function lengthValidation(input: any): ValidationConfig {
 
   return {
     expression: expressions.join(' and '),
-    message: `Length should be ${messages.join(' and ')}.`,
+    message:
+      `${type === 'length' ? 'Length' : 'Value'} ` +
+      `should be ${messages.join(' and ')}.`,
   };
+}
+
+// tslint:disable-next-line:no-any
+function containValidation(input: any): ValidationConfig | undefined {
+  let target;
+  let positive = true;
+
+  if (input.contains != null) {
+    target = parseString(input, 'contains', 'validation');
+    positive = true;
+  }
+
+  if (input.not_contains != null) {
+    target = parseString(input, 'not_contains', 'validation');
+    positive = false;
+  }
+
+  if (target != null) {
+    return {
+      expression: `${positive ? '' : 'not '}regex(value, "${target}")`,
+      message: `Value should ${positive ? '' : 'not '}contains "${target}"`,
+    };
+  }
+
+  return undefined;
+}
+
+// tslint:disable-next-line:no-any
+function comparisonValidation(input: any): ValidationConfig | undefined {
+  let target;
+  let op;
+
+  const keys = [
+    ['equal_to', '=='],
+    ['greater_than', '>'],
+    ['greater_than_or_equal_to', '>='],
+    ['less_than', '<'],
+    ['less_than_or_equal_to', '<='],
+    ['not_equal_to', '!='],
+  ];
+
+  for (const [_key, _op] of keys) {
+    if (input[_key] != null) {
+      target = input[_key];
+      op = _op;
+    }
+  }
+
+  if (target) {
+    return {
+      expression: isDate(target)
+        ? `timestamp(value) ${op} ${new Date(target).getTime()}`
+        : `value ${op} ${target}`,
+    };
+  }
+
+  return undefined;
 }
 
 function combineExpressionWithWhen(expression: string, when?: string): string {
