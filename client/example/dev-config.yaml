@@ -248,7 +248,7 @@ records:
           label: Name
           type: string
           validations:
-            - when: substring(value, 0, 1) != "_"
+            - when: value != null and substring(value, 0, 1) != "_"
               length:
                 max: 10
               inclusive: false
