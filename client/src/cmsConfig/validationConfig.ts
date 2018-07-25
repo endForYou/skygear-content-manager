@@ -79,7 +79,7 @@ function requiredValidation(input: any): ValidationConfig {
   const required = parseBoolean(input, 'required', 'validation');
   return {
     expression: required
-      ? `(typeof(value) in ("string", "array") and length(value) > 0) or ` +
+      ? `(typeof(value) not in ("string", "array") or length(value) > 0) and ` +
         `value != null`
       : `true`,
     message:
