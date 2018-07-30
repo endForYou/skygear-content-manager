@@ -18,8 +18,11 @@
     "typeRoots": [
       "@types",
       "node_modules/@types"
-    ]
+    ],
   },
+  "files": [
+    "node_modules/ts-skygear/index.d.ts"
+  ],
   "include": [
     "src"
   ]

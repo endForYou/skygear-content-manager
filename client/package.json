@@ -83,7 +83,8 @@
     "@types/react-router-redux": "5.0.10",
     "@types/react-select": "1.0.59",
     "@types/uuid": "3.4.3",
-    "prettier": "1.7.4"
+    "prettier": "1.7.4",
+    "ts-skygear": "oursky/ts-skygear#912cd45c6b453df18999d6acde6a0b56453e92a3"
   },
   "jest": {
     "collectCoverageFrom": [
