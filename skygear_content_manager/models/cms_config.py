@@ -4,9 +4,9 @@ DISPLAY_MODE_GROUPED = 'DISPLAY_MODE_GROUPED'
 DISPLAY_MODE_SPREAD = 'DISPLAY_MODE_SPREAD'
 
 # Use first when duplicated data is found
-DUPLICATION_HANDLING_USE_FIRST = 'use-first'
+DUPLICATION_HANDLING_USE_FIRST = 'use_first'
 # Throw error when duplicated data is found
-DUPLICATION_HANDLING_THROW_ERROR = 'throw-error'
+DUPLICATION_HANDLING_THROW_ERROR = 'throw_error'
 
 
 class CMSConfig:
