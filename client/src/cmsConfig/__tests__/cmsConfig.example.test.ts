@@ -190,6 +190,13 @@ test('parseCmsConfig should parse example config', () => {
                   compact: false,
                   name: 'name',
                   label: 'Name',
+                  validations: [
+                    {
+                      expression:
+                        '(typeof(value) not in ("string", "array") or length(value) > 0) and value != null',
+                      message: 'Required field.',
+                    },
+                  ],
                   editable: true,
                   type: 'text_input',
                 },
@@ -385,6 +392,13 @@ test('parseCmsConfig should parse example config', () => {
                   compact: false,
                   name: 'name',
                   label: 'Name',
+                  validations: [
+                    {
+                      expression:
+                        '(typeof(value) not in ("string", "array") or length(value) > 0) and value != null',
+                      message: 'Required field.',
+                    },
+                  ],
                   editable: true,
                   type: 'text_input',
                 },
@@ -2129,16 +2143,8 @@ test('parseCmsConfig should parse example config', () => {
         editable: false,
         enabled: true,
         fields: [
-          {
-            name: 'email',
-            label: 'Email',
-            editable: true,
-          },
-          {
-            name: 'phone',
-            label: 'Phone number',
-            editable: true,
-          },
+          { editable: true, label: 'Email', name: 'email' },
+          { editable: true, label: 'Phone number', name: 'phone' },
         ],
       },
     },

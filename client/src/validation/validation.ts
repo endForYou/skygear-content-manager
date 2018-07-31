@@ -28,6 +28,26 @@ export function validateField(
   // tslint:disable-next-line:no-any
   value: any,
   field: FieldConfig,
+  defaultMessage: string = 'Invalid data'
+): string | undefined {
+  if (field.validations == null || field.validations.length === 0) {
+    return undefined;
+  }
+
+  const result = field.validations
+    .map(validation => ({
+      valid: _validateField(value, field, validation),
+      validation,
+    }))
+    .find(({ valid }) => !valid);
+
+  return result ? result.validation.message || defaultMessage : undefined;
+}
+
+function _validateField(
+  // tslint:disable-next-line:no-any
+  value: any,
+  field: FieldConfig,
   validation: ValidationConfig
 ): boolean {
   const fn = compileExpression(validation.expression, functions);

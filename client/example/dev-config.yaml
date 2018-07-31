@@ -302,6 +302,8 @@ records:
             - name: _id
             - name: name
               type: string
+              validations:
+                - required: true
         - name: asso_refs_embedded
           type: embedded_reference_list
           reference_via_association_record: field_asso_ref

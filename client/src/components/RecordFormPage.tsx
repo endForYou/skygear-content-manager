@@ -7,7 +7,12 @@ import { push } from 'react-router-redux';
 import { Record } from 'skygear';
 
 import { RecordActionDispatcher } from '../actions/record';
-import { FieldConfig, RecordFormPageConfig } from '../cmsConfig';
+import {
+  EmbeddedAssociationReferenceListFieldConfig,
+  FieldConfig,
+  FieldConfigTypes,
+  RecordFormPageConfig,
+} from '../cmsConfig';
 import { Field, FieldContext } from '../fields';
 import { errorMessageFromError, isRecordsOperationError } from '../recordUtil';
 import { RootState } from '../states';
@@ -34,7 +39,8 @@ export interface RecordFormPageProps {
 export type Effect = () => Promise<any>;
 
 interface FieldValidationError {
-  [field: string]: string;
+  errors: { [field: string]: string };
+  referenceErrors: { [field: string]: FieldValidationError[] };
 }
 
 interface State {
@@ -78,7 +84,10 @@ class RecordFormPageImpl extends React.PureComponent<
     this.state = {
       afterEffectChange: {},
       beforeEffectChange: {},
-      fieldValidationError: {},
+      fieldValidationError: {
+        errors: {},
+        referenceErrors: {},
+      },
       recordChange: {},
     };
   }
@@ -214,28 +223,42 @@ class RecordFormPageImpl extends React.PureComponent<
    */
   public validateFields(): FieldValidationError {
     const { config: { fields }, record } = this.props;
+    return this._validateFields(record, fields);
+  }
 
-    const validationErrors = fields
-      .filter(
-        field => field.validations != null && field.validations.length > 0
+  private _validateFields(
+    // tslint:disable-next-line:no-any
+    data: any,
+    fieldConfigs: FieldConfig[]
+  ): FieldValidationError {
+    const validationErrors = fieldConfigs
+      .map(
+        field =>
+          [field.name, validateField(data[field.name], field)] as [
+            string,
+            string
+          ]
       )
-      .map(field => {
-        const validations = field.validations!;
-        const result = validations
-          .map(validation => ({
-            valid: validateField(record[field.name], field, validation),
-            validation,
-          }))
-          .find(({ valid }) => !valid);
+      .filter(([name, message]) => message != null);
 
-        return [
-          field.name,
-          result ? result.validation.message || 'Invalid data' : undefined,
-        ] as [string, string];
-      })
-      .filter(([fieldName, errorMessage]) => errorMessage != null);
+    const referenceErrors = fieldConfigs
+      .filter(f => f.type === FieldConfigTypes.EmbeddedReferenceList)
+      .map(f => f as EmbeddedAssociationReferenceListFieldConfig)
+      .map(
+        f =>
+          [
+            f.name,
+            // tslint:disable-next-line:no-any
+            data._transient[f.name].map((d: any) =>
+              this._validateFields(d, f.displayFields)
+            ),
+          ] as [string, FieldValidationError[]]
+      );
 
-    return objectFrom(validationErrors);
+    return {
+      errors: objectFrom(validationErrors),
+      referenceErrors: objectFrom(referenceErrors),
+    };
   }
 }
 
