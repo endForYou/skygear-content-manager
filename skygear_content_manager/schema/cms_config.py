@@ -231,7 +231,9 @@ class DuplicationHandling(fields.String):
            value != DUPLICATION_HANDLING_USE_FIRST and \
            value != DUPLICATION_HANDLING_THROW_ERROR:
             raise ValidationError(
-                'Invalid handle_duplicated_identifier value.')
+                'Invalid value, expected: "{}" or "{}".'.format(
+                    DUPLICATION_HANDLING_USE_FIRST,
+                    DUPLICATION_HANDLING_THROW_ERROR))
 
 
 class CMSAssociationRecordFieldSchema(Schema):
