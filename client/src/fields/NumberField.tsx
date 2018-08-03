@@ -2,6 +2,7 @@ import classnames from 'classnames';
 import * as React from 'react';
 
 import { FloatDisplayFieldConfig, FloatInputFieldConfig } from '../cmsConfig';
+import { hasValidationError } from '../validation/validation';
 import { RequiredFieldProps } from './Field';
 import { StringDisplay } from './StringDisplay';
 import { ValidationText } from './validation/ValidationText';
@@ -63,10 +64,12 @@ export class FloatInputField extends React.PureComponent<
     } = this.props;
 
     return (
-      <React.Fragment>
+      <div className={className}>
         <input
           {...rest}
-          className={classnames(className, 'number-input')}
+          className={classnames('number-input', {
+            'validation-error': hasValidationError(validationError),
+          })}
           type="text"
           id={name}
           name={name}
@@ -76,7 +79,7 @@ export class FloatInputField extends React.PureComponent<
           disabled={!editable}
         />
         <ValidationText validationError={validationError} />
-      </React.Fragment>
+      </div>
     );
   }
 

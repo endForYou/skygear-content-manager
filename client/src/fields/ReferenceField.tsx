@@ -18,6 +18,7 @@ import { ReferenceLink } from '../components/ReferenceLink';
 import { parseReference } from '../recordUtil';
 
 import { debouncePromise1, objectFrom } from '../util';
+import { hasValidationError } from '../validation/validation';
 import { RequiredFieldProps } from './Field';
 import { NullField } from './NullField';
 import { ValidationText } from './validation/ValidationText';
@@ -113,17 +114,19 @@ class ReferenceDropdownFieldImpl extends React.PureComponent<
     const { value } = this.state;
 
     return (
-      <React.Fragment>
+      <div className={className}>
         <StringSelectAsync
           {...rest}
-          className={classnames(className, 'ref-select')}
+          className={classnames('ref-select', {
+            'validation-error': hasValidationError(validationError),
+          })}
           loadOptions={this.debouncedLoadOptions}
           onChange={this.onChange}
           value={value || undefined}
           disabled={!editable}
         />
         <ValidationText validationError={validationError} />
-      </React.Fragment>
+      </div>
     );
   }
 

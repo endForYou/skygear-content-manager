@@ -5,6 +5,7 @@ import {
   IntegerDisplayFieldConfig,
   IntegerInputFieldConfig,
 } from '../cmsConfig';
+import { hasValidationError } from '../validation/validation';
 import { RequiredFieldProps } from './Field';
 import { StringDisplay } from './StringDisplay';
 import { ValidationText } from './validation/ValidationText';
@@ -70,10 +71,12 @@ class IntegerFieldImpl extends React.PureComponent<
 
     if (editable) {
       return (
-        <React.Fragment>
+        <div className={className}>
           <input
             {...rest}
-            className={classnames(className, 'integer-input')}
+            className={classnames('integer-input', {
+              'validation-error': hasValidationError(validationError),
+            })}
             type="text"
             id={name}
             name={name}
@@ -82,7 +85,7 @@ class IntegerFieldImpl extends React.PureComponent<
             placeholder="0"
           />
           <ValidationText validationError={validationError} />
-        </React.Fragment>
+        </div>
       );
     } else {
       return (

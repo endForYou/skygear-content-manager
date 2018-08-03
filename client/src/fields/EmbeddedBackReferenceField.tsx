@@ -21,13 +21,17 @@ import {
 import { objectValues, swap } from '../util';
 
 import { deleteRecordsProperly, saveRecordsProperly } from '../recordUtil';
-import { FieldValidationError } from '../validation/validation';
+import {
+  FieldValidationError,
+  hasValidationError,
+} from '../validation/validation';
 import {
   Field,
   FieldChangeHandler,
   FieldContext,
   RequiredFieldProps,
 } from './Field';
+import { ValidationAlert } from './validation/ValidationAlert';
 
 export type EmbeddedBackReferenceListFieldProps = RequiredFieldProps<
   EmbeddedBackReferenceListFieldConfig
@@ -204,6 +208,7 @@ export class EmbeddedBackReferenceListField extends React.PureComponent<
 
     return (
       <div className={classnames(className, 'embedded-back-reference')}>
+        <ValidationAlert validationError={validationError} />
         <div className="embedded-back-reference-field">{items}</div>
         {config.editable && (
           <div>
@@ -338,7 +343,12 @@ function FormGroup(props: FieldProps): JSX.Element {
   const { fieldConfig, onFieldChange, record, validationError } = props;
   return (
     <div className="record-form-group">
-      <label className="record-form-label" htmlFor={fieldConfig.name}>
+      <label
+        className={classnames('record-form-label', {
+          'validation-error': hasValidationError(validationError),
+        })}
+        htmlFor={fieldConfig.name}
+      >
         {fieldConfig.label}
       </label>
       <Field

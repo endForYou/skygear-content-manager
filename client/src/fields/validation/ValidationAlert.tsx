@@ -1,5 +1,3 @@
-import './ValidationText.scss';
-
 import React from 'react';
 import { FieldValidationError } from '../../validation/validation';
 
@@ -7,7 +5,7 @@ interface Props {
   validationError: FieldValidationError | undefined;
 }
 
-export class ValidationText extends React.PureComponent<Props> {
+export class ValidationAlert extends React.PureComponent<Props> {
   public render() {
     const { validationError } = this.props;
 
@@ -20,7 +18,7 @@ export class ValidationText extends React.PureComponent<Props> {
     }
 
     return (
-      <div className="text-danger record-form-validation-error">
+      <div className="alert alert-danger record-form-validation-error">
         {validationError.errorMessage}
       </div>
     );

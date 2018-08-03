@@ -9,7 +9,7 @@ export interface FieldValidationError {
   embeddedErrors: Array<{ [key: string]: FieldValidationError }>;
 }
 
-export function hasFieldValidationError(fieldErrors: {
+export function hasAnyValidationError(fieldErrors: {
   [key: string]: FieldValidationError;
 }): boolean {
   for (const key in fieldErrors) {
@@ -17,14 +17,26 @@ export function hasFieldValidationError(fieldErrors: {
       continue;
     }
 
-    if (fieldErrors[key].errorMessage != null) {
+    if (hasValidationError(fieldErrors[key])) {
       return true;
     }
+  }
 
-    for (const embeddedError of fieldErrors[key].embeddedErrors) {
-      if (hasFieldValidationError(embeddedError)) {
-        return true;
-      }
+  return false;
+}
+
+export function hasValidationError(error: FieldValidationError | undefined) {
+  if (error == null) {
+    return false;
+  }
+
+  if (error.errorMessage != null) {
+    return true;
+  }
+
+  for (const embeddedError of error.embeddedErrors) {
+    if (hasAnyValidationError(embeddedError)) {
+      return true;
     }
   }
 

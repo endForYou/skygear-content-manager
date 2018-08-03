@@ -5,6 +5,7 @@ import { BaseStringInputField } from './BaseStringInputField';
 import { RequiredFieldProps } from './Field';
 
 import { TextDisplayFieldConfig, TextInputFieldConfig } from '../cmsConfig';
+import { hasValidationError } from '../validation/validation';
 import { StringDisplay } from './StringDisplay';
 import { ValidationText } from './validation/ValidationText';
 
@@ -40,10 +41,12 @@ export class TextInputField extends BaseStringInputField<
     } = this.props;
 
     return (
-      <React.Fragment>
+      <div className={className}>
         <input
           {...rest}
-          className={classnames(className, 'text-input')}
+          className={classnames('text-input', {
+            'validation-error': hasValidationError(validationError),
+          })}
           type="text"
           id={name}
           name={name}
@@ -53,7 +56,7 @@ export class TextInputField extends BaseStringInputField<
           disabled={!editable}
         />
         <ValidationText validationError={validationError} />
-      </React.Fragment>
+      </div>
     );
   }
 

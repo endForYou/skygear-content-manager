@@ -40,9 +40,9 @@ class BooleanFieldImpl extends React.PureComponent<BooleanFieldProps, State> {
     const disabled = editable === undefined ? true : !editable;
 
     return (
-      <React.Fragment>
+      <div className={className}>
         <div
-          className={classnames(className, {
+          className={classnames({
             'boolean-display': !!disabled,
             'boolean-input': !disabled,
           })}
@@ -57,7 +57,7 @@ class BooleanFieldImpl extends React.PureComponent<BooleanFieldProps, State> {
           </div>
         </div>
         <ValidationText validationError={validationError} />
-      </React.Fragment>
+      </div>
     );
   }
 

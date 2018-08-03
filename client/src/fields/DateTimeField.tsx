@@ -8,6 +8,7 @@ import {
 } from '../cmsConfig';
 import { TzDatetime } from '../components/TzDatetime';
 import { TzDatetimeInput } from '../components/TzDatetimeInput';
+import { hasValidationError } from '../validation/validation';
 import { RequiredFieldProps } from './Field';
 import { ValidationText } from './validation/ValidationText';
 
@@ -73,21 +74,25 @@ class DateTimePickerFieldImpl extends React.PureComponent<
     } = this.props;
 
     return (
-      <React.Fragment>
+      <div className={className}>
         <TzDatetimeInput
           {...rest}
-          className={classnames(className, 'datetime-input-container')}
+          className={classnames('datetime-input-container')}
           dateFormat={DATE_FORMAT}
           timeFormat={TIME_FORMAT}
           value={this.state.value || undefined}
           onChange={this.handleChange}
-          inputProps={{ className: 'datetime-input' }}
+          inputProps={{
+            className: classnames('datetime-input', {
+              'validation-error': hasValidationError(validationError),
+            }),
+          }}
           timezone={timezone}
           // TODO: handle editable
           // disabled={!editable}
         />
         <ValidationText validationError={validationError} />
-      </React.Fragment>
+      </div>
     );
   }
 

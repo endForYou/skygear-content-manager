@@ -4,8 +4,10 @@ import * as React from 'react';
 import { FileDisplayFieldConfig, FileUploaderFieldConfig } from '../cmsConfig';
 import { AssetType, AssetUploader } from '../components/AssetUploader';
 
+import { hasValidationError } from '../validation/validation';
 import { RequiredFieldProps } from './Field';
 import { NullField } from './NullField';
+import { ValidationAlert } from './validation/ValidationAlert';
 
 export type FileDisplayFieldProps = RequiredFieldProps<FileDisplayFieldConfig>;
 
@@ -60,12 +62,13 @@ export class FileUploaderField extends React.PureComponent<
       className,
       onFieldChange,
       value: value,
-      validationError: _validationError,
+      validationError,
       ...rest,
     } = this.props;
 
     return (
       <div className={classnames(className, 'file-input')}>
+        <ValidationAlert validationError={validationError} />
         <AssetUploader
           {...rest}
           accept={accept}
@@ -73,6 +76,9 @@ export class FileUploaderField extends React.PureComponent<
           assetType={AssetType.File}
           onChange={onFieldChange}
           style={{
+            borderColor: hasValidationError(validationError)
+              ? '#dc3545'
+              : undefined,
             height: 155,
             width: 348,
           }}

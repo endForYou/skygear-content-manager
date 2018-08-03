@@ -19,7 +19,8 @@ import { Remote, RemoteType } from '../types';
 import { entriesOf, objectFrom, objectValues } from '../util';
 import {
   FieldValidationError,
-  hasFieldValidationError,
+  hasAnyValidationError,
+  hasValidationError,
   validateField,
 } from '../validation/validation';
 import { Form } from './Form';
@@ -196,7 +197,7 @@ class RecordFormPageImpl extends React.PureComponent<
 
     const fieldValidationResult = this.validateFields();
     this.setState({ fieldValidationErrors: fieldValidationResult });
-    if (hasFieldValidationError(fieldValidationResult)) {
+    if (hasAnyValidationError(fieldValidationResult)) {
       return;
     }
 
@@ -257,15 +258,17 @@ interface FieldProps {
 }
 
 function FormGroup(props: FieldProps): JSX.Element {
-  const { fieldConfig } = props;
+  const { fieldConfig, validationError } = props;
   return (
     <div className="record-form-group">
-      <div className="record-form-label">
+      <div
+        className={classnames('record-form-label', {
+          'validation-error': hasValidationError(validationError),
+        })}
+      >
         <label htmlFor={fieldConfig.name}>{fieldConfig.label}</label>
       </div>
-      <div className="record-form-field-with-error">
-        <FormField {...props} />
-      </div>
+      <FormField {...props} />
     </div>
   );
 }

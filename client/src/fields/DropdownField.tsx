@@ -5,6 +5,7 @@ import Select, { Option, OptionValues } from 'react-select';
 import { RequiredFieldProps } from './Field';
 
 import { DropdownFieldConfig } from '../cmsConfig';
+import { hasValidationError } from '../validation/validation';
 import { ValidationText } from './validation/ValidationText';
 
 export type DropdownFieldProps = RequiredFieldProps<DropdownFieldConfig>;
@@ -155,10 +156,12 @@ export class DropdownField extends React.PureComponent<
 
     if (editable) {
       return (
-        <React.Fragment>
-          <div className={classnames(className, 'dropdown')}>
+        <div className={className}>
+          <div className={classnames('dropdown')}>
             <Select
-              className="dropdown-select"
+              className={classnames('dropdown-select', {
+                'validation-error': hasValidationError(validationError),
+              })}
               name={name}
               clearable={false}
               searchable={true}
@@ -170,7 +173,9 @@ export class DropdownField extends React.PureComponent<
             {selectValue === SelectValue.Custom && (
               <input
                 {...rest}
-                className="dropdown-custom-input"
+                className={classnames('dropdown-custom-input', {
+                  'validation-error': hasValidationError(validationError),
+                })}
                 type="text"
                 value={value || ''}
                 onChange={this.handleCustomValueChange}
@@ -178,7 +183,7 @@ export class DropdownField extends React.PureComponent<
             )}
           </div>
           <ValidationText validationError={validationError} />
-        </React.Fragment>
+        </div>
       );
     } else {
       let displayValue: string;

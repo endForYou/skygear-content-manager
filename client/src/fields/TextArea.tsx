@@ -2,6 +2,7 @@ import classnames from 'classnames';
 import * as React from 'react';
 
 import { TextAreaFieldConfig } from '../cmsConfig';
+import { hasValidationError } from '../validation/validation';
 import { BaseStringInputField } from './BaseStringInputField';
 import { RequiredFieldProps } from './Field';
 import { ValidationText } from './validation/ValidationText';
@@ -24,19 +25,20 @@ export class TextArea extends BaseStringInputField<
     const disabled = editable === undefined ? true : !editable;
 
     return (
-      <React.Fragment>
+      <div className={className}>
         <textarea
           {...rest}
-          className={classnames(className, {
+          className={classnames({
             'textarea-display': !!disabled,
             'textarea-input': !disabled,
+            'validation-error': hasValidationError(validationError),
           })}
           value={this.state.value}
           onChange={this.handleChange}
           disabled={disabled}
         />
         <ValidationText validationError={validationError} />
-      </React.Fragment>
+      </div>
     );
   }
 

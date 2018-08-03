@@ -9,6 +9,7 @@ import {
 import { RequiredFieldProps } from './Field';
 import { ImageAssetUploader } from './ImageAssetUploader';
 import { NullField } from './NullField';
+import { ValidationAlert } from './validation/ValidationAlert';
 
 export type ImageDisplayFieldProps = RequiredFieldProps<
   ImageDisplayFieldConfig
@@ -67,10 +68,15 @@ export class ImageUploaderField extends React.PureComponent<
   }
 
   public render() {
-    const { config: { editable, nullable }, className } = this.props;
+    const {
+      config: { editable, nullable },
+      className,
+      validationError,
+    } = this.props;
 
     return (
       <div className={classnames(className, 'image-input')}>
+        <ValidationAlert validationError={validationError} />
         <ImageAssetUploader {...this.props} />
         {nullable && editable && this.renderClearButton()}
       </div>
