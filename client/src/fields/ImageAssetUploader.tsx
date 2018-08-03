@@ -12,7 +12,12 @@ class ImageAssetUploaderImpl extends React.PureComponent<
   ImageAssetUploaderProps
 > {
   public render() {
-    const { config: { editable }, onFieldChange, ...rest } = this.props;
+    const {
+      config: { editable },
+      onFieldChange,
+      validationError: _validationError,
+      ...rest,
+    } = this.props;
     const {
       preview_height: previewHeight = 200,
       preview_width: previewWidth = 200,

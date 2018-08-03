@@ -18,6 +18,7 @@ export const ImageDisplayField: React.SFC<ImageDisplayFieldProps> = ({
   config: { compact },
   className,
   value,
+  validationError: _validationError,
   ...rest,
 }) => {
   if (value == null) {

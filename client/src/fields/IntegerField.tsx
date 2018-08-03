@@ -7,12 +7,14 @@ import {
 } from '../cmsConfig';
 import { RequiredFieldProps } from './Field';
 import { StringDisplay } from './StringDisplay';
+import { ValidationText } from './validation/ValidationText';
 
 type IntegerDisplayFieldProps = RequiredFieldProps<IntegerDisplayFieldConfig>;
 
 export const IntegerDisplayField: React.SFC<IntegerDisplayFieldProps> = ({
   className,
   value,
+  validationError: _validationError,
   ...rest,
 }) => {
   return (
@@ -62,21 +64,25 @@ class IntegerFieldImpl extends React.PureComponent<
       className,
       onFieldChange: _onFieldChange,
       value: _value,
+      validationError,
       ...rest,
     } = this.props;
 
     if (editable) {
       return (
-        <input
-          {...rest}
-          className={classnames(className, 'integer-input')}
-          type="text"
-          id={name}
-          name={name}
-          value={this.state.stringValue}
-          onChange={this.handleChange}
-          placeholder="0"
-        />
+        <React.Fragment>
+          <input
+            {...rest}
+            className={classnames(className, 'integer-input')}
+            type="text"
+            id={name}
+            name={name}
+            value={this.state.stringValue}
+            onChange={this.handleChange}
+            placeholder="0"
+          />
+          <ValidationText validationError={validationError} />
+        </React.Fragment>
       );
     } else {
       return (

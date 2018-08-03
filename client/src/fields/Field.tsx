@@ -16,6 +16,7 @@ import {
 } from '../cmsConfig';
 import { Effect } from '../components/RecordFormPage';
 
+import { FieldValidationError } from '../validation/validation';
 import { AssociationRecordSelect } from './AssociationRecordSelect';
 import { AssociationReferenceListField } from './AssociationReferenceField';
 import { BackReferenceListField } from './BackReferenceField';
@@ -51,6 +52,7 @@ export interface ChildProps<C extends FieldConfig> {
 
   // tslint:disable-next-line: no-any
   value: any;
+  validationError?: FieldValidationError;
   context: FieldContext;
 }
 

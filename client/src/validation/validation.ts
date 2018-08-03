@@ -4,6 +4,33 @@ import { FieldConfig, FieldConfigTypes } from '../cmsConfig';
 import { ValidationConfig } from '../cmsConfig/validationConfig';
 import { functions } from './functions';
 
+export interface FieldValidationError {
+  errorMessage: string | undefined;
+  embeddedErrors: Array<{ [key: string]: FieldValidationError }>;
+}
+
+export function hasFieldValidationError(fieldErrors: {
+  [key: string]: FieldValidationError;
+}): boolean {
+  for (const key in fieldErrors) {
+    if (!fieldErrors.hasOwnProperty(key)) {
+      continue;
+    }
+
+    if (fieldErrors[key].errorMessage != null) {
+      return true;
+    }
+
+    for (const embeddedError of fieldErrors[key].embeddedErrors) {
+      if (hasFieldValidationError(embeddedError)) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
 // tslint:disable-next-line:no-any
 function transformFieldValue(value: any, fieldType: FieldConfigTypes) {
   if (value == null) {

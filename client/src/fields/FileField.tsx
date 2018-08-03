@@ -13,6 +13,7 @@ export const FileDisplayField: React.SFC<FileDisplayFieldProps> = ({
   config: { compact },
   className,
   value,
+  validationError: _validationError,
   ...rest,
 }) => {
   if (value == null) {
@@ -59,6 +60,7 @@ export class FileUploaderField extends React.PureComponent<
       className,
       onFieldChange,
       value: value,
+      validationError: _validationError,
       ...rest,
     } = this.props;
 

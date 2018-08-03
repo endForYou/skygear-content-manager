@@ -8,7 +8,6 @@ import { Record } from 'skygear';
 
 import { RecordActionDispatcher } from '../actions/record';
 import {
-  EmbeddedAssociationReferenceListFieldConfig,
   FieldConfig,
   FieldConfigTypes,
   RecordFormPageConfig,
@@ -18,7 +17,11 @@ import { errorMessageFromError, isRecordsOperationError } from '../recordUtil';
 import { RootState } from '../states';
 import { Remote, RemoteType } from '../types';
 import { entriesOf, objectFrom, objectValues } from '../util';
-import { validateField } from '../validation/validation';
+import {
+  FieldValidationError,
+  hasFieldValidationError,
+  validateField,
+} from '../validation/validation';
 import { Form } from './Form';
 
 // TODO: Reduce reused components between edit and new page
@@ -38,14 +41,9 @@ export interface RecordFormPageProps {
 // tslint:disable-next-line: no-any
 export type Effect = () => Promise<any>;
 
-interface FieldValidationError {
-  errors: { [field: string]: string };
-  referenceErrors: { [field: string]: FieldValidationError[] };
-}
-
 interface State {
   recordChange: RecordChange;
-  fieldValidationError: FieldValidationError;
+  fieldValidationErrors: { [key: string]: FieldValidationError } | undefined;
 
   // Side effects produced by fields. They will get executed after record is
   // saved successfully.
@@ -84,10 +82,7 @@ class RecordFormPageImpl extends React.PureComponent<
     this.state = {
       afterEffectChange: {},
       beforeEffectChange: {},
-      fieldValidationError: {
-        errors: {},
-        referenceErrors: {},
-      },
+      fieldValidationErrors: undefined,
       recordChange: {},
     };
   }
@@ -127,7 +122,7 @@ class RecordFormPageImpl extends React.PureComponent<
 
   public render() {
     const { className, config, record, savingRecord } = this.props;
-    const { fieldValidationError } = this.state;
+    const { fieldValidationErrors } = this.state;
 
     const formGroups = config.fields.map((fieldConfig, index) => {
       return (
@@ -137,7 +132,9 @@ class RecordFormPageImpl extends React.PureComponent<
           record={record}
           recordChange={this.state.recordChange}
           onRecordChange={this.handleRecordChange}
-          validationError={fieldValidationError[fieldConfig.name] || ''}
+          validationError={
+            fieldValidationErrors && fieldValidationErrors[fieldConfig.name]
+          }
         />
       );
     });
@@ -198,8 +195,8 @@ class RecordFormPageImpl extends React.PureComponent<
     mergeRecordChange(record, recordChange);
 
     const fieldValidationResult = this.validateFields();
-    this.setState({ fieldValidationError: fieldValidationResult });
-    if (Object.keys(fieldValidationResult).length > 0) {
+    this.setState({ fieldValidationErrors: fieldValidationResult });
+    if (hasFieldValidationError(fieldValidationResult)) {
       return;
     }
 
@@ -221,7 +218,7 @@ class RecordFormPageImpl extends React.PureComponent<
   /**
    * Return dictionary of validation errors, empty if no errors.
    */
-  public validateFields(): FieldValidationError {
+  public validateFields(): { [key: string]: FieldValidationError } {
     const { config: { fields }, record } = this.props;
     return this._validateFields(record, fields);
   }
@@ -230,35 +227,24 @@ class RecordFormPageImpl extends React.PureComponent<
     // tslint:disable-next-line:no-any
     data: any,
     fieldConfigs: FieldConfig[]
-  ): FieldValidationError {
-    const validationErrors = fieldConfigs
-      .map(
-        field =>
-          [field.name, validateField(data[field.name], field)] as [
-            string,
-            string
-          ]
-      )
-      .filter(([name, message]) => message != null);
-
-    const referenceErrors = fieldConfigs
-      .filter(f => f.type === FieldConfigTypes.EmbeddedReferenceList)
-      .map(f => f as EmbeddedAssociationReferenceListFieldConfig)
-      .map(
-        f =>
-          [
-            f.name,
-            // tslint:disable-next-line:no-any
-            data._transient[f.name].map((d: any) =>
-              this._validateFields(d, f.displayFields)
-            ),
-          ] as [string, FieldValidationError[]]
-      );
-
-    return {
-      errors: objectFrom(validationErrors),
-      referenceErrors: objectFrom(referenceErrors),
-    };
+  ): { [key: string]: FieldValidationError } {
+    const validationErrors = fieldConfigs.map(
+      f =>
+        [
+          f.name,
+          {
+            embeddedErrors:
+              f.type === FieldConfigTypes.EmbeddedReferenceList
+                ? // tslint:disable-next-line:no-any
+                  data._transient[f.name].map((d: any) =>
+                    this._validateFields(d, f.displayFields)
+                  )
+                : [],
+            errorMessage: validateField(data[f.name], f),
+          },
+        ] as [string, FieldValidationError]
+    );
+    return objectFrom(validationErrors);
   }
 }
 
@@ -267,11 +253,11 @@ interface FieldProps {
   record: Record;
   recordChange: RecordChange;
   onRecordChange: RecordChangeHandler;
-  validationError: string;
+  validationError: FieldValidationError | undefined;
 }
 
 function FormGroup(props: FieldProps): JSX.Element {
-  const { fieldConfig, validationError } = props;
+  const { fieldConfig } = props;
   return (
     <div className="record-form-group">
       <div className="record-form-label">
@@ -279,11 +265,6 @@ function FormGroup(props: FieldProps): JSX.Element {
       </div>
       <div className="record-form-field-with-error">
         <FormField {...props} />
-        {validationError.length > 0 && (
-          <div className="text-danger record-form-validation-error">
-            {validationError}
-          </div>
-        )}
       </div>
     </div>
   );
@@ -303,6 +284,7 @@ function FormField(props: FieldProps): JSX.Element {
       context={FieldContext(record)}
       onFieldChange={(value, beforeEffect, afterEffect) =>
         onRecordChange(name, value, beforeEffect, afterEffect)}
+      validationError={props.validationError}
     />
   );
 }

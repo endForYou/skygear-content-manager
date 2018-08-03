@@ -5,6 +5,7 @@ import Select, { Option, OptionValues } from 'react-select';
 import { RequiredFieldProps } from './Field';
 
 import { DropdownFieldConfig } from '../cmsConfig';
+import { ValidationText } from './validation/ValidationText';
 
 export type DropdownFieldProps = RequiredFieldProps<DropdownFieldConfig>;
 
@@ -146,6 +147,7 @@ export class DropdownField extends React.PureComponent<
       config: { compact, editable, name, nullOption, options },
       className,
       onFieldChange: _,
+      validationError,
       ...rest,
     } = this.props;
 
@@ -153,27 +155,30 @@ export class DropdownField extends React.PureComponent<
 
     if (editable) {
       return (
-        <div className={classnames(className, 'dropdown')}>
-          <Select
-            className="dropdown-select"
-            name={name}
-            clearable={false}
-            searchable={true}
-            placeholder=""
-            value={this.state.selectValue}
-            onChange={this.handleSelectChange}
-            options={this.selectOptions}
-          />
-          {selectValue === SelectValue.Custom && (
-            <input
-              {...rest}
-              className="dropdown-custom-input"
-              type="text"
-              value={value || ''}
-              onChange={this.handleCustomValueChange}
+        <React.Fragment>
+          <div className={classnames(className, 'dropdown')}>
+            <Select
+              className="dropdown-select"
+              name={name}
+              clearable={false}
+              searchable={true}
+              placeholder=""
+              value={this.state.selectValue}
+              onChange={this.handleSelectChange}
+              options={this.selectOptions}
             />
-          )}
-        </div>
+            {selectValue === SelectValue.Custom && (
+              <input
+                {...rest}
+                className="dropdown-custom-input"
+                type="text"
+                value={value || ''}
+                onChange={this.handleCustomValueChange}
+              />
+            )}
+          </div>
+          <ValidationText validationError={validationError} />
+        </React.Fragment>
       );
     } else {
       let displayValue: string;

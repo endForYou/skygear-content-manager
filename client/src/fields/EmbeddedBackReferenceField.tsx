@@ -21,6 +21,7 @@ import {
 import { objectValues, swap } from '../util';
 
 import { deleteRecordsProperly, saveRecordsProperly } from '../recordUtil';
+import { FieldValidationError } from '../validation/validation';
 import {
   Field,
   FieldChangeHandler,
@@ -147,10 +148,11 @@ export class EmbeddedBackReferenceListField extends React.PureComponent<
   }
 
   public render() {
-    const { config, className } = this.props;
+    const { config, className, validationError } = this.props;
     const { embeddedRecords } = this.state;
-
     const items = embeddedRecords.map((r, index) => {
+      const fieldValidationErrors =
+        validationError != null ? validationError.embeddedErrors[index] : {};
       return (
         <EmbeddedRecordView
           key={r._id}
@@ -195,6 +197,7 @@ export class EmbeddedBackReferenceListField extends React.PureComponent<
             )
           }
           removable={config.editable || false}
+          fieldValidationErrors={fieldValidationErrors}
         />
       );
     });
@@ -261,6 +264,7 @@ interface EmbeddedRecordViewProps {
   removable: boolean;
   upMovable: boolean;
   downMovable: boolean;
+  fieldValidationErrors: { [key: string]: FieldValidationError } | undefined;
 }
 
 function EmbeddedRecordView({
@@ -274,6 +278,7 @@ function EmbeddedRecordView({
   record,
   removable,
   upMovable,
+  fieldValidationErrors,
 }: EmbeddedRecordViewProps): JSX.Element {
   const formGroups = fieldConfigs.map((fieldConfig, index) => {
     return (
@@ -283,6 +288,9 @@ function EmbeddedRecordView({
         onFieldChange={(value, beforeEffect, affterEffect) =>
           onRecordChange(fieldConfig.name, value, beforeEffect, affterEffect)}
         record={record}
+        validationError={
+          fieldValidationErrors && fieldValidationErrors[fieldConfig.name]
+        }
       />
     );
   });
@@ -323,10 +331,11 @@ interface FieldProps {
   fieldConfig: FieldConfig;
   onFieldChange: FieldChangeHandler;
   record: Record;
+  validationError: FieldValidationError | undefined;
 }
 
 function FormGroup(props: FieldProps): JSX.Element {
-  const { fieldConfig, onFieldChange, record } = props;
+  const { fieldConfig, onFieldChange, record, validationError } = props;
   return (
     <div className="record-form-group">
       <label className="record-form-label" htmlFor={fieldConfig.name}>
@@ -338,6 +347,7 @@ function FormGroup(props: FieldProps): JSX.Element {
         value={record[fieldConfig.name]}
         context={FieldContext(record)}
         onFieldChange={onFieldChange}
+        validationError={validationError}
       />
     </div>
   );

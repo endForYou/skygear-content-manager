@@ -6,6 +6,7 @@ import 'react-toggle/style.css';
 
 import { BooleanFieldConfig } from '../cmsConfig';
 import { RequiredFieldProps } from './Field';
+import { ValidationText } from './validation/ValidationText';
 
 export type BooleanFieldProps = RequiredFieldProps<BooleanFieldConfig>;
 
@@ -32,27 +33,31 @@ class BooleanFieldImpl extends React.PureComponent<BooleanFieldProps, State> {
       className,
       onFieldChange: _onFieldChange,
       value: _value,
+      validationError,
       ...rest,
     } = this.props;
 
     const disabled = editable === undefined ? true : !editable;
 
     return (
-      <div
-        className={classnames(className, {
-          'boolean-display': !!disabled,
-          'boolean-input': !disabled,
-        })}
-      >
-        <div className="boolean-toggle-container">
-          <ReactToggle
-            {...rest}
-            checked={this.state.value}
-            onChange={this.handleChange}
-            disabled={disabled}
-          />
+      <React.Fragment>
+        <div
+          className={classnames(className, {
+            'boolean-display': !!disabled,
+            'boolean-input': !disabled,
+          })}
+        >
+          <div className="boolean-toggle-container">
+            <ReactToggle
+              {...rest}
+              checked={this.state.value}
+              onChange={this.handleChange}
+              disabled={disabled}
+            />
+          </div>
         </div>
-      </div>
+        <ValidationText validationError={validationError} />
+      </React.Fragment>
     );
   }
 

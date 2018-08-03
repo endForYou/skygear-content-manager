@@ -9,6 +9,7 @@ import {
 import { TzDatetime } from '../components/TzDatetime';
 import { TzDatetimeInput } from '../components/TzDatetimeInput';
 import { RequiredFieldProps } from './Field';
+import { ValidationText } from './validation/ValidationText';
 
 const DATE_FORMAT = 'YYYY-MM-DD';
 const TIME_FORMAT = 'HH:mm:ssZ';
@@ -21,6 +22,7 @@ export const DateTimeDisplayField: React.SFC<DateTimeDisplayFieldProps> = ({
   className,
   value,
   onFieldChange: _onFieldChange,
+  validationError: _validationError,
   ...rest,
 }) => {
   return (
@@ -66,22 +68,26 @@ class DateTimePickerFieldImpl extends React.PureComponent<
       className,
       onFieldChange: _onFieldChange,
       value: _value,
+      validationError,
       ...rest,
     } = this.props;
 
     return (
-      <TzDatetimeInput
-        {...rest}
-        className={classnames(className, 'datetime-input-container')}
-        dateFormat={DATE_FORMAT}
-        timeFormat={TIME_FORMAT}
-        value={this.state.value || undefined}
-        onChange={this.handleChange}
-        inputProps={{ className: 'datetime-input' }}
-        timezone={timezone}
-        // TODO: handle editable
-        // disabled={!editable}
-      />
+      <React.Fragment>
+        <TzDatetimeInput
+          {...rest}
+          className={classnames(className, 'datetime-input-container')}
+          dateFormat={DATE_FORMAT}
+          timeFormat={TIME_FORMAT}
+          value={this.state.value || undefined}
+          onChange={this.handleChange}
+          inputProps={{ className: 'datetime-input' }}
+          timezone={timezone}
+          // TODO: handle editable
+          // disabled={!editable}
+        />
+        <ValidationText validationError={validationError} />
+      </React.Fragment>
     );
   }
 
