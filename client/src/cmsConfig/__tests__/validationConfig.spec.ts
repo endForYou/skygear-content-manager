@@ -19,7 +19,7 @@ describe('parseValidationConfig', () => {
       })
     ).toEqual({
       expression:
-        '(typeof(value) in ("string", "array") and length(value) > 0) or value != null',
+        '(typeof(value) not in ("string", "array") or length(value) > 0) and value != null',
       message: 'I am your father.',
     });
   });
