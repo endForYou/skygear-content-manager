@@ -247,6 +247,12 @@ records:
         - name: name
           label: Name
           type: string
+          validations:
+            - when: substring(value, 0, 1) != "_"
+              expression: length(value) < 10
+              message: Too long.
+            - expression: lower(value) not in ("admin", "god")
+              message: Reserved name.
         - name: textarea
           type: text_area
         - name: dropdown
@@ -305,6 +311,9 @@ records:
           type: image
         - name: fileasset
           type: asset
+          validations:
+            - required: true
+            - expression: regex(get(value, "content_type"), "^(image|video)")
         - name: deleted
           type: boolean
           default_value: false

@@ -16,6 +16,7 @@ import {
   parseString,
   parseTimezone,
 } from './util';
+import { parseValidationConfigs, ValidationConfig } from './validationConfig';
 
 export type ReferenceFieldConfig =
   | ReferenceDisplayFieldConfig
@@ -89,6 +90,7 @@ export enum DeleteAction {
 export interface FieldConfigAttrs {
   name: string;
   label: string;
+  validations?: ValidationConfig[];
 
   // derived attrs depending on which page the field lives in
   compact: boolean;
@@ -891,8 +893,9 @@ function parseFieldConfigAttrs(
   const name = parseString(input, 'name', fieldType);
   const label =
     parseOptionalString(input, 'label', fieldType) || humanize(name);
+  const validations = parseValidationConfigs(input.validations);
 
-  return { compact: false, name, label };
+  return { compact: false, name, label, validations };
 }
 
 function parseEditableConfigAttrs(

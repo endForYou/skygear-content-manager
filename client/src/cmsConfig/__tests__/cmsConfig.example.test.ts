@@ -75,6 +75,18 @@ test('parseCmsConfig should parse example config', () => {
               compact: false,
               name: 'name',
               label: 'Name',
+              validations: [
+                {
+                  expression:
+                    'not (substring(value, 0, 1) != "_") or (length(value) < 10)',
+                  message: 'Too long.',
+                },
+                {
+                  expression:
+                    'not (value != null) or (lower(value) not in ("admin", "god"))',
+                  message: 'Reserved name.',
+                },
+              ],
               editable: true,
               type: 'text_input',
             },
@@ -302,6 +314,17 @@ test('parseCmsConfig should parse example config', () => {
               compact: false,
               name: 'fileasset',
               label: 'Fileasset',
+              validations: [
+                {
+                  expression:
+                    '(typeof(value) in ("string", "array") and length(value) > 0) or value != null',
+                  message: 'Required field.',
+                },
+                {
+                  expression:
+                    'not (value != null) or (regex(get(value, "content_type"), "^(image|video)"))',
+                },
+              ],
               editable: true,
               accept: '',
               nullable: true,

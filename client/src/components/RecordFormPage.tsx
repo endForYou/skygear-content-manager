@@ -12,7 +12,8 @@ import { Field, FieldContext } from '../fields';
 import { errorMessageFromError, isRecordsOperationError } from '../recordUtil';
 import { RootState } from '../states';
 import { Remote, RemoteType } from '../types';
-import { entriesOf, objectValues } from '../util';
+import { entriesOf, objectFrom, objectValues } from '../util';
+import { validateField } from '../validation/validation';
 import { Form } from './Form';
 
 // TODO: Reduce reused components between edit and new page
@@ -32,8 +33,13 @@ export interface RecordFormPageProps {
 // tslint:disable-next-line: no-any
 export type Effect = () => Promise<any>;
 
+interface FieldValidationError {
+  [field: string]: string;
+}
+
 interface State {
   recordChange: RecordChange;
+  fieldValidationError: FieldValidationError;
 
   // Side effects produced by fields. They will get executed after record is
   // saved successfully.
@@ -72,6 +78,7 @@ class RecordFormPageImpl extends React.PureComponent<
     this.state = {
       afterEffectChange: {},
       beforeEffectChange: {},
+      fieldValidationError: {},
       recordChange: {},
     };
   }
@@ -111,6 +118,7 @@ class RecordFormPageImpl extends React.PureComponent<
 
   public render() {
     const { className, config, record, savingRecord } = this.props;
+    const { fieldValidationError } = this.state;
 
     const formGroups = config.fields.map((fieldConfig, index) => {
       return (
@@ -120,6 +128,7 @@ class RecordFormPageImpl extends React.PureComponent<
           record={record}
           recordChange={this.state.recordChange}
           onRecordChange={this.handleRecordChange}
+          validationError={fieldValidationError[fieldConfig.name] || ''}
         />
       );
     });
@@ -179,6 +188,12 @@ class RecordFormPageImpl extends React.PureComponent<
 
     mergeRecordChange(record, recordChange);
 
+    const fieldValidationResult = this.validateFields();
+    this.setState({ fieldValidationError: fieldValidationResult });
+    if (Object.keys(fieldValidationResult).length > 0) {
+      return;
+    }
+
     Promise.resolve()
       .then(() => EffectAll(objectValues(beforeEffectChange))())
       .then(() =>
@@ -193,6 +208,35 @@ class RecordFormPageImpl extends React.PureComponent<
       })
       .catch(effectError => this.setState({ effectError }));
   };
+
+  /**
+   * Return dictionary of validation errors, empty if no errors.
+   */
+  public validateFields(): FieldValidationError {
+    const { config: { fields }, record } = this.props;
+
+    const validationErrors = fields
+      .filter(
+        field => field.validations != null && field.validations.length > 0
+      )
+      .map(field => {
+        const validations = field.validations!;
+        const result = validations
+          .map(validation => ({
+            valid: validateField(record[field.name], field, validation),
+            validation,
+          }))
+          .find(({ valid }) => !valid);
+
+        return [
+          field.name,
+          result ? result.validation.message || 'Invalid data' : undefined,
+        ] as [string, string];
+      })
+      .filter(([fieldName, errorMessage]) => errorMessage != null);
+
+    return objectFrom(validationErrors);
+  }
 }
 
 interface FieldProps {
@@ -200,16 +244,24 @@ interface FieldProps {
   record: Record;
   recordChange: RecordChange;
   onRecordChange: RecordChangeHandler;
+  validationError: string;
 }
 
 function FormGroup(props: FieldProps): JSX.Element {
-  const { fieldConfig } = props;
+  const { fieldConfig, validationError } = props;
   return (
     <div className="record-form-group">
       <div className="record-form-label">
         <label htmlFor={fieldConfig.name}>{fieldConfig.label}</label>
       </div>
-      <FormField {...props} />
+      <div className="record-form-field-with-error">
+        <FormField {...props} />
+        {validationError.length > 0 && (
+          <div className="text-danger record-form-validation-error">
+            {validationError}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
