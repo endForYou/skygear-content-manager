@@ -11,6 +11,7 @@ export type TextDisplayFieldProps = RequiredFieldProps<TextDisplayFieldConfig>;
 
 export const TextDisplayField: React.SFC<TextDisplayFieldProps> = ({
   className,
+  onFieldChange: _onFieldChange,
   ...rest,
 }) => {
   return (

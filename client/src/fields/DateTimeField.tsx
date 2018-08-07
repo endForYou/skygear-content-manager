@@ -20,6 +20,7 @@ export const DateTimeDisplayField: React.SFC<DateTimeDisplayFieldProps> = ({
   config: { compact, timezone },
   className,
   value,
+  onFieldChange: _onFieldChange,
   ...rest,
 }) => {
   return (
