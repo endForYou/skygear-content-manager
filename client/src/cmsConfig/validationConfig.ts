@@ -177,8 +177,9 @@ function lengthOrRangeValidation(input: any): ValidationConfig | undefined {
   return {
     expression: expressions.join(' and '),
     message:
+      parseOptionalString(input, 'message', 'validation') ||
       `${type === 'length' ? 'Length' : 'Value'} ` +
-      `should be ${messages.join(' and ')}.`,
+        `should be ${messages.join(' and ')}.`,
   };
 }
 
@@ -200,7 +201,9 @@ function containValidation(input: any): ValidationConfig | undefined {
   if (target != null) {
     return {
       expression: `${positive ? '' : 'not '}regex(value, "${target}")`,
-      message: `Value should ${positive ? '' : 'not '}contains "${target}"`,
+      message:
+        parseOptionalString(input, 'message', 'validation') ||
+        `Value should ${positive ? '' : 'not '}contains "${target}"`,
     };
   }
 
@@ -233,6 +236,7 @@ function comparisonValidation(input: any): ValidationConfig | undefined {
       expression: isDate(target)
         ? `timestamp(value) ${op} ${target.getTime()}`
         : `value ${op} ${target}`,
+      message: parseOptionalString(input, 'message', 'validation'),
     };
   }
 
