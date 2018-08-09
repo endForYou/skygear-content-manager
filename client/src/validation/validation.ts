@@ -65,10 +65,17 @@ function transformFieldValue(value: any, fieldType: FieldConfigTypes) {
 
 export function validateField(
   // tslint:disable-next-line:no-any
-  value: any,
+  data: any,
   field: FieldConfig,
   defaultMessage: string = 'Invalid data'
 ): string | undefined {
+  const value =
+    field.type === FieldConfigTypes.ReferenceList ||
+    field.type === FieldConfigTypes.ReferenceSelect ||
+    field.type === FieldConfigTypes.EmbeddedReferenceList
+      ? data._transient[field.name]
+      : data[field.name];
+
   if (field.validations == null || field.validations.length === 0) {
     return undefined;
   }

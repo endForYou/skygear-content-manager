@@ -241,7 +241,7 @@ class RecordFormPageImpl extends React.PureComponent<
                     this._validateFields(d, f.displayFields)
                   )
                 : [],
-            errorMessage: validateField(data[f.name], f),
+            errorMessage: validateField(data, f),
           },
         ] as [string, FieldValidationError]
     );
