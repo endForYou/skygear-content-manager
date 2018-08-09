@@ -1,4 +1,6 @@
+import creditCardRegex from 'credit-card-regex';
 import moment from 'moment';
+import urlRegex from 'url-regex';
 import {
   isArray,
   isDate,
@@ -63,6 +65,23 @@ const predefinedFunctions = {
       value: string,
       regex: string
     ) => value.match(new RegExp(regex)) != null,
+  },
+  match_pattern: {
+    [`${ValueTypes.string},${ValueTypes.string}`]: (
+      value: string,
+      pattern: string
+    ) => {
+      switch (pattern) {
+        case 'credit_card':
+          return creditCardRegex({ exact: true }).test(value);
+        case 'email':
+          return new RegExp('@').test(value);
+        case 'url':
+          return urlRegex({ strict: false, exact: true }).test(value);
+        default:
+          throw new Error(`Unknown pattern ${pattern}`);
+      }
+    },
   },
   now: {
     [NoArgs]: () => new Date(),

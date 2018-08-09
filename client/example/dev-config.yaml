@@ -248,9 +248,10 @@ records:
           label: Name
           type: string
           validations:
-            - when: substring(value, 0, 1) != "_"
-              expression: length(value) < 10
-              message: Too long.
+            - when: value != null and substring(value, 0, 1) != "_"
+              length:
+                max: 10
+              inclusive: false
             - expression: lower(value) not in ("admin", "god")
               message: Reserved name.
         - name: textarea

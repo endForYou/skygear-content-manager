@@ -78,8 +78,8 @@ test('parseCmsConfig should parse example config', () => {
               validations: [
                 {
                   expression:
-                    'not (substring(value, 0, 1) != "_") or (length(value) < 10)',
-                  message: 'Too long.',
+                    'not (value != null and substring(value, 0, 1) != "_") or (length(value) < 10)',
+                  message: 'Length should be smaller than 10.',
                 },
                 {
                   expression:
@@ -317,7 +317,7 @@ test('parseCmsConfig should parse example config', () => {
               validations: [
                 {
                   expression:
-                    '(typeof(value) in ("string", "array") and length(value) > 0) or value != null',
+                    '(typeof(value) not in ("string", "array") or length(value) > 0) and value != null',
                   message: 'Required field.',
                 },
                 {
