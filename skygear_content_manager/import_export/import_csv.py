@@ -371,11 +371,13 @@ def replace_assets_in_record_data(data_list, fields, file_assets):
         try:
             for field in fields:
                 file_id = data[field.name]
-                asset = file_assets.get(file_id)
-                if asset is None:
-                    raise AssetNotFoundException(file_id)
-
-                data[field.name] = asset.id
+                if file_id:
+                    asset = file_assets.get(file_id)
+                    if asset is None:
+                        raise AssetNotFoundException(file_id)
+                    data[field.name] = asset.id
+                else:
+                    data[field.name] = None
 
             result.append(data)
         except Exception as e:
