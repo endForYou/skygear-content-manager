@@ -234,6 +234,12 @@ class RecordFormPageImpl extends React.PureComponent<
         [
           f.name,
           {
+            // TODO: Fix embedded errors validation
+            // data._transient is not fully updated, since the form submit
+            // relies on effects created by fields to execute the save logic.
+            //
+            // Atm, the config would reject validation for reference fields and
+            // their child fields.
             embeddedErrors:
               f.type === FieldConfigTypes.EmbeddedReferenceList
                 ? // tslint:disable-next-line:no-any

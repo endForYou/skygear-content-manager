@@ -366,28 +366,30 @@ export function recursivelyPreprocessFieldAlias(editable: boolean, input: any) {
 export function parseFieldConfig(
   context: ConfigContext,
   // tslint:disable-next-line:no-any
-  a: any
+  a: any,
+  depth: number = 0
 ): FieldConfig {
   switch (a.type) {
     case 'reference':
-      return parseReferenceFieldConfig(context, a);
+      return parseReferenceFieldConfig(context, a, depth);
     case 'reference_dropdown':
-      return parseReferenceDropdownFieldConfig(context, a);
+      return parseReferenceDropdownFieldConfig(context, a, depth);
     case 'reference_list':
-      return parseReferenceListFieldConfig(context, a);
+      return parseReferenceListFieldConfig(context, a, depth);
     case 'reference_select':
-      return parseReferenceSelectFieldConfig(context, a);
+      return parseReferenceSelectFieldConfig(context, a, depth);
     case 'embedded_reference_list':
-      return parseEmbeddedReferenceListFieldConfig(context, a);
+      return parseEmbeddedReferenceListFieldConfig(context, a, depth);
     default:
-      return parseNonReferenceFieldConfig(context, a);
+      return parseNonReferenceFieldConfig(context, a, depth);
   }
 }
 
 export function parseNonReferenceFieldConfig(
   context: RecordTypeContext,
   // tslint:disable-next-line: no-any
-  a: any
+  a: any,
+  depth: number = 0
 ): FieldConfig {
   // built-in fields
   switch (a.name) {
@@ -401,37 +403,37 @@ export function parseNonReferenceFieldConfig(
 
   switch (a.type) {
     case 'text_display':
-      return parseTextDisplayFieldConfig(a);
+      return parseTextDisplayFieldConfig(a, depth);
     case 'text_input':
-      return parseTextInputFieldConfig(a);
+      return parseTextInputFieldConfig(a, depth);
     case 'text_area':
-      return parseTextAreaFieldConfig(a);
+      return parseTextAreaFieldConfig(a, depth);
     case 'dropdown':
-      return parseDropdownFieldConfig(a);
+      return parseDropdownFieldConfig(a, depth);
     case 'wysiwyg':
-      return parseWYSIWYGFieldConfig(a);
+      return parseWYSIWYGFieldConfig(a, depth);
     case 'date_time_display':
-      return parseDateTimeDisplayFieldConfig(a, context);
+      return parseDateTimeDisplayFieldConfig(a, context, depth);
     case 'date_time_picker':
-      return parseDateTimePickerFieldConfig(a, context);
+      return parseDateTimePickerFieldConfig(a, context, depth);
     case 'boolean':
-      return parseBooleanFieldConfig(a);
+      return parseBooleanFieldConfig(a, depth);
     case 'integer_display':
-      return parseIntegerDisplayFieldConfig(a);
+      return parseIntegerDisplayFieldConfig(a, depth);
     case 'integer_input':
-      return parseIntegerInputFieldConfig(a);
+      return parseIntegerInputFieldConfig(a, depth);
     case 'float_display':
-      return parseFloatDisplayFieldConfig(a);
+      return parseFloatDisplayFieldConfig(a, depth);
     case 'float_input':
-      return parseFloatInputFieldConfig(a);
+      return parseFloatInputFieldConfig(a, depth);
     case 'image_display':
-      return parseImageDisplayFieldConfig(a);
+      return parseImageDisplayFieldConfig(a, depth);
     case 'image_uploader':
-      return parseImageUploaderFieldConfig(a);
+      return parseImageUploaderFieldConfig(a, depth);
     case 'file_display':
-      return parseFileDisplayFieldConfig(a);
+      return parseFileDisplayFieldConfig(a, depth);
     case 'file_uploader':
-      return parseFileUploaderFieldConfig(a);
+      return parseFileUploaderFieldConfig(a, depth);
 
     // backward compatible
     case '_id':
@@ -450,36 +452,40 @@ export function parseNonReferenceFieldConfig(
 }
 
 function parseTextDisplayFieldConfig(
-  input: FieldConfigInput
+  input: FieldConfigInput,
+  depth: number
 ): TextDisplayFieldConfig {
   return {
-    ...parseFieldConfigAttrs(input, 'text_display'),
+    ...parseFieldConfigAttrs(input, FieldConfigTypes.TextDisplay, depth),
     type: FieldConfigTypes.TextDisplay,
   };
 }
 
 function parseTextInputFieldConfig(
-  input: FieldConfigInput
+  input: FieldConfigInput,
+  depth: number
 ): TextInputFieldConfig {
   return {
-    ...parseEditableConfigAttrs(input, 'text_input'),
+    ...parseEditableConfigAttrs(input, FieldConfigTypes.TextInput, depth),
     defaultValue: parseOptionalString(input, 'default_value', 'text_input'),
     type: FieldConfigTypes.TextInput,
   };
 }
 
 function parseTextAreaFieldConfig(
-  input: FieldConfigInput
+  input: FieldConfigInput,
+  depth: number
 ): TextAreaFieldConfig {
   return {
-    ...parseEditableConfigAttrs(input, 'text_area'),
+    ...parseEditableConfigAttrs(input, FieldConfigTypes.TextArea, depth),
     defaultValue: parseOptionalString(input, 'default_value', 'text_area'),
     type: FieldConfigTypes.TextArea,
   };
 }
 
 function parseDropdownFieldConfig(
-  input: FieldConfigInput
+  input: FieldConfigInput,
+  depth: number
 ): DropdownFieldConfig {
   // tslint:disable-next-line: no-any
   const options: DropdownOption[] = input.options.map((optIn: any) => {
@@ -509,7 +515,7 @@ function parseDropdownFieldConfig(
   customOption.label = customOption.label || 'Others';
 
   return {
-    ...parseEditableConfigAttrs(input, 'dropdown'),
+    ...parseEditableConfigAttrs(input, FieldConfigTypes.Dropdown, depth),
     customOption,
     defaultValue:
       parseOptionalString(input, 'default_value', 'dropdown') ||
@@ -520,9 +526,12 @@ function parseDropdownFieldConfig(
   };
 }
 
-function parseWYSIWYGFieldConfig(input: FieldConfigInput): WYSIWYGFieldConfig {
+function parseWYSIWYGFieldConfig(
+  input: FieldConfigInput,
+  depth: number
+): WYSIWYGFieldConfig {
   return {
-    ...parseEditableConfigAttrs(input, 'wysiwyg'),
+    ...parseEditableConfigAttrs(input, FieldConfigTypes.WYSIWYG, depth),
     config: input.config,
     defaultValue: parseOptionalString(input, 'default_value', 'wysiwyg'),
     type: FieldConfigTypes.WYSIWYG,
@@ -531,10 +540,11 @@ function parseWYSIWYGFieldConfig(input: FieldConfigInput): WYSIWYGFieldConfig {
 
 function parseDateTimeDisplayFieldConfig(
   input: FieldConfigInput,
-  context: RecordTypeContext
+  context: RecordTypeContext,
+  depth: number
 ): DateTimeDisplayFieldConfig {
   return {
-    ...parseFieldConfigAttrs(input, 'date_time_display'),
+    ...parseFieldConfigAttrs(input, FieldConfigTypes.DateTimeDisplay, depth),
     timezone: parseTimezone(input, 'timezone'),
     type: FieldConfigTypes.DateTimeDisplay,
   };
@@ -542,57 +552,65 @@ function parseDateTimeDisplayFieldConfig(
 
 function parseDateTimePickerFieldConfig(
   input: FieldConfigInput,
-  context: RecordTypeContext
+  context: RecordTypeContext,
+  depth: number
 ): DateTimePickerFieldConfig {
   return {
-    ...parseEditableConfigAttrs(input, 'date_time_picker'),
+    ...parseEditableConfigAttrs(input, FieldConfigTypes.DateTimePicker, depth),
     defaultValue: parseOptionalDate(input, 'default_value', 'date_time_picker'),
     timezone: parseTimezone(input, 'timezone'),
     type: FieldConfigTypes.DateTimePicker,
   };
 }
 
-function parseBooleanFieldConfig(input: FieldConfigInput): BooleanFieldConfig {
+function parseBooleanFieldConfig(
+  input: FieldConfigInput,
+  depth: number
+): BooleanFieldConfig {
   return {
-    ...parseEditableConfigAttrs(input, 'boolean'),
+    ...parseEditableConfigAttrs(input, FieldConfigTypes.Boolean, depth),
     defaultValue: parseOptionalBoolean(input, 'default_value', 'boolean'),
     type: FieldConfigTypes.Boolean,
   };
 }
 
 function parseIntegerDisplayFieldConfig(
-  input: FieldConfigInput
+  input: FieldConfigInput,
+  depth: number
 ): IntegerDisplayFieldConfig {
   return {
-    ...parseFieldConfigAttrs(input, 'integer_display'),
+    ...parseFieldConfigAttrs(input, FieldConfigTypes.IntegerDisplay, depth),
     type: FieldConfigTypes.IntegerDisplay,
   };
 }
 
 function parseIntegerInputFieldConfig(
-  input: FieldConfigInput
+  input: FieldConfigInput,
+  depth: number
 ): IntegerInputFieldConfig {
   return {
-    ...parseEditableConfigAttrs(input, 'integer_input'),
+    ...parseEditableConfigAttrs(input, FieldConfigTypes.IntegerInput, depth),
     defaultValue: parseOptionalNumber(input, 'default_value', 'integer_input'),
     type: FieldConfigTypes.IntegerInput,
   };
 }
 
 function parseFloatDisplayFieldConfig(
-  input: FieldConfigInput
+  input: FieldConfigInput,
+  depth: number
 ): FloatDisplayFieldConfig {
   return {
-    ...parseFieldConfigAttrs(input, 'float_display'),
+    ...parseFieldConfigAttrs(input, FieldConfigTypes.FloatDisplay, depth),
     type: FieldConfigTypes.FloatDisplay,
   };
 }
 
 function parseFloatInputFieldConfig(
-  input: FieldConfigInput
+  input: FieldConfigInput,
+  depth: number
 ): FloatInputFieldConfig {
   return {
-    ...parseEditableConfigAttrs(input, 'float_input'),
+    ...parseEditableConfigAttrs(input, FieldConfigTypes.FloatInput, depth),
     defaultValue: parseOptionalNumber(input, 'default_value', 'float_input'),
     type: FieldConfigTypes.FloatInput,
   };
@@ -621,13 +639,14 @@ function parseReferenceFieldConfigAttrs(
 
 export function parseReferenceFieldConfig(
   context: RecordTypeContext,
-  input: FieldConfigInput
+  input: FieldConfigInput,
+  depth: number
 ): ReferenceDisplayFieldConfig {
   const displayFieldName =
     parseOptionalString(input, 'reference_field_name', 'reference') || '_id';
 
   return {
-    ...parseFieldConfigAttrs(input, 'reference'),
+    ...parseFieldConfigAttrs(input, FieldConfigTypes.Reference, depth),
     displayFieldName,
     reference: parseReferenceFieldConfigAttrs(context, input),
     type: FieldConfigTypes.Reference,
@@ -636,13 +655,18 @@ export function parseReferenceFieldConfig(
 
 export function parseReferenceDropdownFieldConfig(
   context: RecordTypeContext,
-  input: FieldConfigInput
+  input: FieldConfigInput,
+  depth: number
 ): ReferenceDropdownFieldConfig {
   const displayFieldName =
     parseOptionalString(input, 'reference_field_name', 'reference') || '_id';
 
   return {
-    ...parseEditableConfigAttrs(input, 'reference'),
+    ...parseEditableConfigAttrs(
+      input,
+      FieldConfigTypes.ReferenceDropdown,
+      depth
+    ),
     defaultValue: undefined,
     displayFieldName,
     reference: parseReferenceFieldConfigAttrs(context, input),
@@ -652,7 +676,8 @@ export function parseReferenceDropdownFieldConfig(
 
 function parseReferenceListFieldConfig(
   context: ConfigContext,
-  input: FieldConfigInput
+  input: FieldConfigInput,
+  depth: number
 ): ReferenceListFieldConfig {
   const displayFieldName = parseString(
     input,
@@ -661,7 +686,7 @@ function parseReferenceListFieldConfig(
   );
 
   return {
-    ...parseFieldConfigAttrs(input, 'reference'),
+    ...parseFieldConfigAttrs(input, FieldConfigTypes.ReferenceList, depth),
     displayFieldName,
     reference: parseMultiReferenceFieldConfigAttrs(context, input),
     type: FieldConfigTypes.ReferenceList,
@@ -670,7 +695,8 @@ function parseReferenceListFieldConfig(
 
 function parseReferenceSelectFieldConfig(
   context: ConfigContext,
-  input: FieldConfigInput
+  input: FieldConfigInput,
+  depth: number
 ): ReferenceSelectFieldConfig {
   const displayFieldName = parseString(
     input,
@@ -679,7 +705,7 @@ function parseReferenceSelectFieldConfig(
   );
 
   return {
-    ...parseEditableConfigAttrs(input, 'reference'),
+    ...parseEditableConfigAttrs(input, FieldConfigTypes.ReferenceSelect, depth),
     defaultValue: undefined,
     displayFieldName,
     reference: parseMultiReferenceFieldConfigAttrs(context, input),
@@ -689,7 +715,8 @@ function parseReferenceSelectFieldConfig(
 
 function parseEmbeddedReferenceListFieldConfig(
   context: ConfigContext,
-  input: FieldConfigInput
+  input: FieldConfigInput,
+  depth: number
 ): EmbeddedReferenceListFieldConfig {
   if (!isArray(input.reference_fields)) {
     throw new Error('Expect reference_fields to be array of fields');
@@ -697,7 +724,7 @@ function parseEmbeddedReferenceListFieldConfig(
 
   const displayFields = input.reference_fields
     // tslint:disable-next-line: no-any
-    .map((f: any) => parseFieldConfig(context, f)) as FieldConfig[];
+    .map((f: any) => parseFieldConfig(context, f, depth + 1)) as FieldConfig[];
 
   const positionFieldName = parseOptionalString(
     input,
@@ -731,7 +758,11 @@ function parseEmbeddedReferenceListFieldConfig(
   );
 
   return {
-    ...parseEditableConfigAttrs(input, 'embedded_reference'),
+    ...parseEditableConfigAttrs(
+      input,
+      FieldConfigTypes.EmbeddedReferenceList,
+      depth
+    ),
     displayFields,
     positionFieldName,
     reference: parseMultiReferenceFieldConfigAttrs(context, input),
@@ -841,22 +872,24 @@ function deriveReferencesByTargetName(
 }
 
 function parseImageDisplayFieldConfig(
-  input: FieldConfigInput
+  input: FieldConfigInput,
+  depth: number
 ): ImageDisplayFieldConfig {
   return {
-    ...parseFieldConfigAttrs(input, 'image_display'),
+    ...parseFieldConfigAttrs(input, FieldConfigTypes.ImageDisplay, depth),
     config: input.config,
     type: FieldConfigTypes.ImageDisplay,
   };
 }
 
 function parseImageUploaderFieldConfig(
-  input: FieldConfigInput
+  input: FieldConfigInput,
+  depth: number
 ): ImageUploaderFieldConfig {
   const nullable = parseOptionalBoolean(input, 'nullable', 'image_uploader');
 
   return {
-    ...parseEditableConfigAttrs(input, 'image_uploader'),
+    ...parseEditableConfigAttrs(input, FieldConfigTypes.ImageUploader, depth),
     config: input.config,
     nullable: nullable == null ? true : nullable,
     type: FieldConfigTypes.ImageUploader,
@@ -864,21 +897,23 @@ function parseImageUploaderFieldConfig(
 }
 
 function parseFileDisplayFieldConfig(
-  input: FieldConfigInput
+  input: FieldConfigInput,
+  depth: number
 ): FileDisplayFieldConfig {
   return {
-    ...parseFieldConfigAttrs(input, 'file_display'),
+    ...parseFieldConfigAttrs(input, FieldConfigTypes.FileDisplay, depth),
     type: FieldConfigTypes.FileDisplay,
   };
 }
 
 function parseFileUploaderFieldConfig(
-  input: FieldConfigInput
+  input: FieldConfigInput,
+  depth: number
 ): FileUploaderFieldConfig {
   const nullable = parseOptionalBoolean(input, 'nullable', 'file_uploader');
 
   return {
-    ...parseEditableConfigAttrs(input, 'file_uploader'),
+    ...parseEditableConfigAttrs(input, FieldConfigTypes.FileUploader, depth),
     accept: parseOptionalString(input, 'accept', 'file_uploader') || '',
     nullable: nullable == null ? true : nullable,
     type: FieldConfigTypes.FileUploader,
@@ -888,12 +923,25 @@ function parseFileUploaderFieldConfig(
 function parseFieldConfigAttrs(
   // tslint:disable-next-line: no-any
   input: any,
-  fieldType: string
+  fieldType: FieldConfigTypes,
+  depth: number
 ): FieldConfigAttrs {
   const name = parseString(input, 'name', fieldType);
   const label =
     parseOptionalString(input, 'label', fieldType) || humanize(name);
-  const validations = parseValidationConfigs(input.validations);
+  let validations;
+
+  // TODO:
+  // Display config error if setting validation in embedded reference fields
+  // or child fields
+  if (
+    (depth !== 0 || fieldType === FieldConfigTypes.EmbeddedReferenceList) &&
+    input.validations != null
+  ) {
+    throw new Error('Validation is not supported by reference fields');
+  }
+
+  validations = parseValidationConfigs(input.validations);
 
   return { compact: false, name, label, validations };
 }
@@ -901,7 +949,8 @@ function parseFieldConfigAttrs(
 function parseEditableConfigAttrs(
   // tslint:disable-next-line: no-any
   input: any,
-  fieldType: string
+  fieldType: FieldConfigTypes,
+  depth: number
 ): EditableFieldConfigAttrs {
   const optionalAttrs: { editable?: boolean } = {};
 
@@ -911,7 +960,7 @@ function parseEditableConfigAttrs(
   }
 
   return {
-    ...parseFieldConfigAttrs(input, fieldType),
+    ...parseFieldConfigAttrs(input, fieldType, depth),
     ...optionalAttrs,
   };
 }
