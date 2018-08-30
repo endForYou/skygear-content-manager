@@ -178,15 +178,25 @@ class CMSRecordImport:
                  name,
                  fields,
                  handle_duplicated_identifier=DUPLICATION_HANDLING_USE_FIRST,
-                 identifier=None):
+                 identifier=None,
+                 limit=None):
+        if not limit:
+            limit = CMSRecordImportLimitConfig()
+
         self.record_type = record_type
         self.name = name
         self.handle_duplicated_identifier = handle_duplicated_identifier
         self.identifier = identifier
+        self.limit = limit
         self.fields = fields
 
     def get_reference_fields(self):
         return [f for f in self.fields if f.reference]
+
+
+class CMSRecordImportLimitConfig:
+    def __init__(self, record_number=None):
+        self.record_number = record_number
 
 
 class CMSRecordImportField:

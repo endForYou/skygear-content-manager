@@ -18,6 +18,7 @@ from ..models.cms_config import CMSRecordExport
 from ..models.cms_config import CMSRecordExportField
 from ..models.cms_config import CMSRecordImport
 from ..models.cms_config import CMSRecordImportField
+from ..models.cms_config import CMSRecordImportLimitConfig
 from .nested_dict import NestedDict
 
 
@@ -256,6 +257,7 @@ class CMSRecordImportSchema(Schema):
     name = fields.String()
     identifier = fields.String(required=False)
     handle_duplicated_identifier = DuplicationHandling(required=False)
+    limit = fields.Nested('CMSRecordImportLimitConfigSchema', required=False)
 
     fields = fields.Nested('CMSRecordImportFieldSchema', many=True)
 
@@ -270,6 +272,15 @@ class CMSRecordImportSchema(Schema):
     @post_load
     def make_object(self, data):
         return CMSRecordImport(**data)
+
+
+class CMSRecordImportLimitConfigSchema(Schema):
+
+    record_number = fields.Integer(required=False)
+
+    @post_load
+    def make_object(self, data):
+        return CMSRecordImportLimitConfig(**data)
 
 
 class CMSRecordImportFieldSchema(Schema):
