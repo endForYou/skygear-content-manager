@@ -2,7 +2,6 @@ import './ListPage.scss';
 
 import classNames from 'classnames';
 import { Location } from 'history';
-import * as qs from 'query-string';
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
@@ -44,6 +43,10 @@ import {
   InjectedProps as SyncFilterProps,
   syncFilterWithUrl,
 } from '../components/SyncUrl/SyncUrlFilter';
+import {
+  InjectedProps as SyncPageProps,
+  syncPageWithUrl,
+} from '../components/SyncUrl/SyncUrlPage';
 import {
   InjectedProps as SyncSortProps,
   syncSortWithUrl,
@@ -219,6 +222,7 @@ const ListTable: React.SFC<ListTableProps> = ({
 export type ListPageProps = StateProps &
   DispatchProps &
   SyncFilterProps &
+  SyncPageProps &
   SyncSortProps;
 
 export interface StateProps {
@@ -227,7 +231,6 @@ export interface StateProps {
   isLoading: boolean;
   location: Location;
   maxPage: number;
-  page: number;
   pageConfig: ListPageConfig;
   recordName: string;
   records: Record[];
@@ -299,6 +302,11 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
     const { dispatch } = this.props;
     dispatch(importRecords(actionConfig.name, attrs));
   }
+
+  public onFilterChange = (filters: Filter[]) => {
+    this.props.onChangePage();
+    this.props.onChangeFilter(filters);
+  };
 
   public onSortButtonClick(name: string) {
     const sortState = nextSortState(this.props.sortState, name);
@@ -466,7 +474,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
                     <FilterMenu
                       filterConfigs={pageConfig.filters}
                       filters={filters}
-                      onChangeFilter={this.props.onChangeFilter}
+                      onChangeFilter={this.onFilterChange}
                     />
                   </div>
                 </div>
@@ -482,7 +490,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
               className="list-filter-tag-list"
               filters={filters}
               filterConfigs={pageConfig.filters}
-              onChangeFilter={this.props.onChangeFilter}
+              onChangeFilter={this.onFilterChange}
             />
           </div>
         )}
@@ -562,8 +570,6 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
 function ListPageFactory(recordName: string) {
   function mapStateToProps(state: RootState, props: RouteProps): StateProps {
     const { location } = props;
-    const { page: pageStr = '1' } = qs.parse(location.search);
-    const page = parseInt(pageStr, 10);
 
     const recordConfig = getCmsConfig(state).records[recordName];
     if (recordConfig == null) {
@@ -589,7 +595,6 @@ function ListPageFactory(recordName: string) {
       isLoading,
       location,
       maxPage,
-      page,
       pageConfig,
       recordName,
       records,
@@ -600,7 +605,9 @@ function ListPageFactory(recordName: string) {
     return { dispatch };
   }
 
-  const SyncedListPage = syncSortWithUrl(syncFilterWithUrl(ListPageImpl));
+  const SyncedListPage = syncSortWithUrl(
+    syncFilterWithUrl(syncPageWithUrl(ListPageImpl))
+  );
   return connect(mapStateToProps, mapDispatchToProps)(SyncedListPage);
 }
 

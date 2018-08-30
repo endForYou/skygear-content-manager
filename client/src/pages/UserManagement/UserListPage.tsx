@@ -2,7 +2,6 @@ import './UserListPage.scss';
 
 import classNames from 'classnames';
 import { Location } from 'history';
-import * as qs from 'query-string';
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
@@ -29,6 +28,10 @@ import {
   InjectedProps as SyncFilterProps,
   syncFilterWithUrl,
 } from '../../components/SyncUrl/SyncUrlFilter';
+import {
+  InjectedProps as SyncPageProps,
+  syncPageWithUrl,
+} from '../../components/SyncUrl/SyncUrlPage';
 import { ToggleButton } from '../../components/ToggleButton';
 import { RootState, RouteProps } from '../../states';
 import { SkygearUser } from '../../types';
@@ -168,13 +171,15 @@ const ListTable: React.SFC<ListTableProps> = (props: ListTableProps) => {
   );
 };
 
-type UserListPageProps = StateProps & DispatchProps & SyncFilterProps;
+type UserListPageProps = StateProps &
+  DispatchProps &
+  SyncFilterProps &
+  SyncPageProps;
 
 interface StateProps {
   adminRole: string;
   filterConfigs: FilterConfig[];
   location: Location;
-  page: number;
   maxPage: number;
   isLoading: boolean;
   currentUserId: string;
@@ -222,6 +227,11 @@ class UserListPageImpl extends React.PureComponent<UserListPageProps, State> {
     this.setState({ showfilterMenu: !this.state.showfilterMenu });
   }
 
+  public onFilterChange = (filters: Filter[]) => {
+    this.props.onChangePage();
+    this.props.onChangeFilter(filters);
+  };
+
   public onFilterItemClicked(filterConfig: FilterConfig) {
     const newFilter = filterFactory(filterConfig);
 
@@ -235,7 +245,7 @@ class UserListPageImpl extends React.PureComponent<UserListPageProps, State> {
             newFilter,
           ];
 
-    this.props.onChangeFilter(filters);
+    this.onFilterChange(filters);
     this.toggleFilterMenu();
   }
 
@@ -283,7 +293,7 @@ class UserListPageImpl extends React.PureComponent<UserListPageProps, State> {
                   <FilterMenu
                     filterConfigs={this.props.filterConfigs}
                     filters={filters}
-                    onChangeFilter={this.props.onChangeFilter}
+                    onChangeFilter={this.onFilterChange}
                   />
                 </div>
               </div>
@@ -298,7 +308,7 @@ class UserListPageImpl extends React.PureComponent<UserListPageProps, State> {
               className="list-filter-tag-list"
               filters={filters}
               filterConfigs={this.props.filterConfigs}
-              onChangeFilter={this.props.onChangeFilter}
+              onChangeFilter={this.onFilterChange}
             />
           </div>
         )}
@@ -354,8 +364,6 @@ class UserListPageImpl extends React.PureComponent<UserListPageProps, State> {
 function UserListPageFactory() {
   function mapStateToProps(state: RootState, props: RouteProps): StateProps {
     const { location } = props;
-    const { page: pageStr = '1' } = qs.parse(location.search);
-    const page = parseInt(pageStr, 10);
 
     const adminRole = state.adminRole;
     const { isLoading, users, totalCount } = state.user;
@@ -370,7 +378,6 @@ function UserListPageFactory() {
       isLoading,
       location,
       maxPage,
-      page,
       users,
     };
   }
@@ -379,7 +386,7 @@ function UserListPageFactory() {
     return { dispatch };
   }
 
-  const SyncedListPage = syncFilterWithUrl(UserListPageImpl);
+  const SyncedListPage = syncFilterWithUrl(syncPageWithUrl(UserListPageImpl));
   return connect(mapStateToProps, mapDispatchToProps)(SyncedListPage);
 }
 
