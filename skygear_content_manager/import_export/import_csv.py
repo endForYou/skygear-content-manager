@@ -150,6 +150,11 @@ class ColumnNotFoundException(ImportAPIException):
         return 108
 
 
+class RecordNumberExceedLimitException(ImportAPIException):
+    def __init__(self, limit):
+        message = 'Maximum number of records is {}'.format(limit)
+        super(RecordNumberExceedLimitException, self).__init__(message)
+
 
 def prepare_import_records(stream, import_config, atomic):
     reader = csv.reader(stream)
@@ -158,7 +163,13 @@ def prepare_import_records(stream, import_config, atomic):
     column_mapping = find_column_mapping(header, import_config)
 
     data_list = []
+    number = 0
+    limit = import_config.limit.record_number
     for row in reader:
+        number = number + 1
+        if limit and number > limit:
+            raise RecordNumberExceedLimitException(limit)
+
         data = project_csv_data(row, column_mapping)
         data_list.append(data)
 
