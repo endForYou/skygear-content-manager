@@ -1,6 +1,4 @@
-import creditCardRegex from 'credit-card-regex';
 import moment from 'moment';
-import urlRegex from 'url-regex';
 import {
   isArray,
   isDate,
@@ -11,6 +9,8 @@ import {
   isUndefined,
 } from 'util';
 
+import creditCardRegex from '../regex/creditCardRegex';
+import urlRegex from '../regex/urlRegex';
 import { objectFrom } from '../util';
 
 // tslint:disable:no-any object-literal-sort-keys
