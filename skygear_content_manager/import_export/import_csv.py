@@ -60,7 +60,39 @@ class RecordIdentifierMap:
         record_ids.append(record_id)
 
 
-class ImportRecordException(SkygearException):
+class ImportAPIException(SkygearException):
+    def error_code(self):
+        return 10000
+
+    def error_message(self):
+        return self.message
+
+    def error_name(self):
+        return self.__class__.__name__
+
+    def error_dict_extra(self):
+        return None
+
+    def to_dict(self):
+        d = {
+            '_type': 'error',
+            'code': self.error_code(),
+            'message': self.error_message(),
+            'name': self.error_name(),
+        }
+
+        extra = self.error_dict_extra()
+
+        if extra:
+            d.update(extra)
+
+        return d
+
+    def as_dict(self):
+        return self.to_dict()
+
+
+class ImportRecordException(ImportAPIException):
     def __init__(self, record_data, underlying_error):
         message = str(underlying_error)
         super(ImportRecordException, self).__init__(message)
@@ -68,56 +100,55 @@ class ImportRecordException(SkygearException):
         self.record_data = record_data
         self.underlying_error = underlying_error
 
-    @classmethod
-    def error_code_for_exception(cls, e):
-        if isinstance(e, DuplicateIdentifierValueException):
-            return 109
-        elif isinstance(e, AssetNotFoundException):
-            return 110
+    def error_code(self):
+        if isinstance(self.underlying_error, ImportAPIException):
+            return self.underlying_error.error_code()
 
-        return 10000
+        return super(ImportRecordException, self).error_code()
 
-    def to_dict(self):
-        return {
-            '_id': self.record_data.get('_id'),
-            '_type': 'error',
-            'code': self.error_code_for_exception(self.underlying_error),
-            'message': str(self.underlying_error),
-            'name': self.underlying_error.__class__.__name__,
-        }
+    def error_message(self):
+        if isinstance(self.underlying_error, ImportAPIException):
+            return self.underlying_error.error_message()
 
-    def as_dict(self):
-        return self.to_dict()
+        return str(self.underlying_error)
+
+    def error_name(self):
+        if isinstance(self.underlying_error, ImportAPIException):
+            return self.underlying_error.error_name()
+
+        return self.underlying_error.__class__.__name__
+
+    def error_dict_extra(self):
+        return {'_id': self.record_data.get('_id')}
 
 
-class DuplicateIdentifierValueException(Exception):
+class DuplicateIdentifierValueException(ImportAPIException):
     def __init__(self, record_type, key, value):
         message = 'duplicate identifier value for "{}.{} == {}"' \
                   .format(record_type, key, value)
         super(DuplicateIdentifierValueException, self).__init__(message)
 
+    def error_code(self):
+        return 109
 
-class AssetNotFoundException(Exception):
+
+class AssetNotFoundException(ImportAPIException):
     def __init__(self, filename):
         message = '"{}" not found in imported file or asset'.format(filename)
         super(AssetNotFoundException, self).__init__(message)
 
+    def error_code(self):
+        return 110
 
-class ColumnNotFoundException(SkygearException):
+
+class ColumnNotFoundException(ImportAPIException):
     def __init__(self, column_name):
         message = 'field "{}" not found in the csv header'.format(column_name)
         super(ColumnNotFoundException, self).__init__(message)
 
-    def to_dict(self):
-        return {
-            '_type': 'error',
-            'code': 108,
-            'message': self.message,
-            'name': self.__class__.__name__,
-        }
+    def error_code(self):
+        return 108
 
-    def as_dict(self):
-        return self.to_dict()
 
 
 def prepare_import_records(stream, import_config, atomic):
