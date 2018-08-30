@@ -64,35 +64,35 @@ export function withEventHandler<P extends InjectedProps>(
             case BaseFilterQueryType.IsNotNull:
               return {
                 ...f,
-                query: BaseFilterQueryType[value],
+                query: value as BaseFilterQueryType,
               };
             default:
           }
-          switch (filter.type) {
+          switch (f.type) {
             case FilterType.StringFilterType:
               return {
                 ...f,
-                query: StringFilterQueryType[value],
+                query: value as StringFilterQueryType,
               };
             case FilterType.IntegerFilterType:
               return {
                 ...f,
-                query: IntegerFilterQueryType[value],
+                query: value as IntegerFilterQueryType,
               };
             case FilterType.BooleanFilterType:
               return {
                 ...f,
-                query: BooleanFilterQueryType[value],
+                query: value as BooleanFilterQueryType,
               };
             case FilterType.DateTimeFilterType:
               return {
                 ...f,
-                query: DateTimeFilterQueryType[value],
+                query: value as DateTimeFilterQueryType,
               };
             case FilterType.ReferenceFilterType:
               return {
                 ...f,
-                query: ReferenceFilterQueryType[value],
+                query: value as ReferenceFilterQueryType,
               };
             default:
               throw new Error(
