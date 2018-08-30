@@ -156,6 +156,12 @@ class RecordNumberExceedLimitException(ImportAPIException):
         super(RecordNumberExceedLimitException, self).__init__(message)
 
 
+class FileSizeExceedLimitException(ImportAPIException):
+    def __init__(self, limit):
+        message = 'Maximum file size is {} bytes'.format(limit)
+        super(FileSizeExceedLimitException, self).__init__(message)
+
+
 def prepare_import_records(stream, import_config, atomic):
     reader = csv.reader(stream)
     header = next(reader)
