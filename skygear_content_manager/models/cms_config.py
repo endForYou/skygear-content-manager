@@ -195,8 +195,9 @@ class CMSRecordImport:
 
 
 class CMSRecordImportLimitConfig:
-    def __init__(self, record_number=None):
+    def __init__(self, record_number=None, file_size=None):
         self.record_number = record_number
+        self.file_size = file_size
 
 
 class CMSRecordImportField:

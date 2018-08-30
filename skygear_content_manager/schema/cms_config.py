@@ -1,3 +1,4 @@
+import humanfriendly
 from marshmallow import Schema
 from marshmallow import ValidationError
 from marshmallow import fields
@@ -277,9 +278,13 @@ class CMSRecordImportSchema(Schema):
 class CMSRecordImportLimitConfigSchema(Schema):
 
     record_number = fields.Integer(required=False)
+    file_size = fields.String(required=False)
 
     @post_load
     def make_object(self, data):
+        if 'file_size' in data:
+            data['file_size'] = humanfriendly.parse_size(data['file_size'])
+
         return CMSRecordImportLimitConfig(**data)
 
 

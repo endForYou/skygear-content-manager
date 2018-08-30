@@ -18,6 +18,7 @@ imports:
     handle_duplicated_identifier: throw_error
     limit:
       record_number: 100
+      file_size: 1MB
     fields:
       - name: name
         label: Name
