@@ -35,6 +35,12 @@ export enum FileImportActionTypes {
   ImportRemoveAllFiles = 'IMPORT_REMOVE_ALL_FILES',
 }
 
+export enum FileImportHandleTypes {
+  error,
+  ignore,
+  replace,
+}
+
 interface ImportedFileQueryResult {
   files: ImportedFile[];
   overallCount: number;

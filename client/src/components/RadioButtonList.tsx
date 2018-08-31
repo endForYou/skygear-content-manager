@@ -23,7 +23,7 @@ export class RadioButtonList extends React.PureComponent<Props> {
                 type="radio"
                 name="exportQuery"
                 value={index}
-                onClick={() => onChange(index)}
+                onChange={() => onChange(index)}
                 checked={selectedIndex === index}
               />
               <span className="option-title">{options[index]}</span>
