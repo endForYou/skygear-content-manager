@@ -99,4 +99,7 @@ def transient_foreign_records(record, export_config, association_records):
             # skip for direct reference
             continue
 
+        if '_transient' not in record:
+            record['_transient'] = {}
+
         record['_transient'][field.name] = records
