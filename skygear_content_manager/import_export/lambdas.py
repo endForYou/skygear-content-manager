@@ -1,4 +1,5 @@
 import json
+import os
 import tempfile
 from urllib.parse import parse_qs
 
@@ -13,6 +14,7 @@ from .csv_serializer import RecordSerializer
 from .export_csv import prepare_response as prepare_export_response
 from .export_csv import render_data
 from .export_csv import render_header
+from .import_csv import FileSizeExceedLimitException
 from .import_csv import import_records
 from .import_csv import prepare_import_records
 
@@ -103,6 +105,10 @@ def register_import_lambdas(settings):
 
         temp_file = tempfile.NamedTemporaryFile(suffix='.csv')
         file.save(temp_file.name)
+
+        size_limit = import_config.limit.file_size
+        if size_limit and os.stat(temp_file.name).st_size > size_limit:
+            raise FileSizeExceedLimitException(size_limit)
 
         records = None
         with open(temp_file.name, 'r', encoding='utf-8') as fp:

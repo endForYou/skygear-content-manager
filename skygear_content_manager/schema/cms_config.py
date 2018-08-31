@@ -1,3 +1,4 @@
+import humanfriendly
 from marshmallow import Schema
 from marshmallow import ValidationError
 from marshmallow import fields
@@ -18,6 +19,7 @@ from ..models.cms_config import CMSRecordExport
 from ..models.cms_config import CMSRecordExportField
 from ..models.cms_config import CMSRecordImport
 from ..models.cms_config import CMSRecordImportField
+from ..models.cms_config import CMSRecordImportLimitConfig
 from .nested_dict import NestedDict
 
 
@@ -256,6 +258,7 @@ class CMSRecordImportSchema(Schema):
     name = fields.String()
     identifier = fields.String(required=False)
     handle_duplicated_identifier = DuplicationHandling(required=False)
+    limit = fields.Nested('CMSRecordImportLimitConfigSchema', required=False)
 
     fields = fields.Nested('CMSRecordImportFieldSchema', many=True)
 
@@ -270,6 +273,19 @@ class CMSRecordImportSchema(Schema):
     @post_load
     def make_object(self, data):
         return CMSRecordImport(**data)
+
+
+class CMSRecordImportLimitConfigSchema(Schema):
+
+    record_number = fields.Integer(required=False)
+    file_size = fields.String(required=False)
+
+    @post_load
+    def make_object(self, data):
+        if 'file_size' in data:
+            data['file_size'] = humanfriendly.parse_size(data['file_size'])
+
+        return CMSRecordImportLimitConfig(**data)
 
 
 class CMSRecordImportFieldSchema(Schema):

@@ -9,6 +9,7 @@ ConfigArgParse==0.13.0
 docutils==0.14
 ecdsa==0.13
 future==0.16.0
+humanfriendly==4.16.1
 idna==2.6
 jmespath==0.9.3
 marshmallow==3.0.0b11
