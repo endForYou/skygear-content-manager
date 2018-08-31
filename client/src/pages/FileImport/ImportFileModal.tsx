@@ -249,10 +249,11 @@ class ImportFileModalImpl extends React.PureComponent<Props, State> {
 
   private onImportClick = () => {
     const { fileNames, filesByName } = this.props;
+    const handleType = this.state.handleType as FileImportHandleTypes;
     const files = fileNames
       .map(n => filesByName[n])
       .filter(f => f != null) as File[];
-    this.props.actionDispatcher.importFiles(files);
+    this.props.actionDispatcher.importFiles(files, handleType);
   };
 }
 
