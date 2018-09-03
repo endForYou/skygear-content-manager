@@ -2,7 +2,6 @@ import './FileImportPage.scss';
 
 import classnames from 'classnames';
 import { Location } from 'history';
-import * as qs from 'query-string';
 import * as React from 'react';
 import { connect, Dispatch } from 'react-redux';
 
@@ -17,6 +16,10 @@ import {
   InjectedProps as SyncFilterProps,
   syncFilterWithUrl,
 } from '../../components/SyncUrl/SyncUrlFilter';
+import {
+  InjectedProps as SyncPageProps,
+  syncPageWithUrl,
+} from '../../components/SyncUrl/SyncUrlPage';
 import {
   InjectedProps as SyncSortProps,
   syncSortWithUrl,
@@ -38,6 +41,7 @@ const DATETIME_FORMAT = 'YYYY-MM-DD HH:mm:ssZ';
 
 type FileImportPageProps = StateProps &
   SyncFilterProps &
+  SyncPageProps &
   SyncSortProps &
   DispatchProps;
 
@@ -46,7 +50,6 @@ interface StateProps {
   isLoading: boolean;
   location: Location;
   maxPage: number;
-  page: number;
   files: ImportedFile[];
 }
 
@@ -191,6 +194,11 @@ class FileImportPage extends React.Component<FileImportPageProps, State> {
     }
   }
 
+  public onFilterChange = (filters: Filter[]) => {
+    this.props.onChangePage();
+    this.props.onChangeFilter(filters);
+  };
+
   public toggleFilterMenu() {
     this.setState({ showfilterMenu: !this.state.showfilterMenu });
   }
@@ -249,7 +257,7 @@ class FileImportPage extends React.Component<FileImportPageProps, State> {
                   <FilterMenu
                     filterConfigs={filterConfigs}
                     filters={filters}
-                    onChangeFilter={this.props.onChangeFilter}
+                    onChangeFilter={this.onFilterChange}
                   />
                 </div>
               </div>
@@ -264,7 +272,7 @@ class FileImportPage extends React.Component<FileImportPageProps, State> {
               className="list-filter-tag-list"
               filters={filters}
               filterConfigs={filterConfigs}
-              onChangeFilter={this.props.onChangeFilter}
+              onChangeFilter={this.onFilterChange}
             />
           </div>
         )}
@@ -338,8 +346,6 @@ class FileImportPage extends React.Component<FileImportPageProps, State> {
 function FileImportPageFactory() {
   function mapStateToProps(state: RootState, props: RouteProps): StateProps {
     const { location } = props;
-    const { page: pageStr = '1' } = qs.parse(location.search);
-    const page = parseInt(pageStr, 10);
     const { isLoading, files, totalCount } = state.fileImport.list;
 
     const maxPage = Math.ceil(totalCount / ImportedFileListPerPageCount);
@@ -372,7 +378,6 @@ function FileImportPageFactory() {
       isLoading,
       location,
       maxPage,
-      page,
     };
   }
 
@@ -380,7 +385,9 @@ function FileImportPageFactory() {
     return { dispatch };
   }
 
-  const syncedPage = syncSortWithUrl(syncFilterWithUrl(FileImportPage));
+  const syncedPage = syncSortWithUrl(
+    syncFilterWithUrl(syncPageWithUrl(FileImportPage))
+  );
   return connect(mapStateToProps, mapDispatchToProps)(syncedPage);
 }
 
