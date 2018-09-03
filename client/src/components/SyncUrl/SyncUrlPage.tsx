@@ -81,6 +81,10 @@ export function syncPageWithUrl<P extends InjectedProps>(
     // tslint:enable:jsx-wrap-multiline
 
     private onChangePage = () => {
+      // FIXME: (Steven-Chan)
+      // This seems a work around to some underlying problem but I can't
+      // identify it yet, my guess is SyncUrlPage and SyncUrlFilter should be
+      // using the same set of SyncToUrl and SearchParamsObserver.
       this.setState({ needReset: true });
     };
   } as React.ComponentType<Props>;
