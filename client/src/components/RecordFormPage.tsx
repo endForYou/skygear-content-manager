@@ -240,13 +240,7 @@ class RecordFormPageImpl extends React.PureComponent<
             //
             // Atm, the config would reject validation for reference fields and
             // their child fields.
-            embeddedErrors:
-              f.type === FieldConfigTypes.EmbeddedReferenceList
-                ? // tslint:disable-next-line:no-any
-                  data._transient[f.name].map((d: any) =>
-                    this._validateFields(d, f.displayFields)
-                  )
-                : [],
+            embeddedErrors: [],
             errorMessage: validateField(data, f),
           },
         ] as [string, FieldValidationError]
