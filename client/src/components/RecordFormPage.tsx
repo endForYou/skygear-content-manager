@@ -9,7 +9,6 @@ import { Record } from 'skygear';
 import { RecordActionDispatcher } from '../actions/record';
 import {
   FieldConfig,
-  FieldConfigTypes,
   RecordFormPageConfig,
 } from '../cmsConfig';
 import { Field, FieldContext } from '../fields';
