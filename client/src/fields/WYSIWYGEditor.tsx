@@ -1,11 +1,14 @@
 import { Editor } from '@tinymce/tinymce-react';
+import classnames from 'classnames';
 import * as React from 'react';
 
 import { connect } from 'react-redux';
 import { WYSIWYGFieldConfig } from '../cmsConfig';
 import { AppConfig } from '../config';
 import { RootState } from '../states';
+import { hasValidationError } from '../validation/validation';
 import { RequiredFieldProps } from './Field';
+import { ValidationText } from './validation/ValidationText';
 
 export interface WYSIWYGEditorProps
   extends RequiredFieldProps<WYSIWYGFieldConfig> {
@@ -47,7 +50,7 @@ class WYSIWYGEditorImpl extends React.PureComponent<WYSIWYGEditorProps, State> {
   }
 
   public render() {
-    const { className } = this.props;
+    const { className, validationError } = this.props;
     const { config: userConfig, editable } = this.props.config;
     const { value } = this.state;
 
@@ -65,11 +68,18 @@ class WYSIWYGEditorImpl extends React.PureComponent<WYSIWYGEditorProps, State> {
 
     return (
       <div className={className}>
-        <Editor
-          init={editorEditInitObj}
-          value={value}
-          onEditorChange={this.handleEditorChange}
-        />
+        <div
+          className={classnames('wysiwyg', {
+            'validation-error': hasValidationError(validationError),
+          })}
+        >
+          <Editor
+            init={editorEditInitObj}
+            value={value}
+            onEditorChange={this.handleEditorChange}
+          />
+        </div>
+        <ValidationText validationError={validationError} />
       </div>
     );
   }

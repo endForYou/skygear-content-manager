@@ -23,21 +23,13 @@
     label {
       margin-bottom: 0;
     }
+
+    &.validation-error {
+      color: #dc3545;
+    }
   }
 
   .record-form-field {
     flex: 1;
-  }
-
-  .record-form-field-with-error {
-    flex: 1;
-  }
-
-  .record-form-validation-error {
-    margin-top: to-rem(2px);
-
-    &::before {
-      content: '* ';
-    }
   }
 }

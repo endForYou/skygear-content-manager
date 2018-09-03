@@ -21,6 +21,7 @@ export class AssociationReferenceListField extends React.PureComponent<
       config,
       onFieldChange: _onFieldChange,
       value: _value,
+      validationError: _validationError,
       ...rest,
     } = this.props;
 

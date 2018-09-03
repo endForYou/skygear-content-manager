@@ -1,0 +1,9 @@
+@import 'styleUtils/common.scss';
+
+.record-form-validation-error {
+  margin-top: to-rem(2px);
+
+  &::before {
+    content: '* ';
+  }
+}

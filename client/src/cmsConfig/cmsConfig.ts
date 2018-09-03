@@ -864,8 +864,8 @@ function parseAssociationRecord(
     );
   }
 
-  const ref0 = parseReferenceFieldConfig(context, fields[0]);
-  const ref1 = parseReferenceFieldConfig(context, fields[1]);
+  const ref0 = parseReferenceFieldConfig(context, fields[0], 0);
+  const ref1 = parseReferenceFieldConfig(context, fields[1], 0);
   const referenceConfigPair: [
     ReferenceDisplayFieldConfig,
     ReferenceDisplayFieldConfig

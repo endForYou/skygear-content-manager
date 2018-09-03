@@ -2,14 +2,17 @@ import classnames from 'classnames';
 import * as React from 'react';
 
 import { FloatDisplayFieldConfig, FloatInputFieldConfig } from '../cmsConfig';
+import { hasValidationError } from '../validation/validation';
 import { RequiredFieldProps } from './Field';
 import { StringDisplay } from './StringDisplay';
+import { ValidationText } from './validation/ValidationText';
 
 type FloatDisplayFieldProps = RequiredFieldProps<FloatDisplayFieldConfig>;
 
 export const FloatDisplayField: React.SFC<FloatDisplayFieldProps> = ({
   className,
   value,
+  validationError: _validationError,
   ...rest,
 }) => {
   return (
@@ -56,21 +59,27 @@ export class FloatInputField extends React.PureComponent<
       className,
       onFieldChange: _onFieldChange,
       value: _value,
+      validationError,
       ...rest,
     } = this.props;
 
     return (
-      <input
-        {...rest}
-        className={classnames(className, 'number-input')}
-        type="text"
-        id={name}
-        name={name}
-        value={this.state.stringValue}
-        onChange={this.handleChange}
-        placeholder="0"
-        disabled={!editable}
-      />
+      <div className={className}>
+        <input
+          {...rest}
+          className={classnames('number-input', {
+            'validation-error': hasValidationError(validationError),
+          })}
+          type="text"
+          id={name}
+          name={name}
+          value={this.state.stringValue}
+          onChange={this.handleChange}
+          placeholder="0"
+          disabled={!editable}
+        />
+        <ValidationText validationError={validationError} />
+      </div>
     );
   }
 

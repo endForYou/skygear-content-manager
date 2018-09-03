@@ -2,6 +2,7 @@ import * as React from 'react';
 
 import { ImageUploaderFieldConfig } from '../cmsConfig';
 import { AssetType, AssetUploader } from '../components/AssetUploader';
+import { hasValidationError } from '../validation/validation';
 import { RequiredFieldProps } from './Field';
 
 export type ImageAssetUploaderProps = RequiredFieldProps<
@@ -12,7 +13,12 @@ class ImageAssetUploaderImpl extends React.PureComponent<
   ImageAssetUploaderProps
 > {
   public render() {
-    const { config: { editable }, onFieldChange, ...rest } = this.props;
+    const {
+      config: { editable },
+      onFieldChange,
+      validationError,
+      ...rest,
+    } = this.props;
     const {
       preview_height: previewHeight = 200,
       preview_width: previewWidth = 200,
@@ -25,6 +31,9 @@ class ImageAssetUploaderImpl extends React.PureComponent<
         assetType={AssetType.Image}
         onChange={onFieldChange}
         style={{
+          borderColor: hasValidationError(validationError)
+            ? '#dc3545'
+            : undefined,
           height: previewHeight + 32,
           width: previewWidth + 32,
         }}

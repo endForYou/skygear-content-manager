@@ -2129,16 +2129,8 @@ test('parseCmsConfig should parse example config', () => {
         editable: false,
         enabled: true,
         fields: [
-          {
-            name: 'email',
-            label: 'Email',
-            editable: true,
-          },
-          {
-            name: 'phone',
-            label: 'Phone number',
-            editable: true,
-          },
+          { editable: true, label: 'Email', name: 'email' },
+          { editable: true, label: 'Phone number', name: 'phone' },
         ],
       },
     },

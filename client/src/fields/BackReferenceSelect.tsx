@@ -1,3 +1,4 @@
+import classnames from 'classnames';
 import * as React from 'react';
 import {
   Async as SelectAsync,
@@ -11,7 +12,9 @@ import { BackReferenceSelectFieldConfig } from '../cmsConfig';
 import { Effect } from '../components/RecordFormPage';
 import { debouncePromise1, makeArray } from '../util';
 
+import { hasValidationError } from '../validation/validation';
 import { RequiredFieldProps } from './Field';
+import { ValidationText } from './validation/ValidationText';
 
 export type BackReferenceSelectProps = RequiredFieldProps<
   BackReferenceSelectFieldConfig
@@ -52,22 +55,30 @@ class BackReferenceSelectImpl extends React.PureComponent<
 
   public render() {
     const {
+      className,
       context,
       config,
       onFieldChange: _onFieldChange,
       value: _value,
+      validationError,
       ...rest,
     } = this.props;
 
     return (
-      <StringSelectAsync
-        {...rest}
-        multi={true}
-        value={this.state.options}
-        loadOptions={this.debouncedLoadOptionsHandler}
-        onChange={this.onChange}
-        disabled={!config.editable}
-      />
+      <div className={className}>
+        <StringSelectAsync
+          {...rest}
+          className={classnames('back-ref-select', {
+            'validation-error': hasValidationError(validationError),
+          })}
+          multi={true}
+          value={this.state.options}
+          loadOptions={this.debouncedLoadOptionsHandler}
+          onChange={this.onChange}
+          disabled={!config.editable}
+        />
+        <ValidationText validationError={validationError} />
+      </div>
     );
   }
 

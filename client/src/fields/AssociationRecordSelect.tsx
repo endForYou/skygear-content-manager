@@ -1,3 +1,4 @@
+import classnames from 'classnames';
 import * as React from 'react';
 import {
   Async as SelectAsync,
@@ -12,7 +13,9 @@ import { Effect } from '../components/RecordFormPage';
 import { deleteRecordsProperly, parseReference } from '../recordUtil';
 import { debouncePromise1, makeArray, objectFrom } from '../util';
 
+import { hasValidationError } from '../validation/validation';
 import { RequiredFieldProps } from './Field';
+import { ValidationText } from './validation/ValidationText';
 
 export type AssociationRecordSelectProps = RequiredFieldProps<
   AssociationReferenceSelectFieldConfig
@@ -61,21 +64,29 @@ class AssociationRecordSelectImpl extends React.PureComponent<
 
   public render() {
     const {
+      className,
       context,
       config,
       onFieldChange: _onFieldChange,
       value: _value,
+      validationError,
       ...rest,
     } = this.props;
 
     return (
-      <StringSelectAsync
-        {...rest}
-        multi={true}
-        value={this.state.options}
-        loadOptions={this.debouncedLoadOptionsHandler}
-        onChange={this.onChange}
-      />
+      <div className={className}>
+        <StringSelectAsync
+          {...rest}
+          className={classnames('asso-ref-select', {
+            'validation-error': hasValidationError(validationError),
+          })}
+          multi={true}
+          value={this.state.options}
+          loadOptions={this.debouncedLoadOptionsHandler}
+          onChange={this.onChange}
+        />
+        <ValidationText validationError={validationError} />
+      </div>
     );
   }
 

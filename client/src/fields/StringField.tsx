@@ -5,13 +5,16 @@ import { BaseStringInputField } from './BaseStringInputField';
 import { RequiredFieldProps } from './Field';
 
 import { TextDisplayFieldConfig, TextInputFieldConfig } from '../cmsConfig';
+import { hasValidationError } from '../validation/validation';
 import { StringDisplay } from './StringDisplay';
+import { ValidationText } from './validation/ValidationText';
 
 export type TextDisplayFieldProps = RequiredFieldProps<TextDisplayFieldConfig>;
 
 export const TextDisplayField: React.SFC<TextDisplayFieldProps> = ({
   className,
   onFieldChange: _onFieldChange,
+  validationError: _validationError,
   ...rest,
 }) => {
   return (
@@ -33,21 +36,27 @@ export class TextInputField extends BaseStringInputField<
       className,
       config: { editable, label, name },
       onFieldChange: _,
+      validationError,
       ...rest,
     } = this.props;
 
     return (
-      <input
-        {...rest}
-        className={classnames(className, 'text-input')}
-        type="text"
-        id={name}
-        name={name}
-        placeholder={label}
-        value={this.state.value}
-        onChange={this.handleChange}
-        disabled={!editable}
-      />
+      <div className={className}>
+        <input
+          {...rest}
+          className={classnames('text-input', {
+            'validation-error': hasValidationError(validationError),
+          })}
+          type="text"
+          id={name}
+          name={name}
+          placeholder={label}
+          value={this.state.value}
+          onChange={this.handleChange}
+          disabled={!editable}
+        />
+        <ValidationText validationError={validationError} />
+      </div>
     );
   }
 

@@ -2,6 +2,8 @@
 
 .record-form-field {
   display: flex;
+  flex-direction: column;
+  justify-content: center;
 
   &.text-input,
   &.text-display,
@@ -17,8 +19,6 @@
   &.ref-display,
   &.image-display-null,
   &.file-display-null {
-    flex-direction: column;
-    justify-content: center;
     width: 100%;
   }
 
@@ -32,6 +32,32 @@
   &.ref-select,
   &.ref-display {
     width: 100%;
+  }
+}
+
+.text-input,
+.integer-input,
+.number-input,
+.datetime-input,
+.textarea-input,
+.dropdown-custom-input {
+  &.validation-error {
+    border-color: #dc3545;
+  }
+}
+
+.dropdown-select,
+.ref-select,
+.back-ref-select,
+.asso-ref-select {
+  &.validation-error .Select-control {
+    border-color: #dc3545;
+  }
+}
+
+.wysiwyg {
+  &.validation-error .mce-tinymce.mce-container {
+    border-color: #dc3545;
   }
 }
 
@@ -79,12 +105,15 @@
 
 .boolean-input,
 .boolean-display {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: to-rem(38px);
   vertical-align: middle;
 }
 
 .boolean-toggle-container {
-  // to align its child vertically center
-  display: flex;
+  line-height: 1;
 }
 
 .dropdown {
