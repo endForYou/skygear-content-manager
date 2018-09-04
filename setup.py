@@ -42,6 +42,7 @@ setup(
       license='Other/Proprietary License',
       install_requires=[
             'arrow>=0.12.1',
+            'humanfriendly>=4.16.1',
             'marshmallow>=3.0.0b7',
             'python-jose>=2.0',
             'requests>=2.18.4',
