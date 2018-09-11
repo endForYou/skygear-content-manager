@@ -25,9 +25,9 @@ def get_filter_func(col_map, name, query, value):
     elif query == 'not_equal_to':
         return col != value
     elif query == 'contain':
-        return col.ilike(value)
+        return col.ilike('%' + value + '%')
     elif query == 'not_contain':
-        return not_(col.ilike(value))
+        return not_(col.ilike('%' + value + '%'))
     elif query == 'before' or query == 'less_than':
         return col < value
     elif query == 'after' or query == 'greater_than':

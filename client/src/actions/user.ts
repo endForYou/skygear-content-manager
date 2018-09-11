@@ -2,8 +2,6 @@ import { Dispatch } from 'redux';
 import { ThunkAction } from 'redux-thunk';
 import skygear, { Role } from 'skygear';
 
-import { queryWithFilters } from './record';
-
 import { Filter } from '../cmsConfig';
 import { RootState } from '../states';
 import { SkygearUser } from '../types';
@@ -231,18 +229,10 @@ function fetchUsersImpl(
   filters: Filter[]
 ): Promise<UserQueryResult> {
   const params = {
-    // filter: getImportedFileFilter(filters),
+    filter: filters,
     page,
     perPage,
   };
-
-  const recordCls = skygear.UserRecord;
-  const query = queryWithFilters(filters, recordCls);
-
-  query.overallCount = true;
-  query.limit = perPage;
-  query.offset = (page - 1) * perPage;
-  query.addDescending('_created_at');
 
   return (
     skygear
