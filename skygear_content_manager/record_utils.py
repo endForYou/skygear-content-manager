@@ -50,6 +50,9 @@ def apply_filters(query, filters, col_map):
 
 
 def fetch_records_by_values_in_key(record_type, key, values):
+    if len(values) == 0:
+        return []
+
     value_predicates = [eq_predicate(key, v) for v in values]
     predicate = or_predicate(value_predicates)
     return fetch_records(record_type, predicate)
