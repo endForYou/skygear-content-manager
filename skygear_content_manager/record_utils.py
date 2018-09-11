@@ -20,21 +20,21 @@ def get_filter_func(col_map, name, query, value):
     if not col:
         raise Exception('Unexpected field name: {}'.format(name))
 
-    if query == 'EqualTo':
+    if query == 'equal_to':
         return col == value
-    elif query == 'NotEqualTo':
+    elif query == 'not_equal_to':
         return col != value
-    elif query == 'Contain':
+    elif query == 'contain':
         return col.ilike(value)
-    elif query == 'NotContain':
+    elif query == 'not_contain':
         return not_(col.ilike(value))
-    elif query == 'Before' or query == 'LessThan':
+    elif query == 'before' or query == 'less_than':
         return col < value
-    elif query == 'After' or query == 'GreaterThan':
+    elif query == 'after' or query == 'greater_than':
         return col > value
-    elif query == 'LessThanOrEqualTo':
+    elif query == 'less_than_or_equal_to':
         return col <= value
-    elif query == 'GreaterThanOrEqualTo':
+    elif query == 'greater_than_or_equal_to':
         return col >= value
     else:
         raise Exception('Unexpected query type: {}', format(query))
