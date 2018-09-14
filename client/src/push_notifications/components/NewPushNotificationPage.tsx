@@ -115,74 +115,76 @@ class NewPushNotificationPageImpl extends React.PureComponent<
 
     return (
       <div className={classnames(className, 'push-form-page')}>
-        <form className="push-form-groups" onSubmit={this.handleSubmit}>
-          <div className="push-form-group">
-            <div className="push-form-label">Audiences</div>
-            <div className="push-form-field">
-              <Select
-                name="selecttype"
-                className="push-form-select"
-                clearable={false}
-                searchable={false}
-                value={type}
-                onChange={this.handleSelectTypeChange}
-                options={campaignTypeOptions}
-              />
-            </div>
-          </div>
-          {type === PushCampaignType.SpecificUsers && (
+        <form onSubmit={this.handleSubmit}>
+          <div className="push-form-groups">
             <div className="push-form-group">
-              <div className="push-form-label" />
-              <div className="push-form-field push-filters">
-                <div className="push-filters-title">Filter Conditions</div>
-                {formGroups}
+              <div className="push-form-label">Audiences</div>
+              <div className="push-form-field">
+                <Select
+                  name="selecttype"
+                  className="push-form-select"
+                  clearable={false}
+                  searchable={false}
+                  value={type}
+                  onChange={this.handleSelectTypeChange}
+                  options={campaignTypeOptions}
+                />
               </div>
             </div>
-          )}
-          <div className="push-form-group">
-            <div className="push-form-label">No. of audiences</div>
-            <div className="push-form-field">
-              <div className="push-form-display">{numberOfAudiences}</div>
+            {type === PushCampaignType.SpecificUsers && (
+              <div className="push-form-group">
+                <div className="push-form-label" />
+                <div className="push-form-field push-filters">
+                  <div className="push-filters-title">Filter Conditions</div>
+                  {formGroups}
+                </div>
+              </div>
+            )}
+            <div className="push-form-group">
+              <div className="push-form-label">No. of audiences</div>
+              <div className="push-form-field">
+                <div className="push-form-display">{numberOfAudiences}</div>
+              </div>
             </div>
+            <div className="push-form-section-title">Message</div>
+            <div className="push-form-group">
+              <div className="push-form-label">Title</div>
+              <div className="push-form-field">
+                <input
+                  type="text"
+                  className="push-form-input"
+                  name="title"
+                  placeholder="Title"
+                  value={title}
+                  onChange={this.handleTitleChange}
+                />
+              </div>
+            </div>
+            <div className="push-form-group">
+              <label className="push-form-label" htmlFor="content">
+                Content
+              </label>
+              <div className="push-form-field">
+                <textarea
+                  value={content}
+                  onChange={this.handlerContentChange}
+                  className="push-form-input textarea"
+                  required={true}
+                  rows={5}
+                />
+              </div>
+            </div>
+            {this.state.errorMessage !== undefined && (
+              <div
+                className="push-filter-error alert alert-danger form-login-alert"
+                role="alert"
+              >
+                {this.state.errorMessage}
+              </div>
+            )}
           </div>
-          <div className="push-form-section-title">Message</div>
-          <div className="push-form-group">
-            <div className="push-form-label">Title</div>
-            <div className="push-form-field">
-              <input
-                type="text"
-                className="push-form-input"
-                name="title"
-                placeholder="Title"
-                value={title}
-                onChange={this.handleTitleChange}
-              />
-            </div>
-          </div>
-          <div className="push-form-group">
-            <label className="push-form-label" htmlFor="content">
-              Content
-            </label>
-            <div className="push-form-field">
-              <textarea
-                value={content}
-                onChange={this.handlerContentChange}
-                className="push-form-input textarea"
-                required={true}
-                rows={5}
-              />
-            </div>
-          </div>
-          {this.state.errorMessage !== undefined && (
-            <div
-              className="push-filter-error alert alert-danger form-login-alert"
-              role="alert"
-            >
-              {this.state.errorMessage}
-            </div>
-          )}
+          <SubmitButton savingPushCampaign={savingPushCampaign} />
         </form>
-        <SubmitButton savingPushCampaign={savingPushCampaign} />
       </div>
     );
   }
