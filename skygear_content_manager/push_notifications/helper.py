@@ -2,6 +2,11 @@ from skygear.action import push_users
 from skygear.container import SkygearContainer
 
 
+class PushException(Exception):
+    def __init__(self, push_error):
+        super(PushException, self).__init__(push_error['message'])
+
+
 class PushNotificationHelper():
     def __init__(self):
         self.container = SkygearContainer()
@@ -26,4 +31,6 @@ class PushNotificationHelper():
             },
         }
 
-        push_users(self.container, user_ids, notification)
+        result = push_users(self.container, user_ids, notification)
+        if 'error' in result:
+            raise PushException(result['error'])

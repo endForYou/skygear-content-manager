@@ -57,7 +57,7 @@ class NewPushNotificationPageContainerImpl extends React.PureComponent<Props> {
 function mapStateToProps(state: RootState): StateProps {
   return {
     content: '',
-    savingPushCampaign: undefined,
+    savingPushCampaign: state.pushCampaign.new.savingPushCampaign,
     userFilters: getCmsConfig(state).pushNotifications.filterUserConfigs,
   };
 }

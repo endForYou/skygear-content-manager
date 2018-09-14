@@ -15,6 +15,7 @@ import {
 } from '../../cmsConfig';
 import { PrimaryButton } from '../../components/PrimaryButton';
 import { FilterInput } from '../../filters/FilterInput';
+import { isOutlawError } from '../../recordUtil';
 import { RootState } from '../../states';
 import { NewPushCampaign, Remote, RemoteType } from '../../types';
 import { entriesOf } from '../../util';
@@ -93,6 +94,25 @@ class NewPushNotificationPageImpl extends React.PureComponent<
       dispatch
     );
     this.fetchUserList();
+  }
+
+  public componentWillReceiveProps(nextProps: NewPushNotificationPageProps) {
+    if (
+      this.props.savingPushCampaign != null &&
+      this.props.savingPushCampaign.type === RemoteType.Loading &&
+      nextProps.savingPushCampaign != null
+    ) {
+      if (nextProps.savingPushCampaign.type === RemoteType.Success) {
+        this.props.dispatch(push(`/notification`));
+      } else if (nextProps.savingPushCampaign.type === RemoteType.Failure) {
+        const error = nextProps.savingPushCampaign.error;
+        this.setState({
+          errorMessage: isOutlawError(error)
+            ? error.error.message
+            : error.message,
+        });
+      }
+    }
   }
 
   public render() {
@@ -176,7 +196,7 @@ class NewPushNotificationPageImpl extends React.PureComponent<
             </div>
             {this.state.errorMessage !== undefined && (
               <div
-                className="push-filter-error alert alert-danger form-login-alert"
+                className="push-filter-error alert alert-danger"
                 role="alert"
               >
                 {this.state.errorMessage}
@@ -224,7 +244,6 @@ class NewPushNotificationPageImpl extends React.PureComponent<
   public handleSubmit: React.FormEventHandler<HTMLFormElement> = event => {
     event.preventDefault();
 
-    const { dispatch } = this.props;
     const { newPushCampaign } = this.state;
 
     if (!newPushCampaign.content) {
@@ -238,16 +257,7 @@ class NewPushNotificationPageImpl extends React.PureComponent<
       });
     }
 
-    this.notificationActionDispatcher
-      .savePushCampaign(newPushCampaign)
-      .then(() => {
-        dispatch(push(`/notification`));
-      })
-      .catch(error => {
-        this.setState({
-          errorMessage: error.toString(),
-        });
-      });
+    this.notificationActionDispatcher.savePushCampaign(newPushCampaign);
   };
 
   public handleFilterChange: FilterChangeHandler = (
