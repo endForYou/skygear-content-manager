@@ -25,9 +25,9 @@ def get_filter_func(col_map, name, query, value):
     elif query == 'not_equal_to':
         return col != value
     elif query == 'contain':
-        return col.ilike('%' + value + '%')
+        return col.ilike('%' + escape_sql_like(value) + '%')
     elif query == 'not_contain':
-        return not_(col.ilike('%' + value + '%'))
+        return not_(col.ilike('%' + escape_sql_like(value) + '%'))
     elif query == 'before' or query == 'less_than':
         return col < value
     elif query == 'after' or query == 'greater_than':
@@ -106,3 +106,7 @@ def transient_foreign_records(record, export_config, association_records):
             record['_transient'] = {}
 
         record['_transient'][field.name] = records
+
+
+def escape_sql_like(rawString):
+    return rawString.replace('%', '\\%').replace('_', '\\_')
