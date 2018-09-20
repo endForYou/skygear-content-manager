@@ -17,6 +17,7 @@ import {
   ActionConfigTypes,
   ExportActionConfig,
   FieldConfig,
+  FieldConfigTypes,
   Filter,
   FilterConfig,
   ImportActionConfig,
@@ -87,6 +88,53 @@ export function nextSortState(
   };
 }
 
+interface TableHeaderColumnProps {
+  fieldConfig: FieldConfig;
+  sortState: SortState;
+  onSortButtonClick: SortButtonClickHandler;
+}
+
+const TableHeaderColumn: React.SFC<TableHeaderColumnProps> = ({
+  fieldConfig,
+  sortState,
+  onSortButtonClick,
+}) => {
+  const sortableFieldType = [
+    FieldConfigTypes.Boolean,
+    FieldConfigTypes.DateTimeDisplay,
+    FieldConfigTypes.DateTimePicker,
+    FieldConfigTypes.Dropdown,
+    FieldConfigTypes.FloatDisplay,
+    FieldConfigTypes.FloatInput,
+    FieldConfigTypes.IntegerDisplay,
+    FieldConfigTypes.IntegerInput,
+    FieldConfigTypes.TextArea,
+    FieldConfigTypes.TextDisplay,
+    FieldConfigTypes.TextInput,
+    FieldConfigTypes.WYSIWYG,
+  ];
+
+  const sortButton =
+    sortableFieldType.indexOf(fieldConfig.type) !== -1 ? (
+      <SortButton
+        className="d-inline-block mx-1"
+        sortOrder={
+          fieldConfig.name === sortState.fieldName
+            ? sortState.order
+            : SortOrder.Undefined
+        }
+        onClick={() => onSortButtonClick(fieldConfig.name)}
+      />
+    ) : null;
+
+  return (
+    <div className="table-cell">
+      {fieldConfig.label}
+      {sortButton}
+    </div>
+  );
+};
+
 interface TableHeaderProps {
   fieldConfigs: FieldConfig[];
   sortState: SortState;
@@ -98,26 +146,17 @@ const TableHeader: React.SFC<TableHeaderProps> = ({
   sortState,
   onSortButtonClick,
 }) => {
-  const columns = fieldConfigs.map((fieldConfig, index) => {
-    const sortOrder =
-      fieldConfig.name === sortState.fieldName
-        ? sortState.order
-        : SortOrder.Undefined;
-    return (
-      <div key={index} className="table-cell">
-        {fieldConfig.label}
-        <SortButton
-          className="d-inline-block mx-1"
-          sortOrder={sortOrder}
-          onClick={() => onSortButtonClick(fieldConfig.name)}
-        />
-      </div>
-    );
-  });
   return (
     <div className="table-header">
       <div className="table-row">
-        {columns}
+        {fieldConfigs.map((fieldConfig, index) => (
+          <TableHeaderColumn
+            key={index}
+            fieldConfig={fieldConfig}
+            sortState={sortState}
+            onSortButtonClick={onSortButtonClick}
+          />
+        ))}
         <div className="table-cell" />
       </div>
     </div>
