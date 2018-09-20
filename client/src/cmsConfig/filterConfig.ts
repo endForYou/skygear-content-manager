@@ -83,6 +83,7 @@ export function parseFilterConfig(
     case 'string':
       return parseStringFilterConfig(a);
     case 'number':
+    case 'float':
       return parseNumberFilterConfig(a);
     case 'boolean':
       return parseBooleanFilterConfig(a);
