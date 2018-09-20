@@ -663,7 +663,13 @@ test('parseCmsConfig should parse example config', () => {
               name: 'integer',
               label: 'Integer',
               nullable: false,
-              type: 'integer',
+              type: 'number',
+            },
+            {
+              name: 'number',
+              label: 'Number',
+              nullable: false,
+              type: 'number',
             },
             {
               name: 'reference',
