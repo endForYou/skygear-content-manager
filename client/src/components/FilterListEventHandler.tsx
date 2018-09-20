@@ -8,8 +8,8 @@ import {
   FilterQueryType,
   FilterType,
   GeneralFilter,
-  IntegerFilter,
-  IntegerFilterQueryType,
+  NumberFilter,
+  NumberFilterQueryType,
   ReferenceFilter,
   ReferenceFilterQueryType,
   StringFilter,
@@ -74,10 +74,10 @@ export function withEventHandler<P extends InjectedProps>(
                 ...f,
                 query: value as StringFilterQueryType,
               };
-            case FilterType.IntegerFilterType:
+            case FilterType.NumberFilterType:
               return {
                 ...f,
-                query: value as IntegerFilterQueryType,
+                query: value as NumberFilterQueryType,
               };
             case FilterType.BooleanFilterType:
               return {
@@ -115,9 +115,9 @@ export function withEventHandler<P extends InjectedProps>(
           switch (filter.type) {
             case FilterType.StringFilterType:
               return { ...(f as StringFilter), value: event.target.value };
-            case FilterType.IntegerFilterType:
+            case FilterType.NumberFilterType:
               return {
-                ...(f as IntegerFilter),
+                ...(f as NumberFilter),
                 value: Number(event.target.value),
               };
             case FilterType.BooleanFilterType:

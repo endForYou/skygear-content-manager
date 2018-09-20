@@ -27,8 +27,8 @@ import {
   FilterType,
   GeneralFilter,
   GeneralFilterQueryType,
-  IntegerFilter,
-  IntegerFilterQueryType,
+  NumberFilter,
+  NumberFilterQueryType,
   ReferenceFieldConfig,
   ReferenceFilter,
   ReferenceFilterQueryType,
@@ -441,8 +441,8 @@ function addFilterToQuery(query: Query, filter: Filter, recordCls: RecordCls) {
     case FilterType.StringFilterType:
       addStringFilterToQuery(query, filter);
       break;
-    case FilterType.IntegerFilterType:
-      addIntegerFilterToQuery(query, filter);
+    case FilterType.NumberFilterType:
+      addNumberFilterToQuery(query, filter);
       break;
     case FilterType.BooleanFilterType:
       addBooleanFilterToQuery(query, filter);
@@ -485,29 +485,29 @@ function addStringFilterToQuery(query: Query, filter: StringFilter) {
   }
 }
 
-function addIntegerFilterToQuery(query: Query, filter: IntegerFilter) {
+function addNumberFilterToQuery(query: Query, filter: NumberFilter) {
   switch (filter.query) {
-    case IntegerFilterQueryType.EqualTo:
+    case NumberFilterQueryType.EqualTo:
       query.equalTo(filter.name, filter.value);
       break;
-    case IntegerFilterQueryType.NotEqualTo:
+    case NumberFilterQueryType.NotEqualTo:
       query.notEqualTo(filter.name, filter.value);
       break;
-    case IntegerFilterQueryType.LessThan:
+    case NumberFilterQueryType.LessThan:
       query.lessThan(filter.name, filter.value);
       break;
-    case IntegerFilterQueryType.GreaterThan:
+    case NumberFilterQueryType.GreaterThan:
       query.greaterThan(filter.name, filter.value);
       break;
-    case IntegerFilterQueryType.LessThanOrEqualTo:
+    case NumberFilterQueryType.LessThanOrEqualTo:
       query.lessThanOrEqualTo(filter.name, filter.value);
       break;
-    case IntegerFilterQueryType.GreaterThanOrEqualTo:
+    case NumberFilterQueryType.GreaterThanOrEqualTo:
       query.greaterThanOrEqualTo(filter.name, filter.value);
       break;
     default:
       throw new Error(
-        `addIntegerFilterToQuery does not support IntegerFilterQueryType ${filter.type}`
+        `addNumberFilterToQuery does not support NumberFilterQueryType ${filter.type}`
       );
   }
 }

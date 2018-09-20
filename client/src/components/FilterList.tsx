@@ -17,8 +17,8 @@ import {
   FilterQueryType,
   FilterType,
   GeneralFilter,
-  IntegerFilter,
-  IntegerFilterQueryType,
+  NumberFilter,
+  NumberFilterQueryType,
   ReferenceFilter,
   ReferenceFilterConfig,
   ReferenceFilterQueryType,
@@ -77,8 +77,8 @@ export class FilterList extends React.PureComponent<FilterListProps> {
     switch (filter.type) {
       case FilterType.StringFilterType:
         return this.renderStringFilterSelect(filter);
-      case FilterType.IntegerFilterType:
-        return this.renderIntegerFilterSelect(filter);
+      case FilterType.NumberFilterType:
+        return this.renderNumberFilterSelect(filter);
       case FilterType.BooleanFilterType:
         return this.renderBooleanFilterSelect(filter);
       case FilterType.DateTimeFilterType:
@@ -121,7 +121,7 @@ export class FilterList extends React.PureComponent<FilterListProps> {
     );
   }
 
-  public renderIntegerFilterSelect(filter: Filter) {
+  public renderNumberFilterSelect(filter: Filter) {
     return (
       <ReactSelectWrapper
         clearable={false}
@@ -129,14 +129,14 @@ export class FilterList extends React.PureComponent<FilterListProps> {
         onChange={(value: Option<OptionValues> | null) =>
           this.handleQueryTypeChange(filter, value)}
       >
-        <option value={IntegerFilterQueryType.EqualTo}>Equal to</option>
-        <option value={IntegerFilterQueryType.NotEqualTo}>Not equal to</option>
-        <option value={IntegerFilterQueryType.LessThan}>Less than</option>
-        <option value={IntegerFilterQueryType.GreaterThan}>Greater than</option>
-        <option value={IntegerFilterQueryType.LessThanOrEqualTo}>
+        <option value={NumberFilterQueryType.EqualTo}>Equal to</option>
+        <option value={NumberFilterQueryType.NotEqualTo}>Not equal to</option>
+        <option value={NumberFilterQueryType.LessThan}>Less than</option>
+        <option value={NumberFilterQueryType.GreaterThan}>Greater than</option>
+        <option value={NumberFilterQueryType.LessThanOrEqualTo}>
           Less than or equal to
         </option>
-        <option value={IntegerFilterQueryType.GreaterThanOrEqualTo}>
+        <option value={NumberFilterQueryType.GreaterThanOrEqualTo}>
           Greater than or equal to
         </option>
         {this.renderNullFilterSelect(filter)}
@@ -198,8 +198,8 @@ export class FilterList extends React.PureComponent<FilterListProps> {
     switch (filter.type) {
       case FilterType.StringFilterType:
         return this.renderStringInput(filter);
-      case FilterType.IntegerFilterType:
-        return this.renderIntegerInput(filter);
+      case FilterType.NumberFilterType:
+        return this.renderNumberInput(filter);
       case FilterType.BooleanFilterType:
         return <div />;
       case FilterType.DateTimeFilterType:
@@ -230,7 +230,7 @@ export class FilterList extends React.PureComponent<FilterListProps> {
     );
   }
 
-  public renderIntegerInput(filter: IntegerFilter) {
+  public renderNumberInput(filter: NumberFilter) {
     const { handleFilterValueChange } = this.props;
 
     return (
