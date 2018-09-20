@@ -50,7 +50,7 @@ function urlStringToFilter(filterStr: string, filterConfigs: FilterConfig[]) {
         case FilterType.DateTimeFilterType:
           return { ...newFilter, query, value: moment(value).toDate() };
         case FilterType.NumberFilterType:
-          return { ...newFilter, query, value: parseInt(value, 10) };
+          return { ...newFilter, query, value: Number(value) };
         default:
           return { ...newFilter, query, value };
       }
