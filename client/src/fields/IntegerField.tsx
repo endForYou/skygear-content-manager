@@ -5,6 +5,7 @@ import {
   IntegerDisplayFieldConfig,
   IntegerInputFieldConfig,
 } from '../cmsConfig';
+import { NumberInput } from '../components/NumberInput';
 import { hasValidationError } from '../validation/validation';
 import { RequiredFieldProps } from './Field';
 import { StringDisplay } from './StringDisplay';
@@ -33,7 +34,6 @@ export type IntegerInputFieldProps = RequiredFieldProps<
 
 interface State {
   value: number;
-  stringValue: string;
 }
 
 class IntegerFieldImpl extends React.PureComponent<
@@ -44,7 +44,6 @@ class IntegerFieldImpl extends React.PureComponent<
     super(props);
 
     this.state = {
-      stringValue: props.value == null ? '' : `${props.value}`,
       value: props.value,
     };
   }
@@ -53,7 +52,6 @@ class IntegerFieldImpl extends React.PureComponent<
     if (nextProps.value !== this.state.value) {
       this.setState({
         ...this.state,
-        stringValue: nextProps.value == null ? '' : `${nextProps.value}`,
         value: nextProps.value,
       });
     }
@@ -72,16 +70,16 @@ class IntegerFieldImpl extends React.PureComponent<
     if (editable) {
       return (
         <div className={className}>
-          <input
+          <NumberInput
             {...rest}
             className={classnames('integer-input', {
               'validation-error': hasValidationError(validationError),
             })}
-            type="text"
             id={name}
             name={name}
-            value={this.state.stringValue}
-            onChange={this.handleChange}
+            isInteger={true}
+            value={this.state.value}
+            onValueChange={this.handleChange}
             placeholder="0"
           />
           <ValidationText validationError={validationError} />
@@ -100,28 +98,10 @@ class IntegerFieldImpl extends React.PureComponent<
     }
   }
 
-  public handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value.trim();
-    if (value === '' || value === '-') {
-      this.setState({ ...this.state, stringValue: value, value: 0 }, () => {
-        if (this.props.onFieldChange) {
-          this.props.onFieldChange(0);
-        }
-      });
-      return;
+  public handleChange = (value: number) => {
+    if (this.props.onFieldChange) {
+      this.props.onFieldChange(value);
     }
-
-    const isValid = /^-?\d+$/.test(value);
-    if (!isValid) {
-      return;
-    }
-
-    const num = parseInt(value, 10);
-    this.setState({ ...this.state, stringValue: value, value: num }, () => {
-      if (this.props.onFieldChange) {
-        this.props.onFieldChange(num);
-      }
-    });
   };
 }
 

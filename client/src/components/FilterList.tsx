@@ -5,6 +5,7 @@ import moment from 'moment';
 import * as React from 'react';
 // tslint:disable-next-line: no-submodule-imports
 import 'react-datetime/css/react-datetime.css';
+import { Option, OptionValues } from 'react-select';
 
 import {
   BaseFilterQueryType,
@@ -28,7 +29,7 @@ import {
 import { TzDatetimeInput } from '../components/TzDatetimeInput';
 import { ReferenceFilterInput } from '../filters/ReferenceFilterInput';
 
-import { Option, OptionValues } from 'react-select';
+import { NumberInput } from './NumberInput';
 import { ReactSelectWrapper } from './ReactSelectWrapper';
 
 interface FilterListProps {
@@ -40,6 +41,7 @@ interface FilterListProps {
     filter: Filter,
     event: React.ChangeEvent<HTMLInputElement>
   ) => void;
+  handleNumberValueChange: (filter: Filter, value: number) => void;
   handleReferenceChange: (filter: Filter, value: string[]) => void;
   onCloseFilterClicked: (filter: Filter) => void;
   handleDateTimeValueChange: (filter: Filter, datetime: Date) => void;
@@ -231,18 +233,19 @@ export class FilterList extends React.PureComponent<FilterListProps> {
   }
 
   public renderNumberInput(filter: NumberFilter) {
-    const { handleFilterValueChange } = this.props;
+    const { handleNumberValueChange } = this.props;
 
     return (
-      <input
-        type="number"
+      <NumberInput
         className="text-input"
         autoFocus={true}
-        onChange={event => handleFilterValueChange(filter, event)}
+        onValueChange={value => handleNumberValueChange(filter, value)}
+        placeholder="0"
         value={filter.value}
       />
     );
   }
+
   public renderDateTimeInput(
     filter: DateTimeFilter,
     config: DateTimeFilterConfig
