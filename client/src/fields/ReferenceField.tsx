@@ -120,6 +120,7 @@ class ReferenceDropdownFieldImpl extends React.PureComponent<
           className={classnames('ref-select', {
             'validation-error': hasValidationError(validationError),
           })}
+          cache={false}
           loadOptions={this.debouncedLoadOptions}
           onChange={this.onChange}
           value={value || undefined}
