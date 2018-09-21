@@ -77,11 +77,3 @@ form.embedded-record-view.editable:focus-within {
     line-height: to-rem(18px) !important;
   }
 }
-
-.btn-add {
-  @include btn;
-  @include btn-primary;
-  font-size: to-rem(12px);
-  line-height: to-rem(12px);
-  padding: to-rem(8px) to-rem(12px);
-}

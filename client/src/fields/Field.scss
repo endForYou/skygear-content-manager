@@ -138,6 +138,15 @@
   background-size: cover;
 }
 
+.btn-add {
+  @include btn;
+  @include btn-primary;
+  display: inline-block;
+  font-size: to-rem(12px);
+  line-height: to-rem(12px);
+  padding: to-rem(8px) to-rem(12px);
+}
+
 .btn-clear {
   @include btn;
   @include btn-secondary;
@@ -145,6 +154,15 @@
   line-height: to-rem(12px);
   padding: to-rem(8px) to-rem(12px);
   margin-top: to-rem(10px);
+}
+
+.btn-create-ref {
+  margin-top: to-rem(10px);
+
+  &:hover {
+    text-decoration: none;
+    color: white;
+  }
 }
 
 .back-ref-list,
