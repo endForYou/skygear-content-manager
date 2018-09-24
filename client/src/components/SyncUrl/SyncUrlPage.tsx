@@ -66,7 +66,7 @@ export function syncPageWithUrl<P extends InjectedProps>(
             if (needReset) {
               this.setState({ needReset: false, page: 1 });
             } else if (page !== newPage) {
-              this.setState({ page: newPage });
+              this.setState({ page: isNaN(newPage) ? 1 : newPage });
             }
           }}
         />,

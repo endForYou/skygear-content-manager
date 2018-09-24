@@ -30,7 +30,9 @@ export class SearchParamsObserver extends React.PureComponent<
         nextProps.location
       );
 
-      this.props.onChange(value, nextValue);
+      if (!shallowCompare(value, nextValue)) {
+        this.props.onChange(value, nextValue);
+      }
     }
   }
 
