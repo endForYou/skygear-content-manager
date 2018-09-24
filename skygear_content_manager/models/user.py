@@ -24,6 +24,9 @@ class User(Base):
     __tablename__ = 'user'
     id = Column('_id', Text, primary_key=True, nullable=False)
 
+    username = Column(Text)
+    email = Column(Text)
+
 
 class AuthRole(Base):
     __tablename__ = '_auth_role'

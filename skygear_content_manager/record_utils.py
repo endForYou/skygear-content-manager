@@ -20,21 +20,21 @@ def get_filter_func(col_map, name, query, value):
     if not col:
         raise Exception('Unexpected field name: {}'.format(name))
 
-    if query == 'EqualTo':
+    if query == 'equal_to':
         return col == value
-    elif query == 'NotEqualTo':
+    elif query == 'not_equal_to':
         return col != value
-    elif query == 'Contain':
-        return col.ilike(value)
-    elif query == 'NotContain':
-        return not_(col.ilike(value))
-    elif query == 'Before' or query == 'LessThan':
+    elif query == 'contain':
+        return col.ilike('%' + escape_sql_like(value) + '%')
+    elif query == 'not_contain':
+        return not_(col.ilike('%' + escape_sql_like(value) + '%'))
+    elif query == 'before' or query == 'less_than':
         return col < value
-    elif query == 'After' or query == 'GreaterThan':
+    elif query == 'after' or query == 'greater_than':
         return col > value
-    elif query == 'LessThanOrEqualTo':
+    elif query == 'less_than_or_equal_to':
         return col <= value
-    elif query == 'GreaterThanOrEqualTo':
+    elif query == 'greater_than_or_equal_to':
         return col >= value
     else:
         raise Exception('Unexpected query type: {}', format(query))
@@ -50,6 +50,9 @@ def apply_filters(query, filters, col_map):
 
 
 def fetch_records_by_values_in_key(record_type, key, values):
+    if len(values) == 0:
+        return []
+
     value_predicates = [eq_predicate(key, v) for v in values]
     predicate = or_predicate(value_predicates)
     return fetch_records(record_type, predicate)
@@ -103,3 +106,7 @@ def transient_foreign_records(record, export_config, association_records):
             record['_transient'] = {}
 
         record['_transient'][field.name] = records
+
+
+def escape_sql_like(rawString):
+    return rawString.replace('%', '\\%').replace('_', '\\_')

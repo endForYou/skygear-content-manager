@@ -4,6 +4,7 @@ from marshmallow import fields
 
 from ..db_session import scoped_session
 from ..models.user import Auth
+from ..models.user import User
 from ..record_utils import apply_filters
 from ..record_utils import fetch_records_by_values_in_key
 from ..skygear_utils import validate_master_user
@@ -12,7 +13,9 @@ PAGE_SIZE = 25
 PAGE = 1
 
 filter_name_to_col = {
-    'id': Auth.id,
+    '_id': Auth.id,
+    'email': User.email,
+    'username': User.username,
 }
 
 
@@ -42,10 +45,10 @@ def register_lambdas(settings):
         page = kwargs.get('page', PAGE)
         filter = kwargs.get('filter', [])
         with scoped_session() as session:
-            total_count = session.query(Auth).count()
-            query = session.query(Auth)
+            query = session.query(Auth).join(Auth.user)
             query = apply_filters(query, filter, filter_name_to_col)
             query = query.limit(page_size).offset(page_size * (page - 1))
+            total_count = query.count()
             result = query.all()
             users = UserSchema(many=True).dump(result)
             inject_user_record(users)
