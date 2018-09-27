@@ -28,7 +28,7 @@ function Value({ config, filter }: { config: FilterConfig; filter: Filter }) {
 
   switch (filter.type) {
     case FilterType.StringFilterType:
-    case FilterType.IntegerFilterType:
+    case FilterType.NumberFilterType:
     case FilterType.GeneralFilterType:
       return <div className="value primary-color">{filter.value}</div>;
     case FilterType.BooleanFilterType:

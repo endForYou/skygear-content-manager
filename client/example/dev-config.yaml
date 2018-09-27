@@ -175,7 +175,9 @@ records:
         - name: boolean
           type: boolean
         - name: integer
-          type: integer
+          type: number
+        - name: number
+          type: number
         - name: reference
           type: reference
           reference_target: ref_demo

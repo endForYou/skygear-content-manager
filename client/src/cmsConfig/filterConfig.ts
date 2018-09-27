@@ -13,7 +13,7 @@ import { CmsRecord, ConfigContext, RecordTypeContext } from './cmsConfig';
 
 export type FilterConfig =
   | StringFilterConfig
-  | IntegerFilterConfig
+  | NumberFilterConfig
   | BooleanFilterConfig
   | DateTimeFilterConfig
   | GeneralFilterConfig
@@ -23,7 +23,7 @@ export enum FilterConfigTypes {
   String = 'string',
   DateTime = 'date_time',
   Boolean = 'boolean',
-  Integer = 'integer',
+  Number = 'number',
   General = 'general',
   Reference = 'reference',
 }
@@ -45,8 +45,8 @@ export interface StringFilterConfig extends FilterConfigInput {
   name: string;
 }
 
-export interface IntegerFilterConfig extends FilterConfigInput {
-  type: FilterConfigTypes.Integer;
+export interface NumberFilterConfig extends FilterConfigInput {
+  type: FilterConfigTypes.Number;
   name: string;
 }
 
@@ -82,8 +82,9 @@ export function parseFilterConfig(
   switch (a.type) {
     case 'string':
       return parseStringFilterConfig(a);
-    case 'integer':
-      return parseIntegerFilterConfig(a);
+    case 'number':
+    case 'float':
+      return parseNumberFilterConfig(a);
     case 'boolean':
       return parseBooleanFilterConfig(a);
     case 'date_time':
@@ -117,12 +118,10 @@ function parseStringFilterConfig(input: FilterConfigInput): StringFilterConfig {
   };
 }
 
-function parseIntegerFilterConfig(
-  input: FilterConfigInput
-): IntegerFilterConfig {
+function parseNumberFilterConfig(input: FilterConfigInput): NumberFilterConfig {
   return {
-    ...parseFilterConfigAttrs(input, 'integer'),
-    type: FilterConfigTypes.Integer,
+    ...parseFilterConfigAttrs(input, 'number'),
+    type: FilterConfigTypes.Number,
   };
 }
 
@@ -199,7 +198,7 @@ export enum StringFilterQueryType {
   NotContain = 'not_contain',
 }
 
-export enum IntegerFilterQueryType {
+export enum NumberFilterQueryType {
   EqualTo = 'equal_to',
   NotEqualTo = 'not_equal_to',
   LessThan = 'less_than',
@@ -228,7 +227,7 @@ export enum ReferenceFilterQueryType {
 
 export type Filter =
   | StringFilter
-  | IntegerFilter
+  | NumberFilter
   | BooleanFilter
   | DateTimeFilter
   | GeneralFilter
@@ -237,6 +236,7 @@ export type Filter =
 export enum FilterType {
   StringFilterType = 'StringFilterType',
   IntegerFilterType = 'IntegerFilterType',
+  NumberFilterType = 'NumberFilterType',
   BooleanFilterType = 'BooleanFilterType',
   DateTimeFilterType = 'DateTimeFilterType',
   GeneralFilterType = 'GeneralFilterType',
@@ -257,9 +257,9 @@ export interface StringFilter extends FilterAttrs {
   value: string;
 }
 
-export interface IntegerFilter extends FilterAttrs {
-  type: FilterType.IntegerFilterType;
-  query: BaseFilterQueryType | IntegerFilterQueryType;
+export interface NumberFilter extends FilterAttrs {
+  type: FilterType.NumberFilterType;
+  query: BaseFilterQueryType | NumberFilterQueryType;
   value: number;
 }
 
@@ -291,7 +291,7 @@ export interface ReferenceFilter extends FilterAttrs {
 export type FilterQueryType =
   | BaseFilterQueryType
   | StringFilterQueryType
-  | IntegerFilterQueryType
+  | NumberFilterQueryType
   | BooleanFilterQueryType
   | DateTimeFilterQueryType
   | GeneralFilterQueryType
@@ -309,14 +309,14 @@ export function filterFactory(filterConfig: FilterConfig): Filter {
         type: FilterType.StringFilterType,
         value: '',
       };
-    case FilterConfigTypes.Integer:
+    case FilterConfigTypes.Number:
       return {
         id: uuid(),
         label: filterConfig.label,
         name: filterConfig.name,
         nullable: filterConfig.nullable,
-        query: IntegerFilterQueryType.EqualTo,
-        type: FilterType.IntegerFilterType,
+        query: NumberFilterQueryType.EqualTo,
+        type: FilterType.NumberFilterType,
         value: 0,
       };
     case FilterConfigTypes.Boolean:

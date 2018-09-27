@@ -8,8 +8,8 @@ import {
   FilterQueryType,
   FilterType,
   GeneralFilter,
-  IntegerFilter,
-  IntegerFilterQueryType,
+  NumberFilter,
+  NumberFilterQueryType,
   ReferenceFilter,
   ReferenceFilterQueryType,
   StringFilter,
@@ -28,6 +28,7 @@ export interface InjectedProps {
     filter: Filter,
     event: React.ChangeEvent<HTMLInputElement>
   ) => void;
+  handleNumberValueChange: (filter: Filter, value: number) => void;
   handleReferenceChange: (filter: Filter, value: string[]) => void;
   handleDateTimeValueChange: (filter: Filter, datetime: Date) => void;
   onCloseFilterClicked: (filter: Filter) => void;
@@ -46,6 +47,7 @@ export function withEventHandler<P extends InjectedProps>(
           // TODO (Steven-Chan):
           // Should debounce the function
           handleFilterValueChange={this.handleFilterValueChange}
+          handleNumberValueChange={this.handleNumberValueChange}
           handleDateTimeValueChange={this.handleDateTimeValueChange}
           handleReferenceChange={this.handleReferenceFilterChange}
           onCloseFilterClicked={this.onCloseFilterClicked}
@@ -74,10 +76,10 @@ export function withEventHandler<P extends InjectedProps>(
                 ...f,
                 query: value as StringFilterQueryType,
               };
-            case FilterType.IntegerFilterType:
+            case FilterType.NumberFilterType:
               return {
                 ...f,
-                query: value as IntegerFilterQueryType,
+                query: value as NumberFilterQueryType,
               };
             case FilterType.BooleanFilterType:
               return {
@@ -115,11 +117,6 @@ export function withEventHandler<P extends InjectedProps>(
           switch (filter.type) {
             case FilterType.StringFilterType:
               return { ...(f as StringFilter), value: event.target.value };
-            case FilterType.IntegerFilterType:
-              return {
-                ...(f as IntegerFilter),
-                value: Number(event.target.value),
-              };
             case FilterType.BooleanFilterType:
             case FilterType.DateTimeFilterType:
               return f;
@@ -132,6 +129,18 @@ export function withEventHandler<P extends InjectedProps>(
           }
         }
         return f;
+      });
+
+      this.props.onChangeFilter(filters);
+    };
+
+    private handleNumberValueChange = (filter: Filter, value: number) => {
+      const filters = this.props.filters.map(f => {
+        if (f.id === filter.id) {
+          return { ...(f as NumberFilter), value };
+        } else {
+          return f;
+        }
       });
 
       this.props.onChangeFilter(filters);

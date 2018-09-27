@@ -2,6 +2,7 @@ import classnames from 'classnames';
 import * as React from 'react';
 
 import { FloatDisplayFieldConfig, FloatInputFieldConfig } from '../cmsConfig';
+import { NumberInput } from '../components/NumberInput';
 import { hasValidationError } from '../validation/validation';
 import { RequiredFieldProps } from './Field';
 import { StringDisplay } from './StringDisplay';
@@ -27,7 +28,6 @@ export const FloatDisplayField: React.SFC<FloatDisplayFieldProps> = ({
 type FloatInputFieldProps = RequiredFieldProps<FloatInputFieldConfig>;
 interface State {
   value: number;
-  stringValue: string;
 }
 
 export class FloatInputField extends React.PureComponent<
@@ -38,7 +38,6 @@ export class FloatInputField extends React.PureComponent<
     super(props);
 
     this.state = {
-      stringValue: props.value == null ? '' : `${props.value}`,
       value: props.value,
     };
   }
@@ -47,7 +46,6 @@ export class FloatInputField extends React.PureComponent<
     if (nextProps.value !== this.state.value) {
       this.setState({
         ...this.state,
-        stringValue: nextProps.value == null ? '' : `${nextProps.value}`,
         value: nextProps.value,
       });
     }
@@ -65,16 +63,15 @@ export class FloatInputField extends React.PureComponent<
 
     return (
       <div className={className}>
-        <input
+        <NumberInput
           {...rest}
           className={classnames('number-input', {
             'validation-error': hasValidationError(validationError),
           })}
-          type="text"
           id={name}
           name={name}
-          value={this.state.stringValue}
-          onChange={this.handleChange}
+          value={this.state.value}
+          onValueChange={this.handleChange}
           placeholder="0"
           disabled={!editable}
         />
@@ -83,27 +80,9 @@ export class FloatInputField extends React.PureComponent<
     );
   }
 
-  public handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value.trim();
-    if (value === '' || value === '-') {
-      this.setState({ ...this.state, stringValue: value, value: 0 }, () => {
-        if (this.props.onFieldChange) {
-          this.props.onFieldChange(0);
-        }
-      });
-      return;
+  public handleChange = (value: number) => {
+    if (this.props.onFieldChange) {
+      this.props.onFieldChange(value);
     }
-
-    const isValid = /^-?\d+(\.)?\d*$/.test(value);
-    if (!isValid) {
-      return;
-    }
-
-    const num = parseFloat(value);
-    this.setState({ ...this.state, stringValue: value, value: num }, () => {
-      if (this.props.onFieldChange) {
-        this.props.onFieldChange(num);
-      }
-    });
   };
 }

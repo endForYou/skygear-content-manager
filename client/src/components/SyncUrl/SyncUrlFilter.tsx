@@ -49,8 +49,8 @@ function urlStringToFilter(filterStr: string, filterConfigs: FilterConfig[]) {
           return { ...newFilter, query };
         case FilterType.DateTimeFilterType:
           return { ...newFilter, query, value: moment(value).toDate() };
-        case FilterType.IntegerFilterType:
-          return { ...newFilter, query, value: parseInt(value, 10) };
+        case FilterType.NumberFilterType:
+          return { ...newFilter, query, value: Number(value) };
         default:
           return { ...newFilter, query, value };
       }

@@ -368,7 +368,7 @@ function FileImportPageFactory() {
         label: 'Size',
         name: 'size',
         nullable: false,
-        type: FilterConfigTypes.Integer,
+        type: FilterConfigTypes.Number,
       },
     ];
 

@@ -5,6 +5,7 @@ import moment from 'moment';
 import * as React from 'react';
 // tslint:disable-next-line: no-submodule-imports
 import 'react-datetime/css/react-datetime.css';
+import { Option, OptionValues } from 'react-select';
 
 import {
   BaseFilterQueryType,
@@ -17,8 +18,8 @@ import {
   FilterQueryType,
   FilterType,
   GeneralFilter,
-  IntegerFilter,
-  IntegerFilterQueryType,
+  NumberFilter,
+  NumberFilterQueryType,
   ReferenceFilter,
   ReferenceFilterConfig,
   ReferenceFilterQueryType,
@@ -28,7 +29,7 @@ import {
 import { TzDatetimeInput } from '../components/TzDatetimeInput';
 import { ReferenceFilterInput } from '../filters/ReferenceFilterInput';
 
-import { Option, OptionValues } from 'react-select';
+import { NumberInput } from './NumberInput';
 import { ReactSelectWrapper } from './ReactSelectWrapper';
 
 interface FilterListProps {
@@ -40,6 +41,7 @@ interface FilterListProps {
     filter: Filter,
     event: React.ChangeEvent<HTMLInputElement>
   ) => void;
+  handleNumberValueChange: (filter: Filter, value: number) => void;
   handleReferenceChange: (filter: Filter, value: string[]) => void;
   onCloseFilterClicked: (filter: Filter) => void;
   handleDateTimeValueChange: (filter: Filter, datetime: Date) => void;
@@ -77,8 +79,8 @@ export class FilterList extends React.PureComponent<FilterListProps> {
     switch (filter.type) {
       case FilterType.StringFilterType:
         return this.renderStringFilterSelect(filter);
-      case FilterType.IntegerFilterType:
-        return this.renderIntegerFilterSelect(filter);
+      case FilterType.NumberFilterType:
+        return this.renderNumberFilterSelect(filter);
       case FilterType.BooleanFilterType:
         return this.renderBooleanFilterSelect(filter);
       case FilterType.DateTimeFilterType:
@@ -121,7 +123,7 @@ export class FilterList extends React.PureComponent<FilterListProps> {
     );
   }
 
-  public renderIntegerFilterSelect(filter: Filter) {
+  public renderNumberFilterSelect(filter: Filter) {
     return (
       <ReactSelectWrapper
         clearable={false}
@@ -129,14 +131,14 @@ export class FilterList extends React.PureComponent<FilterListProps> {
         onChange={(value: Option<OptionValues> | null) =>
           this.handleQueryTypeChange(filter, value)}
       >
-        <option value={IntegerFilterQueryType.EqualTo}>Equal to</option>
-        <option value={IntegerFilterQueryType.NotEqualTo}>Not equal to</option>
-        <option value={IntegerFilterQueryType.LessThan}>Less than</option>
-        <option value={IntegerFilterQueryType.GreaterThan}>Greater than</option>
-        <option value={IntegerFilterQueryType.LessThanOrEqualTo}>
+        <option value={NumberFilterQueryType.EqualTo}>Equal to</option>
+        <option value={NumberFilterQueryType.NotEqualTo}>Not equal to</option>
+        <option value={NumberFilterQueryType.LessThan}>Less than</option>
+        <option value={NumberFilterQueryType.GreaterThan}>Greater than</option>
+        <option value={NumberFilterQueryType.LessThanOrEqualTo}>
           Less than or equal to
         </option>
-        <option value={IntegerFilterQueryType.GreaterThanOrEqualTo}>
+        <option value={NumberFilterQueryType.GreaterThanOrEqualTo}>
           Greater than or equal to
         </option>
         {this.renderNullFilterSelect(filter)}
@@ -198,8 +200,8 @@ export class FilterList extends React.PureComponent<FilterListProps> {
     switch (filter.type) {
       case FilterType.StringFilterType:
         return this.renderStringInput(filter);
-      case FilterType.IntegerFilterType:
-        return this.renderIntegerInput(filter);
+      case FilterType.NumberFilterType:
+        return this.renderNumberInput(filter);
       case FilterType.BooleanFilterType:
         return <div />;
       case FilterType.DateTimeFilterType:
@@ -230,19 +232,20 @@ export class FilterList extends React.PureComponent<FilterListProps> {
     );
   }
 
-  public renderIntegerInput(filter: IntegerFilter) {
-    const { handleFilterValueChange } = this.props;
+  public renderNumberInput(filter: NumberFilter) {
+    const { handleNumberValueChange } = this.props;
 
     return (
-      <input
-        type="number"
+      <NumberInput
         className="text-input"
         autoFocus={true}
-        onChange={event => handleFilterValueChange(filter, event)}
+        onValueChange={value => handleNumberValueChange(filter, value)}
+        placeholder="0"
         value={filter.value}
       />
     );
   }
+
   public renderDateTimeInput(
     filter: DateTimeFilter,
     config: DateTimeFilterConfig
