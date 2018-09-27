@@ -287,6 +287,8 @@ records:
           type: reference
           reference_target: ref_demo
           reference_field_name: name
+          add_button:
+            enabled: true
         - name: back_refs
           type: reference_list
           reference_via_back_reference: back_ref_demo

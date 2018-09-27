@@ -126,17 +126,19 @@ class ReferenceDropdownFieldImpl extends React.PureComponent<
           value={value || undefined}
           disabled={!editable}
         />
-        <div>
-          <a
-            key="export"
-            href={`/records/${config.reference.targetCmsRecord.name}/new`}
-            target="_blank"
-            role="button"
-            className="btn-add btn-create-ref primary-button"
-          >
-            Create New {config.label}
-          </a>
-        </div>
+        {config.addButton.enabled && (
+          <div>
+            <a
+              key="export"
+              href={`/records/${config.reference.targetCmsRecord.name}/new`}
+              target="_blank"
+              role="button"
+              className="btn-add btn-create-ref primary-button"
+            >
+              {config.addButton.label}
+            </a>
+          </div>
+        )}
         <ValidationText validationError={validationError} />
       </div>
     );
