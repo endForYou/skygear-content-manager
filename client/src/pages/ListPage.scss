@@ -65,6 +65,7 @@ $horizontal-spacing: to-rem(32px);
     font-family: HelveticaNeue, sans-serif;
     vertical-align: middle;
     min-width: to-rem(250px);
+    max-width: to-rem(500px);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
