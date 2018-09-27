@@ -120,11 +120,25 @@ class ReferenceDropdownFieldImpl extends React.PureComponent<
           className={classnames('ref-select', {
             'validation-error': hasValidationError(validationError),
           })}
+          cache={false}
           loadOptions={this.debouncedLoadOptions}
           onChange={this.onChange}
           value={value || undefined}
           disabled={!editable}
         />
+        {config.addButton.enabled && (
+          <div>
+            <a
+              key="export"
+              href={`/records/${config.reference.targetCmsRecord.name}/new`}
+              target="_blank"
+              role="button"
+              className="btn-add btn-create-ref primary-button"
+            >
+              {config.addButton.label}
+            </a>
+          </div>
+        )}
         <ValidationText validationError={validationError} />
       </div>
     );

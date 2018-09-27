@@ -199,6 +199,10 @@ export interface ReferenceDropdownFieldConfig extends EditableFieldConfigAttrs {
   type: FieldConfigTypes.ReferenceDropdown;
   reference: DirectReference;
   displayFieldName: string;
+  addButton: {
+    enabled: boolean;
+    label: string;
+  };
   // TODO: Support defaultValue for ReferenceDropdown
   defaultValue: undefined;
 }
@@ -661,12 +665,31 @@ export function parseReferenceDropdownFieldConfig(
   const displayFieldName =
     parseOptionalString(input, 'reference_field_name', 'reference') || '_id';
 
+  const attrs = parseEditableConfigAttrs(
+    input,
+    FieldConfigTypes.ReferenceDropdown,
+    depth
+  );
+
+  const addButton = {
+    enabled: false,
+    label: '',
+  };
+  if (input.add_button != null) {
+    const enabled = parseOptionalBoolean(
+      input.add_button,
+      'enabled',
+      'reference.add_button'
+    );
+    addButton.enabled = enabled == null ? false : enabled;
+    addButton.label =
+      parseOptionalString(input.add_button, 'label', 'reference.add_button') ||
+      `Create New ${attrs.label}`;
+  }
+
   return {
-    ...parseEditableConfigAttrs(
-      input,
-      FieldConfigTypes.ReferenceDropdown,
-      depth
-    ),
+    ...attrs,
+    addButton,
     defaultValue: undefined,
     displayFieldName,
     reference: parseReferenceFieldConfigAttrs(context, input),

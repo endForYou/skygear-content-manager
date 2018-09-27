@@ -151,6 +151,7 @@ test('parseCmsConfig should parse example config', () => {
               name: 'reference',
               label: 'Reference',
               editable: true,
+              addButton: { enabled: true, label: 'Create New Reference' },
               displayFieldName: 'name',
               reference: {
                 targetCmsRecord: { name: 'ref_demo', recordType: 'ref_demo' },
@@ -346,6 +347,7 @@ test('parseCmsConfig should parse example config', () => {
               name: 'reference',
               label: 'Reference',
               editable: true,
+              addButton: { enabled: true, label: 'Create New Reference' },
               displayFieldName: 'name',
               reference: {
                 targetCmsRecord: { name: 'ref_demo', recordType: 'ref_demo' },
@@ -824,6 +826,7 @@ test('parseCmsConfig should parse example config', () => {
               name: 'reference',
               label: 'Reference',
               editable: true,
+              addButton: { enabled: false, label: '' },
               displayFieldName: 'name',
               reference: {
                 targetCmsRecord: { name: 'ref_demo', recordType: 'ref_demo' },
@@ -1008,6 +1011,7 @@ test('parseCmsConfig should parse example config', () => {
               name: 'reference',
               label: 'Reference',
               editable: true,
+              addButton: { enabled: false, label: '' },
               displayFieldName: 'name',
               reference: {
                 targetCmsRecord: { name: 'ref_demo', recordType: 'ref_demo' },
@@ -1954,6 +1958,7 @@ test('parseCmsConfig should parse example config', () => {
               name: 'reference',
               label: 'Reference',
               editable: true,
+              addButton: { enabled: false, label: '' },
               displayFieldName: 'name',
               reference: {
                 targetCmsRecord: {
@@ -1979,6 +1984,7 @@ test('parseCmsConfig should parse example config', () => {
               name: 'reference',
               label: 'Reference',
               editable: true,
+              addButton: { enabled: false, label: '' },
               displayFieldName: 'name',
               reference: {
                 targetCmsRecord: {
@@ -2001,6 +2007,7 @@ test('parseCmsConfig should parse example config', () => {
               name: 'reference',
               label: 'Reference',
               editable: true,
+              addButton: { enabled: false, label: '' },
               displayFieldName: 'name',
               reference: {
                 targetCmsRecord: {
@@ -2026,6 +2033,7 @@ test('parseCmsConfig should parse example config', () => {
               name: 'reference',
               label: 'Reference',
               editable: true,
+              addButton: { enabled: false, label: '' },
               displayFieldName: 'name',
               reference: {
                 targetCmsRecord: {
