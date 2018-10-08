@@ -341,7 +341,9 @@ class NewPushNotificationPageImpl extends React.PureComponent<
       })
       .catch(error => {
         this.setState({
-          errorMessage: error.toString(),
+          errorMessage: isOutlawError(error)
+            ? error.error.message
+            : error.message,
         });
       });
   };
