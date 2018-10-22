@@ -919,6 +919,7 @@ function fetchReferentsWithTarget(
     backRefConfig.reference.targetCmsRecord.recordType,
     backRefConfig.reference.sourceFieldName,
     {
+      predicates: backRefConfig.reference.predicates,
       sortAscending: backRefConfig.sortOrder === SortOrder.Asc,
       sortByField: backRefConfig.positionFieldName,
     }
@@ -975,6 +976,10 @@ function fetchAssociationRecordsWithTarget(
     assoRefConfig.reference.associationRecordConfig.cmsRecord.recordType,
     assoRefConfig.reference.sourceReference.name,
     {
+      predicates: assoRefConfig.reference.predicates.map(predicate => {
+        predicate.name = `${assoRefConfig.reference.targetReference.name}.${predicate.name}`;
+        return predicate;
+      }),
       sortAscending: assoRefConfig.sortOrder === SortOrder.Asc,
       sortByField: assoRefConfig.positionFieldName,
       transientIncludeFieldName: assoRefConfig.reference.targetReference.name,
@@ -990,6 +995,7 @@ function fetchReferentRecords(
     transientIncludeFieldName?: string;
     sortByField?: string;
     sortAscending?: boolean;
+    predicates: Predicate[];
   }
 ): Promise<Record[]> {
   const query = new Query(Record.extend(recordType));
@@ -1011,6 +1017,10 @@ function fetchReferentRecords(
   query.contains(sourceFieldName, sourceIds);
   if (option && option.transientIncludeFieldName) {
     query.transientInclude(option.transientIncludeFieldName);
+  }
+
+  if (option) {
+    applyPredicatesToQuery(query, option.predicates);
   }
 
   return skygear.publicDB
