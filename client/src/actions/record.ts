@@ -976,10 +976,12 @@ function fetchAssociationRecordsWithTarget(
     assoRefConfig.reference.associationRecordConfig.cmsRecord.recordType,
     assoRefConfig.reference.sourceReference.name,
     {
-      predicates: assoRefConfig.reference.predicates.map(predicate => {
-        predicate.name = `${assoRefConfig.reference.targetReference.name}.${predicate.name}`;
-        return predicate;
-      }),
+      predicates: assoRefConfig.reference.predicates.map(predicate => ({
+        ...predicate,
+        name:
+          `${assoRefConfig.reference.targetReference.name}` +
+          `.${predicate.name}`,
+      })),
       sortAscending: assoRefConfig.sortOrder === SortOrder.Asc,
       sortByField: assoRefConfig.positionFieldName,
       transientIncludeFieldName: assoRefConfig.reference.targetReference.name,

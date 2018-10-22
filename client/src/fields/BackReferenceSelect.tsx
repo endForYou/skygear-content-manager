@@ -12,6 +12,7 @@ import { BackReferenceSelectFieldConfig } from '../cmsConfig';
 import { Effect } from '../components/RecordFormPage';
 import { debouncePromise1, makeArray } from '../util';
 
+import { applyPredicatesToQuery } from '../actions/record';
 import { hasValidationError } from '../validation/validation';
 import { RequiredFieldProps } from './Field';
 import { ValidationText } from './validation/ValidationText';
@@ -83,11 +84,12 @@ class BackReferenceSelectImpl extends React.PureComponent<
   }
 
   public loadOptionsHandler: LoadOptionsAsyncHandler<string> = value => {
-    const { targetCmsRecord } = this.props.config.reference;
+    const { predicates, targetCmsRecord } = this.props.config.reference;
 
     const RecordCls = Record.extend(targetCmsRecord.recordType);
 
     const query = new Query(RecordCls);
+    applyPredicatesToQuery(query, predicates);
     if (value !== '') {
       query.caseInsensitiveLike(
         this.props.config.displayFieldName,

@@ -13,6 +13,7 @@ import { Effect } from '../components/RecordFormPage';
 import { deleteRecordsProperly, parseReference } from '../recordUtil';
 import { debouncePromise1, makeArray, objectFrom } from '../util';
 
+import { applyPredicatesToQuery } from '../actions/record';
 import { hasValidationError } from '../validation/validation';
 import { RequiredFieldProps } from './Field';
 import { ValidationText } from './validation/ValidationText';
@@ -91,13 +92,14 @@ class AssociationRecordSelectImpl extends React.PureComponent<
   }
 
   public loadOptionsHandler: LoadOptionsAsyncHandler<string> = value => {
-    const { targetReference } = this.props.config.reference;
+    const { predicates, targetReference } = this.props.config.reference;
 
     const RecordCls = Record.extend(
       targetReference.reference.targetCmsRecord.recordType
     );
 
     const query = new Query(RecordCls);
+    applyPredicatesToQuery(query, predicates);
     if (value !== '') {
       query.caseInsensitiveLike(
         this.props.config.displayFieldName,

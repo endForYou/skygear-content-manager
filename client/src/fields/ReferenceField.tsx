@@ -17,6 +17,7 @@ import {
 import { ReferenceLink } from '../components/ReferenceLink';
 import { parseReference } from '../recordUtil';
 
+import { applyPredicatesToQuery } from '../actions/record';
 import { debouncePromise1, objectFrom } from '../util';
 import { hasValidationError } from '../validation/validation';
 import { RequiredFieldProps } from './Field';
@@ -147,11 +148,12 @@ class ReferenceDropdownFieldImpl extends React.PureComponent<
   public loadOptions: LoadOptionsAsyncHandler<string> = input => {
     const {
       displayFieldName,
-      reference: { targetCmsRecord },
+      reference: { predicates, targetCmsRecord },
     } = this.props.config;
 
     const RecordCls = Record.extend(targetCmsRecord.recordType);
     const query = new Query(RecordCls);
+    applyPredicatesToQuery(query, predicates);
     if (input !== '') {
       query.caseInsensitiveLike(
         this.props.config.displayFieldName,
