@@ -10,6 +10,7 @@ test('parseCmsConfig should parse example config', () => {
   });
   const parsed = yaml.safeLoad(text);
   const config = parseCmsConfig(parsed);
+  // console.log(JSON.stringify(config));
   expect(config).toEqual({
     associationRecordByName: {
       field_asso_ref: {
@@ -21,6 +22,7 @@ test('parseCmsConfig should parse example config', () => {
             label: 'Field demo',
             displayFieldName: '_id',
             reference: {
+              predicates: [],
               targetCmsRecord: { name: 'field_demo', recordType: 'field_demo' },
               type: 'DirectReference',
             },
@@ -32,6 +34,7 @@ test('parseCmsConfig should parse example config', () => {
             label: 'Asso ref demo',
             displayFieldName: '_id',
             reference: {
+              predicates: [],
               targetCmsRecord: {
                 name: 'asso_ref_demo',
                 recordType: 'asso_ref_demo',
@@ -154,6 +157,14 @@ test('parseCmsConfig should parse example config', () => {
               addButton: { enabled: true, label: 'Create New Reference' },
               displayFieldName: 'name',
               reference: {
+                predicates: [
+                  {
+                    name: 'name',
+                    type: 'not_equal_to',
+                    value: '',
+                    valueType: 'json_value',
+                  },
+                ],
                 targetCmsRecord: { name: 'ref_demo', recordType: 'ref_demo' },
                 type: 'DirectReference',
               },
@@ -166,6 +177,14 @@ test('parseCmsConfig should parse example config', () => {
               editable: true,
               displayFieldName: 'name',
               reference: {
+                predicates: [
+                  {
+                    name: 'name',
+                    type: 'not_equal_to',
+                    value: '',
+                    valueType: 'json_value',
+                  },
+                ],
                 sourceFieldName: 'reference',
                 targetCmsRecord: {
                   name: 'back_ref_demo',
@@ -197,6 +216,7 @@ test('parseCmsConfig should parse example config', () => {
               ],
               positionFieldName: 'field_demo_position',
               reference: {
+                predicates: [],
                 sourceFieldName: 'reference',
                 targetCmsRecord: {
                   name: 'back_ref_demo',
@@ -243,6 +263,7 @@ test('parseCmsConfig should parse example config', () => {
                       label: 'Field demo',
                       displayFieldName: '_id',
                       reference: {
+                        predicates: [],
                         targetCmsRecord: {
                           name: 'field_demo',
                           recordType: 'field_demo',
@@ -257,6 +278,7 @@ test('parseCmsConfig should parse example config', () => {
                       label: 'Asso ref demo',
                       displayFieldName: '_id',
                       reference: {
+                        predicates: [],
                         targetCmsRecord: {
                           name: 'asso_ref_demo',
                           recordType: 'asso_ref_demo',
@@ -267,12 +289,14 @@ test('parseCmsConfig should parse example config', () => {
                     },
                   ],
                 },
+                predicates: [],
                 sourceReference: {
                   compact: false,
                   name: 'field_demo',
                   label: 'Field demo',
                   displayFieldName: '_id',
                   reference: {
+                    predicates: [],
                     targetCmsRecord: {
                       name: 'field_demo',
                       recordType: 'field_demo',
@@ -287,6 +311,7 @@ test('parseCmsConfig should parse example config', () => {
                   label: 'Asso ref demo',
                   displayFieldName: '_id',
                   reference: {
+                    predicates: [],
                     targetCmsRecord: {
                       name: 'asso_ref_demo',
                       recordType: 'asso_ref_demo',
@@ -350,6 +375,14 @@ test('parseCmsConfig should parse example config', () => {
               addButton: { enabled: true, label: 'Create New Reference' },
               displayFieldName: 'name',
               reference: {
+                predicates: [
+                  {
+                    name: 'name',
+                    type: 'not_equal_to',
+                    value: '',
+                    valueType: 'json_value',
+                  },
+                ],
                 targetCmsRecord: { name: 'ref_demo', recordType: 'ref_demo' },
                 type: 'DirectReference',
               },
@@ -362,6 +395,14 @@ test('parseCmsConfig should parse example config', () => {
               editable: true,
               displayFieldName: 'name',
               reference: {
+                predicates: [
+                  {
+                    name: 'name',
+                    type: 'not_equal_to',
+                    value: '',
+                    valueType: 'json_value',
+                  },
+                ],
                 sourceFieldName: 'reference',
                 targetCmsRecord: {
                   name: 'back_ref_demo',
@@ -393,6 +434,7 @@ test('parseCmsConfig should parse example config', () => {
               ],
               positionFieldName: 'field_demo_position',
               reference: {
+                predicates: [],
                 sourceFieldName: 'reference',
                 targetCmsRecord: {
                   name: 'back_ref_demo',
@@ -439,6 +481,7 @@ test('parseCmsConfig should parse example config', () => {
                       label: 'Field demo',
                       displayFieldName: '_id',
                       reference: {
+                        predicates: [],
                         targetCmsRecord: {
                           name: 'field_demo',
                           recordType: 'field_demo',
@@ -453,6 +496,7 @@ test('parseCmsConfig should parse example config', () => {
                       label: 'Asso ref demo',
                       displayFieldName: '_id',
                       reference: {
+                        predicates: [],
                         targetCmsRecord: {
                           name: 'asso_ref_demo',
                           recordType: 'asso_ref_demo',
@@ -463,12 +507,14 @@ test('parseCmsConfig should parse example config', () => {
                     },
                   ],
                 },
+                predicates: [],
                 sourceReference: {
                   compact: false,
                   name: 'field_demo',
                   label: 'Field demo',
                   displayFieldName: '_id',
                   reference: {
+                    predicates: [],
                     targetCmsRecord: {
                       name: 'field_demo',
                       recordType: 'field_demo',
@@ -483,6 +529,7 @@ test('parseCmsConfig should parse example config', () => {
                   label: 'Asso ref demo',
                   displayFieldName: '_id',
                   reference: {
+                    predicates: [],
                     targetCmsRecord: {
                       name: 'asso_ref_demo',
                       recordType: 'asso_ref_demo',
@@ -601,6 +648,14 @@ test('parseCmsConfig should parse example config', () => {
               label: 'Reference',
               displayFieldName: 'name',
               reference: {
+                predicates: [
+                  {
+                    name: 'name',
+                    type: 'not_equal_to',
+                    value: '',
+                    valueType: 'json_value',
+                  },
+                ],
                 targetCmsRecord: { name: 'ref_demo', recordType: 'ref_demo' },
                 type: 'DirectReference',
               },
@@ -612,6 +667,14 @@ test('parseCmsConfig should parse example config', () => {
               label: 'Back refs',
               displayFieldName: 'name',
               reference: {
+                predicates: [
+                  {
+                    name: 'name',
+                    type: 'not_equal_to',
+                    value: '',
+                    valueType: 'json_value',
+                  },
+                ],
                 sourceFieldName: 'reference',
                 targetCmsRecord: {
                   name: 'back_ref_demo',
@@ -719,6 +782,14 @@ test('parseCmsConfig should parse example config', () => {
               label: 'Reference',
               displayFieldName: 'name',
               reference: {
+                predicates: [
+                  {
+                    name: 'name',
+                    type: 'not_equal_to',
+                    value: '',
+                    valueType: 'json_value',
+                  },
+                ],
                 targetCmsRecord: { name: 'ref_demo', recordType: 'ref_demo' },
                 type: 'DirectReference',
               },
@@ -730,6 +801,14 @@ test('parseCmsConfig should parse example config', () => {
               label: 'Back refs',
               displayFieldName: 'name',
               reference: {
+                predicates: [
+                  {
+                    name: 'name',
+                    type: 'not_equal_to',
+                    value: '',
+                    valueType: 'json_value',
+                  },
+                ],
                 sourceFieldName: 'reference',
                 targetCmsRecord: {
                   name: 'back_ref_demo',
@@ -829,6 +908,7 @@ test('parseCmsConfig should parse example config', () => {
               addButton: { enabled: false, label: '' },
               displayFieldName: 'name',
               reference: {
+                predicates: [],
                 targetCmsRecord: { name: 'ref_demo', recordType: 'ref_demo' },
                 type: 'DirectReference',
               },
@@ -841,6 +921,7 @@ test('parseCmsConfig should parse example config', () => {
               editable: true,
               displayFieldName: 'name',
               reference: {
+                predicates: [],
                 sourceFieldName: 'reference',
                 targetCmsRecord: {
                   name: 'back_ref_demo',
@@ -872,6 +953,7 @@ test('parseCmsConfig should parse example config', () => {
               ],
               positionFieldName: 'field_demo_position',
               reference: {
+                predicates: [],
                 sourceFieldName: 'reference',
                 targetCmsRecord: {
                   name: 'back_ref_demo',
@@ -918,6 +1000,7 @@ test('parseCmsConfig should parse example config', () => {
                       label: 'Field demo',
                       displayFieldName: '_id',
                       reference: {
+                        predicates: [],
                         targetCmsRecord: {
                           name: 'field_demo',
                           recordType: 'field_demo',
@@ -932,6 +1015,7 @@ test('parseCmsConfig should parse example config', () => {
                       label: 'Asso ref demo',
                       displayFieldName: '_id',
                       reference: {
+                        predicates: [],
                         targetCmsRecord: {
                           name: 'asso_ref_demo',
                           recordType: 'asso_ref_demo',
@@ -942,12 +1026,14 @@ test('parseCmsConfig should parse example config', () => {
                     },
                   ],
                 },
+                predicates: [],
                 sourceReference: {
                   compact: false,
                   name: 'field_demo',
                   label: 'Field demo',
                   displayFieldName: '_id',
                   reference: {
+                    predicates: [],
                     targetCmsRecord: {
                       name: 'field_demo',
                       recordType: 'field_demo',
@@ -962,6 +1048,7 @@ test('parseCmsConfig should parse example config', () => {
                   label: 'Asso ref demo',
                   displayFieldName: '_id',
                   reference: {
+                    predicates: [],
                     targetCmsRecord: {
                       name: 'asso_ref_demo',
                       recordType: 'asso_ref_demo',
@@ -1014,6 +1101,7 @@ test('parseCmsConfig should parse example config', () => {
               addButton: { enabled: false, label: '' },
               displayFieldName: 'name',
               reference: {
+                predicates: [],
                 targetCmsRecord: { name: 'ref_demo', recordType: 'ref_demo' },
                 type: 'DirectReference',
               },
@@ -1026,6 +1114,7 @@ test('parseCmsConfig should parse example config', () => {
               editable: true,
               displayFieldName: 'name',
               reference: {
+                predicates: [],
                 sourceFieldName: 'reference',
                 targetCmsRecord: {
                   name: 'back_ref_demo',
@@ -1057,6 +1146,7 @@ test('parseCmsConfig should parse example config', () => {
               ],
               positionFieldName: 'field_demo_position',
               reference: {
+                predicates: [],
                 sourceFieldName: 'reference',
                 targetCmsRecord: {
                   name: 'back_ref_demo',
@@ -1103,6 +1193,7 @@ test('parseCmsConfig should parse example config', () => {
                       label: 'Field demo',
                       displayFieldName: '_id',
                       reference: {
+                        predicates: [],
                         targetCmsRecord: {
                           name: 'field_demo',
                           recordType: 'field_demo',
@@ -1117,6 +1208,7 @@ test('parseCmsConfig should parse example config', () => {
                       label: 'Asso ref demo',
                       displayFieldName: '_id',
                       reference: {
+                        predicates: [],
                         targetCmsRecord: {
                           name: 'asso_ref_demo',
                           recordType: 'asso_ref_demo',
@@ -1127,12 +1219,14 @@ test('parseCmsConfig should parse example config', () => {
                     },
                   ],
                 },
+                predicates: [],
                 sourceReference: {
                   compact: false,
                   name: 'field_demo',
                   label: 'Field demo',
                   displayFieldName: '_id',
                   reference: {
+                    predicates: [],
                     targetCmsRecord: {
                       name: 'field_demo',
                       recordType: 'field_demo',
@@ -1147,6 +1241,7 @@ test('parseCmsConfig should parse example config', () => {
                   label: 'Asso ref demo',
                   displayFieldName: '_id',
                   reference: {
+                    predicates: [],
                     targetCmsRecord: {
                       name: 'asso_ref_demo',
                       recordType: 'asso_ref_demo',
@@ -1244,6 +1339,14 @@ test('parseCmsConfig should parse example config', () => {
               label: 'Reference',
               displayFieldName: 'name',
               reference: {
+                predicates: [
+                  {
+                    name: 'name',
+                    type: 'not_equal_to',
+                    value: '',
+                    valueType: 'json_value',
+                  },
+                ],
                 targetCmsRecord: { name: 'ref_demo', recordType: 'ref_demo' },
                 type: 'DirectReference',
               },
@@ -1255,6 +1358,14 @@ test('parseCmsConfig should parse example config', () => {
               label: 'Back refs',
               displayFieldName: 'name',
               reference: {
+                predicates: [
+                  {
+                    name: 'name',
+                    type: 'not_equal_to',
+                    value: '',
+                    valueType: 'json_value',
+                  },
+                ],
                 sourceFieldName: 'reference',
                 targetCmsRecord: {
                   name: 'back_ref_demo',
@@ -1282,6 +1393,7 @@ test('parseCmsConfig should parse example config', () => {
                       label: 'Field demo',
                       displayFieldName: '_id',
                       reference: {
+                        predicates: [],
                         targetCmsRecord: {
                           name: 'field_demo',
                           recordType: 'field_demo',
@@ -1296,6 +1408,7 @@ test('parseCmsConfig should parse example config', () => {
                       label: 'Asso ref demo',
                       displayFieldName: '_id',
                       reference: {
+                        predicates: [],
                         targetCmsRecord: {
                           name: 'asso_ref_demo',
                           recordType: 'asso_ref_demo',
@@ -1306,12 +1419,21 @@ test('parseCmsConfig should parse example config', () => {
                     },
                   ],
                 },
+                predicates: [
+                  {
+                    name: 'name',
+                    type: 'not_equal_to',
+                    value: '',
+                    valueType: 'json_value',
+                  },
+                ],
                 sourceReference: {
                   compact: false,
                   name: 'field_demo',
                   label: 'Field demo',
                   displayFieldName: '_id',
                   reference: {
+                    predicates: [],
                     targetCmsRecord: {
                       name: 'field_demo',
                       recordType: 'field_demo',
@@ -1326,6 +1448,7 @@ test('parseCmsConfig should parse example config', () => {
                   label: 'Asso ref demo',
                   displayFieldName: '_id',
                   reference: {
+                    predicates: [],
                     targetCmsRecord: {
                       name: 'asso_ref_demo',
                       recordType: 'asso_ref_demo',
@@ -1358,6 +1481,7 @@ test('parseCmsConfig should parse example config', () => {
               ],
               positionFieldName: 'field_demo_position',
               reference: {
+                predicates: [],
                 sourceFieldName: 'reference',
                 targetCmsRecord: {
                   name: 'back_ref_demo',
@@ -1402,6 +1526,7 @@ test('parseCmsConfig should parse example config', () => {
                       label: 'Field demo',
                       displayFieldName: '_id',
                       reference: {
+                        predicates: [],
                         targetCmsRecord: {
                           name: 'field_demo',
                           recordType: 'field_demo',
@@ -1416,6 +1541,7 @@ test('parseCmsConfig should parse example config', () => {
                       label: 'Asso ref demo',
                       displayFieldName: '_id',
                       reference: {
+                        predicates: [],
                         targetCmsRecord: {
                           name: 'asso_ref_demo',
                           recordType: 'asso_ref_demo',
@@ -1426,12 +1552,14 @@ test('parseCmsConfig should parse example config', () => {
                     },
                   ],
                 },
+                predicates: [],
                 sourceReference: {
                   compact: false,
                   name: 'field_demo',
                   label: 'Field demo',
                   displayFieldName: '_id',
                   reference: {
+                    predicates: [],
                     targetCmsRecord: {
                       name: 'field_demo',
                       recordType: 'field_demo',
@@ -1446,6 +1574,7 @@ test('parseCmsConfig should parse example config', () => {
                   label: 'Asso ref demo',
                   displayFieldName: '_id',
                   reference: {
+                    predicates: [],
                     targetCmsRecord: {
                       name: 'asso_ref_demo',
                       recordType: 'asso_ref_demo',
@@ -1489,6 +1618,14 @@ test('parseCmsConfig should parse example config', () => {
               label: 'Reference',
               displayFieldName: 'name',
               reference: {
+                predicates: [
+                  {
+                    name: 'name',
+                    type: 'not_equal_to',
+                    value: '',
+                    valueType: 'json_value',
+                  },
+                ],
                 targetCmsRecord: { name: 'ref_demo', recordType: 'ref_demo' },
                 type: 'DirectReference',
               },
@@ -1500,6 +1637,14 @@ test('parseCmsConfig should parse example config', () => {
               label: 'Back refs',
               displayFieldName: 'name',
               reference: {
+                predicates: [
+                  {
+                    name: 'name',
+                    type: 'not_equal_to',
+                    value: '',
+                    valueType: 'json_value',
+                  },
+                ],
                 sourceFieldName: 'reference',
                 targetCmsRecord: {
                   name: 'back_ref_demo',
@@ -1527,6 +1672,7 @@ test('parseCmsConfig should parse example config', () => {
                       label: 'Field demo',
                       displayFieldName: '_id',
                       reference: {
+                        predicates: [],
                         targetCmsRecord: {
                           name: 'field_demo',
                           recordType: 'field_demo',
@@ -1541,6 +1687,7 @@ test('parseCmsConfig should parse example config', () => {
                       label: 'Asso ref demo',
                       displayFieldName: '_id',
                       reference: {
+                        predicates: [],
                         targetCmsRecord: {
                           name: 'asso_ref_demo',
                           recordType: 'asso_ref_demo',
@@ -1551,12 +1698,21 @@ test('parseCmsConfig should parse example config', () => {
                     },
                   ],
                 },
+                predicates: [
+                  {
+                    name: 'name',
+                    type: 'not_equal_to',
+                    value: '',
+                    valueType: 'json_value',
+                  },
+                ],
                 sourceReference: {
                   compact: false,
                   name: 'field_demo',
                   label: 'Field demo',
                   displayFieldName: '_id',
                   reference: {
+                    predicates: [],
                     targetCmsRecord: {
                       name: 'field_demo',
                       recordType: 'field_demo',
@@ -1571,6 +1727,7 @@ test('parseCmsConfig should parse example config', () => {
                   label: 'Asso ref demo',
                   displayFieldName: '_id',
                   reference: {
+                    predicates: [],
                     targetCmsRecord: {
                       name: 'asso_ref_demo',
                       recordType: 'asso_ref_demo',
@@ -1603,6 +1760,7 @@ test('parseCmsConfig should parse example config', () => {
               ],
               positionFieldName: 'field_demo_position',
               reference: {
+                predicates: [],
                 sourceFieldName: 'reference',
                 targetCmsRecord: {
                   name: 'back_ref_demo',
@@ -1647,6 +1805,7 @@ test('parseCmsConfig should parse example config', () => {
                       label: 'Field demo',
                       displayFieldName: '_id',
                       reference: {
+                        predicates: [],
                         targetCmsRecord: {
                           name: 'field_demo',
                           recordType: 'field_demo',
@@ -1661,6 +1820,7 @@ test('parseCmsConfig should parse example config', () => {
                       label: 'Asso ref demo',
                       displayFieldName: '_id',
                       reference: {
+                        predicates: [],
                         targetCmsRecord: {
                           name: 'asso_ref_demo',
                           recordType: 'asso_ref_demo',
@@ -1671,12 +1831,14 @@ test('parseCmsConfig should parse example config', () => {
                     },
                   ],
                 },
+                predicates: [],
                 sourceReference: {
                   compact: false,
                   name: 'field_demo',
                   label: 'Field demo',
                   displayFieldName: '_id',
                   reference: {
+                    predicates: [],
                     targetCmsRecord: {
                       name: 'field_demo',
                       recordType: 'field_demo',
@@ -1691,6 +1853,7 @@ test('parseCmsConfig should parse example config', () => {
                   label: 'Asso ref demo',
                   displayFieldName: '_id',
                   reference: {
+                    predicates: [],
                     targetCmsRecord: {
                       name: 'asso_ref_demo',
                       recordType: 'asso_ref_demo',
@@ -1813,6 +1976,7 @@ test('parseCmsConfig should parse example config', () => {
               editable: true,
               displayFieldName: 'name',
               reference: {
+                predicates: [],
                 sourceFieldName: 'reference',
                 targetCmsRecord: {
                   name: 'field_demo',
@@ -1832,6 +1996,7 @@ test('parseCmsConfig should parse example config', () => {
               editable: true,
               displayFieldName: 'name',
               reference: {
+                predicates: [],
                 sourceFieldName: 'reference',
                 targetCmsRecord: {
                   name: 'field_demo',
@@ -1862,6 +2027,7 @@ test('parseCmsConfig should parse example config', () => {
               editable: true,
               displayFieldName: 'name',
               reference: {
+                predicates: [],
                 sourceFieldName: 'reference',
                 targetCmsRecord: {
                   name: 'field_demo',
@@ -1881,6 +2047,7 @@ test('parseCmsConfig should parse example config', () => {
               editable: true,
               displayFieldName: 'name',
               reference: {
+                predicates: [],
                 sourceFieldName: 'reference',
                 targetCmsRecord: {
                   name: 'field_demo',
@@ -1916,6 +2083,7 @@ test('parseCmsConfig should parse example config', () => {
               label: 'Field references',
               displayFieldName: 'name',
               reference: {
+                predicates: [],
                 sourceFieldName: 'reference',
                 targetCmsRecord: {
                   name: 'field_demo',
@@ -1934,6 +2102,7 @@ test('parseCmsConfig should parse example config', () => {
               label: 'Field references',
               displayFieldName: 'name',
               reference: {
+                predicates: [],
                 sourceFieldName: 'reference',
                 targetCmsRecord: {
                   name: 'field_demo',
@@ -1961,6 +2130,7 @@ test('parseCmsConfig should parse example config', () => {
               addButton: { enabled: false, label: '' },
               displayFieldName: 'name',
               reference: {
+                predicates: [],
                 targetCmsRecord: {
                   name: 'field_demo',
                   recordType: 'field_demo',
@@ -1987,6 +2157,7 @@ test('parseCmsConfig should parse example config', () => {
               addButton: { enabled: false, label: '' },
               displayFieldName: 'name',
               reference: {
+                predicates: [],
                 targetCmsRecord: {
                   name: 'field_demo',
                   recordType: 'field_demo',
@@ -2010,6 +2181,7 @@ test('parseCmsConfig should parse example config', () => {
               addButton: { enabled: false, label: '' },
               displayFieldName: 'name',
               reference: {
+                predicates: [],
                 targetCmsRecord: {
                   name: 'field_demo',
                   recordType: 'field_demo',
@@ -2036,6 +2208,7 @@ test('parseCmsConfig should parse example config', () => {
               addButton: { enabled: false, label: '' },
               displayFieldName: 'name',
               reference: {
+                predicates: [],
                 targetCmsRecord: {
                   name: 'field_demo',
                   recordType: 'field_demo',
@@ -2064,6 +2237,7 @@ test('parseCmsConfig should parse example config', () => {
               label: 'Reference',
               displayFieldName: 'name',
               reference: {
+                predicates: [],
                 targetCmsRecord: {
                   name: 'field_demo',
                   recordType: 'field_demo',
@@ -2087,6 +2261,7 @@ test('parseCmsConfig should parse example config', () => {
               label: 'Reference',
               displayFieldName: 'name',
               reference: {
+                predicates: [],
                 targetCmsRecord: {
                   name: 'field_demo',
                   recordType: 'field_demo',
