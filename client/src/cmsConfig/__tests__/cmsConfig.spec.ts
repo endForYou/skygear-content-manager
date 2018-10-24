@@ -177,6 +177,7 @@ describe('parseCmsConfig records and association records', () => {
               label: 'Admin id',
               name: 'admin_id',
               reference: {
+                predicates: [],
                 targetCmsRecord: {
                   name: 'admin',
                   recordType: 'user',
@@ -191,6 +192,7 @@ describe('parseCmsConfig records and association records', () => {
               label: 'Product id',
               name: 'product_id',
               reference: {
+                predicates: [],
                 targetCmsRecord: {
                   name: 'product',
                   recordType: 'product',

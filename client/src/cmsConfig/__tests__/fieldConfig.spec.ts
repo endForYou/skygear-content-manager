@@ -26,6 +26,7 @@ const context: ConfigContext = {
           label: 'A id',
           name: 'a_id',
           reference: {
+            predicates: [],
             targetCmsRecord: {
               name: 'RecordA',
               recordType: 'a',
@@ -40,6 +41,7 @@ const context: ConfigContext = {
           label: 'B id',
           name: 'b_id',
           reference: {
+            predicates: [],
             targetCmsRecord: {
               name: 'RecordB',
               recordType: 'b',
@@ -130,6 +132,7 @@ describe('parseFieldConfig Reference', () => {
       label: 'A',
       name: 'A',
       reference: {
+        predicates: [],
         targetCmsRecord: {
           name: 'RecordA',
           recordType: 'a',
@@ -153,6 +156,7 @@ describe('parseFieldConfig Reference', () => {
       label: 'A',
       name: 'A',
       reference: {
+        predicates: [],
         targetCmsRecord: {
           name: 'RecordA',
           recordType: 'a',
@@ -188,6 +192,7 @@ describe('parseFieldConfig Reference', () => {
       label: 'A',
       name: 'A',
       reference: {
+        predicates: [],
         sourceFieldName: 'a_id',
         targetCmsRecord: {
           name: 'RecordB',
@@ -237,6 +242,7 @@ describe('parseFieldConfig Reference', () => {
               label: 'A id',
               name: 'a_id',
               reference: {
+                predicates: [],
                 targetCmsRecord: {
                   name: 'RecordA',
                   recordType: 'a',
@@ -251,6 +257,7 @@ describe('parseFieldConfig Reference', () => {
               label: 'B id',
               name: 'b_id',
               reference: {
+                predicates: [],
                 targetCmsRecord: {
                   name: 'RecordB',
                   recordType: 'b',
@@ -261,12 +268,14 @@ describe('parseFieldConfig Reference', () => {
             },
           ],
         },
+        predicates: [],
         sourceReference: {
           compact: false,
           displayFieldName: '_id',
           label: 'A id',
           name: 'a_id',
           reference: {
+            predicates: [],
             targetCmsRecord: {
               name: 'RecordA',
               recordType: 'a',
@@ -281,6 +290,7 @@ describe('parseFieldConfig Reference', () => {
           label: 'B id',
           name: 'b_id',
           reference: {
+            predicates: [],
             targetCmsRecord: {
               name: 'RecordB',
               recordType: 'b',
@@ -347,6 +357,7 @@ describe('parseFieldConfig EmbeddedReference', () => {
       name: 'A',
       positionFieldName: undefined,
       reference: {
+        predicates: [],
         sourceFieldName: 'a_id',
         targetCmsRecord: {
           name: 'RecordB',

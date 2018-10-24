@@ -19,6 +19,7 @@ import {
   CmsRecord,
   DateTimeFilter,
   DateTimeFilterQueryType,
+  DirectReference,
   EmbeddedAssociationReferenceListFieldConfig,
   EmbeddedBackReferenceListFieldConfig,
   EmbeddedReferenceListFieldConfig,
@@ -731,6 +732,11 @@ function queryWithTarget(
       queryResult = qr;
       sources = qr.map(r => r);
 
+      return Promise.all(
+        refs.map(ref => filterRefInTransientIncludedWithPredicate(sources, ref))
+      );
+    })
+    .then(() => {
       // group back reference and embedded back reference
       const backRefsAttrs = references
         .filter(r => r.reference.type === ReferenceTypes.ViaBackReference)
@@ -841,6 +847,36 @@ function fetchEmbeddedRecordData(
   return Promise.all(nextLevelQueries);
 }
 
+function filterRefInTransientIncludedWithPredicate(
+  sources: Record[],
+  directRef: ReferenceFieldConfig
+) {
+  // ignore record without reference
+  sources = sources.filter(src => src.$transient[directRef.name] != null);
+
+  // skip if no predicates
+  if (directRef.reference.predicates.length === 0) {
+    return Promise.resolve();
+  }
+
+  const reference = directRef.reference as DirectReference;
+  const query = new Query(Record.extend(reference.targetCmsRecord.recordType));
+  applyPredicatesToQuery(query, directRef.reference.predicates);
+  query.contains('_id', sources.map(src => src.$transient[directRef.name]._id));
+
+  // query with predicate in configuration
+  // if record not found in query result, the result is filtered
+  return skygear.publicDB.query(query).then(fetchedRefs => {
+    const ids = fetchedRefs.map(fetchedRef => fetchedRef.id);
+    sources.forEach(source => {
+      if (ids.indexOf(source.$transient[directRef.name].id) === -1) {
+        source[directRef.name] = null;
+        source.$transient[directRef.name] = null;
+      }
+    });
+  });
+}
+
 function fetchAllReferentsWithTarget(
   sources: Record[],
   refs: BackReferenceAttrs[]
@@ -883,6 +919,7 @@ function fetchReferentsWithTarget(
     backRefConfig.reference.targetCmsRecord.recordType,
     backRefConfig.reference.sourceFieldName,
     {
+      predicates: backRefConfig.reference.predicates,
       sortAscending: backRefConfig.sortOrder === SortOrder.Asc,
       sortByField: backRefConfig.positionFieldName,
     }
@@ -939,6 +976,12 @@ function fetchAssociationRecordsWithTarget(
     assoRefConfig.reference.associationRecordConfig.cmsRecord.recordType,
     assoRefConfig.reference.sourceReference.name,
     {
+      predicates: assoRefConfig.reference.predicates.map(predicate => ({
+        ...predicate,
+        name:
+          `${assoRefConfig.reference.targetReference.name}` +
+          `.${predicate.name}`,
+      })),
       sortAscending: assoRefConfig.sortOrder === SortOrder.Asc,
       sortByField: assoRefConfig.positionFieldName,
       transientIncludeFieldName: assoRefConfig.reference.targetReference.name,
@@ -954,6 +997,7 @@ function fetchReferentRecords(
     transientIncludeFieldName?: string;
     sortByField?: string;
     sortAscending?: boolean;
+    predicates: Predicate[];
   }
 ): Promise<Record[]> {
   const query = new Query(Record.extend(recordType));
@@ -975,6 +1019,10 @@ function fetchReferentRecords(
   query.contains(sourceFieldName, sourceIds);
   if (option && option.transientIncludeFieldName) {
     query.transientInclude(option.transientIncludeFieldName);
+  }
+
+  if (option) {
+    applyPredicatesToQuery(query, option.predicates);
   }
 
   return skygear.publicDB

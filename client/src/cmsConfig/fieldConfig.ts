@@ -8,6 +8,7 @@ import {
   RecordTypeContext,
   recursivelyApplyFn,
 } from './cmsConfig';
+import { parsePredicateConfig, PredicateValue } from './predicateConfig';
 import {
   parseOptionalBoolean,
   parseOptionalDate,
@@ -217,18 +218,22 @@ export enum ReferenceTypes {
   ViaAssociationRecord = 'ViaAssociationRecord',
 }
 
-export interface DirectReference {
+interface ReferenceAttrs {
+  predicates: PredicateValue;
+}
+
+export interface DirectReference extends ReferenceAttrs {
   type: ReferenceTypes.DirectReference;
   targetCmsRecord: CmsRecord;
 }
 
-export interface ReferenceViaBackReference {
+export interface ReferenceViaBackReference extends ReferenceAttrs {
   type: ReferenceTypes.ViaBackReference;
   sourceFieldName: string;
   targetCmsRecord: CmsRecord;
 }
 
-export interface ReferenceViaAssociationRecord {
+export interface ReferenceViaAssociationRecord extends ReferenceAttrs {
   type: ReferenceTypes.ViaAssociationRecord;
 
   // the AssociationRecordConfig that this reference is made on
@@ -636,6 +641,7 @@ function parseReferenceFieldConfigAttrs(
   const targetCmsRecord = cmsRecordData.record;
 
   return {
+    predicates: parsePredicateConfig(input.predicates, context) || [],
     targetCmsRecord,
     type: ReferenceTypes.DirectReference,
   };
@@ -837,6 +843,7 @@ function parseBackReferenceFieldConfigAttrs(
   );
 
   return {
+    predicates: parsePredicateConfig(input.predicates, context) || [],
     sourceFieldName,
     targetCmsRecord,
     type: ReferenceTypes.ViaBackReference,
@@ -871,6 +878,7 @@ function parseAssociationReferenceFieldConfigAttrs(
 
   return {
     associationRecordConfig,
+    predicates: parsePredicateConfig(input.predicates, context) || [],
     sourceReference,
     targetReference,
     type: ReferenceTypes.ViaAssociationRecord,

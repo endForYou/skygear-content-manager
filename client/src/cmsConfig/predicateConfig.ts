@@ -1,6 +1,7 @@
 import { isArray } from 'util';
 
-import { CmsRecord, ConfigContext } from '.';
+import { CmsRecord } from '.';
+import { RecordTypeContext } from './cmsConfig';
 import { parseString } from './util';
 
 export enum PredicateTypes {
@@ -50,7 +51,7 @@ interface ReferencePredicate extends PredicateAttrs {
 export function parsePredicateConfig(
   // tslint:disable-next-line: no-any
   input: any,
-  context: ConfigContext
+  context: RecordTypeContext
 ): PredicateValue | undefined {
   if (input == null) {
     return undefined;
@@ -62,7 +63,7 @@ export function parsePredicateConfig(
 function parsePredicateValue(
   // tslint:disable-next-line: no-any
   input: any,
-  context: ConfigContext
+  context: RecordTypeContext
 ): PredicateValue {
   if (!isArray(input)) {
     throw new Error('Expected array of predicate');
@@ -153,7 +154,7 @@ function parseJSONValuePredicate(input: any): JSONValuePredicate {
 function parseReferencePredicate(
   // tslint:disable-next-line: no-any
   input: any,
-  context: ConfigContext
+  context: RecordTypeContext
 ): ReferencePredicate {
   const targetRecordName = parseString(
     input.value,

@@ -148,11 +148,19 @@ records:
           type: reference
           reference_target: ref_demo
           reference_field_name: name
+          predicates:
+            - name: name
+              predicate: not_equal_to
+              value: ""
         - name: back_refs
           type: reference_list
           reference_via_back_reference: back_ref_demo
           reference_from_field: reference
           reference_field_name: name
+          predicates:
+            - name: name
+              predicate: not_equal_to
+              value: ""
         - name: imageasset
           type: image
         - name: fileasset
@@ -183,6 +191,10 @@ records:
           reference_target: ref_demo
           reference_field_name: name
           nullable: true
+          predicates:
+            - name: name
+              predicate: not_equal_to
+              value: ""
     show:
       fields:
         - name: _id
@@ -210,16 +222,28 @@ records:
           type: reference
           reference_target: ref_demo
           reference_field_name: name
+          predicates:
+            - name: name
+              predicate: not_equal_to
+              value: ""
         - name: back_refs
           type: reference_list
           reference_via_back_reference: back_ref_demo
           reference_from_field: reference
           reference_field_name: name
+          predicates:
+            - name: name
+              predicate: not_equal_to
+              value: ""
         - name: asso_refs
           type: reference_list
           reference_via_association_record: field_asso_ref
           reference_target: asso_ref_demo
           reference_field_name: name
+          predicates:
+            - name: name
+              predicate: not_equal_to
+              value: ""
         - name: back_refs_embedded
           type: embedded_reference_list
           reference_via_back_reference: back_ref_demo
@@ -291,11 +315,19 @@ records:
           reference_field_name: name
           add_button:
             enabled: true
+          predicates:
+            - name: name
+              predicate: not_equal_to
+              value: ""
         - name: back_refs
           type: reference_list
           reference_via_back_reference: back_ref_demo
           reference_from_field: reference
           reference_field_name: name
+          predicates:
+            - name: name
+              predicate: not_equal_to
+              value: ""
         - name: back_refs_embedded
           type: embedded_reference_list
           reference_via_back_reference: back_ref_demo
