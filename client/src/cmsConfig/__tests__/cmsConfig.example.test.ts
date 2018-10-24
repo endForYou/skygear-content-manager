@@ -741,7 +741,14 @@ test('parseCmsConfig should parse example config', () => {
               label: 'Reference',
               nullable: true,
               displayFieldName: 'name',
-              predicates: [],
+              predicates: [
+                {
+                  name: 'name',
+                  type: 'not_equal_to',
+                  value: '',
+                  valueType: 'json_value',
+                },
+              ],
               targetCmsRecord: { name: 'ref_demo', recordType: 'ref_demo' },
               type: 'reference',
             },

@@ -191,6 +191,10 @@ records:
           reference_target: ref_demo
           reference_field_name: name
           nullable: true
+          predicates:
+            - name: name
+              predicate: not_equal_to
+              value: ""
     show:
       fields:
         - name: _id
