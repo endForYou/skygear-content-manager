@@ -8,6 +8,7 @@ import {
 import 'react-select/dist/react-select.css';
 import skygear, { Query, Record } from 'skygear';
 
+import { applyPredicatesToQuery } from '../actions/record';
 import { ReferenceFilterConfig } from '../cmsConfig';
 import { debouncePromise1, makeArray } from '../util';
 import { RequiredFilterInputProps } from './FilterInput';
@@ -53,10 +54,11 @@ class ReferenceFilterInputImpl extends React.PureComponent<
   }
 
   public loadOptions: LoadOptionsAsyncHandler<string> = input => {
-    const { displayFieldName, targetCmsRecord } = this.props.config;
+    const { displayFieldName, predicates, targetCmsRecord } = this.props.config;
 
     const RecordCls = Record.extend(targetCmsRecord.recordType);
     const query = new Query(RecordCls);
+    applyPredicatesToQuery(query, predicates);
     if (input !== '') {
       query.caseInsensitiveLike(
         this.props.config.displayFieldName,

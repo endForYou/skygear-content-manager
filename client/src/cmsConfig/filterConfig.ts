@@ -10,6 +10,7 @@ import {
 
 import { TimezoneValue } from '../types';
 import { CmsRecord, ConfigContext, RecordTypeContext } from './cmsConfig';
+import { parsePredicateConfig, Predicate } from './predicateConfig';
 
 export type FilterConfig =
   | StringFilterConfig
@@ -60,6 +61,7 @@ export interface ReferenceFilterConfig extends FilterConfigAttrs {
   type: FilterConfigTypes.Reference;
   targetCmsRecord: CmsRecord;
   displayFieldName: string;
+  predicates: Predicate[];
 }
 
 export function parseFilterConfig(
@@ -174,6 +176,7 @@ function parseReferenceFilterConfig(
   return {
     ...parseFilterConfigAttrs(input, 'reference'),
     displayFieldName,
+    predicates: parsePredicateConfig(input.predicates, context) || [],
     targetCmsRecord,
     type: FilterConfigTypes.Reference,
   };

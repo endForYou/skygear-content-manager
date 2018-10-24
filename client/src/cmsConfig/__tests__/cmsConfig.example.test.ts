@@ -741,6 +741,7 @@ test('parseCmsConfig should parse example config', () => {
               label: 'Reference',
               nullable: true,
               displayFieldName: 'name',
+              predicates: [],
               targetCmsRecord: { name: 'ref_demo', recordType: 'ref_demo' },
               type: 'reference',
             },
