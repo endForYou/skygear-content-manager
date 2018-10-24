@@ -34,42 +34,30 @@ export interface FilterConfigAttrs {
   nullable: boolean;
 }
 
-interface FilterConfigInput {
-  type: string;
-  label: string;
-  nullable: boolean;
-}
-
-export interface StringFilterConfig extends FilterConfigInput {
+export interface StringFilterConfig extends FilterConfigAttrs {
   type: FilterConfigTypes.String;
-  name: string;
 }
 
-export interface NumberFilterConfig extends FilterConfigInput {
+export interface NumberFilterConfig extends FilterConfigAttrs {
   type: FilterConfigTypes.Number;
-  name: string;
 }
 
-export interface BooleanFilterConfig extends FilterConfigInput {
+export interface BooleanFilterConfig extends FilterConfigAttrs {
   type: FilterConfigTypes.Boolean;
-  name: string;
 }
 
-export interface DateTimeFilterConfig extends FilterConfigInput {
+export interface DateTimeFilterConfig extends FilterConfigAttrs {
   type: FilterConfigTypes.DateTime;
-  name: string;
   timezone?: TimezoneValue;
 }
 
-export interface GeneralFilterConfig extends FilterConfigInput {
+export interface GeneralFilterConfig extends FilterConfigAttrs {
   type: FilterConfigTypes.General;
-  name: string;
   names: string[];
 }
 
-export interface ReferenceFilterConfig extends FilterConfigInput {
+export interface ReferenceFilterConfig extends FilterConfigAttrs {
   type: FilterConfigTypes.Reference;
-  name: string;
   targetCmsRecord: CmsRecord;
   displayFieldName: string;
 }
@@ -111,14 +99,16 @@ function parseFilterConfigAttrs(
   return { name, label, nullable };
 }
 
-function parseStringFilterConfig(input: FilterConfigInput): StringFilterConfig {
+// tslint:disable-next-line:no-any
+function parseStringFilterConfig(input: any): StringFilterConfig {
   return {
     ...parseFilterConfigAttrs(input, 'string'),
     type: FilterConfigTypes.String,
   };
 }
 
-function parseNumberFilterConfig(input: FilterConfigInput): NumberFilterConfig {
+// tslint:disable-next-line:no-any
+function parseNumberFilterConfig(input: any): NumberFilterConfig {
   return {
     ...parseFilterConfigAttrs(input, 'number'),
     type: FilterConfigTypes.Number,
@@ -126,7 +116,8 @@ function parseNumberFilterConfig(input: FilterConfigInput): NumberFilterConfig {
 }
 
 function parseBooleanFilterConfig(
-  input: FilterConfigInput
+  // tslint:disable-next-line:no-any
+  input: any
 ): BooleanFilterConfig {
   return {
     ...parseFilterConfigAttrs(input, 'boolean'),
@@ -147,7 +138,8 @@ function parseDateTimeFilterConfig(
 }
 
 function parseGeneralFilterConfig(
-  input: FilterConfigInput
+  // tslint:disable-next-line:no-any
+  input: any
 ): GeneralFilterConfig {
   const label =
     parseOptionalString(input, 'label', 'general') || humanize(name);
@@ -163,7 +155,8 @@ function parseGeneralFilterConfig(
 }
 
 function parseReferenceFilterConfig(
-  input: FilterConfigInput,
+  // tslint:disable-next-line:no-any
+  input: any,
   context: ConfigContext
 ): ReferenceFilterConfig {
   const targetRecordName = parseString(input, 'reference_target', 'reference');
