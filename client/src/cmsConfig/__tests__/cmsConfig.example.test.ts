@@ -1929,14 +1929,7 @@ test('parseCmsConfig should parse example config', () => {
           references: [],
         },
         show: {
-          actions: [
-            {
-              href: '/record/{cmsRecord.name}/{record._id}/edit',
-              label: 'Edit',
-              target: '',
-              type: 'link',
-            },
-          ],
+          actions: [],
           cmsRecord: { name: 'field_demo_deleted', recordType: 'field_demo' },
           fields: [
             { compact: false, label: 'ID', name: '_id', type: 'text_display' },
@@ -2284,14 +2277,7 @@ test('parseCmsConfig should parse example config', () => {
       asso_ref_demo: {
         cmsRecord: { name: 'asso_ref_demo', recordType: 'asso_ref_demo' },
         show: {
-          actions: [
-            {
-              href: '/record/{cmsRecord.name}/{record._id}/edit',
-              label: 'Edit',
-              target: '',
-              type: 'link',
-            },
-          ],
+          actions: [],
           cmsRecord: { name: 'asso_ref_demo', recordType: 'asso_ref_demo' },
           fields: [
             { compact: false, label: 'ID', name: '_id', type: 'text_display' },
