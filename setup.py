@@ -43,7 +43,7 @@ setup(
       install_requires=[
             'arrow>=0.12.1',
             'humanfriendly>=4.16.1',
-            'marshmallow>=3.0.0b7',
+            'marshmallow>=3.0.0b7,<=3.0.0b18',
             'python-jose>=2.0',
             'requests>=2.18.4',
             'ruamel.yaml>=0.15.40',
