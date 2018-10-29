@@ -40,7 +40,7 @@ class NewPageContainerImpl extends React.PureComponent<Props> {
       'new'
     );
 
-    this.newRecord = new (Record.extend(props.config.cmsRecord.name))();
+    this.newRecord = new (Record.extend(props.config.cmsRecord.recordType))();
     props.config.fields
       .filter(isFieldEditable)
       .filter(field => field.defaultValue !== undefined)
