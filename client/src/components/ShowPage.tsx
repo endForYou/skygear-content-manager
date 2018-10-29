@@ -55,8 +55,8 @@ export class ShowPage extends React.PureComponent<ShowPageProps> {
           }
           actionContext={
             remoteRecord.type === RemoteType.Success
-              ? { record: remoteRecord.value }
-              : {}
+              ? { record: remoteRecord.value, cmsRecord: config.cmsRecord }
+              : { cmsRecord: config.cmsRecord }
           }
         />
         {content}

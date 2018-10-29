@@ -87,8 +87,8 @@ class EditPageContainerImpl extends React.PureComponent<Props> {
           }
           actionContext={
             remoteRecord.type === RemoteType.Success
-              ? { record: remoteRecord.value }
-              : {}
+              ? { record: remoteRecord.value, cmsRecord: config.cmsRecord }
+              : { cmsRecord: config.cmsRecord }
           }
         />
         {content}

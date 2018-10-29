@@ -15,6 +15,7 @@ import {
 } from '../actions/record';
 import {
   ActionConfigTypes,
+  CmsRecord,
   ExportActionConfig,
   FieldConfig,
   FieldConfigTypes,
@@ -164,12 +165,14 @@ const TableHeader: React.SFC<TableHeaderProps> = ({
 };
 
 interface TableRowProps {
+  cmsRecord: CmsRecord;
   fieldConfigs: FieldConfig[];
   itemActions: ListItemActionConfig[];
   record: Record;
 }
 
 const TableRow: React.SFC<TableRowProps> = ({
+  cmsRecord,
   fieldConfigs,
   itemActions,
   record,
@@ -195,7 +198,7 @@ const TableRow: React.SFC<TableRowProps> = ({
             key={index}
             className="item-action"
             actionConfig={action}
-            context={{ record }}
+            context={{ record, cmsRecord }}
           />
         ))}
       </div>
@@ -204,12 +207,14 @@ const TableRow: React.SFC<TableRowProps> = ({
 };
 
 interface TableBodyProps {
+  cmsRecord: CmsRecord;
   fieldConfigs: FieldConfig[];
   itemActions: ListItemActionConfig[];
   records: Record[];
 }
 
 const TableBody: React.SFC<TableBodyProps> = ({
+  cmsRecord,
   fieldConfigs,
   itemActions,
   records,
@@ -218,6 +223,7 @@ const TableBody: React.SFC<TableBodyProps> = ({
     return (
       <TableRow
         key={index}
+        cmsRecord={cmsRecord}
         fieldConfigs={fieldConfigs}
         itemActions={itemActions}
         record={record}
@@ -228,6 +234,7 @@ const TableBody: React.SFC<TableBodyProps> = ({
 };
 
 interface ListTableProps {
+  cmsRecord: CmsRecord;
   fieldConfigs: FieldConfig[];
   itemActions: ListItemActionConfig[];
   sortState: SortState;
@@ -236,6 +243,7 @@ interface ListTableProps {
 }
 
 const ListTable: React.SFC<ListTableProps> = ({
+  cmsRecord,
   fieldConfigs,
   itemActions,
   onSortButtonClick,
@@ -250,6 +258,7 @@ const ListTable: React.SFC<ListTableProps> = ({
         onSortButtonClick={onSortButtonClick}
       />
       <TableBody
+        cmsRecord={cmsRecord}
         fieldConfigs={fieldConfigs}
         itemActions={itemActions}
         records={records}
@@ -353,7 +362,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
   }
 
   public renderActionButton(
-    recordName: string,
+    cmsRecord: CmsRecord,
     actionConfig: ListActionConfig,
     index: number
   ) {
@@ -383,7 +392,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
             className="list-action primary-button"
             actionConfig={actionConfig}
             context={{
-              record_type: recordName,
+              cmsRecord,
             }}
           />
         );
@@ -393,9 +402,9 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
   }
 
   public renderActionButtons() {
-    const { recordName, pageConfig: { actions } } = this.props;
+    const { pageConfig: { actions, cmsRecord } } = this.props;
     const actionsButtons = actions.map((action, index) =>
-      this.renderActionButton(recordName, action, index)
+      this.renderActionButton(cmsRecord, action, index)
     );
     return actionsButtons;
   }
@@ -544,6 +553,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
               } else {
                 return (
                   <ListTable
+                    cmsRecord={pageConfig.cmsRecord}
                     fieldConfigs={pageConfig.fields}
                     itemActions={pageConfig.itemActions}
                     records={records}

@@ -55,7 +55,10 @@ class NewPageContainerImpl extends React.PureComponent<Props> {
         <RecordFormTopbar
           title={`Create New ${config.label}`}
           actions={config.actions}
-          actionContext={{ record: this.newRecord }}
+          actionContext={{
+            cmsRecord: config.cmsRecord,
+            record: this.newRecord,
+          }}
         />
         <RecordFormPage
           className="record-form"
