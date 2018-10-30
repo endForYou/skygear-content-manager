@@ -12,7 +12,7 @@ future==0.16.0
 humanfriendly==4.16.1
 idna==2.6
 jmespath==0.9.3
-marshmallow==3.0.0b11
+marshmallow==3.0.0b18
 psycopg2==2.7.4
 pycryptodome==3.5.1
 python-dateutil==2.6.1

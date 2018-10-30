@@ -28,6 +28,9 @@ class CMSConfigSchema(Schema):
     imports = NestedDict('CMSRecordImportSchema', key='name', required=False)
     exports = NestedDict('CMSRecordExportSchema', key='name', required=False)
 
+    class Meta:
+        unknown = 'exclude'
+
     @pre_load
     def pre_load(self, data):
         return data
@@ -242,6 +245,9 @@ class CMSAssociationRecordFieldSchema(Schema):
 
     name = fields.String()
     reference_target = fields.String()
+
+    class Meta:
+        unknown = 'exclude'
 
     @post_load
     def make_object(self, data):
