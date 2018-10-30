@@ -23,8 +23,8 @@ function applyContext(href: string, context: any): string {
       .reduce((acc: string, [key, value]: [string, any]) => {
         const type = typeof value;
         return type !== 'string' && type !== 'boolean' && type !== 'number'
-          ? href.replace(new RegExp(`{${key}}`), '')
-          : href.replace(new RegExp(`{${key}}`), value);
+          ? acc.replace(new RegExp(`{${key}}`), '')
+          : acc.replace(new RegExp(`{${key}}`), value);
       }, href)
   );
 }

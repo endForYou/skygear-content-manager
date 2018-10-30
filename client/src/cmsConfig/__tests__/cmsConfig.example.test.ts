@@ -551,7 +551,7 @@ test('parseCmsConfig should parse example config', () => {
         list: {
           actions: [
             {
-              href: '/records/{record_type}/new',
+              href: '/records/{cmsRecord.name}/new',
               label: 'Add',
               target: '',
               type: 'link',
@@ -755,13 +755,13 @@ test('parseCmsConfig should parse example config', () => {
           ],
           itemActions: [
             {
-              href: '/record/{record.id}',
+              href: '/record/{cmsRecord.name}/{record._id}',
               label: 'Show',
               target: '',
               type: 'link',
             },
             {
-              href: '/record/{record.id}/edit',
+              href: '/record/{cmsRecord.name}/{record._id}/edit',
               label: 'Edit',
               target: '',
               type: 'link',
@@ -1271,7 +1271,7 @@ test('parseCmsConfig should parse example config', () => {
         show: {
           actions: [
             {
-              href: '/record/{record.id}/edit',
+              href: '/record/{cmsRecord.name}/{record._id}/edit',
               label: 'Edit',
               target: '',
               type: 'link',
@@ -1910,7 +1910,7 @@ test('parseCmsConfig should parse example config', () => {
           ],
           itemActions: [
             {
-              href: '/record/{record.id}',
+              href: '/record/{cmsRecord.name}/{record._id}',
               label: 'Show',
               target: '',
               type: 'link',
@@ -1929,14 +1929,7 @@ test('parseCmsConfig should parse example config', () => {
           references: [],
         },
         show: {
-          actions: [
-            {
-              href: '/record/{record.id}/edit',
-              label: 'Edit',
-              target: '',
-              type: 'link',
-            },
-          ],
+          actions: [],
           cmsRecord: { name: 'field_demo_deleted', recordType: 'field_demo' },
           fields: [
             { compact: false, label: 'ID', name: '_id', type: 'text_display' },
@@ -2070,7 +2063,7 @@ test('parseCmsConfig should parse example config', () => {
         show: {
           actions: [
             {
-              href: '/record/{record.id}/edit',
+              href: '/record/{cmsRecord.name}/{record._id}/edit',
               label: 'Edit',
               target: '',
               type: 'link',
@@ -2230,7 +2223,7 @@ test('parseCmsConfig should parse example config', () => {
         show: {
           actions: [
             {
-              href: '/record/{record.id}/edit',
+              href: '/record/{cmsRecord.name}/{record._id}/edit',
               label: 'Edit',
               target: '',
               type: 'link',
@@ -2284,14 +2277,7 @@ test('parseCmsConfig should parse example config', () => {
       asso_ref_demo: {
         cmsRecord: { name: 'asso_ref_demo', recordType: 'asso_ref_demo' },
         show: {
-          actions: [
-            {
-              href: '/record/{record.id}/edit',
-              label: 'Edit',
-              target: '',
-              type: 'link',
-            },
-          ],
+          actions: [],
           cmsRecord: { name: 'asso_ref_demo', recordType: 'asso_ref_demo' },
           fields: [
             { compact: false, label: 'ID', name: '_id', type: 'text_display' },

@@ -7,7 +7,7 @@ describe('mapDefaultActionToAction', () => {
     };
     const result = mapDefaultActionToAction(input);
     expect(result).toEqual({
-      href: '/records/{record_type}/new',
+      href: '/records/{cmsRecord.name}/new',
       label: 'Add',
       type: 'link',
     });
@@ -28,7 +28,7 @@ describe('mapDefaultActionToAction', () => {
     };
     const result = mapDefaultActionToAction(input);
     expect(result).toEqual({
-      href: '/records/{record_type}/new',
+      href: '/records/{cmsRecord.name}/new',
       label: 'Customized',
       type: 'link',
     });
@@ -41,7 +41,7 @@ describe('mapDefaultActionToAction', () => {
     };
     const result = mapDefaultActionToAction(input);
     expect(result).toEqual({
-      href: '/records/{record_type}/new',
+      href: '/records/{cmsRecord.name}/new',
       label: 'Add',
       type: 'link',
     });

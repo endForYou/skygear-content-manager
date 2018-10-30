@@ -40,7 +40,7 @@ class NewPageContainerImpl extends React.PureComponent<Props> {
       'new'
     );
 
-    this.newRecord = new (Record.extend(props.config.cmsRecord.name))();
+    this.newRecord = new (Record.extend(props.config.cmsRecord.recordType))();
     props.config.fields
       .filter(isFieldEditable)
       .filter(field => field.defaultValue !== undefined)
@@ -55,7 +55,10 @@ class NewPageContainerImpl extends React.PureComponent<Props> {
         <RecordFormTopbar
           title={`Create New ${config.label}`}
           actions={config.actions}
-          actionContext={{ record: this.newRecord }}
+          actionContext={{
+            cmsRecord: config.cmsRecord,
+            record: this.newRecord,
+          }}
         />
         <RecordFormPage
           className="record-form"

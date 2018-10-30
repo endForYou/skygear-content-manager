@@ -661,7 +661,7 @@ function parseShowPageConfig(
     .map((f: any) => parseFieldConfig(context, f)) as FieldConfig[];
 
   return {
-    actions: parseShowActions(input.actions),
+    actions: parseShowActions(input.actions, context, cmsRecord),
     cmsRecord,
     fields,
     label,
@@ -669,8 +669,12 @@ function parseShowPageConfig(
   };
 }
 
-// tslint:disable-next-line: no-any
-function parseShowActions(input: any): ShowActionConfig[] {
+function parseShowActions(
+  // tslint:disable-next-line: no-any
+  input: any,
+  context: ConfigContext,
+  cmsRecord: CmsRecord
+): ShowActionConfig[] {
   const itemActionTypes = [
     ActionConfigTypes.Link,
     ActionConfigTypes.EditButton,
@@ -678,12 +682,14 @@ function parseShowActions(input: any): ShowActionConfig[] {
 
   const defaultActions = [
     {
-      type: ActionConfigTypes.EditButton,
+      actionType: ActionConfigTypes.EditButton,
+      predicate: (c: PreParseCmsRecordConfig) =>
+        c.pages.has(RecordPageTypes.Edit),
     },
   ];
 
   if (input == null) {
-    input = defaultActions;
+    input = getDefaultActions(defaultActions, context, cmsRecord);
   }
 
   return (

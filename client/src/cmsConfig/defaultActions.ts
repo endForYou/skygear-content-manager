@@ -8,7 +8,7 @@ const defaultActionMap: { [key: string]: DefaultAction } = {
   add_button: {
     configurableKeys: ['label'],
     value: {
-      href: '/records/{record_type}/new',
+      href: '/records/{cmsRecord.name}/new',
       label: 'Add',
       type: 'link',
     },
@@ -16,7 +16,7 @@ const defaultActionMap: { [key: string]: DefaultAction } = {
   edit_button: {
     configurableKeys: ['label'],
     value: {
-      href: '/record/{record.id}/edit',
+      href: '/record/{cmsRecord.name}/{record._id}/edit',
       label: 'Edit',
       type: 'link',
     },
@@ -24,7 +24,7 @@ const defaultActionMap: { [key: string]: DefaultAction } = {
   show_button: {
     configurableKeys: ['label'],
     value: {
-      href: '/record/{record.id}',
+      href: '/record/{cmsRecord.name}/{record._id}',
       label: 'Show',
       type: 'link',
     },
