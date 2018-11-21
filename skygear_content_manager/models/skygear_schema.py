@@ -4,13 +4,29 @@ reserved_fields = {
         'name': '_id',
         'type': 'string',
     },
+    '_owner_id': {
+        'name': '_owner_id',
+        'type': 'string',
+    },
+    '_access': {
+        'name': '_access',
+        'type': 'json',
+    },
     '_created_at': {
         'name': '_created_at',
         'type': 'datetime',
     },
+    '_created_by': {
+        'name': '_created_by',
+        'type': 'string',
+    },
     '_updated_at': {
         'name': '_updated_at',
         'type': 'datetime',
+    },
+    '_updated_by': {
+        'name': '_updated_by',
+        'type': 'string',
     },
 }
 
