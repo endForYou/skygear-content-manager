@@ -80,6 +80,43 @@ describe('parseFieldConfig', () => {
     };
     expect(() => parseFieldConfig(minimalContext, input)).toThrow();
   });
+
+  it('should parse built-in fields', () => {
+    const inputs = [
+      '_id',
+      'id',
+      '_owner_id',
+      'ownerID',
+      '_access',
+      'access',
+      '_updated_at',
+      'updatedAt',
+      '_created_at',
+      'createdAt',
+      '_updated_by',
+      'updatedBy',
+      '_created_by',
+      'createdBy',
+    ];
+    inputs.forEach(input => {
+      const result = parseFieldConfig(minimalContext, { name: input });
+      expect(result).not.toBeNull();
+    });
+  });
+
+  it('should ignore built-in field type', () => {
+    const input = {
+      name: '_updated_at',
+      type: 'string',
+    };
+    const result = parseFieldConfig(minimalContext, input);
+    expect(result).toEqual({
+      compact: false,
+      label: 'Updated at',
+      name: 'updatedAt',
+      type: 'date_time_display',
+    });
+  });
 });
 
 describe('parseFieldConfig DateTime', () => {
