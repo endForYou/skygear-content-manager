@@ -403,18 +403,25 @@ export function parseNonReferenceFieldConfig(
   // built-in fields
   switch (a.name) {
     case '_id':
+    case 'id':
       return parseIdFieldConfig(a);
     case '_owner_id':
+    case 'ownerID':
       return parseOwnerIdFieldConfig(a);
     case '_access':
+    case 'access':
       return parseAccessFieldConfig(a);
     case '_created_at':
+    case 'createdAt':
       return parseCreatedAtFieldConfig(a, context);
     case '_updated_at':
+    case 'updatedAt':
       return parseUpdatedAtFieldConfig(a, context);
     case '_created_by':
+    case 'createdBy':
       return parseCreatedByFieldConfig(a, context);
     case '_updated_by':
+    case 'updatedBy':
       return parseUpdatedByFieldConfig(a, context);
   }
 
