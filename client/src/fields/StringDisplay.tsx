@@ -10,7 +10,8 @@ interface Props {
   name?: string;
   className?: string;
 
-  value: string;
+  // tslint:disable-next-line:no-any
+  value: any;
 }
 
 export const StringDisplay: React.SFC<Props> = ({
@@ -21,7 +22,7 @@ export const StringDisplay: React.SFC<Props> = ({
 }) => {
   return (
     <span {...rest} className={classnames(className, { full: !compact })}>
-      {value}
+      {typeof value === 'string' ? value : JSON.stringify(value)}
     </span>
   );
 };

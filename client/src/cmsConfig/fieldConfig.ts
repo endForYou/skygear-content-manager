@@ -403,11 +403,26 @@ export function parseNonReferenceFieldConfig(
   // built-in fields
   switch (a.name) {
     case '_id':
+    case 'id':
       return parseIdFieldConfig(a);
+    case '_owner_id':
+    case 'ownerID':
+      return parseOwnerIdFieldConfig(a);
+    case '_access':
+    case 'access':
+      return parseAccessFieldConfig(a);
     case '_created_at':
+    case 'createdAt':
       return parseCreatedAtFieldConfig(a, context);
     case '_updated_at':
+    case 'updatedAt':
       return parseUpdatedAtFieldConfig(a, context);
+    case '_created_by':
+    case 'createdBy':
+      return parseCreatedByFieldConfig(a, context);
+    case '_updated_by':
+    case 'updatedBy':
+      return parseUpdatedByFieldConfig(a, context);
   }
 
   switch (a.type) {
@@ -1003,8 +1018,39 @@ function parseIdFieldConfig(input: FieldConfigInput): TextDisplayFieldConfig {
 
   return {
     compact: false,
-    label: parseOptionalString(input, 'label', 'ID') || 'ID',
+    label: parseOptionalString(input, 'label', '_id') || 'ID',
     name: '_id',
+    type: FieldConfigTypes.TextDisplay,
+  };
+}
+
+function parseOwnerIdFieldConfig(
+  input: FieldConfigInput
+): TextDisplayFieldConfig {
+  if (input.type) {
+    console.log(`Type (${input.type}) is ignored in _owner_id field.`);
+  }
+
+  return {
+    compact: false,
+    label: parseOptionalString(input, 'label', '_owner_id') || 'Owner ID',
+    name: 'ownerID',
+    type: FieldConfigTypes.TextDisplay,
+  };
+}
+
+function parseAccessFieldConfig(
+  input: FieldConfigInput
+): TextDisplayFieldConfig {
+  // TODO: display in json
+  if (input.type) {
+    console.log(`Type (${input.type}) is ignored in _access field.`);
+  }
+
+  return {
+    compact: false,
+    label: parseOptionalString(input, 'label', '_access') || 'Access',
+    name: 'access',
     type: FieldConfigTypes.TextDisplay,
   };
 }
@@ -1042,6 +1088,38 @@ function parseUpdatedAtFieldConfig(
     name: 'updatedAt',
     timezone: parseTimezone(input, 'timezone'),
     type: FieldConfigTypes.DateTimeDisplay,
+  };
+}
+
+function parseCreatedByFieldConfig(
+  input: FieldConfigInput,
+  context: RecordTypeContext
+): TextDisplayFieldConfig {
+  if (input.type) {
+    console.log(`Type (${input.type}) is ignored in _created_by field`);
+  }
+
+  return {
+    compact: false,
+    label: parseOptionalString(input, 'label', '_created_by') || 'Created by',
+    name: 'createdBy',
+    type: FieldConfigTypes.TextDisplay,
+  };
+}
+
+function parseUpdatedByFieldConfig(
+  input: FieldConfigInput,
+  context: RecordTypeContext
+): TextDisplayFieldConfig {
+  if (input.type) {
+    console.log(`Type (${input.type}) is ignored in _updated_by field`);
+  }
+
+  return {
+    compact: false,
+    label: parseOptionalString(input, 'label', '_updated_by') || 'Updated by',
+    name: 'updatedBy',
+    type: FieldConfigTypes.TextDisplay,
   };
 }
 
