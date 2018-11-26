@@ -17,7 +17,7 @@ export const IntegerDisplayField: React.SFC<IntegerDisplayFieldProps> = ({
   className,
   value,
   validationError: _validationError,
-  ...rest,
+  ...rest
 }) => {
   return (
     <StringDisplay
@@ -64,7 +64,7 @@ class IntegerFieldImpl extends React.PureComponent<
       onFieldChange: _onFieldChange,
       value: _value,
       validationError,
-      ...rest,
+      ...rest
     } = this.props;
 
     if (editable) {

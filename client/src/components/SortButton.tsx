@@ -12,7 +12,7 @@ interface SortButtonProps extends React.AnchorHTMLAttributes<HTMLDivElement> {
 export const SortButton: React.SFC<SortButtonProps> = ({
   sortOrder,
   className,
-  ...props,
+  ...props
 }) => {
   return (
     <div className={classnames(className, 'sort-button')} {...props}>

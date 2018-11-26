@@ -149,7 +149,7 @@ export class DropdownField extends React.PureComponent<
       className,
       onFieldChange: _,
       validationError,
-      ...rest,
+      ...rest
     } = this.props;
 
     const { selectValue, value } = this.state;

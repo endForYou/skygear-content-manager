@@ -107,7 +107,7 @@ class ReferenceDropdownFieldImpl extends React.PureComponent<
       onFieldChange: _onFieldChange,
       value: _value,
       validationError,
-      ...rest,
+      ...rest
     } = this.props;
 
     const { editable } = config;

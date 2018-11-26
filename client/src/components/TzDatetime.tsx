@@ -19,7 +19,7 @@ const TzDatetimeImpl: React.SFC<Props> = ({
   value,
   settings,
   timezone,
-  ...rest,
+  ...rest
 }) => {
   const utcOffset = utcOffsetOfTimezone(timezone || settings.timezone);
 

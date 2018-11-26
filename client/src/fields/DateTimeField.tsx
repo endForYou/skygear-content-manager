@@ -24,7 +24,7 @@ export const DateTimeDisplayField: React.SFC<DateTimeDisplayFieldProps> = ({
   value,
   onFieldChange: _onFieldChange,
   validationError: _validationError,
-  ...rest,
+  ...rest
 }) => {
   return (
     <TzDatetime
@@ -70,7 +70,7 @@ class DateTimePickerFieldImpl extends React.PureComponent<
       onFieldChange: _onFieldChange,
       value: _value,
       validationError,
-      ...rest,
+      ...rest
     } = this.props;
 
     return (

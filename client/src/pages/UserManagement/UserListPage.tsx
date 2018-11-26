@@ -136,7 +136,7 @@ interface TableBodyProps {
 const TableBody: React.SFC<TableBodyProps> = ({
   currentUserId,
   users,
-  ...rest,
+  ...rest
 }) => {
   const rows = users.map((user, index) => {
     const onCMSAccessChange = (newValue: boolean) => {

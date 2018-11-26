@@ -62,7 +62,7 @@ class BackReferenceSelectImpl extends React.PureComponent<
       onFieldChange: _onFieldChange,
       value: _value,
       validationError,
-      ...rest,
+      ...rest
     } = this.props;
 
     return (

@@ -22,7 +22,7 @@ export class BackReferenceListField extends React.PureComponent<
       className,
       onFieldChange: _onFieldChange,
       value: _value,
-      ...rest,
+      ...rest
     } = this.props;
 
     const $transient = context.record.$transient;

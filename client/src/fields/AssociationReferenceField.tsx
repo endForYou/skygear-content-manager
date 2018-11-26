@@ -22,7 +22,7 @@ export class AssociationReferenceListField extends React.PureComponent<
       onFieldChange: _onFieldChange,
       value: _value,
       validationError: _validationError,
-      ...rest,
+      ...rest
     } = this.props;
 
     const $transient = context.record.$transient;

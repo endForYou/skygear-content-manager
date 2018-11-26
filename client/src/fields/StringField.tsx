@@ -15,7 +15,7 @@ export const TextDisplayField: React.SFC<TextDisplayFieldProps> = ({
   className,
   onFieldChange: _onFieldChange,
   validationError: _validationError,
-  ...rest,
+  ...rest
 }) => {
   return (
     <StringDisplay
@@ -37,7 +37,7 @@ export class TextInputField extends BaseStringInputField<
       config: { editable, label, name },
       onFieldChange: _,
       validationError,
-      ...rest,
+      ...rest
     } = this.props;
 
     return (

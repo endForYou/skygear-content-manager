@@ -34,7 +34,7 @@ class BooleanFieldImpl extends React.PureComponent<BooleanFieldProps, State> {
       onFieldChange: _onFieldChange,
       value: _value,
       validationError,
-      ...rest,
+      ...rest
     } = this.props;
 
     const disabled = editable === undefined ? true : !editable;
