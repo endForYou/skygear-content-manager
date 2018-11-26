@@ -1,7 +1,7 @@
 import './FilterList.scss';
 
 import classnames from 'classnames';
-import moment from 'moment';
+import * as moment from 'moment';
 import * as React from 'react';
 // tslint:disable-next-line: no-submodule-imports
 import 'react-datetime/css/react-datetime.css';

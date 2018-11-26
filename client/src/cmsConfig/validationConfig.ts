@@ -1,5 +1,5 @@
 import compileExpression from 'filtrex';
-import moment from 'moment';
+import * as moment from 'moment';
 import { isArray, isDate } from 'util';
 
 import {
