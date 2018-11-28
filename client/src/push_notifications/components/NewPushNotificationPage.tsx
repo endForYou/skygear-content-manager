@@ -324,6 +324,8 @@ class NewPushNotificationPageImpl extends React.PureComponent<
       query = this.queryWithFilters(query, filterOptionsByName);
     }
 
+    // unlimited user to push
+    query.limit = 999999;
     query.overallCount = true;
     skygear.publicDB
       .query(query)
