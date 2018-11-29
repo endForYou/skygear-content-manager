@@ -1,3 +1,4 @@
+from datetime import datetime
 import skygear
 from marshmallow import Schema
 from marshmallow import fields
@@ -88,6 +89,10 @@ def register_lambda(settings):
                             f for f in duplicated_files if f.id == file.id
                         ]
                         session.delete(old_file[0])
+
+                        # Need to manually update the uploaded_at.
+                        # I guess it's because the id does not change.
+                        file.uploaded_at = datetime.now()
                         session.add(file)
                         imported_files.append(file)
                 else:
