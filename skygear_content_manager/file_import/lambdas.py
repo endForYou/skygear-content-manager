@@ -1,3 +1,4 @@
+from datetime import datetime
 import skygear
 from marshmallow import Schema
 from marshmallow import fields
@@ -69,16 +70,34 @@ def register_lambda(settings):
     def create_imported_file(**kwargs):
         validate_master_user()
         new_imported_files = kwargs['importedFiles']
+        handle_type = kwargs['handleType']
         schema = CmsImportedFileSchema(many=True)
         new_imported_files = schema.load(new_imported_files)
 
         with scoped_session() as session:
-            ensure_unique_file_name(session, new_imported_files)
+            duplicated_files = ensure_unique_file_name(
+                session, new_imported_files, handle_type)
+            duplicated_names = [f.id for f in duplicated_files]
             imported_files = []
             for file in new_imported_files:
                 file = CmsImportedFile.from_dict(file)
-                session.add(file)
-                imported_files.append(file)
+                if file.id in duplicated_names:
+                    if handle_type == 'ignore':
+                        pass
+                    elif handle_type == 'replace':
+                        old_file = [
+                            f for f in duplicated_files if f.id == file.id
+                        ]
+                        session.delete(old_file[0])
+
+                        # Need to manually update the uploaded_at.
+                        # I guess it's because the id does not change.
+                        file.uploaded_at = datetime.now()
+                        session.add(file)
+                        imported_files.append(file)
+                else:
+                    session.add(file)
+                    imported_files.append(file)
 
             # apply the update
             session.flush()
@@ -94,14 +113,15 @@ def inject_signed_url(files):
         file['url'] = signer.sign(file['asset'])
 
 
-def ensure_unique_file_name(session, files):
+def ensure_unique_file_name(session, files, handle_type):
     duplicated_files = session.query(CmsImportedFile) \
         .filter(CmsImportedFile.id.in_([f['id'] for f in files])) \
         .all()
     duplicated_names = [f.id for f in duplicated_files]
 
-    if len(duplicated_names) > 0:
+    if len(duplicated_names) > 0 and handle_type == 'error':
         raise DuplicatedFileException(duplicated_names)
+    return duplicated_files
 
 
 class DuplicatedFileException(Exception):

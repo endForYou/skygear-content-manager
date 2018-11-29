@@ -2,6 +2,7 @@ import { RouteComponentProps } from 'react-router';
 import { RouterState } from 'react-router-redux';
 import { Record } from 'skygear';
 
+import { FileImportHandleTypes } from './actions/fileImport';
 import { CmsConfig } from './cmsConfig';
 import { AppConfig } from './config';
 import { getSettings } from './settings';
@@ -169,6 +170,7 @@ export interface ImportedFileListState extends ListStateAttrs {
 export interface ImportFileState {
   fileNames: string[];
   filesByName: { [key: string]: File | undefined };
+  handleType: FileImportHandleTypes;
   importing: boolean;
   importError?: Error;
   uploadingFileNames: string[];
@@ -182,6 +184,7 @@ export const initialImportedFileListState: ImportedFileListState = {
 export const initialImportFileState: ImportFileState = {
   fileNames: [],
   filesByName: {},
+  handleType: FileImportHandleTypes.error,
   importing: false,
   uploadingFileNames: [],
 };

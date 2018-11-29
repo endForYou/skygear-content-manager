@@ -35,6 +35,12 @@ export enum FileImportActionTypes {
   ImportRemoveAllFiles = 'IMPORT_REMOVE_ALL_FILES',
 }
 
+export enum FileImportHandleTypes {
+  error,
+  ignore,
+  replace,
+}
+
 interface ImportedFileQueryResult {
   files: ImportedFile[];
   overallCount: number;
@@ -364,12 +370,19 @@ function uploadFilesImpl(file: File): Promise<Asset> {
 }
 
 function createImportedFilesImpl(
-  data: CreateImportedFileRequestData[]
+  data: CreateImportedFileRequestData[],
+  handleType: FileImportHandleTypes
 ): Promise<void> {
-  return skygear.lambda('imported_file:create', { importedFiles: data });
+  return skygear.lambda('imported_file:create', {
+    handleType: FileImportHandleTypes[handleType],
+    importedFiles: data,
+  });
 }
 
-function importFiles(files: File[]): ThunkAction<Promise<void>, {}, {}> {
+function importFiles(
+  files: File[],
+  handleType: FileImportHandleTypes
+): ThunkAction<Promise<void>, {}, {}> {
   return dispatch => {
     dispatch(importFilesRequest(files));
 
@@ -388,7 +401,7 @@ function importFiles(files: File[]): ThunkAction<Promise<void>, {}, {}> {
 
     return Promise.all(uploadFilesPromise)
       .then((data: CreateImportedFileRequestData[]) => {
-        return createImportedFilesImpl(data);
+        return createImportedFilesImpl(data, handleType);
       })
       .then(() => {
         dispatch(importFilesSuccess(files));
@@ -430,7 +443,7 @@ export class FileImportActionDispatcher {
     this.dispatch(importRemoveAllFiles());
   }
 
-  public importFiles(files: File[]) {
-    this.dispatch(importFiles(files));
+  public importFiles(files: File[], handleType: FileImportHandleTypes) {
+    this.dispatch(importFiles(files, handleType));
   }
 }

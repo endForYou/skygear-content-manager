@@ -4,10 +4,14 @@ import * as React from 'react';
 import Dropzone, { DropFileEventHandler } from 'react-dropzone';
 import { connect } from 'react-redux';
 
-import { FileImportActionDispatcher } from '../../actions/fileImport';
+import {
+  FileImportActionDispatcher,
+  FileImportHandleTypes,
+} from '../../actions/fileImport';
 import { LoadingSpinner } from '../../components/LoadingSpinner';
 import { Modal } from '../../components/Modal';
 import { PrimaryButton } from '../../components/PrimaryButton';
+import { RadioButtonList } from '../../components/RadioButtonList';
 import { errorMessageFromError } from '../../recordUtil';
 import { ImportFileState, RootState } from '../../states';
 
@@ -18,6 +22,7 @@ interface ImportFileModalProps {
 }
 
 type StateProps = ImportFileState;
+type State = Partial<StateProps>;
 
 type Props = ImportFileModalProps & StateProps;
 
@@ -55,7 +60,7 @@ const FileItem: React.SFC<FileItemProps> = ({
   );
 };
 
-class ImportFileModalImpl extends React.PureComponent<Props> {
+class ImportFileModalImpl extends React.PureComponent<Props, State> {
   private fileInput: HTMLInputElement | null = null;
 
   constructor(props: Props) {
@@ -63,6 +68,7 @@ class ImportFileModalImpl extends React.PureComponent<Props> {
     this.state = {
       fileNames: [],
       filesByName: {},
+      handleType: props.handleType,
     };
   }
 
@@ -111,6 +117,7 @@ class ImportFileModalImpl extends React.PureComponent<Props> {
 
   private renderBody = () => {
     const { fileNames, importing, uploadingFileNames } = this.props;
+    const handleType = this.state.handleType as FileImportHandleTypes;
 
     return (
       <div className="file-import-modal">
@@ -152,6 +159,21 @@ class ImportFileModalImpl extends React.PureComponent<Props> {
             ))}
           </div>
         </Dropzone>
+        <div>
+          <div className="setting-title">
+            If the uploaded files already exist:
+          </div>
+          <RadioButtonList
+            className="handle-options"
+            options={[
+              'Return error',
+              `Ignore the uploaded files`,
+              `Replace with the uploaded files`,
+            ]}
+            selectedIndex={handleType}
+            onChange={value => this.setState({ handleType: value })}
+          />
+        </div>
         {this.renderErrorMessage()}
       </div>
     );
@@ -227,10 +249,11 @@ class ImportFileModalImpl extends React.PureComponent<Props> {
 
   private onImportClick = () => {
     const { fileNames, filesByName } = this.props;
+    const handleType = this.state.handleType as FileImportHandleTypes;
     const files = fileNames
       .map(n => filesByName[n])
       .filter(f => f != null) as File[];
-    this.props.actionDispatcher.importFiles(files);
+    this.props.actionDispatcher.importFiles(files, handleType);
   };
 }
 
