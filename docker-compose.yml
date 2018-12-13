@@ -73,6 +73,7 @@ services:
       CMS_SKYGEAR_ENDPOINT: http://localhost:80/cms-api/
       CMS_SKYGEAR_API_KEY: my_skygear_key
       CMS_SKYGEAR_MASTER_KEY: my_master_key
+      CMS_AUTH_SECRET: my_cms_auth_secret
       CMS_USER_PERMITTED_ROLE: Admin
       CMS_STATIC_URL: http://localhost:80/lib/
       CMS_PUBLIC_URL: http://localhost:80/cms
