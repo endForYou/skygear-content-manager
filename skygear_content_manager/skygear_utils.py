@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 
 import requests
 import skygear
@@ -237,9 +238,10 @@ class Body:
 
 
 class AuthData:
-    def __init__(self, is_admin, skygear_token):
+    def __init__(self, is_admin, skygear_token, expire_at=0):
         self.is_admin = is_admin
         self.skygear_token = skygear_token
+        self.expire_at = expire_at
 
     @classmethod
     def from_cms_token(cls, cms_token):
@@ -252,9 +254,15 @@ class AuthData:
         except JWTError:
             return None
 
+        expire_at = authdict.get('expire_at', 0)
+        if expire_at < datetime.utcnow().timestamp():
+            # token expired
+            return None
+
         return cls(
             is_admin=authdict.get('is_admin', False),
-            skygear_token=authdict.get('skygear_access_token', None))
+            skygear_token=authdict.get('skygear_access_token', None),
+            expire_at=expire_at)
 
     def to_cms_token(self):
         return jwt.encode(
@@ -262,6 +270,7 @@ class AuthData:
                 'iss': 'skygear-content-manager',
                 'skygear_access_token': self.skygear_token,
                 'is_admin': self.is_admin,
+                'expire_at': self.expire_at,
             },
             CMS_AUTH_SECRET,
             algorithm='HS256')
