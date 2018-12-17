@@ -91,6 +91,14 @@
     "prettier": "1.15.3",
     "ts-skygear": "oursky/ts-skygear#912cd45c6b453df18999d6acde6a0b56453e92a3"
   },
+  "proxy": {
+    "/api": {
+      "target": "http://localhost:3001/",
+      "pathRewrite": {
+        "^/api": ""
+      }
+    }
+  },
   "jest": {
     "collectCoverageFrom": [
       "src/**/*.{js,jsx,ts,tsx}"
