@@ -1,4 +1,4 @@
-import compileExpression from 'filtrex';
+import * as compileExpression from 'filtrex';
 import * as moment from 'moment';
 import { isArray, isDate } from 'util';
 
