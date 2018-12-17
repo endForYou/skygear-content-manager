@@ -85,12 +85,13 @@ class SkygearRequest:
 class SkygearResponse:
 
     # resp: requests response
-    def __init__(self, status_code, headers, body, error_code=None):
+    def __init__(self, status_code, headers, cookies, body, error_code=None):
         self.error_code = error_code
 
         self.status_code = status_code
         self.headers = headers
         self.body = body
+        self.cookies = cookies
 
     @classmethod
     def forbidden(cls):
@@ -98,6 +99,7 @@ class SkygearResponse:
             status_code=None,
             headers=None,
             body=None,
+            cookies=None,
             error_code=PermissionDenied,
         )
 
@@ -107,6 +109,7 @@ class SkygearResponse:
             status_code=None,
             headers=None,
             body=None,
+            cookies=None,
             error_code=AccessTokenNotAccepted,
         )
 
@@ -115,11 +118,13 @@ class SkygearResponse:
         status_code = resp.status_code
         body = Body(resp.content)
         headers = {k: v for k, v in resp.headers.items()}
+        cookies = resp.cookies
 
         return cls(
             status_code=status_code,
             headers=headers,
             body=body,
+            cookies=cookies,
         )
 
     @property
@@ -129,7 +134,11 @@ class SkygearResponse:
             if access_token:
                 return access_token
 
-        return self.headers.get('X-Skygear-Access-Token')
+        access_token = self.headers.get('X-Skygear-Access-Token', None)
+        if access_token:
+            return access_token
+
+        return self.cookies.get('X-Skygear-Access-Token')
 
     @access_token.setter
     def access_token(self, access_token):
@@ -137,6 +146,7 @@ class SkygearResponse:
             self.body.data['result']['access_token'] = access_token
 
         self.headers['X-Skygear-Access-Token'] = access_token
+        self.cookies['X-Skygear-Access-Token'] = access_token
 
     @classmethod
     def error_message(cls, error_code):
@@ -187,11 +197,16 @@ class SkygearResponse:
         filtered_headers = [(k, v) for k, v in self.headers.items()
                             if k not in RESPONSE_HEADER_BLACKLIST]
 
-        return skygear.Response(
+        resp = skygear.Response(
             response=self.body.to_data(),
             status=str(self.status_code),
             headers=filtered_headers,
         )
+
+        for k, v in self.cookies.iteritems():
+            resp.set_cookie(k, v)
+
+        return resp
 
 
 class Body:
