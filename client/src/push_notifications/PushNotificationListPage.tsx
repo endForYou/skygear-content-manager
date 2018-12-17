@@ -184,9 +184,10 @@ function PushNotificationListPageFactory() {
     return { dispatch };
   }
 
-  return connect(mapStateToProps, mapDispatchToProps)(
-    PushNotificationListPageImpl
-  );
+  return connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(PushNotificationListPageImpl);
 }
 
 export const PushNotificationListPage: React.ComponentClass<

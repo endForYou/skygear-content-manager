@@ -100,9 +100,10 @@ function mapDispatchToProps(dispatch: Dispatch<RootState>): DispatchProps {
   return { dispatch };
 }
 
-const ConnectedEditPageContainer = connect(mapStateToProps, mapDispatchToProps)(
-  UserPageImpl
-);
+const ConnectedEditPageContainer = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(UserPageImpl);
 
 export const UserPageContainer: React.ComponentType<
   UserPageContainerProps

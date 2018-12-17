@@ -109,7 +109,9 @@ export class DropdownField extends React.PureComponent<
   }
 
   get selectOptions() {
-    const { config: { options, nullOption, customOption } } = this.props;
+    const {
+      config: { options, nullOption, customOption },
+    } = this.props;
 
     const selectValue = this.state.selectValue;
     const value = this.state.value;

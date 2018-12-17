@@ -87,9 +87,10 @@ function mapDispatchToProps(dispatch: Dispatch<RootState>): DispatchProps {
   return { dispatch };
 }
 
-const ConnectedNewPageContainer = connect(mapStateToProps, mapDispatchToProps)(
-  NewPageContainerImpl
-);
+const ConnectedNewPageContainer = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(NewPageContainerImpl);
 
 export const NewPageContainer: React.ComponentType<
   NewPageContainerProps

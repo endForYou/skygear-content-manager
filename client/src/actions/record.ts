@@ -481,7 +481,9 @@ function addStringFilterToQuery(query: Query, filter: StringFilter) {
       break;
     default:
       throw new Error(
-        `addStringFilterToQuery does not support StringFilterQueryType ${filter.type}`
+        `addStringFilterToQuery does not support StringFilterQueryType ${
+          filter.type
+        }`
       );
   }
 }
@@ -508,7 +510,9 @@ function addNumberFilterToQuery(query: Query, filter: NumberFilter) {
       break;
     default:
       throw new Error(
-        `addNumberFilterToQuery does not support NumberFilterQueryType ${filter.type}`
+        `addNumberFilterToQuery does not support NumberFilterQueryType ${
+          filter.type
+        }`
       );
   }
 }
@@ -523,7 +527,9 @@ function addBooleanFilterToQuery(query: Query, filter: BooleanFilter) {
       break;
     default:
       throw new Error(
-        `addBooleanFilterToQuery does not support BooleanFilterQueryType ${filter.type}`
+        `addBooleanFilterToQuery does not support BooleanFilterQueryType ${
+          filter.type
+        }`
       );
   }
 }
@@ -538,7 +544,9 @@ function addDatetimeFilterToQuery(query: Query, filter: DateTimeFilter) {
       break;
     default:
       throw new Error(
-        `addDatetimeFilterToQuery does not support DateTimeFilterQueryType ${filter.type}`
+        `addDatetimeFilterToQuery does not support DateTimeFilterQueryType ${
+          filter.type
+        }`
       );
   }
 }
@@ -552,7 +560,9 @@ function addReferenceFilterToQuery(query: Query, filter: ReferenceFilter) {
       break;
     default:
       throw new Error(
-        `addDatetimeFilterToQuery does not support DateTimeFilterQueryType ${filter.type}`
+        `addDatetimeFilterToQuery does not support DateTimeFilterQueryType ${
+          filter.type
+        }`
       );
   }
 }
@@ -573,7 +583,9 @@ function createGeneralFilterQuery(filter: GeneralFilter, recordCls: RecordCls) {
       return generalQuery;
     default:
       throw new Error(
-        `createGeneralFilterQuery does not support GeneralFilterQueryType ${filter.query}`
+        `createGeneralFilterQuery does not support GeneralFilterQueryType ${
+          filter.query
+        }`
       );
   }
 }
@@ -823,25 +835,24 @@ function fetchEmbeddedRecordData(
     nextLevelQuery.contains('_id', ids);
     nextLevelQuery.limit = ids.length;
 
-    return queryWithTarget(
-      nextLevelQuery,
-      field.references
-    ).then(transientQueryResult => {
-      const transientQueryResultById = groupBy(
-        transientQueryResult.map(qr => qr),
-        r => r._id
-      );
+    return queryWithTarget(nextLevelQuery, field.references).then(
+      transientQueryResult => {
+        const transientQueryResultById = groupBy(
+          transientQueryResult.map(qr => qr),
+          r => r._id
+        );
 
-      // mutate the original queryResult
-      sources.forEach(r => {
-        const targetEmbeddedRecords = r.$transient[field.name];
-        r.$transient[field.name] = isSingleEmbeddedRef
-          ? transientQueryResultById.get(targetEmbeddedRecords._id)![0]
-          : targetEmbeddedRecords.map((embeddedRecord: Record) => {
-              return transientQueryResultById.get(embeddedRecord._id)![0];
-            });
-      });
-    });
+        // mutate the original queryResult
+        sources.forEach(r => {
+          const targetEmbeddedRecords = r.$transient[field.name];
+          r.$transient[field.name] = isSingleEmbeddedRef
+            ? transientQueryResultById.get(targetEmbeddedRecords._id)![0]
+            : targetEmbeddedRecords.map((embeddedRecord: Record) => {
+                return transientQueryResultById.get(embeddedRecord._id)![0];
+              });
+        });
+      }
+    );
   });
 
   return Promise.all(nextLevelQueries);

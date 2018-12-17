@@ -40,7 +40,8 @@ export class ImportModal extends React.PureComponent<ImportModalProps, State> {
             className="modal-button-primary primary-button"
             disabled={this.state.file == null}
             onClick={() =>
-              this.props.onImport(this.props.importConfig, this.importAttrs())}
+              this.props.onImport(this.props.importConfig, this.importAttrs())
+            }
           >
             Import
           </button>,

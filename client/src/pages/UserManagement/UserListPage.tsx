@@ -387,7 +387,10 @@ function UserListPageFactory() {
   }
 
   const SyncedListPage = syncFilterWithUrl(syncPageWithUrl(UserListPageImpl));
-  return connect(mapStateToProps, mapDispatchToProps)(SyncedListPage);
+  return connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(SyncedListPage);
 }
 
 export { UserListPageFactory };

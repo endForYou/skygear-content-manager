@@ -42,4 +42,7 @@ function mapDispatchToProps(dispatch: Dispatch<RootState>): DispatchProps {
 
 export const ShowPageContainer: React.ComponentType<
   ShowPageContainerProps
-> = connect(undefined, mapDispatchToProps)(ShowPageContainerImpl);
+> = connect(
+  undefined,
+  mapDispatchToProps
+)(ShowPageContainerImpl);

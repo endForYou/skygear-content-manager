@@ -124,7 +124,10 @@ export class EmbeddedAssociationReferenceField extends React.PureComponent<
   }
 
   public handleEmbeddedRecordCreate() {
-    const { config: { reference }, context } = this.props;
+    const {
+      config: { reference },
+      context,
+    } = this.props;
     const AssocRecordCls = Record.extend(
       reference.associationRecordConfig.cmsRecord.recordType
     );
@@ -189,7 +192,8 @@ export class EmbeddedAssociationReferenceField extends React.PureComponent<
             this.handleEmbeddedRecordChange(index, name, value, effect);
           }}
           onRecordMoveDown={() =>
-            this.handleEmbeddedRecordMove(index, index + 1)}
+            this.handleEmbeddedRecordMove(index, index + 1)
+          }
           onRecordMoveUp={() => this.handleEmbeddedRecordMove(index, index - 1)}
           onRecordRemove={() => this.handleEmbeddedRecordRemove(index)}
           record={r}
@@ -301,7 +305,8 @@ function EmbeddedRecordView({
         key={index}
         fieldConfig={fieldConfig}
         onFieldChange={(value, effect) =>
-          onRecordChange(fieldConfig.name, value, effect)}
+          onRecordChange(fieldConfig.name, value, effect)
+        }
         record={record}
         validationError={
           fieldValidationErrors && fieldValidationErrors[fieldConfig.name]

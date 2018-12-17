@@ -388,7 +388,10 @@ function FileImportPageFactory() {
   const syncedPage = syncSortWithUrl(
     syncFilterWithUrl(syncPageWithUrl(FileImportPage))
   );
-  return connect(mapStateToProps, mapDispatchToProps)(syncedPage);
+  return connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(syncedPage);
 }
 
 export { FileImportPageFactory };

@@ -124,9 +124,10 @@ const mapDispatchToProps: MapDispatchToProps<DispatchProps, {}> = dispatch => {
   };
 };
 
-const ConnectedLoginForm = connect(mapStateToProps, mapDispatchToProps)(
-  LoginForm
-);
+const ConnectedLoginForm = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(LoginForm);
 
 const Topbar: React.SFC = () => {
   return (

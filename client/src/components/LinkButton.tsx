@@ -30,7 +30,11 @@ function applyContext(href: string, context: any): string {
 }
 
 export const LinkButton: React.SFC<LinkButtonProps> = props => {
-  const { actionConfig: { href, label, target }, context, className } = props;
+  const {
+    actionConfig: { href, label, target },
+    context,
+    className,
+  } = props;
   const formattedHref = applyContext(href, context);
 
   // string starts with {scheme}:// or // are external link

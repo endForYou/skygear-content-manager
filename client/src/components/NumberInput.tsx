@@ -4,12 +4,12 @@ import { Omit } from '../typeutil';
 
 interface NumberInputProps
   extends Omit<
-      React.DetailedHTMLProps<
-        React.InputHTMLAttributes<HTMLInputElement>,
-        HTMLInputElement
-      >,
-      'onChange' | 'type' | 'value'
-    > {
+    React.DetailedHTMLProps<
+      React.InputHTMLAttributes<HTMLInputElement>,
+      HTMLInputElement
+    >,
+    'onChange' | 'type' | 'value'
+  > {
   isInteger?: boolean;
   emptyValue?: number;
   value?: number;
