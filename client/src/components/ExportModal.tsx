@@ -58,7 +58,6 @@ export class ExportModal extends React.PureComponent<ExportModalProps, State> {
 
     const searchParams = new URLSearchParams();
     searchParams.append('export_name', actionConfig.name);
-    searchParams.append('key', skygear.auth.accessToken || '');
     if (exportPredicate.length > 0) {
       searchParams.append('predicate', JSON.stringify(exportPredicate));
     }
