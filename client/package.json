@@ -97,6 +97,12 @@
       "pathRewrite": {
         "^/api": ""
       }
+    },
+    "/docker-api": {
+      "target": "http://app:3000/",
+      "pathRewrite": {
+        "^/docker-api": ""
+      }
     }
   },
   "jest": {

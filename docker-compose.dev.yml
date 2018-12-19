@@ -43,7 +43,7 @@ services:
       PUBLIC_URL: .
       REACT_APP_CMS_CONFIG_URL: /dev-config.yaml
       REACT_APP_SKYGEAR_API_KEY: my_skygear_key
-      REACT_APP_SKYGEAR_ENDPOINT: http://localhost:3002/api/cms-api/
+      REACT_APP_SKYGEAR_ENDPOINT: http://localhost:3002/docker-api/cms-api/
       REACT_APP_ADMIN_ROLE: Admin
       REACT_APP_PRIMARY_COLOR: '#FF5722'
       REACT_APP_SIDEBAR_COLOR: '#03A9F4'
