@@ -243,6 +243,9 @@ module.exports = {
       },
     ],
   },
+  performance: {
+    hints: false
+  },
   optimization: {
     minimizer: [
       // Minify the code.
