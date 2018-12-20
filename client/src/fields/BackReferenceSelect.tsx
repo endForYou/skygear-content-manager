@@ -62,7 +62,7 @@ class BackReferenceSelectImpl extends React.PureComponent<
       onFieldChange: _onFieldChange,
       value: _value,
       validationError,
-      ...rest,
+      ...rest
     } = this.props;
 
     return (
@@ -123,7 +123,9 @@ class BackReferenceSelectImpl extends React.PureComponent<
     );
 
     const eff: Effect = () => {
-      const { targetCmsRecord: { recordType } } = config.reference;
+      const {
+        targetCmsRecord: { recordType },
+      } = config.reference;
       const RecordCls = Record.extend(recordType);
 
       const newTargets = newTargetIds.map(

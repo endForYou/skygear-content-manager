@@ -136,7 +136,7 @@ interface TableBodyProps {
 const TableBody: React.SFC<TableBodyProps> = ({
   currentUserId,
   users,
-  ...rest,
+  ...rest
 }) => {
   const rows = users.map((user, index) => {
     const onCMSAccessChange = (newValue: boolean) => {
@@ -387,7 +387,10 @@ function UserListPageFactory() {
   }
 
   const SyncedListPage = syncFilterWithUrl(syncPageWithUrl(UserListPageImpl));
-  return connect(mapStateToProps, mapDispatchToProps)(SyncedListPage);
+  return connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(SyncedListPage);
 }
 
 export { UserListPageFactory };

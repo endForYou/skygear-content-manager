@@ -84,11 +84,13 @@ export function syncSortWithUrl<P extends InjectedProps>(
       const { dispatch, location } = this.props;
 
       const { sortState } = this.state;
+      const urlParams = sortStateToUrlParams(sortState);
+      const searchParams = urlParams == null ? {} : urlParams;
 
       return [
         <SyncToUrl
           key="sync-to-url"
-          value={sortStateToUrlParams(sortState) || {}}
+          value={searchParams}
           searchKeys={['sortBy', 'order']}
           location={location}
           dispatch={dispatch}

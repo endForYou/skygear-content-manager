@@ -108,7 +108,8 @@ export const FilterTagList: React.SFC<FilterTagListProps> = ({
             config={config}
             filter={filter}
             onCloseFilterClicked={() =>
-              onChangeFilter(filters.filter(f => f.id !== filter.id))}
+              onChangeFilter(filters.filter(f => f.id !== filter.id))
+            }
           />
         );
       })}

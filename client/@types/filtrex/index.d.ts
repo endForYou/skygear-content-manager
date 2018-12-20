@@ -53,11 +53,4 @@
  * These functions will be available in the expression in the same way as `sqrt(x)` and `round(x)`.
  */
 
-declare module 'filtrex' {
-  export default function compileExpression(
-    expression: string,
-    extraFunctions?: {
-      [T: string]: Function
-    }
-  ): (obj: {}) => any;
-}
+declare module 'filtrex';

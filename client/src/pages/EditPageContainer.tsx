@@ -112,9 +112,10 @@ function mapDispatchToProps(dispatch: Dispatch<RootState>): DispatchProps {
   return { dispatch };
 }
 
-const ConnectedEditPageContainer = connect(mapStateToProps, mapDispatchToProps)(
-  EditPageContainerImpl
-);
+const ConnectedEditPageContainer = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(EditPageContainerImpl);
 
 export const EditPageContainer: React.ComponentType<
   EditPageContainerProps

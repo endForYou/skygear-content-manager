@@ -80,7 +80,7 @@ export const ImportingModal = ({
 
 export const ImportFailureModal = ({
   importConfig,
-  ...rest,
+  ...rest
 }: { importConfig: ImportActionConfig } & Omit<FailureModalProps, 'title'>) => {
   return <FailureModal title={importConfig.label} {...rest} />;
 };

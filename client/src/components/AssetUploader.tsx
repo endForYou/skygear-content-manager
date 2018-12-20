@@ -131,7 +131,7 @@ export class AssetUploader extends React.PureComponent<Props> {
       style,
       value,
       disabled,
-      ...rest,
+      ...rest
     } = this.props;
 
     return (

@@ -90,5 +90,8 @@ export const SettingsPageFactory = () => {
     return { dispatch };
   }
 
-  return connect(mapStateToProps, mapDispatchToProps)(SettingsPage);
+  return connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(SettingsPage);
 };

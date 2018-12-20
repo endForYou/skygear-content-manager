@@ -46,48 +46,47 @@ const Root = ({ history, store }: RootProps) => {
 // TODO (Steven-Chan):
 // support registering custom CMSConfigProvider
 function main(appConfig: AppConfig = defaultAppConfig): void {
-  fetchUser(
-    appConfig.skygearEndpoint,
-    appConfig.skygearApiKey
-  ).then((user: User) => {
-    const publicUrl: string = appConfig.publicUrl;
-    const history: History = createHistoryFromPublicUrl(publicUrl);
-    const settings = getSettings();
+  fetchUser(appConfig.skygearEndpoint, appConfig.skygearApiKey).then(
+    (user: User) => {
+      const publicUrl: string = appConfig.publicUrl;
+      const history: History = createHistoryFromPublicUrl(publicUrl);
+      const settings = getSettings();
 
-    const initialState = initialRootState(
-      appConfig.adminRole,
-      appConfig,
-      user,
-      settings
-    );
-    const rootReducer = rootReducerFactory();
-    const store = createStore<RootState>(
-      rootReducer,
-      initialState,
-      applyMiddleware(
-        thunk,
-        routerMiddleware(history),
-        getUnauthenticatedMiddleware()
-      )
-    );
+      const initialState = initialRootState(
+        appConfig.adminRole,
+        appConfig,
+        user,
+        settings
+      );
+      const rootReducer = rootReducerFactory();
+      const store = createStore<RootState>(
+        rootReducer,
+        initialState,
+        applyMiddleware(
+          thunk,
+          routerMiddleware(history),
+          getUnauthenticatedMiddleware()
+        )
+      );
 
-    ReactDOM.render(
-      <Root history={history} store={store} />,
-      document.getElementById('root')
-    );
+      ReactDOM.render(
+        <Root history={history} store={store} />,
+        document.getElementById('root')
+      );
 
-    // inject theme classes to head
-    const head = document.getElementsByTagName('head')[0];
-    const linkElement: HTMLLinkElement = document.createElement('link');
-    linkElement.setAttribute('rel', 'stylesheet');
-    linkElement.setAttribute('type', 'text/css');
-    linkElement.setAttribute(
-      'href',
-      'data:text/css;charset=UTF-8,' +
-        encodeURIComponent(generateCSSClass(appConfig.style))
-    );
-    head.appendChild(linkElement);
-  });
+      // inject theme classes to head
+      const head = document.getElementsByTagName('head')[0];
+      const linkElement: HTMLLinkElement = document.createElement('link');
+      linkElement.setAttribute('rel', 'stylesheet');
+      linkElement.setAttribute('type', 'text/css');
+      linkElement.setAttribute(
+        'href',
+        'data:text/css;charset=UTF-8,' +
+          encodeURIComponent(generateCSSClass(appConfig.style))
+      );
+      head.appendChild(linkElement);
+    }
+  );
 }
 
 function createHistoryFromPublicUrl(publicUrl: string): History {

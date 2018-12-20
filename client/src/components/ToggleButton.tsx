@@ -5,9 +5,9 @@ import { PrimaryButton } from './PrimaryButton';
 
 interface Props
   extends React.DetailedHTMLProps<
-      React.ButtonHTMLAttributes<HTMLButtonElement>,
-      HTMLButtonElement
-    > {
+    React.ButtonHTMLAttributes<HTMLButtonElement>,
+    HTMLButtonElement
+  > {
   isActive: boolean;
 }
 

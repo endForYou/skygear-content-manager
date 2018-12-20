@@ -1,7 +1,7 @@
 import './FilterList.scss';
 
 import classnames from 'classnames';
-import moment from 'moment';
+import * as moment from 'moment';
 import * as React from 'react';
 // tslint:disable-next-line: no-submodule-imports
 import 'react-datetime/css/react-datetime.css';
@@ -112,7 +112,8 @@ export class FilterList extends React.PureComponent<FilterListProps> {
         clearable={false}
         value={filter.query}
         onChange={(value: Option<OptionValues> | null) =>
-          this.handleQueryTypeChange(filter, value)}
+          this.handleQueryTypeChange(filter, value)
+        }
       >
         <option value={StringFilterQueryType.EqualTo}>Equal to</option>
         <option value={StringFilterQueryType.NotEqualTo}>Not equal to</option>
@@ -129,7 +130,8 @@ export class FilterList extends React.PureComponent<FilterListProps> {
         clearable={false}
         value={filter.query}
         onChange={(value: Option<OptionValues> | null) =>
-          this.handleQueryTypeChange(filter, value)}
+          this.handleQueryTypeChange(filter, value)
+        }
       >
         <option value={NumberFilterQueryType.EqualTo}>Equal to</option>
         <option value={NumberFilterQueryType.NotEqualTo}>Not equal to</option>
@@ -152,7 +154,8 @@ export class FilterList extends React.PureComponent<FilterListProps> {
         clearable={false}
         value={filter.query}
         onChange={(value: Option<OptionValues> | null) =>
-          this.handleQueryTypeChange(filter, value)}
+          this.handleQueryTypeChange(filter, value)
+        }
       >
         <option value={BooleanFilterQueryType.True}>True</option>
         <option value={BooleanFilterQueryType.False}>False</option>
@@ -167,7 +170,8 @@ export class FilterList extends React.PureComponent<FilterListProps> {
         clearable={false}
         value={filter.query}
         onChange={(value: Option<OptionValues> | null) =>
-          this.handleQueryTypeChange(filter, value)}
+          this.handleQueryTypeChange(filter, value)
+        }
       >
         <option value={DateTimeFilterQueryType.Before}>Before</option>
         <option value={DateTimeFilterQueryType.After}>After</option>
@@ -182,7 +186,8 @@ export class FilterList extends React.PureComponent<FilterListProps> {
         clearable={false}
         value={filter.query}
         onChange={(value: Option<OptionValues> | null) =>
-          this.handleQueryTypeChange(filter, value)}
+          this.handleQueryTypeChange(filter, value)
+        }
       >
         <option value={ReferenceFilterQueryType.Contains}>Contains</option>
         {this.renderNullFilterSelect(filter)}

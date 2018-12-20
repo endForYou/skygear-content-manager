@@ -829,20 +829,20 @@ function parseAssociationRecordByName(
     );
   }
 
-  const recordNameConfigPairs = entriesOf(
-    input
-  ).map(([recordName, recordConfig]) => {
-    if (!isObject(recordConfig)) {
-      throw new Error(
-        `want association_record to be object, got ${typeof recordConfig}`
-      );
-    }
+  const recordNameConfigPairs = entriesOf(input).map(
+    ([recordName, recordConfig]) => {
+      if (!isObject(recordConfig)) {
+        throw new Error(
+          `want association_record to be object, got ${typeof recordConfig}`
+        );
+      }
 
-    return [
-      recordName,
-      parseAssociationRecord(context, recordName, recordConfig),
-    ] as [string, AssociationRecordConfig];
-  });
+      return [
+        recordName,
+        parseAssociationRecord(context, recordName, recordConfig),
+      ] as [string, AssociationRecordConfig];
+    }
+  );
 
   return objectFrom(recordNameConfigPairs);
 }

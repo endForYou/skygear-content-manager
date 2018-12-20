@@ -36,7 +36,9 @@ export class FilterInput extends React.PureComponent<FilterFieldProps> {
         return <StringFilterInput {...rest} config={config} />;
       default:
         throw new Error(
-          `Currently does not support Filter with FieldConfigType ${config.type}`
+          `Currently does not support Filter with FieldConfigType ${
+            config.type
+          }`
         );
     }
   }

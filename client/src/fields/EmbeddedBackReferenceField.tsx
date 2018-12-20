@@ -180,7 +180,8 @@ export class EmbeddedBackReferenceListField extends React.PureComponent<
             );
           }}
           onRecordMoveDown={() =>
-            this.handleEmbeddedRecordMove(index, index + 1)}
+            this.handleEmbeddedRecordMove(index, index + 1)
+          }
           onRecordMoveUp={() => this.handleEmbeddedRecordMove(index, index - 1)}
           onRecordRemove={() => this.handleEmbeddedRecordRemove(index)}
           record={r}
@@ -291,7 +292,8 @@ function EmbeddedRecordView({
         key={index}
         fieldConfig={fieldConfig}
         onFieldChange={(value, beforeEffect, affterEffect) =>
-          onRecordChange(fieldConfig.name, value, beforeEffect, affterEffect)}
+          onRecordChange(fieldConfig.name, value, beforeEffect, affterEffect)
+        }
         record={record}
         validationError={
           fieldValidationErrors && fieldValidationErrors[fieldConfig.name]

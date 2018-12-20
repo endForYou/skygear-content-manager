@@ -19,7 +19,7 @@ export class TextArea extends BaseStringInputField<
       className,
       onFieldChange: _,
       validationError,
-      ...rest,
+      ...rest
     } = this.props;
 
     const disabled = editable === undefined ? true : !editable;

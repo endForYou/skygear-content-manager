@@ -1,4 +1,4 @@
-import compileExpression from 'filtrex';
+import * as compileExpression from 'filtrex';
 
 import { FieldConfig, FieldConfigTypes } from '../cmsConfig';
 import { ValidationConfig } from '../cmsConfig/validationConfig';

@@ -18,7 +18,7 @@ export const StringDisplay: React.SFC<Props> = ({
   config: { compact },
   className,
   value,
-  ...rest,
+  ...rest
 }) => {
   return (
     <span {...rest} className={classnames(className, { full: !compact })}>

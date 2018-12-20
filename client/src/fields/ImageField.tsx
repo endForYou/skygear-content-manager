@@ -20,7 +20,7 @@ export const ImageDisplayField: React.SFC<ImageDisplayFieldProps> = ({
   className,
   value,
   validationError: _validationError,
-  ...rest,
+  ...rest
 }) => {
   if (value == null) {
     return (

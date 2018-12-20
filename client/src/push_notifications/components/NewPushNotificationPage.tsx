@@ -376,7 +376,9 @@ class NewPushNotificationPageImpl extends React.PureComponent<
           break;
         default:
           throw new Error(
-            `Currently does not support Filter with FieldConfigType ${filterOption.filterType}`
+            `Currently does not support Filter with FieldConfigType ${
+              filterOption.filterType
+            }`
           );
       }
     });

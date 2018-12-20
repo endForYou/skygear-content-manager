@@ -300,7 +300,10 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
   constructor(props: ListPageProps) {
     super(props);
 
-    const { dispatch, pageConfig: { cmsRecord, references } } = this.props;
+    const {
+      dispatch,
+      pageConfig: { cmsRecord, references },
+    } = this.props;
 
     this.state = {
       exporting: undefined,
@@ -326,7 +329,12 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
   }
 
   public componentWillReceiveProps(nextProps: ListPageProps) {
-    const { filters, import: { importResult }, page, sortState } = this.props;
+    const {
+      filters,
+      import: { importResult },
+      page,
+      sortState,
+    } = this.props;
     // Refresh list after import success
     if (
       (importResult &&
@@ -402,7 +410,9 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
   }
 
   public renderActionButtons() {
-    const { pageConfig: { actions, cmsRecord } } = this.props;
+    const {
+      pageConfig: { actions, cmsRecord },
+    } = this.props;
     const actionsButtons = actions.map((action, index) =>
       this.renderActionButton(cmsRecord, action, index)
     );
@@ -657,7 +667,10 @@ function ListPageFactory(recordName: string) {
   const SyncedListPage = syncSortWithUrl(
     syncFilterWithUrl(syncPageWithUrl(ListPageImpl))
   );
-  return connect(mapStateToProps, mapDispatchToProps)(SyncedListPage);
+  return connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(SyncedListPage);
 }
 
 export const ListPage: React.ComponentClass<ListPageProps> = ListPageImpl;

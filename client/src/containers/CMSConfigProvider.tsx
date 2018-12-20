@@ -53,6 +53,7 @@ function mapDispatchToProps(dispatch: Dispatch<RootState>): DispatchProps {
   return { dispatch };
 }
 
-export const CMSConfigProvider = connect(mapStateToProps, mapDispatchToProps)(
-  CMSConfigProviderImpl
-);
+export const CMSConfigProvider = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(CMSConfigProviderImpl);

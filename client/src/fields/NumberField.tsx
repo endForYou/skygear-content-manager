@@ -14,7 +14,7 @@ export const FloatDisplayField: React.SFC<FloatDisplayFieldProps> = ({
   className,
   value,
   validationError: _validationError,
-  ...rest,
+  ...rest
 }) => {
   return (
     <StringDisplay
@@ -58,7 +58,7 @@ export class FloatInputField extends React.PureComponent<
       onFieldChange: _onFieldChange,
       value: _value,
       validationError,
-      ...rest,
+      ...rest
     } = this.props;
 
     return (

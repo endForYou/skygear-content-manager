@@ -1,5 +1,5 @@
 import { Location } from 'history';
-import moment from 'moment';
+import * as moment from 'moment';
 import * as qs from 'query-string';
 import * as React from 'react';
 import { Dispatch } from 'redux';

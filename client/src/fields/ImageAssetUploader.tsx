@@ -17,13 +17,12 @@ class ImageAssetUploaderImpl extends React.PureComponent<
       config: { editable },
       onFieldChange,
       validationError,
-      ...rest,
+      ...rest
     } = this.props;
     const {
       preview_height: previewHeight = 200,
       preview_width: previewWidth = 200,
-    } =
-      this.props.config.config || {};
+    } = this.props.config.config || {};
     return (
       <AssetUploader
         {...rest}

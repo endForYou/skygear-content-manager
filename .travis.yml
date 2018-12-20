@@ -22,6 +22,7 @@ jobs:
         - node_modules/.bin/prettier --list-different "src/**/*.ts*"
         - npm run lint
         - CI=1 npm run test
+        - npm run build
 
     - stage: test
       language: python

@@ -103,8 +103,8 @@ class RecordFormPageImpl extends React.PureComponent<
       effectError != null
         ? `${effectError}`
         : savingRecord && savingRecord.type === RemoteType.Failure
-          ? errorMessageFromError(savingRecord.error)
-          : undefined;
+        ? errorMessageFromError(savingRecord.error)
+        : undefined;
 
     if (errorDescription == null) {
       return null;
@@ -206,7 +206,10 @@ class RecordFormPageImpl extends React.PureComponent<
       )
       .then(() => EffectAll(objectValues(afterEffectChange))())
       .then(() => {
-        const { config: { cmsRecord }, dispatch } = this.props;
+        const {
+          config: { cmsRecord },
+          dispatch,
+        } = this.props;
         dispatch(push(`/record/${cmsRecord.name}/${record._id}`));
       })
       .catch(effectError => this.setState({ effectError }));
@@ -216,7 +219,10 @@ class RecordFormPageImpl extends React.PureComponent<
    * Return dictionary of validation errors, empty if no errors.
    */
   public validateFields(): { [key: string]: FieldValidationError } {
-    const { config: { fields }, record } = this.props;
+    const {
+      config: { fields },
+      record,
+    } = this.props;
     return this._validateFields(record, fields);
   }
 
@@ -282,7 +288,8 @@ function FormField(props: FieldProps): JSX.Element {
       value={fieldValue}
       context={FieldContext(record)}
       onFieldChange={(value, beforeEffect, afterEffect) =>
-        onRecordChange(name, value, beforeEffect, afterEffect)}
+        onRecordChange(name, value, beforeEffect, afterEffect)
+      }
       validationError={props.validationError}
     />
   );

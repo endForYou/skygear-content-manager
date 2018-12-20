@@ -16,7 +16,7 @@ export const FileDisplayField: React.SFC<FileDisplayFieldProps> = ({
   className,
   value,
   validationError: _validationError,
-  ...rest,
+  ...rest
 }) => {
   if (value == null) {
     return (
@@ -63,7 +63,7 @@ export class FileUploaderField extends React.PureComponent<
       onFieldChange,
       value: value,
       validationError,
-      ...rest,
+      ...rest
     } = this.props;
 
     return (
