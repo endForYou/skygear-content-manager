@@ -4,6 +4,15 @@ CLIENT_SKYGEAR_ENDPOINT = os.environ.get('CLIENT_SKYGEAR_ENDPOINT')
 
 CMS_USER_PERMITTED_ROLE = os.environ.get('CMS_USER_PERMITTED_ROLE', 'Admin')
 CMS_AUTH_SECRET = os.environ.get('CMS_AUTH_SECRET', 'FAKE_AUTH_SECRET')
+CMS_AUTH_TOKEN_EXPIRY_STR = os.environ.get(
+    'CMS_AUTH_TOKEN_EXPIRY')  # in seconds
+CMS_AUTH_TOKEN_EXPIRY = 86400  # default 1 day
+try:
+    CMS_AUTH_TOKEN_EXPIRY = float(CMS_AUTH_TOKEN_EXPIRY_STR)
+except ValueError:
+    pass
+except TypeError:
+    pass
 
 # cms index params
 

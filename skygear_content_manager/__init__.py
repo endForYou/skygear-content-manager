@@ -1,4 +1,6 @@
 import logging
+from datetime import datetime
+from math import floor
 
 import skygear
 from ruamel.yaml import YAML
@@ -14,6 +16,7 @@ from .push_notifications import \
     register_lambda as register_push_notifications_lambda
 from .schema.skygear_schema import SkygearSchemaSchema
 from .settings import CLIENT_SKYGEAR_ENDPOINT
+from .settings import CMS_AUTH_TOKEN_EXPIRY
 from .settings import CMS_CONFIG_FILE_URL
 from .settings import CMS_PUBLIC_URL
 from .settings import CMS_SITE_TITLE
@@ -155,6 +158,7 @@ def intercept_login(req):
     resp.access_token = AuthData(
         is_admin=True,
         skygear_token=resp.access_token,
+        expire_at=floor(datetime.utcnow().timestamp()) + CMS_AUTH_TOKEN_EXPIRY,
     ).to_cms_token()
 
     return resp
@@ -201,6 +205,7 @@ def intercept_me(req):
     resp.access_token = AuthData(
         is_admin=True,
         skygear_token=resp.access_token,
+        expire_at=floor(datetime.utcnow().timestamp()) + CMS_AUTH_TOKEN_EXPIRY,
     ).to_cms_token()
 
     return resp

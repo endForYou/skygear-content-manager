@@ -29,8 +29,10 @@ def register_export_lambdas(settings):
     def export(request):
         data = parse_qs(request.query_string.decode())
         name = data.get('export_name', [None])[0]
-        key = data.get('key', [None])[0]
         predicate_string = data.get('predicate', [None])[0]
+
+        # get access_token from cookies
+        key = request.cookies.get('X-Skygear-Access-Token')
 
         if not key:
             return SkygearResponse.access_token_not_accepted().to_werkzeug()
