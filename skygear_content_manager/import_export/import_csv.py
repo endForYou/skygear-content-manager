@@ -197,13 +197,19 @@ def prepare_import_records(stream, import_config, atomic):
                                   reference_field.handle_duplicated_reference)
         reference_identifier_maps[reference_field.name] = m
 
-    data_list = populate_record_id(data_list, import_config, identifier_map)
     data_list = populate_record_reference(data_list, import_config,
                                           reference_identifier_maps)
     data_list = inject_asset(data_list, import_config)
 
     deserializer = RecordDeserializer(import_config.fields)
     records = deserialize_record_data(data_list, deserializer)
+
+    # Since record deserialisation is based on import config
+    # _id field would be removed if not presented in config
+    # So it is called after deserilization, to avoid being removed
+    #
+    # This assumes that the _id is ready to save
+    records = populate_record_id(records, import_config, identifier_map)
 
     for record in records:
         if isinstance(record, ImportRecordException):
@@ -215,11 +221,8 @@ def prepare_import_records(stream, import_config, atomic):
             continue
 
         if not record['_id']:
-            record['_id'] = str(uuid.uuid4())
-
-        id_prefix = import_config.record_type + '/'
-        if record['_id'][:len(id_prefix)] != id_prefix:
-            record['_id'] = '{}{}'.format(id_prefix, record['_id'])
+            id_prefix = import_config.record_type + '/'
+            record['_id'] = '{}{}'.format(id_prefix, str(uuid.uuid4()))
 
     return records
 
@@ -375,9 +378,6 @@ def deserialize_record_data(data_list, deserializer):
             continue
 
         record = deserializer.deserialize(data)
-
-        # record id does not exist in record if using custom identifier
-        record['_id'] = data.get('_id')
         records.append(record)
 
     return records
