@@ -41,7 +41,10 @@ class FieldDeserializer:
 
         return deserializer.deserialize(value)
 
-    def get_deserializer(self):
+    def get_deserializer(self):  # noqa
+        if self.field_config.name == '_id':
+            return IDDeserializer(self.field_config.record_type)
+
         deserializer = None
 
         if self.field_config.reference:
@@ -69,6 +72,21 @@ class FieldDeserializer:
 class BaseValueDeserializer:
     def deserialize(self, value):
         raise NotImplementedError
+
+
+class IDDeserializer:
+    def __init__(self, record_type):
+        super().__init__()
+        self.record_type = record_type
+
+    def deserialize(self, value):
+        # Backward compatibility
+        # To handle the case that the input is record_type/record_id
+        id_prefix = self.record_type + '/'
+        if value[:len(id_prefix)] != id_prefix:
+            return self.record_type + '/' + value
+
+        return value
 
 
 class ReferenceDeserializer(BaseValueDeserializer):

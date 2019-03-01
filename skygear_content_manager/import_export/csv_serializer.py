@@ -60,8 +60,7 @@ class FieldSerializer:
     def __init__(self, field_config, field_count, record_count):
         serializer = None
         if not field_config.reference:
-            serializer = self.get_serializer(field_config.type,
-                                             field_config.format)
+            serializer = self.get_serializer(field_config)
         else:
             # TODO (Steven-Chan):
             # DISPLAY_MODE_GROUPED now only supports single field
@@ -105,9 +104,14 @@ class FieldSerializer:
 
         return serialized_value
 
-    def get_serializer(self, field_type, format):
+    def get_serializer(self, field_config):
+        if field_config.name == '_id':
+            return IDSerializer(field_config.record_type)
+
         serializer = None
 
+        field_type = field_config.type
+        format = field_config.format
         if field_type == 'string':
             serializer = StringSerializer()
         elif field_type in 'number':
@@ -202,6 +206,15 @@ class ListSerializer(BaseValueSerializer):
         result = ["'" + v + "'" for v in result]
         result = ','.join(result)
         return result
+
+
+class IDSerializer(BaseValueSerializer):
+    def __init__(self, record_type):
+        super().__init__()
+        self.record_type = record_type
+
+    def serialize(self, value):
+        return value.split(self.record_type + '/')[1]
 
 
 class StringSerializer(BaseValueSerializer):
