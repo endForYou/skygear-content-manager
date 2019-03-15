@@ -135,8 +135,8 @@ function parseDateTimeFilterConfig(
 ): DateTimeFilterConfig {
   return {
     ...parseFilterConfigAttrs(input, 'date_time'),
-    timezone: parseTimezone(input, 'timezone'),
     date_time_format: input.date_time_format,
+    timezone: parseTimezone(input, 'timezone'),
     type: FilterConfigTypes.DateTime,
   };
 }

@@ -577,8 +577,8 @@ function parseDateTimeDisplayFieldConfig(
 ): DateTimeDisplayFieldConfig {
   return {
     ...parseFieldConfigAttrs(input, FieldConfigTypes.DateTimeDisplay, depth),
-    timezone: parseTimezone(input, 'timezone'),
     date_time_format: input.date_time_format,
+    timezone: parseTimezone(input, 'timezone'),
     type: FieldConfigTypes.DateTimeDisplay,
   };
 }
@@ -590,10 +590,10 @@ function parseDateTimePickerFieldConfig(
 ): DateTimePickerFieldConfig {
   return {
     ...parseEditableConfigAttrs(input, FieldConfigTypes.DateTimePicker, depth),
-    defaultValue: parseOptionalDate(input, 'default_value', 'date_time_picker'),
-    timezone: parseTimezone(input, 'timezone'),
-    time_picker: input.time_picker,
     date_picker: input.date_picker,
+    defaultValue: parseOptionalDate(input, 'default_value', 'date_time_picker'),
+    time_picker: input.time_picker,
+    timezone: parseTimezone(input, 'timezone'),
     type: FieldConfigTypes.DateTimePicker,
   };
 }

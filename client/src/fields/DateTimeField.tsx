@@ -73,7 +73,7 @@ class DateTimePickerFieldImpl extends React.PureComponent<
       ...rest
     } = this.props;
 
-    const isPickerSpecified = datePickerConfig.enabled || timePickerConfig.enabled
+    const isPickerSpecified = datePickerConfig.enabled || timePickerConfig.enabled;
 
     return (
       <div className={className}>
@@ -82,7 +82,10 @@ class DateTimePickerFieldImpl extends React.PureComponent<
           className={classnames('datetime-input-container')}
           {...(
           isPickerSpecified ?
-            {dateFormat: datePickerConfig.enabled && datePickerConfig.format, timePicker: timePickerConfig.enabled && timePickerConfig.format} :
+            {
+              dateFormat: datePickerConfig.enabled && datePickerConfig.format,
+              timePicker: timePickerConfig.enabled && timePickerConfig.format
+            } :
             {dateFormat: DATE_FORMAT, timeFormat: TIME_FORMAT}
           )}
           value={this.state.value || undefined}
