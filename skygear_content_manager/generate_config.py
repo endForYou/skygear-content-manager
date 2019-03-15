@@ -88,6 +88,9 @@ def generate_field_config(record, field):
         return None
     elif field.type == 'datetime':
         field_config['type'] = 'date_time'
+        field_config['date_picker'] = field.date_picker
+        field_config['time_picker'] = field.time_picker
+        field_config['date_time_format'] = field.date_time_format
     elif field.type == 'integer':
         field_config['type'] = 'integer'
     elif field.type == 'asset':

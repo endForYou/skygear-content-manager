@@ -19,7 +19,7 @@ const DATETIME_FORMAT = 'YYYY-MM-DD HH:mm:ssZ';
 type DateTimeDisplayFieldProps = RequiredFieldProps<DateTimeDisplayFieldConfig>;
 
 export const DateTimeDisplayField: React.SFC<DateTimeDisplayFieldProps> = ({
-  config: { compact, timezone },
+  config: { compact, timezone, date_time_format },
   className,
   value,
   onFieldChange: _onFieldChange,
@@ -32,7 +32,7 @@ export const DateTimeDisplayField: React.SFC<DateTimeDisplayFieldProps> = ({
       className={classnames(className, 'datetime-display', {
         full: !compact,
       })}
-      datetimeFormat={DATETIME_FORMAT}
+      datetimeFormat={date_time_format || DATETIME_FORMAT}
       value={value}
       timezone={timezone}
     />
@@ -65,7 +65,7 @@ class DateTimePickerFieldImpl extends React.PureComponent<
 
   public render() {
     const {
-      config: { timezone },
+      config: { timezone, date_picker: datePickerConfig = {}, time_picker: timePickerConfig = {} },
       className,
       onFieldChange: _onFieldChange,
       value: _value,
@@ -73,13 +73,18 @@ class DateTimePickerFieldImpl extends React.PureComponent<
       ...rest
     } = this.props;
 
+    const isPickerSpecified = datePickerConfig.enabled || timePickerConfig.enabled
+
     return (
       <div className={className}>
         <TzDatetimeInput
           {...rest}
           className={classnames('datetime-input-container')}
-          dateFormat={DATE_FORMAT}
-          timeFormat={TIME_FORMAT}
+          {...(
+          isPickerSpecified ?
+            {dateFormat: datePickerConfig.enabled && datePickerConfig.format, timePicker: timePickerConfig.enabled && timePickerConfig.format} :
+            {dateFormat: DATE_FORMAT, timeFormat: TIME_FORMAT}
+          )}
           value={this.state.value || undefined}
           onChange={this.handleChange}
           inputProps={{

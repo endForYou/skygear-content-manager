@@ -159,12 +159,20 @@ export interface WYSIWYGFieldConfig extends EditableFieldConfigAttrs {
 export interface DateTimeDisplayFieldConfig extends FieldConfigAttrs {
   type: FieldConfigTypes.DateTimeDisplay;
   timezone?: TimezoneValue;
+  date_time_format?: string;
+}
+
+export interface DateTimePickerConfig {
+  enabled?: boolean;
+  format?: string;
 }
 
 export interface DateTimePickerFieldConfig extends EditableFieldConfigAttrs {
   type: FieldConfigTypes.DateTimePicker;
   defaultValue?: Date;
   timezone?: TimezoneValue;
+  date_picker?: DateTimePickerConfig;
+  time_picker?: DateTimePickerConfig;
 }
 
 export interface BooleanFieldConfig extends EditableFieldConfigAttrs {
