@@ -587,10 +587,14 @@ function parseDateTimePickerFieldConfig(
   context: RecordTypeContext,
   depth: number
 ): DateTimePickerFieldConfig {
+  console.log('input2', input)
+  
   return {
     ...parseEditableConfigAttrs(input, FieldConfigTypes.DateTimePicker, depth),
     defaultValue: parseOptionalDate(input, 'default_value', 'date_time_picker'),
     timezone: parseTimezone(input, 'timezone'),
+    time_picker: input.time_picker,
+    date_picker: input.date_picker,
     type: FieldConfigTypes.DateTimePicker,
   };
 }
