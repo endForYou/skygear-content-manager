@@ -578,6 +578,7 @@ function parseDateTimeDisplayFieldConfig(
   return {
     ...parseFieldConfigAttrs(input, FieldConfigTypes.DateTimeDisplay, depth),
     timezone: parseTimezone(input, 'timezone'),
+    date_time_format: input.date_time_format,
     type: FieldConfigTypes.DateTimeDisplay,
   };
 }
@@ -587,8 +588,6 @@ function parseDateTimePickerFieldConfig(
   context: RecordTypeContext,
   depth: number
 ): DateTimePickerFieldConfig {
-  console.log('input2', input)
-  
   return {
     ...parseEditableConfigAttrs(input, FieldConfigTypes.DateTimePicker, depth),
     defaultValue: parseOptionalDate(input, 'default_value', 'date_time_picker'),
