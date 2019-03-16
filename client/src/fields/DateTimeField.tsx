@@ -65,7 +65,11 @@ class DateTimePickerFieldImpl extends React.PureComponent<
 
   public render() {
     const {
-      config: { timezone, date_picker: datePickerConfig = {}, time_picker: timePickerConfig = {} },
+      config: {
+        timezone,
+        date_picker: datePickerConfig = {},
+        time_picker: timePickerConfig = {},
+      },
       className,
       onFieldChange: _onFieldChange,
       value: _value,
@@ -73,21 +77,20 @@ class DateTimePickerFieldImpl extends React.PureComponent<
       ...rest
     } = this.props;
 
-    const isPickerSpecified = datePickerConfig.enabled || timePickerConfig.enabled;
+    const isPickerSpecified =
+      datePickerConfig.enabled || timePickerConfig.enabled;
 
     return (
       <div className={className}>
         <TzDatetimeInput
           {...rest}
           className={classnames('datetime-input-container')}
-          {...(
-          isPickerSpecified ?
-            {
-              dateFormat: datePickerConfig.enabled && datePickerConfig.format,
-              timePicker: timePickerConfig.enabled && timePickerConfig.format
-            } :
-            {dateFormat: DATE_FORMAT, timeFormat: TIME_FORMAT}
-          )}
+          {...(isPickerSpecified
+            ? {
+                dateFormat: datePickerConfig.enabled && datePickerConfig.format,
+                timePicker: timePickerConfig.enabled && timePickerConfig.format,
+              }
+            : { dateFormat: DATE_FORMAT, timeFormat: TIME_FORMAT })}
           value={this.state.value || undefined}
           onChange={this.handleChange}
           inputProps={{
