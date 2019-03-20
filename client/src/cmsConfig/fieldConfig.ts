@@ -291,6 +291,9 @@ export interface EmbeddedReferenceListFieldConfig
   reorderEnabled: boolean;
   references: ReferenceFieldConfig[];
   referenceDeleteAction: DeleteAction;
+  addButton: {
+    enabled: boolean;
+  };
   deleteButton: {
     enabled: boolean;
   };
@@ -804,6 +807,18 @@ function parseEmbeddedReferenceListFieldConfig(
     'reference'
   );
 
+  const addButton = {
+    enabled: false,
+  };
+  if (input.add_button != null) {
+    const enabled = parseOptionalBoolean(
+      input.add_button,
+      'enabled',
+      'reference.add_button'
+    );
+    addButton.enabled = enabled !== false;
+  }
+
   const deleteButton = {
     enabled: false,
   };
@@ -822,6 +837,7 @@ function parseEmbeddedReferenceListFieldConfig(
       FieldConfigTypes.EmbeddedReferenceList,
       depth
     ),
+    addButton,
     deleteButton,
     displayFields,
     positionFieldName,
