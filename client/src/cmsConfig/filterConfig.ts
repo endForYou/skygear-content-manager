@@ -50,7 +50,7 @@ export interface BooleanFilterConfig extends FilterConfigAttrs {
 export interface DateTimeFilterConfig extends FilterConfigAttrs {
   type: FilterConfigTypes.DateTime;
   timezone?: TimezoneValue;
-  date_time_format?: string;
+  dateTimeFormat?: string;
 }
 
 export interface GeneralFilterConfig extends FilterConfigAttrs {
@@ -135,7 +135,7 @@ function parseDateTimeFilterConfig(
 ): DateTimeFilterConfig {
   return {
     ...parseFilterConfigAttrs(input, 'date_time'),
-    date_time_format: input.date_time_format,
+    dateTimeFormat: input.date_time_format,
     timezone: parseTimezone(input, 'timezone'),
     type: FilterConfigTypes.DateTime,
   };
