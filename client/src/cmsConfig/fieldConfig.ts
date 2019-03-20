@@ -1,6 +1,6 @@
 import { isArray } from 'util';
 import { TimezoneValue } from '../types';
-import { get, humanize } from '../util';
+import { humanize } from '../util';
 import {
   AssociationRecordConfig,
   CmsRecord,
@@ -291,7 +291,9 @@ export interface EmbeddedReferenceListFieldConfig
   reorderEnabled: boolean;
   references: ReferenceFieldConfig[];
   referenceDeleteAction: DeleteAction;
-  enableDeleteButton: boolean;
+  deleteButton: {
+    enabled: boolean;
+  };
 }
 
 export interface EmbeddedBackReferenceListFieldConfig
@@ -802,14 +804,26 @@ function parseEmbeddedReferenceListFieldConfig(
     'reference'
   );
 
+  const deleteButton = {
+    enabled: false
+  };
+  if (input.delete_button != null) {
+    const enabled = parseOptionalBoolean(
+      input.delete_button,
+      'enabled',
+      'reference.delete_button'
+    );
+    deleteButton.enabled = enabled !== false;
+  }
+
   return {
     ...parseEditableConfigAttrs(
       input,
       FieldConfigTypes.EmbeddedReferenceList,
       depth
     ),
+    deleteButton,
     displayFields,
-    enableDeleteButton: get(input, ['delete_button', 'enabled']) !== false,
     positionFieldName,
     reference: parseMultiReferenceFieldConfigAttrs(context, input),
     referenceDeleteAction,

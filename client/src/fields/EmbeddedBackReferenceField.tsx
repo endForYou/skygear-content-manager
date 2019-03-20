@@ -201,7 +201,7 @@ export class EmbeddedBackReferenceListField extends React.PureComponent<
               index < embeddedRecords.length - 1
             )
           }
-          removable={config.editable && config.enableDeleteButton || false}
+          removable={config.editable && config.deleteButton.enabled || false}
           fieldValidationErrors={fieldValidationErrors}
         />
       );
