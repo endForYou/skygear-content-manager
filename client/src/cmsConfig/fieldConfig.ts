@@ -291,6 +291,9 @@ export interface EmbeddedReferenceListFieldConfig
   reorderEnabled: boolean;
   references: ReferenceFieldConfig[];
   referenceDeleteAction: DeleteAction;
+  deleteButton: {
+    enabled: boolean;
+  };
 }
 
 export interface EmbeddedBackReferenceListFieldConfig
@@ -801,12 +804,25 @@ function parseEmbeddedReferenceListFieldConfig(
     'reference'
   );
 
+  const deleteButton = {
+    enabled: false,
+  };
+  if (input.delete_button != null) {
+    const enabled = parseOptionalBoolean(
+      input.delete_button,
+      'enabled',
+      'reference.delete_button'
+    );
+    deleteButton.enabled = enabled !== false;
+  }
+
   return {
     ...parseEditableConfigAttrs(
       input,
       FieldConfigTypes.EmbeddedReferenceList,
       depth
     ),
+    deleteButton,
     displayFields,
     positionFieldName,
     reference: parseMultiReferenceFieldConfigAttrs(context, input),

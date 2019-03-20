@@ -14,7 +14,10 @@ test('parseCmsConfig should parse example config', () => {
   expect(config).toEqual({
     associationRecordByName: {
       field_asso_ref: {
-        cmsRecord: { name: 'field_asso_ref', recordType: 'field_asso_ref' },
+        cmsRecord: {
+          name: 'field_asso_ref',
+          recordType: 'field_asso_ref',
+        },
         referenceConfigPair: [
           {
             compact: false,
@@ -23,7 +26,10 @@ test('parseCmsConfig should parse example config', () => {
             displayFieldName: '_id',
             reference: {
               predicates: [],
-              targetCmsRecord: { name: 'field_demo', recordType: 'field_demo' },
+              targetCmsRecord: {
+                name: 'field_demo',
+                recordType: 'field_demo',
+              },
               type: 'DirectReference',
             },
             type: 'reference',
@@ -46,22 +52,42 @@ test('parseCmsConfig should parse example config', () => {
         ],
       },
     },
-    defaultSettings: { timezone: 'Asia/Hong_Kong' },
-    fileImport: { enabled: true },
+    defaultSettings: {
+      timezone: 'Asia/Hong_Kong',
+    },
+    fileImport: {
+      enabled: true,
+    },
     pushNotifications: {
       enabled: true,
       filterUserConfigs: [
-        { name: 'name', label: 'Name', nullable: false, type: 'string' },
+        {
+          name: 'name',
+          label: 'Name',
+          nullable: false,
+          type: 'string',
+        },
       ],
     },
     records: {
       field_demo: {
-        cmsRecord: { name: 'field_demo', recordType: 'field_demo' },
+        cmsRecord: {
+          name: 'field_demo',
+          recordType: 'field_demo',
+        },
         edit: {
           actions: [],
-          cmsRecord: { name: 'field_demo', recordType: 'field_demo' },
+          cmsRecord: {
+            name: 'field_demo',
+            recordType: 'field_demo',
+          },
           fields: [
-            { compact: false, label: 'ID', name: '_id', type: 'text_display' },
+            {
+              compact: false,
+              label: 'ID',
+              name: '_id',
+              type: 'text_display',
+            },
             {
               compact: false,
               label: 'Created at',
@@ -105,13 +131,28 @@ test('parseCmsConfig should parse example config', () => {
               name: 'dropdown',
               label: 'Dropdown',
               editable: true,
-              customOption: { enabled: true, label: 'Others' },
+              customOption: {
+                enabled: true,
+                label: 'Others',
+              },
               defaultValue: 'A',
-              nullOption: { enabled: false, label: 'Undefined' },
+              nullOption: {
+                enabled: false,
+                label: 'Undefined',
+              },
               options: [
-                { label: 'Option A', value: 'A' },
-                { label: 'Option B', value: 'B' },
-                { label: 'Option S', value: 'S' },
+                {
+                  label: 'Option A',
+                  value: 'A',
+                },
+                {
+                  label: 'Option B',
+                  value: 'B',
+                },
+                {
+                  label: 'Option S',
+                  value: 'S',
+                },
               ],
               type: 'dropdown',
             },
@@ -154,7 +195,10 @@ test('parseCmsConfig should parse example config', () => {
               name: 'reference',
               label: 'Reference',
               editable: true,
-              addButton: { enabled: true, label: 'Create New Reference' },
+              addButton: {
+                enabled: true,
+                label: 'Create New Reference',
+              },
               displayFieldName: 'name',
               reference: {
                 predicates: [
@@ -165,7 +209,10 @@ test('parseCmsConfig should parse example config', () => {
                     valueType: 'json_value',
                   },
                 ],
-                targetCmsRecord: { name: 'ref_demo', recordType: 'ref_demo' },
+                targetCmsRecord: {
+                  name: 'ref_demo',
+                  recordType: 'ref_demo',
+                },
                 type: 'DirectReference',
               },
               type: 'reference_dropdown',
@@ -214,6 +261,9 @@ test('parseCmsConfig should parse example config', () => {
                   type: 'text_input',
                 },
               ],
+              deleteButton: {
+                enabled: false,
+              },
               positionFieldName: 'field_demo_position',
               reference: {
                 predicates: [],
@@ -250,6 +300,9 @@ test('parseCmsConfig should parse example config', () => {
                   type: 'text_input',
                 },
               ],
+              deleteButton: {
+                enabled: false,
+              },
               reference: {
                 associationRecordConfig: {
                   cmsRecord: {
@@ -372,7 +425,10 @@ test('parseCmsConfig should parse example config', () => {
               name: 'reference',
               label: 'Reference',
               editable: true,
-              addButton: { enabled: true, label: 'Create New Reference' },
+              addButton: {
+                enabled: true,
+                label: 'Create New Reference',
+              },
               displayFieldName: 'name',
               reference: {
                 predicates: [
@@ -383,7 +439,10 @@ test('parseCmsConfig should parse example config', () => {
                     valueType: 'json_value',
                   },
                 ],
-                targetCmsRecord: { name: 'ref_demo', recordType: 'ref_demo' },
+                targetCmsRecord: {
+                  name: 'ref_demo',
+                  recordType: 'ref_demo',
+                },
                 type: 'DirectReference',
               },
               type: 'reference_dropdown',
@@ -432,6 +491,9 @@ test('parseCmsConfig should parse example config', () => {
                   type: 'text_input',
                 },
               ],
+              deleteButton: {
+                enabled: false,
+              },
               positionFieldName: 'field_demo_position',
               reference: {
                 predicates: [],
@@ -468,6 +530,9 @@ test('parseCmsConfig should parse example config', () => {
                   type: 'text_input',
                 },
               ],
+              deleteButton: {
+                enabled: false,
+              },
               reference: {
                 associationRecordConfig: {
                   cmsRecord: {
@@ -578,10 +643,21 @@ test('parseCmsConfig should parse example config', () => {
               type: 'export',
             },
           ],
-          cmsRecord: { name: 'field_demo', recordType: 'field_demo' },
-          defaultSort: { fieldName: 'name', order: 'descending' },
+          cmsRecord: {
+            name: 'field_demo',
+            recordType: 'field_demo',
+          },
+          defaultSort: {
+            fieldName: 'name',
+            order: 'descending',
+          },
           fields: [
-            { compact: true, label: 'ID', name: '_id', type: 'text_display' },
+            {
+              compact: true,
+              label: 'ID',
+              name: '_id',
+              type: 'text_display',
+            },
             {
               compact: true,
               label: 'Created at',
@@ -656,7 +732,10 @@ test('parseCmsConfig should parse example config', () => {
                     valueType: 'json_value',
                   },
                 ],
-                targetCmsRecord: { name: 'ref_demo', recordType: 'ref_demo' },
+                targetCmsRecord: {
+                  name: 'ref_demo',
+                  recordType: 'ref_demo',
+                },
                 type: 'DirectReference',
               },
               type: 'reference',
@@ -698,7 +777,12 @@ test('parseCmsConfig should parse example config', () => {
             },
           ],
           filters: [
-            { name: '_id', label: 'ID', nullable: false, type: 'string' },
+            {
+              name: '_id',
+              label: 'ID',
+              nullable: false,
+              type: 'string',
+            },
             {
               name: '_created_at',
               label: 'CreatedAt',
@@ -711,7 +795,12 @@ test('parseCmsConfig should parse example config', () => {
               nullable: false,
               type: 'date_time',
             },
-            { name: 'name', label: 'Name', nullable: false, type: 'string' },
+            {
+              name: 'name',
+              label: 'Name',
+              nullable: false,
+              type: 'string',
+            },
             {
               name: 'datetime',
               label: 'Datetime',
@@ -749,7 +838,10 @@ test('parseCmsConfig should parse example config', () => {
                   valueType: 'json_value',
                 },
               ],
-              targetCmsRecord: { name: 'ref_demo', recordType: 'ref_demo' },
+              targetCmsRecord: {
+                name: 'ref_demo',
+                recordType: 'ref_demo',
+              },
               type: 'reference',
             },
           ],
@@ -798,7 +890,10 @@ test('parseCmsConfig should parse example config', () => {
                     valueType: 'json_value',
                   },
                 ],
-                targetCmsRecord: { name: 'ref_demo', recordType: 'ref_demo' },
+                targetCmsRecord: {
+                  name: 'ref_demo',
+                  recordType: 'ref_demo',
+                },
                 type: 'DirectReference',
               },
               type: 'reference',
@@ -830,9 +925,17 @@ test('parseCmsConfig should parse example config', () => {
         },
         new: {
           actions: [],
-          cmsRecord: { name: 'field_demo', recordType: 'field_demo' },
+          cmsRecord: {
+            name: 'field_demo',
+            recordType: 'field_demo',
+          },
           fields: [
-            { compact: false, label: 'ID', name: '_id', type: 'text_display' },
+            {
+              compact: false,
+              label: 'ID',
+              name: '_id',
+              type: 'text_display',
+            },
             {
               compact: false,
               label: 'Created at',
@@ -864,13 +967,28 @@ test('parseCmsConfig should parse example config', () => {
               name: 'dropdown',
               label: 'Dropdown',
               editable: true,
-              customOption: { enabled: true, label: 'Others' },
+              customOption: {
+                enabled: true,
+                label: 'Others',
+              },
               defaultValue: 'A',
-              nullOption: { enabled: false, label: 'Undefined' },
+              nullOption: {
+                enabled: false,
+                label: 'Undefined',
+              },
               options: [
-                { label: 'Option A', value: 'A' },
-                { label: 'Option B', value: 'B' },
-                { label: 'Option S', value: 'S' },
+                {
+                  label: 'Option A',
+                  value: 'A',
+                },
+                {
+                  label: 'Option B',
+                  value: 'B',
+                },
+                {
+                  label: 'Option S',
+                  value: 'S',
+                },
               ],
               type: 'dropdown',
             },
@@ -913,11 +1031,17 @@ test('parseCmsConfig should parse example config', () => {
               name: 'reference',
               label: 'Reference',
               editable: true,
-              addButton: { enabled: false, label: '' },
+              addButton: {
+                enabled: false,
+                label: '',
+              },
               displayFieldName: 'name',
               reference: {
                 predicates: [],
-                targetCmsRecord: { name: 'ref_demo', recordType: 'ref_demo' },
+                targetCmsRecord: {
+                  name: 'ref_demo',
+                  recordType: 'ref_demo',
+                },
                 type: 'DirectReference',
               },
               type: 'reference_dropdown',
@@ -959,6 +1083,9 @@ test('parseCmsConfig should parse example config', () => {
                   type: 'text_input',
                 },
               ],
+              deleteButton: {
+                enabled: false,
+              },
               positionFieldName: 'field_demo_position',
               reference: {
                 predicates: [],
@@ -995,6 +1122,9 @@ test('parseCmsConfig should parse example config', () => {
                   type: 'text_input',
                 },
               ],
+              deleteButton: {
+                enabled: false,
+              },
               reference: {
                 associationRecordConfig: {
                   cmsRecord: {
@@ -1106,11 +1236,17 @@ test('parseCmsConfig should parse example config', () => {
               name: 'reference',
               label: 'Reference',
               editable: true,
-              addButton: { enabled: false, label: '' },
+              addButton: {
+                enabled: false,
+                label: '',
+              },
               displayFieldName: 'name',
               reference: {
                 predicates: [],
-                targetCmsRecord: { name: 'ref_demo', recordType: 'ref_demo' },
+                targetCmsRecord: {
+                  name: 'ref_demo',
+                  recordType: 'ref_demo',
+                },
                 type: 'DirectReference',
               },
               type: 'reference_dropdown',
@@ -1152,6 +1288,9 @@ test('parseCmsConfig should parse example config', () => {
                   type: 'text_input',
                 },
               ],
+              deleteButton: {
+                enabled: false,
+              },
               positionFieldName: 'field_demo_position',
               reference: {
                 predicates: [],
@@ -1188,6 +1327,9 @@ test('parseCmsConfig should parse example config', () => {
                   type: 'text_input',
                 },
               ],
+              deleteButton: {
+                enabled: false,
+              },
               reference: {
                 associationRecordConfig: {
                   cmsRecord: {
@@ -1277,9 +1419,17 @@ test('parseCmsConfig should parse example config', () => {
               type: 'link',
             },
           ],
-          cmsRecord: { name: 'field_demo', recordType: 'field_demo' },
+          cmsRecord: {
+            name: 'field_demo',
+            recordType: 'field_demo',
+          },
           fields: [
-            { compact: false, label: 'ID', name: '_id', type: 'text_display' },
+            {
+              compact: false,
+              label: 'ID',
+              name: '_id',
+              type: 'text_display',
+            },
             {
               compact: false,
               label: 'Created at',
@@ -1355,7 +1505,10 @@ test('parseCmsConfig should parse example config', () => {
                     valueType: 'json_value',
                   },
                 ],
-                targetCmsRecord: { name: 'ref_demo', recordType: 'ref_demo' },
+                targetCmsRecord: {
+                  name: 'ref_demo',
+                  recordType: 'ref_demo',
+                },
                 type: 'DirectReference',
               },
               type: 'reference',
@@ -1487,6 +1640,9 @@ test('parseCmsConfig should parse example config', () => {
                   type: 'text_display',
                 },
               ],
+              deleteButton: {
+                enabled: false,
+              },
               positionFieldName: 'field_demo_position',
               reference: {
                 predicates: [],
@@ -1521,6 +1677,9 @@ test('parseCmsConfig should parse example config', () => {
                   type: 'text_display',
                 },
               ],
+              deleteButton: {
+                enabled: false,
+              },
               reference: {
                 associationRecordConfig: {
                   cmsRecord: {
@@ -1634,7 +1793,10 @@ test('parseCmsConfig should parse example config', () => {
                     valueType: 'json_value',
                   },
                 ],
-                targetCmsRecord: { name: 'ref_demo', recordType: 'ref_demo' },
+                targetCmsRecord: {
+                  name: 'ref_demo',
+                  recordType: 'ref_demo',
+                },
                 type: 'DirectReference',
               },
               type: 'reference',
@@ -1766,6 +1928,9 @@ test('parseCmsConfig should parse example config', () => {
                   type: 'text_display',
                 },
               ],
+              deleteButton: {
+                enabled: false,
+              },
               positionFieldName: 'field_demo_position',
               reference: {
                 predicates: [],
@@ -1800,6 +1965,9 @@ test('parseCmsConfig should parse example config', () => {
                   type: 'text_display',
                 },
               ],
+              deleteButton: {
+                enabled: false,
+              },
               reference: {
                 associationRecordConfig: {
                   cmsRecord: {
@@ -1882,13 +2050,26 @@ test('parseCmsConfig should parse example config', () => {
         },
       },
       field_demo_deleted: {
-        cmsRecord: { name: 'field_demo_deleted', recordType: 'field_demo' },
+        cmsRecord: {
+          name: 'field_demo_deleted',
+          recordType: 'field_demo',
+        },
         list: {
           actions: [],
-          cmsRecord: { name: 'field_demo_deleted', recordType: 'field_demo' },
-          defaultSort: { order: 'undefined' },
+          cmsRecord: {
+            name: 'field_demo_deleted',
+            recordType: 'field_demo',
+          },
+          defaultSort: {
+            order: 'undefined',
+          },
           fields: [
-            { compact: true, label: 'ID', name: '_id', type: 'text_display' },
+            {
+              compact: true,
+              label: 'ID',
+              name: '_id',
+              type: 'text_display',
+            },
             {
               compact: true,
               label: 'Created at',
@@ -1930,9 +2111,17 @@ test('parseCmsConfig should parse example config', () => {
         },
         show: {
           actions: [],
-          cmsRecord: { name: 'field_demo_deleted', recordType: 'field_demo' },
+          cmsRecord: {
+            name: 'field_demo_deleted',
+            recordType: 'field_demo',
+          },
           fields: [
-            { compact: false, label: 'ID', name: '_id', type: 'text_display' },
+            {
+              compact: false,
+              label: 'ID',
+              name: '_id',
+              type: 'text_display',
+            },
             {
               compact: false,
               label: 'Created at',
@@ -1957,12 +2146,23 @@ test('parseCmsConfig should parse example config', () => {
         },
       },
       ref_demo: {
-        cmsRecord: { name: 'ref_demo', recordType: 'ref_demo' },
+        cmsRecord: {
+          name: 'ref_demo',
+          recordType: 'ref_demo',
+        },
         edit: {
           actions: [],
-          cmsRecord: { name: 'ref_demo', recordType: 'ref_demo' },
+          cmsRecord: {
+            name: 'ref_demo',
+            recordType: 'ref_demo',
+          },
           fields: [
-            { compact: false, label: 'ID', name: '_id', type: 'text_display' },
+            {
+              compact: false,
+              label: 'ID',
+              name: '_id',
+              type: 'text_display',
+            },
             {
               compact: false,
               name: 'name',
@@ -2011,9 +2211,17 @@ test('parseCmsConfig should parse example config', () => {
         },
         new: {
           actions: [],
-          cmsRecord: { name: 'ref_demo', recordType: 'ref_demo' },
+          cmsRecord: {
+            name: 'ref_demo',
+            recordType: 'ref_demo',
+          },
           fields: [
-            { compact: false, label: 'ID', name: '_id', type: 'text_display' },
+            {
+              compact: false,
+              label: 'ID',
+              name: '_id',
+              type: 'text_display',
+            },
             {
               compact: false,
               name: 'name',
@@ -2069,9 +2277,17 @@ test('parseCmsConfig should parse example config', () => {
               type: 'link',
             },
           ],
-          cmsRecord: { name: 'ref_demo', recordType: 'ref_demo' },
+          cmsRecord: {
+            name: 'ref_demo',
+            recordType: 'ref_demo',
+          },
           fields: [
-            { compact: false, label: 'ID', name: '_id', type: 'text_display' },
+            {
+              compact: false,
+              label: 'ID',
+              name: '_id',
+              type: 'text_display',
+            },
             {
               compact: false,
               name: 'name',
@@ -2117,18 +2333,32 @@ test('parseCmsConfig should parse example config', () => {
         },
       },
       back_ref_demo: {
-        cmsRecord: { name: 'back_ref_demo', recordType: 'back_ref_demo' },
+        cmsRecord: {
+          name: 'back_ref_demo',
+          recordType: 'back_ref_demo',
+        },
         edit: {
           actions: [],
-          cmsRecord: { name: 'back_ref_demo', recordType: 'back_ref_demo' },
+          cmsRecord: {
+            name: 'back_ref_demo',
+            recordType: 'back_ref_demo',
+          },
           fields: [
-            { compact: false, label: 'ID', name: '_id', type: 'text_display' },
+            {
+              compact: false,
+              label: 'ID',
+              name: '_id',
+              type: 'text_display',
+            },
             {
               compact: false,
               name: 'reference',
               label: 'Reference',
               editable: true,
-              addButton: { enabled: false, label: '' },
+              addButton: {
+                enabled: false,
+                label: '',
+              },
               displayFieldName: 'name',
               reference: {
                 predicates: [],
@@ -2155,7 +2385,10 @@ test('parseCmsConfig should parse example config', () => {
               name: 'reference',
               label: 'Reference',
               editable: true,
-              addButton: { enabled: false, label: '' },
+              addButton: {
+                enabled: false,
+                label: '',
+              },
               displayFieldName: 'name',
               reference: {
                 predicates: [],
@@ -2171,15 +2404,26 @@ test('parseCmsConfig should parse example config', () => {
         },
         new: {
           actions: [],
-          cmsRecord: { name: 'back_ref_demo', recordType: 'back_ref_demo' },
+          cmsRecord: {
+            name: 'back_ref_demo',
+            recordType: 'back_ref_demo',
+          },
           fields: [
-            { compact: false, label: 'ID', name: '_id', type: 'text_display' },
+            {
+              compact: false,
+              label: 'ID',
+              name: '_id',
+              type: 'text_display',
+            },
             {
               compact: false,
               name: 'reference',
               label: 'Reference',
               editable: true,
-              addButton: { enabled: false, label: '' },
+              addButton: {
+                enabled: false,
+                label: '',
+              },
               displayFieldName: 'name',
               reference: {
                 predicates: [],
@@ -2206,7 +2450,10 @@ test('parseCmsConfig should parse example config', () => {
               name: 'reference',
               label: 'Reference',
               editable: true,
-              addButton: { enabled: false, label: '' },
+              addButton: {
+                enabled: false,
+                label: '',
+              },
               displayFieldName: 'name',
               reference: {
                 predicates: [],
@@ -2229,9 +2476,17 @@ test('parseCmsConfig should parse example config', () => {
               type: 'link',
             },
           ],
-          cmsRecord: { name: 'back_ref_demo', recordType: 'back_ref_demo' },
+          cmsRecord: {
+            name: 'back_ref_demo',
+            recordType: 'back_ref_demo',
+          },
           fields: [
-            { compact: false, label: 'ID', name: '_id', type: 'text_display' },
+            {
+              compact: false,
+              label: 'ID',
+              name: '_id',
+              type: 'text_display',
+            },
             {
               compact: false,
               name: 'reference',
@@ -2275,12 +2530,23 @@ test('parseCmsConfig should parse example config', () => {
         },
       },
       asso_ref_demo: {
-        cmsRecord: { name: 'asso_ref_demo', recordType: 'asso_ref_demo' },
+        cmsRecord: {
+          name: 'asso_ref_demo',
+          recordType: 'asso_ref_demo',
+        },
         show: {
           actions: [],
-          cmsRecord: { name: 'asso_ref_demo', recordType: 'asso_ref_demo' },
+          cmsRecord: {
+            name: 'asso_ref_demo',
+            recordType: 'asso_ref_demo',
+          },
           fields: [
-            { compact: false, label: 'ID', name: '_id', type: 'text_display' },
+            {
+              compact: false,
+              label: 'ID',
+              name: '_id',
+              type: 'text_display',
+            },
             {
               compact: false,
               name: 'name',
@@ -2294,17 +2560,36 @@ test('parseCmsConfig should parse example config', () => {
       },
     },
     site: [
-      { type: 'user_management', label: 'USER' },
-      { type: 'push_notifications', label: 'PUSH' },
-      { type: 'file_import', label: 'FILE' },
-      { type: 'space', size: 'medium' },
-      { type: 'record', name: 'field_demo', label: 'Field demo' },
+      {
+        type: 'user_management',
+        label: 'USER',
+      },
+      {
+        type: 'push_notifications',
+        label: 'PUSH',
+      },
+      {
+        type: 'file_import',
+        label: 'FILE',
+      },
+      {
+        type: 'space',
+        size: 'medium',
+      },
+      {
+        type: 'record',
+        name: 'field_demo',
+        label: 'Field demo',
+      },
       {
         type: 'record',
         name: 'field_demo_deleted',
         label: 'Field demo deleted',
       },
-      { type: 'space', size: 'large' },
+      {
+        type: 'space',
+        size: 'large',
+      },
     ],
     userManagement: {
       enabled: true,
@@ -2312,8 +2597,16 @@ test('parseCmsConfig should parse example config', () => {
         editable: false,
         enabled: true,
         fields: [
-          { editable: true, label: 'Email', name: 'email' },
-          { editable: true, label: 'Phone number', name: 'phone' },
+          {
+            editable: true,
+            label: 'Email',
+            name: 'email',
+          },
+          {
+            editable: true,
+            label: 'Phone number',
+            name: 'phone',
+          },
         ],
       },
     },
