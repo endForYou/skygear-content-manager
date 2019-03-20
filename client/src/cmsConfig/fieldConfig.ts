@@ -102,8 +102,6 @@ export interface EditableFieldConfigAttrs extends FieldConfigAttrs {
   editable?: boolean;
 }
 
-const DATETIME_FORMAT = 'YYYY-MM-DD HH:mm:ssZ';
-
 // tslint:disable-next-line:no-any
 export function isFieldEditable(config: {
   type: FieldConfigTypes;
@@ -161,7 +159,7 @@ export interface WYSIWYGFieldConfig extends EditableFieldConfigAttrs {
 export interface DateTimeDisplayFieldConfig extends FieldConfigAttrs {
   type: FieldConfigTypes.DateTimeDisplay;
   timezone?: TimezoneValue;
-  dateTimeFormat: string;
+  dateTimeFormat?: string;
 }
 
 export interface DateTimePickerConfig {
@@ -579,7 +577,7 @@ function parseDateTimeDisplayFieldConfig(
 ): DateTimeDisplayFieldConfig {
   return {
     ...parseFieldConfigAttrs(input, FieldConfigTypes.DateTimeDisplay, depth),
-    dateTimeFormat: input.date_time_format || DATETIME_FORMAT,
+    dateTimeFormat: input.date_time_format,
     timezone: parseTimezone(input, 'timezone'),
     type: FieldConfigTypes.DateTimeDisplay,
   };

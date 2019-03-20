@@ -50,7 +50,7 @@ export interface BooleanFilterConfig extends FilterConfigAttrs {
 export interface DateTimeFilterConfig extends FilterConfigAttrs {
   type: FilterConfigTypes.DateTime;
   timezone?: TimezoneValue;
-  dateTimeFormat: string;
+  date_time_format?: string;
 }
 
 export interface GeneralFilterConfig extends FilterConfigAttrs {
@@ -64,8 +64,6 @@ export interface ReferenceFilterConfig extends FilterConfigAttrs {
   displayFieldName: string;
   predicates: Predicate[];
 }
-
-const DATETIME_FORMAT = 'YYYY-MM-DD HH:mm:ssZ';
 
 export function parseFilterConfig(
   // tslint:disable-next-line: no-any
@@ -137,7 +135,7 @@ function parseDateTimeFilterConfig(
 ): DateTimeFilterConfig {
   return {
     ...parseFilterConfigAttrs(input, 'date_time'),
-    dateTimeFormat: input.date_time_format || DATETIME_FORMAT,
+    date_time_format: input.date_time_format,
     timezone: parseTimezone(input, 'timezone'),
     type: FilterConfigTypes.DateTime,
   };
