@@ -12,10 +12,6 @@ import { hasValidationError } from '../validation/validation';
 import { RequiredFieldProps } from './Field';
 import { ValidationText } from './validation/ValidationText';
 
-const DATE_FORMAT = 'YYYY-MM-DD';
-const TIME_FORMAT = 'HH:mm:ssZ';
-const DATETIME_FORMAT = 'YYYY-MM-DD HH:mm:ssZ';
-
 type DateTimeDisplayFieldProps = RequiredFieldProps<DateTimeDisplayFieldConfig>;
 
 export const DateTimeDisplayField: React.SFC<DateTimeDisplayFieldProps> = ({
