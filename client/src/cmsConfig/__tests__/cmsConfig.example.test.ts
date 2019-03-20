@@ -1650,7 +1650,7 @@ test('parseCmsConfig should parse example config', () => {
                 enabled: false
               },
               deleteButton: {
-                enabled: true
+                enabled: false
               },
               displayFields: [
                 {
@@ -1944,7 +1944,7 @@ test('parseCmsConfig should parse example config', () => {
                 enabled: false
               },
               deleteButton: {
-                enabled: true
+                enabled: false
               },
               displayFields: [
                 {

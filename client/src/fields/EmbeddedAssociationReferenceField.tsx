@@ -177,7 +177,7 @@ export class EmbeddedAssociationReferenceField extends React.PureComponent<
   public render() {
     const { config, className, validationError } = this.props;
     const { embeddedRecords } = this.state;
-    const addable = config.editable && config.addButton.enabled || false
+    const addable = config.editable && config.addButton.enabled || false;
     const items = embeddedRecords.map((r, index) => {
       const fieldValidationErrors =
         validationError != null ? validationError.embeddedErrors[index] : {};

@@ -396,9 +396,6 @@ describe('parseFieldConfig EmbeddedReference', () => {
           type: FieldConfigTypes.TextDisplay,
         },
       ],
-      addButton: {
-        enabled: true
-      },
       label: 'A',
       name: 'A',
       positionFieldName: undefined,
