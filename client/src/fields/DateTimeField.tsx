@@ -74,8 +74,8 @@ class DateTimePickerFieldImpl extends React.PureComponent<
         <TzDatetimeInput
           {...rest}
           className={classnames('datetime-input-container')}
-          dateFormat={datePicker.format}
-          timeFormat={timePicker.format}
+          dateFormat={datePicker.enabled && datePicker.format}
+          timeFormat={timePicker.enabled && timePicker.format}
           value={this.state.value || undefined}
           onChange={this.handleChange}
           inputProps={{
