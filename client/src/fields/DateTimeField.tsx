@@ -14,12 +14,11 @@ import { ValidationText } from './validation/ValidationText';
 
 const DATE_FORMAT = 'YYYY-MM-DD';
 const TIME_FORMAT = 'HH:mm:ssZ';
-const DATETIME_FORMAT = 'YYYY-MM-DD HH:mm:ssZ';
 
 type DateTimeDisplayFieldProps = RequiredFieldProps<DateTimeDisplayFieldConfig>;
 
 export const DateTimeDisplayField: React.SFC<DateTimeDisplayFieldProps> = ({
-  config: { compact, timezone, date_time_format },
+  config: { compact, timezone, dateTimeFormat },
   className,
   value,
   onFieldChange: _onFieldChange,
@@ -32,7 +31,7 @@ export const DateTimeDisplayField: React.SFC<DateTimeDisplayFieldProps> = ({
       className={classnames(className, 'datetime-display', {
         full: !compact,
       })}
-      datetimeFormat={date_time_format || DATETIME_FORMAT}
+      datetimeFormat={dateTimeFormat}
       value={value}
       timezone={timezone}
     />
