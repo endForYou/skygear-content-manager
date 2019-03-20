@@ -1,6 +1,6 @@
 import { isArray } from 'util';
 import { TimezoneValue } from '../types';
-import { humanize } from '../util';
+import { get, humanize } from '../util';
 import {
   AssociationRecordConfig,
   CmsRecord,
@@ -291,6 +291,7 @@ export interface EmbeddedReferenceListFieldConfig
   reorderEnabled: boolean;
   references: ReferenceFieldConfig[];
   referenceDeleteAction: DeleteAction;
+  enableDeleteButton: boolean;
 }
 
 export interface EmbeddedBackReferenceListFieldConfig
@@ -808,6 +809,7 @@ function parseEmbeddedReferenceListFieldConfig(
       depth
     ),
     displayFields,
+    enableDeleteButton: get(input, ['delete_button', 'enabled']) !== false,
     positionFieldName,
     reference: parseMultiReferenceFieldConfigAttrs(context, input),
     referenceDeleteAction,
