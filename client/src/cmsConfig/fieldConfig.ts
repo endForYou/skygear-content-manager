@@ -805,7 +805,7 @@ function parseEmbeddedReferenceListFieldConfig(
   );
 
   const deleteButton = {
-    enabled: false
+    enabled: false,
   };
   if (input.delete_button != null) {
     const enabled = parseOptionalBoolean(

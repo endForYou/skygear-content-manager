@@ -383,7 +383,7 @@ describe('parseFieldConfig EmbeddedReference', () => {
     expect(result).toEqual({
       compact: false,
       deleteButton: {
-        enabled: false
+        enabled: false,
       },
       displayFields: [
         {
