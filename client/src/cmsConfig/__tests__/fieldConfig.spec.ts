@@ -397,6 +397,9 @@ describe('parseFieldConfig EmbeddedReference', () => {
     };
     const result = parseFieldConfig(context, input);
     expect(result).toEqual({
+      addButton: {
+        enabled: false,
+      },
       compact: false,
       deleteButton: {
         enabled: false,

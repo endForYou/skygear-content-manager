@@ -252,6 +252,12 @@ test('parseCmsConfig should parse example config', () => {
               name: 'back_refs_embedded',
               label: 'Back refs embedded',
               editable: true,
+              addButton: {
+                enabled: false,
+              },
+              deleteButton: {
+                enabled: false,
+              },
               displayFields: [
                 {
                   compact: false,
@@ -267,9 +273,6 @@ test('parseCmsConfig should parse example config', () => {
                   type: 'text_input',
                 },
               ],
-              deleteButton: {
-                enabled: false,
-              },
               positionFieldName: 'field_demo_position',
               reference: {
                 predicates: [],
@@ -291,6 +294,12 @@ test('parseCmsConfig should parse example config', () => {
               name: 'asso_refs_embedded',
               label: 'Asso refs embedded',
               editable: true,
+              addButton: {
+                enabled: false,
+              },
+              deleteButton: {
+                enabled: false,
+              },
               displayFields: [
                 {
                   compact: false,
@@ -306,9 +315,6 @@ test('parseCmsConfig should parse example config', () => {
                   type: 'text_input',
                 },
               ],
-              deleteButton: {
-                enabled: false,
-              },
               reference: {
                 associationRecordConfig: {
                   cmsRecord: {
@@ -482,6 +488,12 @@ test('parseCmsConfig should parse example config', () => {
               name: 'back_refs_embedded',
               label: 'Back refs embedded',
               editable: true,
+              addButton: {
+                enabled: false,
+              },
+              deleteButton: {
+                enabled: false,
+              },
               displayFields: [
                 {
                   compact: false,
@@ -497,9 +509,6 @@ test('parseCmsConfig should parse example config', () => {
                   type: 'text_input',
                 },
               ],
-              deleteButton: {
-                enabled: false,
-              },
               positionFieldName: 'field_demo_position',
               reference: {
                 predicates: [],
@@ -521,6 +530,12 @@ test('parseCmsConfig should parse example config', () => {
               name: 'asso_refs_embedded',
               label: 'Asso refs embedded',
               editable: true,
+              addButton: {
+                enabled: false,
+              },
+              deleteButton: {
+                enabled: false,
+              },
               displayFields: [
                 {
                   compact: false,
@@ -536,9 +551,6 @@ test('parseCmsConfig should parse example config', () => {
                   type: 'text_input',
                 },
               ],
-              deleteButton: {
-                enabled: false,
-              },
               reference: {
                 associationRecordConfig: {
                   cmsRecord: {
@@ -1081,6 +1093,12 @@ test('parseCmsConfig should parse example config', () => {
               name: 'back_refs_embedded',
               label: 'Back refs embedded',
               editable: true,
+              addButton: {
+                enabled: false,
+              },
+              deleteButton: {
+                enabled: false,
+              },
               displayFields: [
                 {
                   compact: false,
@@ -1096,9 +1114,6 @@ test('parseCmsConfig should parse example config', () => {
                   type: 'text_input',
                 },
               ],
-              deleteButton: {
-                enabled: false,
-              },
               positionFieldName: 'field_demo_position',
               reference: {
                 predicates: [],
@@ -1120,6 +1135,12 @@ test('parseCmsConfig should parse example config', () => {
               name: 'asso_refs_embedded',
               label: 'Asso refs embedded',
               editable: true,
+              addButton: {
+                enabled: false,
+              },
+              deleteButton: {
+                enabled: false,
+              },
               displayFields: [
                 {
                   compact: false,
@@ -1135,9 +1156,6 @@ test('parseCmsConfig should parse example config', () => {
                   type: 'text_input',
                 },
               ],
-              deleteButton: {
-                enabled: false,
-              },
               reference: {
                 associationRecordConfig: {
                   cmsRecord: {
@@ -1286,6 +1304,12 @@ test('parseCmsConfig should parse example config', () => {
               name: 'back_refs_embedded',
               label: 'Back refs embedded',
               editable: true,
+              addButton: {
+                enabled: false,
+              },
+              deleteButton: {
+                enabled: false,
+              },
               displayFields: [
                 {
                   compact: false,
@@ -1301,9 +1325,6 @@ test('parseCmsConfig should parse example config', () => {
                   type: 'text_input',
                 },
               ],
-              deleteButton: {
-                enabled: false,
-              },
               positionFieldName: 'field_demo_position',
               reference: {
                 predicates: [],
@@ -1325,6 +1346,12 @@ test('parseCmsConfig should parse example config', () => {
               name: 'asso_refs_embedded',
               label: 'Asso refs embedded',
               editable: true,
+              addButton: {
+                enabled: false,
+              },
+              deleteButton: {
+                enabled: false,
+              },
               displayFields: [
                 {
                   compact: false,
@@ -1340,9 +1367,6 @@ test('parseCmsConfig should parse example config', () => {
                   type: 'text_input',
                 },
               ],
-              deleteButton: {
-                enabled: false,
-              },
               reference: {
                 associationRecordConfig: {
                   cmsRecord: {
@@ -1640,6 +1664,12 @@ test('parseCmsConfig should parse example config', () => {
               compact: false,
               name: 'back_refs_embedded',
               label: 'Back refs embedded',
+              addButton: {
+                enabled: false,
+              },
+              deleteButton: {
+                enabled: false,
+              },
               displayFields: [
                 {
                   compact: false,
@@ -1654,9 +1684,6 @@ test('parseCmsConfig should parse example config', () => {
                   type: 'text_display',
                 },
               ],
-              deleteButton: {
-                enabled: false,
-              },
               positionFieldName: 'field_demo_position',
               reference: {
                 predicates: [],
@@ -1677,6 +1704,12 @@ test('parseCmsConfig should parse example config', () => {
               compact: false,
               name: 'asso_refs_embedded',
               label: 'Asso refs embedded',
+              addButton: {
+                enabled: false,
+              },
+              deleteButton: {
+                enabled: false,
+              },
               displayFields: [
                 {
                   compact: false,
@@ -1691,9 +1724,6 @@ test('parseCmsConfig should parse example config', () => {
                   type: 'text_display',
                 },
               ],
-              deleteButton: {
-                enabled: false,
-              },
               reference: {
                 associationRecordConfig: {
                   cmsRecord: {
@@ -1928,6 +1958,12 @@ test('parseCmsConfig should parse example config', () => {
               compact: false,
               name: 'back_refs_embedded',
               label: 'Back refs embedded',
+              addButton: {
+                enabled: false,
+              },
+              deleteButton: {
+                enabled: false,
+              },
               displayFields: [
                 {
                   compact: false,
@@ -1942,9 +1978,6 @@ test('parseCmsConfig should parse example config', () => {
                   type: 'text_display',
                 },
               ],
-              deleteButton: {
-                enabled: false,
-              },
               positionFieldName: 'field_demo_position',
               reference: {
                 predicates: [],
@@ -1965,6 +1998,12 @@ test('parseCmsConfig should parse example config', () => {
               compact: false,
               name: 'asso_refs_embedded',
               label: 'Asso refs embedded',
+              addButton: {
+                enabled: false,
+              },
+              deleteButton: {
+                enabled: false,
+              },
               displayFields: [
                 {
                   compact: false,
@@ -1979,9 +2018,6 @@ test('parseCmsConfig should parse example config', () => {
                   type: 'text_display',
                 },
               ],
-              deleteButton: {
-                enabled: false,
-              },
               reference: {
                 associationRecordConfig: {
                   cmsRecord: {

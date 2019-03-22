@@ -154,6 +154,7 @@ export class EmbeddedBackReferenceListField extends React.PureComponent<
   public render() {
     const { config, className, validationError } = this.props;
     const { embeddedRecords } = this.state;
+    const addable = (config.editable && config.addButton.enabled) || false;
     const items = embeddedRecords.map((r, index) => {
       const fieldValidationErrors =
         validationError != null ? validationError.embeddedErrors[index] : {};
@@ -211,7 +212,7 @@ export class EmbeddedBackReferenceListField extends React.PureComponent<
       <div className={classnames(className, 'embedded-back-reference')}>
         <ValidationAlert validationError={validationError} />
         <div className="embedded-back-reference-field">{items}</div>
-        {config.editable && (
+        {addable && (
           <div>
             <PrimaryButton
               type="button"
