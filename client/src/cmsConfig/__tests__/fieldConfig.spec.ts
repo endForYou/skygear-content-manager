@@ -128,8 +128,16 @@ describe('parseFieldConfig DateTime', () => {
     const result = parseFieldConfig(minimalContext, input);
     expect(result).toEqual({
       compact: false,
+      datePicker: {
+        enabled: false,
+        format: undefined,
+      },
       label: 'Datetime',
       name: 'datetime',
+      timePicker: {
+        enabled: false,
+        format: undefined,
+      },
       type: 'date_time_picker',
     });
   });
@@ -146,8 +154,16 @@ describe('parseFieldConfig DateTime', () => {
     ) as DateTimePickerFieldConfig;
     expect(result).toEqual({
       compact: false,
+      datePicker: {
+        enabled: false,
+        format: undefined,
+      },
       label: 'Datetime',
       name: 'datetime',
+      timePicker: {
+        enabled: false,
+        format: undefined,
+      },
       timezone: 'Asia/Hong_Kong',
       type: 'date_time_picker',
     });

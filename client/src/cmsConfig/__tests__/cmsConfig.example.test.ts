@@ -167,6 +167,12 @@ test('parseCmsConfig should parse example config', () => {
               compact: false,
               name: 'datetime',
               label: 'Datetime',
+              datePicker: {
+                enabled: false,
+              },
+              timePicker: {
+                enabled: false,
+              },
               type: 'date_time_picker',
             },
             {
@@ -698,6 +704,7 @@ test('parseCmsConfig should parse example config', () => {
               compact: true,
               name: 'datetime',
               label: 'Datetime',
+              dateTimeFormat: 'YYYY-MM-DD HH:mm:ssZ',
               type: 'date_time_display',
             },
             {
@@ -1003,6 +1010,12 @@ test('parseCmsConfig should parse example config', () => {
               compact: false,
               name: 'datetime',
               label: 'Datetime',
+              datePicker: {
+                enabled: false,
+              },
+              timePicker: {
+                enabled: false,
+              },
               type: 'date_time_picker',
             },
             {
@@ -1470,6 +1483,7 @@ test('parseCmsConfig should parse example config', () => {
               compact: false,
               name: 'datetime',
               label: 'Datetime',
+              dateTimeFormat: 'YYYY-MM-DD HH:mm:ssZ',
               timezone: 'America/New_York',
               type: 'date_time_display',
             },

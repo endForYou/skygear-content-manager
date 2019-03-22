@@ -12,14 +12,10 @@ import { hasValidationError } from '../validation/validation';
 import { RequiredFieldProps } from './Field';
 import { ValidationText } from './validation/ValidationText';
 
-const DATE_FORMAT = 'YYYY-MM-DD';
-const TIME_FORMAT = 'HH:mm:ssZ';
-const DATETIME_FORMAT = 'YYYY-MM-DD HH:mm:ssZ';
-
 type DateTimeDisplayFieldProps = RequiredFieldProps<DateTimeDisplayFieldConfig>;
 
 export const DateTimeDisplayField: React.SFC<DateTimeDisplayFieldProps> = ({
-  config: { compact, timezone },
+  config: { compact, timezone, dateTimeFormat },
   className,
   value,
   onFieldChange: _onFieldChange,
@@ -32,7 +28,7 @@ export const DateTimeDisplayField: React.SFC<DateTimeDisplayFieldProps> = ({
       className={classnames(className, 'datetime-display', {
         full: !compact,
       })}
-      datetimeFormat={DATETIME_FORMAT}
+      datetimeFormat={dateTimeFormat!}
       value={value}
       timezone={timezone}
     />
@@ -65,7 +61,7 @@ class DateTimePickerFieldImpl extends React.PureComponent<
 
   public render() {
     const {
-      config: { timezone },
+      config: { timezone, datePicker, timePicker },
       className,
       onFieldChange: _onFieldChange,
       value: _value,
@@ -78,8 +74,8 @@ class DateTimePickerFieldImpl extends React.PureComponent<
         <TzDatetimeInput
           {...rest}
           className={classnames('datetime-input-container')}
-          dateFormat={DATE_FORMAT}
-          timeFormat={TIME_FORMAT}
+          dateFormat={datePicker.enabled && datePicker.format}
+          timeFormat={timePicker.enabled && timePicker.format}
           value={this.state.value || undefined}
           onChange={this.handleChange}
           inputProps={{

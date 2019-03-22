@@ -19,6 +19,10 @@ import {
 } from './util';
 import { parseValidationConfigs, ValidationConfig } from './validationConfig';
 
+const DATE_FORMAT = 'YYYY-MM-DD';
+const TIME_FORMAT = 'HH:mm:ssZ';
+const DATETIME_FORMAT = 'YYYY-MM-DD HH:mm:ssZ';
+
 export type ReferenceFieldConfig =
   | ReferenceDisplayFieldConfig
   | ReferenceDropdownFieldConfig
@@ -159,12 +163,20 @@ export interface WYSIWYGFieldConfig extends EditableFieldConfigAttrs {
 export interface DateTimeDisplayFieldConfig extends FieldConfigAttrs {
   type: FieldConfigTypes.DateTimeDisplay;
   timezone?: TimezoneValue;
+  dateTimeFormat?: string;
+}
+
+export interface DateTimePickerConfig {
+  enabled?: boolean;
+  format?: string;
 }
 
 export interface DateTimePickerFieldConfig extends EditableFieldConfigAttrs {
   type: FieldConfigTypes.DateTimePicker;
   defaultValue?: Date;
   timezone?: TimezoneValue;
+  datePicker: DateTimePickerConfig;
+  timePicker: DateTimePickerConfig;
 }
 
 export interface BooleanFieldConfig extends EditableFieldConfigAttrs {
@@ -572,6 +584,9 @@ function parseDateTimeDisplayFieldConfig(
 ): DateTimeDisplayFieldConfig {
   return {
     ...parseFieldConfigAttrs(input, FieldConfigTypes.DateTimeDisplay, depth),
+    dateTimeFormat:
+      parseOptionalString(input, 'date_time_format', 'date_time_format') ||
+      DATETIME_FORMAT,
     timezone: parseTimezone(input, 'timezone'),
     type: FieldConfigTypes.DateTimeDisplay,
   };
@@ -582,9 +597,34 @@ function parseDateTimePickerFieldConfig(
   context: RecordTypeContext,
   depth: number
 ): DateTimePickerFieldConfig {
+  const datePicker: { enabled: boolean; format?: string } = {
+    enabled: false,
+    format: undefined,
+  };
+  const timePicker: { enabled: boolean; format?: string } = {
+    enabled: false,
+    format: undefined,
+  };
+
+  if (input.date_picker) {
+    datePicker.enabled = !!input.date_picker.enabled;
+    datePicker.format =
+      parseOptionalString(input.date_picker, 'format', 'date_picker.format') ||
+      DATE_FORMAT;
+  }
+
+  if (input.time_picker) {
+    timePicker.enabled = !!input.timer_picker.enabled;
+    timePicker.format =
+      parseOptionalString(input.timer_picker, 'format', 'time_picker.format') ||
+      TIME_FORMAT;
+  }
+
   return {
     ...parseEditableConfigAttrs(input, FieldConfigTypes.DateTimePicker, depth),
+    datePicker,
     defaultValue: parseOptionalDate(input, 'default_value', 'date_time_picker'),
+    timePicker,
     timezone: parseTimezone(input, 'timezone'),
     type: FieldConfigTypes.DateTimePicker,
   };
