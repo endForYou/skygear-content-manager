@@ -38,10 +38,28 @@ export class DropdownField extends React.PureComponent<
     this.handleCustomValueChange = this.handleCustomValueChange.bind(this);
   }
 
-  // Does not handle componentWillReceiveProps
+  // Does not handle componentWillReceiveProps for value changes while the field
+  // is rendered for the same record field
   //
   // props does not have enough information to distinguish matched value or
   // custom value with matched value
+  public componentWillReceiveProps(nextProps: DropdownFieldProps) {
+    const isFieldReused =
+      this.props.config.name !== nextProps.config.name ||
+      nextProps.context.record.recordType !==
+        this.props.context.record.recordType ||
+      nextProps.context.record.id !== this.props.context.record.id;
+
+    // assume non editable dropdown field does not have internal state
+    if (
+      !nextProps.config.editable ||
+      (isFieldReused && nextProps.value !== this.props.value)
+    ) {
+      this.setState({
+        ...this.deriveValueStates(nextProps.config, nextProps.value),
+      });
+    }
+  }
 
   public deriveValueStates(config: DropdownFieldConfig, value: ValueType) {
     const { customOption, options } = config;
