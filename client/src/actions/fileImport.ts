@@ -246,7 +246,11 @@ function importRemoveAllFiles(): ImportRemoveAllFiles {
   };
 }
 
-function getSortByName(name: string | undefined): string | undefined {
+function getSortByName(name: string | undefined): string {
+  if (name == null) {
+    return 'uploaded_at';
+  }
+
   switch (name) {
     case 'name':
       return 'id';
@@ -255,7 +259,7 @@ function getSortByName(name: string | undefined): string | undefined {
     case 'size':
       return 'size';
     default:
-      return undefined;
+      throw new Error(`getSortByName: unknown name ${name}`);
   }
 }
 
