@@ -24,7 +24,7 @@ export const TzDatetimeInputImpl: React.SFC<Props> = ({
 }) => {
   const utcOffset = utcOffsetOfTimezone(timezone || settings.timezone);
 
-  return <Datetime {...rest} utcOffset={utcOffset} inputProps={{disabled}} />;
+  return <Datetime {...rest} utcOffset={utcOffset} inputProps={{ disabled }} />;
 };
 
 export const TzDatetimeInput = connect(
