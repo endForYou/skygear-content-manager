@@ -61,7 +61,7 @@ class DateTimePickerFieldImpl extends React.PureComponent<
 
   public render() {
     const {
-      config: { timezone, datePicker, timePicker },
+      config: { timezone, datePicker, timePicker, editable },
       className,
       onFieldChange: _onFieldChange,
       value: _value,
@@ -84,8 +84,7 @@ class DateTimePickerFieldImpl extends React.PureComponent<
             }),
           }}
           timezone={timezone}
-          // TODO: handle editable
-          // disabled={!editable}
+          disabled={editable === false}
         />
         <ValidationText validationError={validationError} />
       </div>

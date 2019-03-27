@@ -13,16 +13,18 @@ import { mapDispatchNoOp } from './TzDatetime';
 interface Props extends Omit<Datetime.DatetimepickerProps, 'utcOffset'> {
   settings: Settings;
   timezone?: TimezoneValue;
+  disabled?: boolean;
 }
 
 export const TzDatetimeInputImpl: React.SFC<Props> = ({
   settings,
   timezone,
+  disabled,
   ...rest
 }) => {
   const utcOffset = utcOffsetOfTimezone(timezone || settings.timezone);
 
-  return <Datetime {...rest} utcOffset={utcOffset} />;
+  return <Datetime {...rest} utcOffset={utcOffset} inputProps={{ disabled }} />;
 };
 
 export const TzDatetimeInput = connect(
