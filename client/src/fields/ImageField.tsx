@@ -60,7 +60,7 @@ export class ImageUploaderField extends React.PureComponent<
   public renderClearButton() {
     return (
       <div>
-        <button className="btn-clear" onClick={this.onClearClick}>
+        <button className="btn-clear" onClick={this.onClearClick} type="button">
           Clear Image
         </button>
       </div>
