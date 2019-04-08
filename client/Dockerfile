@@ -2,6 +2,8 @@ FROM node:8
 
 WORKDIR /usr/src/app
 
+# npm ci needs >= 5.7.0
+RUN npm install -g npm@^5.7.0
 RUN npm install -g http-server
 
 COPY package.json package-lock.json /usr/src/app/
