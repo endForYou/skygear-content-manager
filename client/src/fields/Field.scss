@@ -83,7 +83,7 @@
 .file-display-null {
   &.full {
     @include text-input;
-    border-color: rgba(#CCC, 0.3);
+    border-color: rgba(#ccc, 0.3);
     height: to-rem(38px);
     vertical-align: middle;
   }
@@ -99,7 +99,7 @@
   @include text-input;
   padding-top: to-rem(12px);
   padding-bottom: to-rem(12px);
-  border-color: rgba(#CCC, 0.3);
+  border-color: rgba(#ccc, 0.3);
   color: #495057;
 }
 

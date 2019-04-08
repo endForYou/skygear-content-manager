@@ -1,12 +1,12 @@
 @import 'styleUtils/common.scss';
 
 .sort-button {
-  opacity: .5;
+  opacity: 0.5;
   cursor: pointer;
 }
 
 .sort-button:hover {
-  opacity: .75;
+  opacity: 0.75;
 }
 
 .embedded-back-reference {
@@ -21,7 +21,7 @@
   padding-right: to-rem(18px);
   padding-top: to-rem(18px);
   padding-bottom: to-rem(18px);
-  background-color: rgba(#EEE, 0.3);
+  background-color: rgba(#eee, 0.3);
   border-radius: 4px;
   transition: box-shadow 0.3s ease-in-out;
 
@@ -33,7 +33,7 @@
 
 form.embedded-record-view.editable:hover,
 form.embedded-record-view.editable:focus-within {
-  box-shadow: 0 1px 5px rgba(0,0,0,0.3);
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.3);
 }
 
 .embedded-back-reference-field > .embedded-record-view:not(:first-child) {

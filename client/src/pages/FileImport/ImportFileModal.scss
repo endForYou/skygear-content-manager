@@ -3,12 +3,13 @@
 .file-import-modal {
   .file-dropzone {
     height: to-rem(200px);
-    background-color: rgba(#EEE, 0.3);
+    background-color: rgba(#eee, 0.3);
     margin-top: to-rem(15px);
     overflow-y: auto;
   }
 
-  .setting-title, .handle-options {
+  .setting-title,
+  .handle-options {
     margin: 15px 0;
   }
 
@@ -22,7 +23,7 @@
     padding: to-rem(15px) to-rem(15px);
 
     &:hover {
-      background-color: rgba(#EEE, 0.1);
+      background-color: rgba(#eee, 0.1);
     }
   }
 

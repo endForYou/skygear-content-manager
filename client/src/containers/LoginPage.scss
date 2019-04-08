@@ -2,67 +2,67 @@
 @import 'styleUtils/effect.scss';
 
 .login {
-	.topbar {
-		position: absolute;
-		top: 0;
-		left: 0;
-		right: 0;
-		height: to-rem(70px);
-		background: #19c2bf;
-	}
+  .topbar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: to-rem(70px);
+    background: #19c2bf;
+  }
 
-	.topbar-logo-link {
-		@include btn-hover-effect-opacity;
-		display: flex;
-		align-items: center;
-		height: 100%;
-		margin-left: to-rem(48px);
-	}
+  .topbar-logo-link {
+    @include btn-hover-effect-opacity;
+    display: flex;
+    align-items: center;
+    height: 100%;
+    margin-left: to-rem(48px);
+  }
 
-	.topbar-logo {
-		width: auto;
-		height: to-rem(22px);
-	}
+  .topbar-logo {
+    width: auto;
+    height: to-rem(22px);
+  }
 
-	.form-container {
-		max-width: to-rem(620px);
-		background-color: white;
-		margin-top: to-rem(30px + 70px);
-		margin-bottom: to-rem(30px);
-		margin-left: auto;
-		margin-right: auto;
-		padding: to-rem(34px) to-rem(80px);
-	}
+  .form-container {
+    max-width: to-rem(620px);
+    background-color: white;
+    margin-top: to-rem(30px + 70px);
+    margin-bottom: to-rem(30px);
+    margin-left: auto;
+    margin-right: auto;
+    padding: to-rem(34px) to-rem(80px);
+  }
 
-	.form-title {
-		margin-top: to-rem(4px);
-		margin-bottom: to-rem(44px);
-		font-weight: 300;
-		font-size: to-rem(38px);
-		line-height: to-rem(38px);
-		color: #373A3C;
-		text-align: center;
-	}
+  .form-title {
+    margin-top: to-rem(4px);
+    margin-bottom: to-rem(44px);
+    font-weight: 300;
+    font-size: to-rem(38px);
+    line-height: to-rem(38px);
+    color: #373a3c;
+    text-align: center;
+  }
 
-	.form-item {
-		margin: to-rem(10px) 0;
-	}
+  .form-item {
+    margin: to-rem(10px) 0;
+  }
 
-	.form-label {
-		width: 26%;
-	}
+  .form-label {
+    width: 26%;
+  }
 
-	.form-text-input {
-		@include text-input;
-		width: 74%;
-		height: to-rem(38px);
-	}
+  .form-text-input {
+    @include text-input;
+    width: 74%;
+    height: to-rem(38px);
+  }
 
-	.form-submit {
-		@include btn;
-		@include btn-primary;
-		height: to-rem(40px);
-		width: to-rem(160px);
-		margin: to-rem(40px) auto;
-	}
+  .form-submit {
+    @include btn;
+    @include btn-primary;
+    height: to-rem(40px);
+    width: to-rem(160px);
+    margin: to-rem(40px) auto;
+  }
 }

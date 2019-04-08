@@ -2,16 +2,16 @@
   margin: 15px -15px -15px -15px;
   max-height: 250px;
   overflow-y: auto;
-  border-top: 1px solid darken(#F9F9F9, 10);
-  border-bottom: 1px solid darken(#F9F9F9, 10);
+  border-top: 1px solid darken(#f9f9f9, 10);
+  border-bottom: 1px solid darken(#f9f9f9, 10);
 
   & .import-result-error-item {
     padding: 10px 15px;
-    background-color: #F9F9F9;
+    background-color: #f9f9f9;
   }
 
   & .import-result-error-item:nth-child(2n-1) {
-    background-color: darken(#F9F9F9, 5);
+    background-color: darken(#f9f9f9, 5);
   }
 }
 
