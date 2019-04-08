@@ -33,9 +33,6 @@ export class DropdownField extends React.PureComponent<
       ...this.deriveValueStates(props.config, props.value),
       expanded: false,
     };
-
-    this.handleSelectChange = this.handleSelectChange.bind(this);
-    this.handleCustomValueChange = this.handleCustomValueChange.bind(this);
   }
 
   // Does not handle componentWillReceiveProps for value changes while the field
@@ -81,7 +78,7 @@ export class DropdownField extends React.PureComponent<
     };
   }
 
-  handleSelectChange(option: Option | null) {
+  handleSelectChange = (option: Option | null) => {
     if (option == null) {
       // throw new Error('Unexpected null selected');
       return;
@@ -113,9 +110,9 @@ export class DropdownField extends React.PureComponent<
     if (this.props.onFieldChange) {
       this.props.onFieldChange(newValue);
     }
-  }
+  };
 
-  handleCustomValueChange(event: React.ChangeEvent<HTMLInputElement>) {
+  handleCustomValueChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
     this.setState({
       value,
@@ -124,7 +121,7 @@ export class DropdownField extends React.PureComponent<
     if (this.props.onFieldChange) {
       this.props.onFieldChange(value);
     }
-  }
+  };
 
   get selectOptions() {
     const {

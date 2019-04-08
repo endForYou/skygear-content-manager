@@ -32,10 +32,6 @@ export class PasswordForm extends React.PureComponent<
       password: '',
       successMessage: '',
     };
-
-    this.onPasswordChange = this.onPasswordChange.bind(this);
-    this.onConfirmPasswordChange = this.onConfirmPasswordChange.bind(this);
-    this.onFormSubmit = this.onFormSubmit.bind(this);
   }
 
   render() {
@@ -103,19 +99,21 @@ export class PasswordForm extends React.PureComponent<
     return password !== '' && confirmPassword === password;
   }
 
-  private onPasswordChange(event: React.ChangeEvent<HTMLInputElement>) {
+  private onPasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     this.setState({
       password: event.target.value,
     });
-  }
+  };
 
-  private onConfirmPasswordChange(event: React.ChangeEvent<HTMLInputElement>) {
+  private onConfirmPasswordChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     this.setState({
       confirmPassword: event.target.value,
     });
-  }
+  };
 
-  private onFormSubmit(event: React.FormEvent<HTMLFormElement>) {
+  private onFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     this.setState({ errorMessage: '', isSubmitting: true, successMessage: '' });
@@ -135,5 +133,5 @@ export class PasswordForm extends React.PureComponent<
           isSubmitting: false,
         });
       });
-  }
+  };
 }

@@ -68,27 +68,16 @@ export class EmbeddedAssociationReferenceField extends React.PureComponent<
 
     this.embeddedRecordBeforeEffects = embeddedRecords.map(() => ({}));
     this.embeddedRecordAfterEffects = embeddedRecords.map(() => ({}));
-
-    this.handleEmbeddedRecordChange = this.handleEmbeddedRecordChange.bind(
-      this
-    );
-    this.handleEmbeddedRecordRemove = this.handleEmbeddedRecordRemove.bind(
-      this
-    );
-    this.handleEmbeddedRecordCreate = this.handleEmbeddedRecordCreate.bind(
-      this
-    );
-    this.handleEmbeddedRecordMove = this.handleEmbeddedRecordMove.bind(this);
   }
 
-  handleEmbeddedRecordChange(
+  handleEmbeddedRecordChange = (
     index: number,
     name: string,
     // tslint:disable-next-line: no-any
     value: any,
     beforeEffect?: Effect,
     afterEffect?: Effect
-  ) {
+  ) => {
     if (value !== undefined) {
       this.setState(pState => {
         pState.embeddedRecordUpdate[index][name] = value;
@@ -106,9 +95,9 @@ export class EmbeddedAssociationReferenceField extends React.PureComponent<
     }
 
     this.applyEmbeddedRecordChange();
-  }
+  };
 
-  handleEmbeddedRecordRemove(index: number) {
+  handleEmbeddedRecordRemove = (index: number) => {
     this.setState(pState => {
       pState.embeddedRecordDelete.push(pState.assoRecords[index]);
       pState.embeddedRecordUpdate.splice(index, 1);
@@ -121,9 +110,9 @@ export class EmbeddedAssociationReferenceField extends React.PureComponent<
     this.embeddedRecordAfterEffects.splice(index, 1);
 
     this.applyEmbeddedRecordChange();
-  }
+  };
 
-  handleEmbeddedRecordCreate() {
+  handleEmbeddedRecordCreate = () => {
     const {
       config: { reference },
       context,
@@ -158,9 +147,9 @@ export class EmbeddedAssociationReferenceField extends React.PureComponent<
     this.embeddedRecordAfterEffects.push({});
 
     this.applyEmbeddedRecordChange();
-  }
+  };
 
-  handleEmbeddedRecordMove(from: number, to: number) {
+  handleEmbeddedRecordMove = (from: number, to: number) => {
     this.setState(pState => {
       swap(pState.assoRecords, from, to);
       swap(pState.embeddedRecordUpdate, from, to);
@@ -172,7 +161,7 @@ export class EmbeddedAssociationReferenceField extends React.PureComponent<
     swap(this.embeddedRecordAfterEffects, from, to);
 
     this.applyEmbeddedRecordChange();
-  }
+  };
 
   render() {
     const { config, className, validationError } = this.props;

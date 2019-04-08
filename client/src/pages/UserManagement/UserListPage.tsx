@@ -207,8 +207,6 @@ class UserListPageImpl extends React.PureComponent<UserListPageProps, State> {
 
     this.userActionCreator = new UserActionDispatcher(dispatch);
     this.fetchList = debounce(this.fetchList.bind(this), 200);
-
-    this.onCMSAccessChange = this.onCMSAccessChange.bind(this);
   }
 
   componentDidMount() {
@@ -355,10 +353,10 @@ class UserListPageImpl extends React.PureComponent<UserListPageProps, State> {
     this.userActionCreator.fetchList(page, perPage, filters);
   }
 
-  onCMSAccessChange(user: SkygearUser, hasAccess: boolean) {
+  onCMSAccessChange = (user: SkygearUser, hasAccess: boolean) => {
     const { adminRole } = this.props;
     this.userActionCreator.updateUserCMSAccess(user.id, hasAccess, adminRole);
-  }
+  };
 }
 
 function UserListPageFactory() {
