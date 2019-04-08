@@ -70,7 +70,8 @@
     "postinstall": "/bin/sh scripts/postinstall.sh",
     "test": "node scripts/test.js --env=jsdom",
     "lint": "tslint -p tsconfig.json -c tslint.json 'src/**/*.{ts,tsx}'",
-    "format": "prettier --write --list-different 'src/**/*.{js,jsx,ts,tsx,css,scss}'"
+    "format": "prettier --write --list-different 'src/**/*.{js,jsx,ts,tsx,css,scss}'",
+    "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
     "@oursky/tslint-oursky": "0.11.0",
