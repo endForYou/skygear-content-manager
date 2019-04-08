@@ -1433,7 +1433,7 @@ Object {
           },
           Object {
             "addButton": Object {
-              "enabled": false,
+              "enabled": true,
             },
             "compact": false,
             "deleteButton": Object {
@@ -1448,7 +1448,7 @@ Object {
               },
               Object {
                 "compact": false,
-                "defaultValue": undefined,
+                "defaultValue": "it_works",
                 "editable": true,
                 "label": "Name",
                 "name": "name",
@@ -1478,7 +1478,7 @@ Object {
           },
           Object {
             "addButton": Object {
-              "enabled": false,
+              "enabled": true,
             },
             "compact": false,
             "deleteButton": Object {
@@ -1493,7 +1493,7 @@ Object {
               },
               Object {
                 "compact": false,
-                "defaultValue": undefined,
+                "defaultValue": "it_works_here_as_well",
                 "editable": true,
                 "label": "Name",
                 "name": "name",
@@ -1663,7 +1663,7 @@ Object {
           },
           Object {
             "addButton": Object {
-              "enabled": false,
+              "enabled": true,
             },
             "compact": false,
             "deleteButton": Object {
@@ -1678,7 +1678,7 @@ Object {
               },
               Object {
                 "compact": false,
-                "defaultValue": undefined,
+                "defaultValue": "it_works",
                 "editable": true,
                 "label": "Name",
                 "name": "name",
@@ -1708,7 +1708,7 @@ Object {
           },
           Object {
             "addButton": Object {
-              "enabled": false,
+              "enabled": true,
             },
             "compact": false,
             "deleteButton": Object {
@@ -1723,7 +1723,7 @@ Object {
               },
               Object {
                 "compact": false,
-                "defaultValue": undefined,
+                "defaultValue": "it_works_here_as_well",
                 "editable": true,
                 "label": "Name",
                 "name": "name",
