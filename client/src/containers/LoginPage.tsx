@@ -36,9 +36,7 @@ class LoginForm extends React.PureComponent<LoginFormProps, State> {
     };
   }
 
-  handleInputChange: React.ChangeEventHandler<
-    HTMLInputElement
-  > = event => {
+  handleInputChange: React.ChangeEventHandler<HTMLInputElement> = event => {
     const target = event.target;
     const value = target.value;
     const name = target.name;

@@ -81,9 +81,10 @@ class ReferenceFilterInputImpl extends React.PureComponent<
   };
 
   // tslint:disable-next-line: member-ordering
-  debouncedLoadOptions: LoadOptionsAsyncHandler<
-    string
-  > = debouncePromise1(this.loadOptions, 300);
+  debouncedLoadOptions: LoadOptionsAsyncHandler<string> = debouncePromise1(
+    this.loadOptions,
+    300
+  );
 
   onChange: OnChangeHandler<string> = value => {
     const values = makeArray(value).map(a => a.value);

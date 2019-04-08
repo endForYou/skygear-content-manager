@@ -179,9 +179,10 @@ class ReferenceDropdownFieldImpl extends React.PureComponent<
   };
 
   // tslint:disable-next-line: member-ordering
-  debouncedLoadOptions: LoadOptionsAsyncHandler<
-    string
-  > = debouncePromise1(this.loadOptions, 300);
+  debouncedLoadOptions: LoadOptionsAsyncHandler<string> = debouncePromise1(
+    this.loadOptions,
+    300
+  );
 
   onChange: OnChangeHandler<string> = value => {
     if (value === null) {

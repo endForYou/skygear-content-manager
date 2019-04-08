@@ -362,11 +362,7 @@ export class UserActionDispatcher {
     this.dispatch(fetchUsers(page, perPage, filters));
   }
 
-  updateUserCMSAccess(
-    userId: string,
-    hasAccess: boolean,
-    adminRole: string
-  ) {
+  updateUserCMSAccess(userId: string, hasAccess: boolean, adminRole: string) {
     this.dispatch(updateUserCMSAccess(userId, hasAccess, adminRole));
   }
 

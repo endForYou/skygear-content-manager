@@ -260,11 +260,7 @@ class NewPushNotificationPageImpl extends React.PureComponent<
     this.notificationActionDispatcher.savePushCampaign(newPushCampaign);
   };
 
-  handleFilterChange: FilterChangeHandler = (
-    name,
-    filterType,
-    value
-  ) => {
+  handleFilterChange: FilterChangeHandler = (name, filterType, value) => {
     const newFilterOptionsByName = {
       ...this.state.filterOptionsByName,
       [name]: { value, filterType },
@@ -278,9 +274,7 @@ class NewPushNotificationPageImpl extends React.PureComponent<
     this.fetchUserList(newFilterOptionsByName);
   };
 
-  handleTitleChange: React.ChangeEventHandler<
-    HTMLInputElement
-  > = event => {
+  handleTitleChange: React.ChangeEventHandler<HTMLInputElement> = event => {
     const value = event.target.value;
     this.setState(preState => {
       return {
