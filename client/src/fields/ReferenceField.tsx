@@ -88,7 +88,7 @@ class ReferenceDropdownFieldImpl extends React.PureComponent<
     };
   }
 
-  public componentWillReceiveProps(nextProps: ReferenceDropdownFieldProps) {
+  componentWillReceiveProps(nextProps: ReferenceDropdownFieldProps) {
     const recordsById: RecordsById = propsMergeRecordsById(
       nextProps,
       this.state.recordsById
@@ -99,7 +99,7 @@ class ReferenceDropdownFieldImpl extends React.PureComponent<
     });
   }
 
-  public render() {
+  render() {
     const {
       className: className,
       context,
@@ -145,7 +145,7 @@ class ReferenceDropdownFieldImpl extends React.PureComponent<
     );
   }
 
-  public loadOptions: LoadOptionsAsyncHandler<string> = input => {
+  loadOptions: LoadOptionsAsyncHandler<string> = input => {
     const {
       displayFieldName,
       reference: { predicates, targetCmsRecord },
@@ -179,11 +179,11 @@ class ReferenceDropdownFieldImpl extends React.PureComponent<
   };
 
   // tslint:disable-next-line: member-ordering
-  public debouncedLoadOptions: LoadOptionsAsyncHandler<
+  debouncedLoadOptions: LoadOptionsAsyncHandler<
     string
   > = debouncePromise1(this.loadOptions, 300);
 
-  public onChange: OnChangeHandler<string> = value => {
+  onChange: OnChangeHandler<string> = value => {
     if (value === null) {
       this.setState({ value: null });
       if (this.props.onFieldChange) {

@@ -1059,13 +1059,13 @@ export class RecordActionDispatcher {
     this.context = context;
   }
 
-  public fetch(id: string): Promise<void> {
+  fetch(id: string): Promise<void> {
     return this.dispatch(
       fetchRecord(this.cmsRecord, this.references, id, this.context)
     );
   }
 
-  public fetchList(
+  fetchList(
     page: number,
     perPage: number,
     filters: Filter[] = [],
@@ -1096,7 +1096,7 @@ export class RecordActionDispatcher {
     );
   }
 
-  public save(record: Record): Promise<void> {
+  save(record: Record): Promise<void> {
     return this.dispatch(saveRecord(this.cmsRecord, record, this.context));
   }
 }

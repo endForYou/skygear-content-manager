@@ -36,7 +36,7 @@ export class FilterMenu extends React.PureComponent<Props, State> {
     };
   }
 
-  public render() {
+  render() {
     const { className, filterConfigs, filters } = this.props;
     const { selectedFilterConfig } = this.state;
 
@@ -77,7 +77,7 @@ export class FilterMenu extends React.PureComponent<Props, State> {
   }
 
   private onSelectedFilterConfigChange = (
-    option: Option<OptionValues> | null
+    option: Option | null
   ) => {
     const { filterConfigs } = this.props;
     this.setState({

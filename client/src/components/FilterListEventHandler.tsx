@@ -39,7 +39,7 @@ export function withEventHandler<P extends InjectedProps>(
 ) {
   type Props = Omit<P, keyof InjectedProps> & FilterListEventHandlerProps;
   return class extends React.PureComponent<Props> {
-    public render() {
+    render() {
       return (
         <ListImpl
           {...this.props}

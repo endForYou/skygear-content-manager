@@ -15,7 +15,7 @@ export type AssociationReferenceListFieldProps = RequiredFieldProps<
 export class AssociationReferenceListField extends React.PureComponent<
   AssociationReferenceListFieldProps
 > {
-  public render() {
+  render() {
     const {
       context,
       config,

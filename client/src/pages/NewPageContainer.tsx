@@ -27,8 +27,8 @@ interface DispatchProps {
 }
 
 class NewPageContainerImpl extends React.PureComponent<Props> {
-  public recordDispatcher: RecordActionDispatcher;
-  public newRecord: Record;
+  recordDispatcher: RecordActionDispatcher;
+  newRecord: Record;
 
   constructor(props: Props) {
     super(props);
@@ -47,7 +47,7 @@ class NewPageContainerImpl extends React.PureComponent<Props> {
       .forEach(field => (this.newRecord[field.name] = field.defaultValue));
   }
 
-  public render() {
+  render() {
     const { config, dispatch, savingRecord } = this.props;
 
     return (

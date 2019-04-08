@@ -106,13 +106,13 @@ export function syncFilterWithUrl<P extends InjectedProps>(
       };
     }
 
-    public getFilterStr(props: Props) {
+    getFilterStr(props: Props) {
       const { filter: filterStr = '[]' } = qs.parse(props.location.search);
       return filterStr;
     }
 
     // tslint:disable:jsx-wrap-multiline
-    public render() {
+    render() {
       const { dispatch, filterConfigs, location } = this.props;
 
       const { filters } = this.state;

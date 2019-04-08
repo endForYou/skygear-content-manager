@@ -36,7 +36,7 @@ class LoginForm extends React.PureComponent<LoginFormProps, State> {
     };
   }
 
-  public handleInputChange: React.ChangeEventHandler<
+  handleInputChange: React.ChangeEventHandler<
     HTMLInputElement
   > = event => {
     const target = event.target;
@@ -55,14 +55,14 @@ class LoginForm extends React.PureComponent<LoginFormProps, State> {
     }
   };
 
-  public handleSubmit: React.FormEventHandler<HTMLFormElement> = event => {
+  handleSubmit: React.FormEventHandler<HTMLFormElement> = event => {
     event.preventDefault();
 
     const { username, password } = this.state;
     this.props.onSubmit(username, password);
   };
 
-  public render() {
+  render() {
     return (
       <form className="form-container" onSubmit={this.handleSubmit}>
         <div className="form-title">Login</div>

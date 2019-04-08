@@ -31,14 +31,14 @@ export function makeShowPage(
   const ConnectedShowPage = connect(mapStateToProps)(ShowPage);
 
   const HOC = class extends React.Component {
-    public componentDidMount() {
+    componentDidMount() {
       // TODO: use RecordActionDispatcher instead of direct dispatch
       dispatch(
         fetchRecord(config.cmsRecord, config.references, recordId, 'show')
       );
     }
 
-    public render() {
+    render() {
       return (
         <ConnectedShowPage
           cmsRecord={cmsRecord}

@@ -84,7 +84,7 @@ class RecordFormPageImpl extends React.PureComponent<
     };
   }
 
-  public renderErrorMessage() {
+  renderErrorMessage() {
     const { savingRecord } = this.props;
     const { effectError } = this.state;
 
@@ -117,7 +117,7 @@ class RecordFormPageImpl extends React.PureComponent<
     );
   }
 
-  public render() {
+  render() {
     const { className, config, record, savingRecord } = this.props;
     const { fieldValidationErrors } = this.state;
 
@@ -152,7 +152,7 @@ class RecordFormPageImpl extends React.PureComponent<
     );
   }
 
-  public handleRecordChange: RecordChangeHandler = (
+  handleRecordChange: RecordChangeHandler = (
     name,
     value,
     beforeEffect,
@@ -180,7 +180,7 @@ class RecordFormPageImpl extends React.PureComponent<
     });
   };
 
-  public handleSubmit: React.FormEventHandler<HTMLFormElement> = event => {
+  handleSubmit: React.FormEventHandler<HTMLFormElement> = event => {
     event.preventDefault();
 
     this.setState({ effectError: undefined });
@@ -218,7 +218,7 @@ class RecordFormPageImpl extends React.PureComponent<
   /**
    * Return dictionary of validation errors, empty if no errors.
    */
-  public validateFields(): { [key: string]: FieldValidationError } {
+  validateFields(): { [key: string]: FieldValidationError } {
     const {
       config: { fields },
       record,

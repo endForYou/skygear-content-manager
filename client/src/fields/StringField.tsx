@@ -31,7 +31,7 @@ export class TextInputField extends BaseStringInputField<
   TextInputFieldConfig,
   TextInputFieldProps
 > {
-  public render() {
+  render() {
     const {
       className,
       config: { editable, label, name },

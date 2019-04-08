@@ -224,11 +224,11 @@ export class PushCampaignActionDispatcher {
     this.dispatch = dispatch;
   }
 
-  public fetchList(page: number, perPage: number): Promise<void> {
+  fetchList(page: number, perPage: number): Promise<void> {
     return this.dispatch(fetchPushCampaignList(page, perPage));
   }
 
-  public savePushCampaign(newPushCampaign: NewPushCampaign): Promise<void> {
+  savePushCampaign(newPushCampaign: NewPushCampaign): Promise<void> {
     return this.dispatch(savePushCampaign(newPushCampaign));
   }
 }

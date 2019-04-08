@@ -16,7 +16,7 @@ interface FormProps {
 }
 
 export class Form extends React.PureComponent<FormProps> {
-  public render() {
+  render() {
     const {
       className,
       children,

@@ -23,7 +23,7 @@ export interface ShowPageProps {
 }
 
 export class ShowPage extends React.PureComponent<ShowPageProps> {
-  public render() {
+  render() {
     const { config, remoteRecord } = this.props;
     let content;
     switch (remoteRecord.type) {

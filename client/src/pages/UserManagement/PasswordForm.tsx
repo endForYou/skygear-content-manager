@@ -38,7 +38,7 @@ export class PasswordForm extends React.PureComponent<
     this.onFormSubmit = this.onFormSubmit.bind(this);
   }
 
-  public render() {
+  render() {
     const { className, userId } = this.props;
 
     const {

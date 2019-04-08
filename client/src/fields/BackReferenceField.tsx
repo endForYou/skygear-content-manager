@@ -15,7 +15,7 @@ export type BackReferenceListFieldProps = RequiredFieldProps<
 export class BackReferenceListField extends React.PureComponent<
   BackReferenceListFieldProps
 > {
-  public render() {
+  render() {
     const {
       context,
       config,

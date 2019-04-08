@@ -55,7 +55,7 @@ class AssociationRecordSelectImpl extends React.PureComponent<
     );
   }
 
-  public constructor(props: AssociationRecordSelectProps) {
+  constructor(props: AssociationRecordSelectProps) {
     super(props);
 
     this.state = {
@@ -63,7 +63,7 @@ class AssociationRecordSelectImpl extends React.PureComponent<
     };
   }
 
-  public render() {
+  render() {
     const {
       className,
       context,
@@ -91,7 +91,7 @@ class AssociationRecordSelectImpl extends React.PureComponent<
     );
   }
 
-  public loadOptionsHandler: LoadOptionsAsyncHandler<string> = value => {
+  loadOptionsHandler: LoadOptionsAsyncHandler<string> = value => {
     const { predicates, targetReference } = this.props.config.reference;
 
     const RecordCls = Record.extend(
@@ -117,11 +117,11 @@ class AssociationRecordSelectImpl extends React.PureComponent<
   };
 
   // tslint:disable-next-line: member-ordering
-  public debouncedLoadOptionsHandler: LoadOptionsAsyncHandler<
+  debouncedLoadOptionsHandler: LoadOptionsAsyncHandler<
     string
   > = debouncePromise1(this.loadOptionsHandler, 300);
 
-  public onChange: OnChangeHandler<string> = value => {
+  onChange: OnChangeHandler<string> = value => {
     const options = makeArray(value).map(optionToTargetOption);
     this.setState({ options });
 

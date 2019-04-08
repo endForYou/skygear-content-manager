@@ -16,7 +16,7 @@ interface SearchParamsObserverProps {
 export class SearchParamsObserver extends React.PureComponent<
   SearchParamsObserverProps
 > {
-  public componentWillReceiveProps(nextProps: SearchParamsObserverProps) {
+  componentWillReceiveProps(nextProps: SearchParamsObserverProps) {
     if (
       this.props.location.search !== nextProps.location.search ||
       !shallowCompare(this.props.searchKeys, nextProps.searchKeys)
@@ -36,7 +36,7 @@ export class SearchParamsObserver extends React.PureComponent<
     }
   }
 
-  public render() {
+  render() {
     return null;
   }
 

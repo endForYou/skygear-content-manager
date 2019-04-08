@@ -105,7 +105,7 @@ export class AssetUploader extends React.PureComponent<Props> {
     super(props);
   }
 
-  public componentWillReceiveProps(nextProps: Props) {
+  componentWillReceiveProps(nextProps: Props) {
     if (nextProps.value == null) {
       if (this.droppedFile) {
         releaseDroppedFile(this.droppedFile);
@@ -122,7 +122,7 @@ export class AssetUploader extends React.PureComponent<Props> {
     }
   }
 
-  public render() {
+  render() {
     const {
       accept,
       assetType,
@@ -156,7 +156,7 @@ export class AssetUploader extends React.PureComponent<Props> {
     );
   }
 
-  public onDropAccepted: DropFileEventHandler = (accepted: File[]) => {
+  onDropAccepted: DropFileEventHandler = (accepted: File[]) => {
     const [file] = accepted;
     if (file == null) {
       return;

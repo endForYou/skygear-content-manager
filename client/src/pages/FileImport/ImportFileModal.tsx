@@ -72,7 +72,7 @@ class ImportFileModalImpl extends React.PureComponent<Props, State> {
     };
   }
 
-  public componentWillReceiveProps(nextProps: Props) {
+  componentWillReceiveProps(nextProps: Props) {
     const didImportSuccess =
       !nextProps.importing &&
       this.props.importing &&
@@ -82,7 +82,7 @@ class ImportFileModalImpl extends React.PureComponent<Props, State> {
     }
   }
 
-  public render() {
+  render() {
     const { fileNames, show, importing } = this.props;
 
     return (

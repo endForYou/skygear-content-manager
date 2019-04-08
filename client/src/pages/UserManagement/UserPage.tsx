@@ -29,7 +29,7 @@ interface DispatchProps {
 type Props = UserPageContainerProps & StateProps & DispatchProps;
 
 class UserPageImpl extends React.PureComponent<Props> {
-  public userActionCreator: UserActionDispatcher;
+  userActionCreator: UserActionDispatcher;
 
   constructor(props: Props) {
     super(props);
@@ -38,11 +38,11 @@ class UserPageImpl extends React.PureComponent<Props> {
     this.userActionCreator = new UserActionDispatcher(dispatch);
   }
 
-  public componentDidMount() {
+  componentDidMount() {
     this.loadUser(this.props);
   }
 
-  public render() {
+  render() {
     const { config, user, userId } = this.props;
 
     let body;

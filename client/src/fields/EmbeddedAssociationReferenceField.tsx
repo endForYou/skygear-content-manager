@@ -81,7 +81,7 @@ export class EmbeddedAssociationReferenceField extends React.PureComponent<
     this.handleEmbeddedRecordMove = this.handleEmbeddedRecordMove.bind(this);
   }
 
-  public handleEmbeddedRecordChange(
+  handleEmbeddedRecordChange(
     index: number,
     name: string,
     // tslint:disable-next-line: no-any
@@ -108,7 +108,7 @@ export class EmbeddedAssociationReferenceField extends React.PureComponent<
     this.applyEmbeddedRecordChange();
   }
 
-  public handleEmbeddedRecordRemove(index: number) {
+  handleEmbeddedRecordRemove(index: number) {
     this.setState(pState => {
       pState.embeddedRecordDelete.push(pState.assoRecords[index]);
       pState.embeddedRecordUpdate.splice(index, 1);
@@ -123,7 +123,7 @@ export class EmbeddedAssociationReferenceField extends React.PureComponent<
     this.applyEmbeddedRecordChange();
   }
 
-  public handleEmbeddedRecordCreate() {
+  handleEmbeddedRecordCreate() {
     const {
       config: { reference },
       context,
@@ -160,7 +160,7 @@ export class EmbeddedAssociationReferenceField extends React.PureComponent<
     this.applyEmbeddedRecordChange();
   }
 
-  public handleEmbeddedRecordMove(from: number, to: number) {
+  handleEmbeddedRecordMove(from: number, to: number) {
     this.setState(pState => {
       swap(pState.assoRecords, from, to);
       swap(pState.embeddedRecordUpdate, from, to);
@@ -174,7 +174,7 @@ export class EmbeddedAssociationReferenceField extends React.PureComponent<
     this.applyEmbeddedRecordChange();
   }
 
-  public render() {
+  render() {
     const { config, className, validationError } = this.props;
     const { embeddedRecords } = this.state;
     const addable = (config.editable && config.addButton.enabled) || false;

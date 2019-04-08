@@ -14,17 +14,17 @@ export class ClickOutside extends React.PureComponent<
     super(props);
   }
 
-  public componentDidMount() {
+  componentDidMount() {
     document.addEventListener('touchend', this.handle, true);
     document.addEventListener('click', this.handle, true);
   }
 
-  public componentWillUnmount() {
+  componentWillUnmount() {
     document.removeEventListener('touchend', this.handle, true);
     document.removeEventListener('click', this.handle, true);
   }
 
-  public render() {
+  render() {
     const { children, onClickOutside, ...props } = this.props;
     return (
       <div {...props} ref={this.getContainer}>

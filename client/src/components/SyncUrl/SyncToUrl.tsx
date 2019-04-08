@@ -37,7 +37,7 @@ export class SyncToUrl extends React.PureComponent<
     }
   }
 
-  public componentWillReceiveProps(nextProps: SyncToUrlProps) {
+  componentWillReceiveProps(nextProps: SyncToUrlProps) {
     if (!shallowCompare(this.state.value, nextProps.value)) {
       this.setState({ value: nextProps.value }, () =>
         this.updateUrl(nextProps)
@@ -45,7 +45,7 @@ export class SyncToUrl extends React.PureComponent<
     }
   }
 
-  public render() {
+  render() {
     return null;
   }
 

@@ -44,7 +44,7 @@ export class VerificationForm extends React.PureComponent<
     };
   }
 
-  public render() {
+  render() {
     const { className, config } = this.props;
 
     const {

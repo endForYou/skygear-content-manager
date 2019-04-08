@@ -45,7 +45,7 @@ export type FileUploaderFieldProps = RequiredFieldProps<
 export class FileUploaderField extends React.PureComponent<
   FileUploaderFieldProps
 > {
-  public renderClearButton() {
+  renderClearButton() {
     return (
       <div>
         <button className="btn-clear" onClick={this.onClearClick} type="button">
@@ -55,7 +55,7 @@ export class FileUploaderField extends React.PureComponent<
     );
   }
 
-  public render() {
+  render() {
     const {
       config: { accept, editable, nullable },
       context: _context,

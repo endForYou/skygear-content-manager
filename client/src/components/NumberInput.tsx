@@ -38,7 +38,7 @@ export class NumberInput extends React.PureComponent<NumberInputProps, State> {
     };
   }
 
-  public componentWillReceiveProps(nextProps: NumberInputProps) {
+  componentWillReceiveProps(nextProps: NumberInputProps) {
     if (
       nextProps.value !== this.state.value ||
       nextProps.isInteger !== this.props.isInteger
@@ -57,7 +57,7 @@ export class NumberInput extends React.PureComponent<NumberInputProps, State> {
     }
   }
 
-  public render() {
+  render() {
     const { value: _value, ...rest } = this.props;
 
     return (
@@ -70,7 +70,7 @@ export class NumberInput extends React.PureComponent<NumberInputProps, State> {
     );
   }
 
-  public handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { onValueChange } = this.props;
 
     const value = event.target.value.trim();

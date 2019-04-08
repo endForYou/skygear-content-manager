@@ -16,7 +16,7 @@ export class StringFilterInput extends React.PureComponent<
   StringFilterInputProps,
   StringFilterInputState
 > {
-  public onFieldChange: FieldChangeHandler | undefined;
+  onFieldChange: FieldChangeHandler | undefined;
   constructor(props: StringFilterInputProps) {
     super(props);
 
@@ -29,7 +29,7 @@ export class StringFilterInput extends React.PureComponent<
     };
   }
 
-  public render() {
+  render() {
     const { onFieldChange: _, ...rest } = this.props;
 
     return (

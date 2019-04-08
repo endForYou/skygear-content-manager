@@ -57,7 +57,7 @@ export type ImageUploaderFieldProps = RequiredFieldProps<
 export class ImageUploaderField extends React.PureComponent<
   ImageUploaderFieldProps
 > {
-  public renderClearButton() {
+  renderClearButton() {
     return (
       <div>
         <button className="btn-clear" onClick={this.onClearClick} type="button">
@@ -67,7 +67,7 @@ export class ImageUploaderField extends React.PureComponent<
     );
   }
 
-  public render() {
+  render() {
     const {
       config: { editable, nullable },
       className,

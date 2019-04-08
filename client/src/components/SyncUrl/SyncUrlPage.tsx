@@ -37,13 +37,13 @@ export function syncPageWithUrl<P extends InjectedProps>(
       };
     }
 
-    public getPage(props: Props) {
+    getPage(props: Props) {
       const { page: pageStr = '1' } = qs.parse(location.search);
       return parseInt(pageStr, 10);
     }
 
     // tslint:disable:jsx-wrap-multiline
-    public render() {
+    render() {
       const { dispatch, location } = this.props;
 
       const { needReset, page } = this.state;

@@ -423,7 +423,7 @@ export class FileImportActionDispatcher {
     this.dispatch = dispatch;
   }
 
-  public fetchList(
+  fetchList(
     page: number,
     perPage: number,
     filters: Filter[],
@@ -435,19 +435,19 @@ export class FileImportActionDispatcher {
     );
   }
 
-  public addFiles(files: File[]) {
+  addFiles(files: File[]) {
     this.dispatch(importAddFiles(files));
   }
 
-  public removeFile(file: File) {
+  removeFile(file: File) {
     this.dispatch(importRemoveFile(file));
   }
 
-  public removeAllFile() {
+  removeAllFile() {
     this.dispatch(importRemoveAllFiles());
   }
 
-  public importFiles(files: File[], handleType: FileImportHandleTypes) {
+  importFiles(files: File[], handleType: FileImportHandleTypes) {
     this.dispatch(importFiles(files, handleType));
   }
 }

@@ -42,7 +42,7 @@ export class DisableUserForm extends React.PureComponent<
     };
   }
 
-  public render() {
+  render() {
     const { className } = this.props;
 
     const {

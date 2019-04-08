@@ -23,7 +23,7 @@ interface DispatchProps {
 }
 
 class NewPushNotificationPageContainerImpl extends React.PureComponent<Props> {
-  public notificationActionDispatcher: PushCampaignActionDispatcher;
+  notificationActionDispatcher: PushCampaignActionDispatcher;
 
   constructor(props: Props) {
     super(props);
@@ -35,7 +35,7 @@ class NewPushNotificationPageContainerImpl extends React.PureComponent<Props> {
     );
   }
 
-  public render() {
+  render() {
     const { dispatch, userFilters, savingPushCampaign } = this.props;
 
     return (

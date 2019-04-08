@@ -13,7 +13,7 @@ export class TextArea extends BaseStringInputField<
   TextAreaFieldConfig,
   TextAreaProps
 > {
-  public render() {
+  render() {
     const {
       config: { editable },
       className,

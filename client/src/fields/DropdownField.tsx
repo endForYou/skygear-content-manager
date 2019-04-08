@@ -43,7 +43,7 @@ export class DropdownField extends React.PureComponent<
   //
   // props does not have enough information to distinguish matched value or
   // custom value with matched value
-  public componentWillReceiveProps(nextProps: DropdownFieldProps) {
+  componentWillReceiveProps(nextProps: DropdownFieldProps) {
     const isFieldReused =
       this.props.config.name !== nextProps.config.name ||
       nextProps.context.record.recordType !==
@@ -61,7 +61,7 @@ export class DropdownField extends React.PureComponent<
     }
   }
 
-  public deriveValueStates(config: DropdownFieldConfig, value: ValueType) {
+  deriveValueStates(config: DropdownFieldConfig, value: ValueType) {
     const { customOption, options } = config;
 
     const matched = options.filter(opt => opt.value === value).length > 0;
@@ -81,7 +81,7 @@ export class DropdownField extends React.PureComponent<
     };
   }
 
-  public handleSelectChange(option: Option<OptionValues> | null) {
+  handleSelectChange(option: Option | null) {
     if (option == null) {
       // throw new Error('Unexpected null selected');
       return;
@@ -115,7 +115,7 @@ export class DropdownField extends React.PureComponent<
     }
   }
 
-  public handleCustomValueChange(event: React.ChangeEvent<HTMLInputElement>) {
+  handleCustomValueChange(event: React.ChangeEvent<HTMLInputElement>) {
     const value = event.target.value;
     this.setState({
       value,
@@ -163,7 +163,7 @@ export class DropdownField extends React.PureComponent<
     return combinedOptions;
   }
 
-  public render() {
+  render() {
     const {
       config: { compact, editable, name, nullOption, options },
       className,

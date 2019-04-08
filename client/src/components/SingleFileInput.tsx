@@ -15,11 +15,11 @@ interface Props {
 export class SingleFileInput extends React.PureComponent<Props> {
   private fileInput: HTMLInputElement | null = null;
 
-  public componentWillUnmount() {
+  componentWillUnmount() {
     this.fileInput = null;
   }
 
-  public render() {
+  render() {
     const { accept, className, file, title, placeholder } = this.props;
 
     const inputProps = { accept };

@@ -97,7 +97,7 @@ export interface DispatchProps {
 class PushNotificationListPageImpl extends React.PureComponent<
   PushNotificationListPageProps
 > {
-  public notificationActionDispatcher: PushCampaignActionDispatcher;
+  notificationActionDispatcher: PushCampaignActionDispatcher;
 
   constructor(props: PushNotificationListPageProps) {
     super(props);
@@ -109,12 +109,12 @@ class PushNotificationListPageImpl extends React.PureComponent<
     );
   }
 
-  public componentDidMount() {
+  componentDidMount() {
     const { page } = this.props;
     this.notificationActionDispatcher.fetchList(page, pageSize);
   }
 
-  public render() {
+  render() {
     const { location, page, maxPage, isLoading, pushCampaigns } = this.props;
 
     return (
@@ -157,7 +157,7 @@ class PushNotificationListPageImpl extends React.PureComponent<
     );
   }
 
-  public onPageItemClicked = (page: number) => {
+  onPageItemClicked = (page: number) => {
     this.notificationActionDispatcher.fetchList(page, pageSize);
   };
 }

@@ -358,11 +358,11 @@ export class UserActionDispatcher {
     this.dispatch = dispatch;
   }
 
-  public fetchList(page: number, perPage: number, filters: Filter[]) {
+  fetchList(page: number, perPage: number, filters: Filter[]) {
     this.dispatch(fetchUsers(page, perPage, filters));
   }
 
-  public updateUserCMSAccess(
+  updateUserCMSAccess(
     userId: string,
     hasAccess: boolean,
     adminRole: string
@@ -370,7 +370,7 @@ export class UserActionDispatcher {
     this.dispatch(updateUserCMSAccess(userId, hasAccess, adminRole));
   }
 
-  public fetchUser(userId: string) {
+  fetchUser(userId: string) {
     this.dispatch(fetchUser(userId));
   }
 }
