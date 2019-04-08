@@ -19,7 +19,7 @@ jobs:
         - npm --prefix=client ci
       script:
         - cd client
-        - node_modules/.bin/prettier --list-different "src/**/*.ts*"
+        - npm run format
         - npm run lint
         - CI=1 npm run test
         - npm run build
