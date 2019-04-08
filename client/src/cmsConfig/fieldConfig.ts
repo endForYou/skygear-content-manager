@@ -617,9 +617,9 @@ function parseDateTimePickerFieldConfig(
   }
 
   if (input.time_picker) {
-    timePicker.enabled = !!input.timer_picker.enabled;
+    timePicker.enabled = !!input.time_picker.enabled;
     timePicker.format =
-      parseOptionalString(input.timer_picker, 'format', 'time_picker.format') ||
+      parseOptionalString(input.time_picker, 'format', 'time_picker.format') ||
       TIME_FORMAT;
   }
 
