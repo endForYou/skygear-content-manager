@@ -3,7 +3,7 @@ import './SettingsPage.scss';
 import moment from 'moment-timezone';
 import * as React from 'react';
 import { connect, Dispatch } from 'react-redux';
-import Select, { Option, OptionValues } from 'react-select';
+import Select, { Option } from 'react-select';
 import { updateTimezone } from '../actions/settings';
 import { getCombinedSettings } from '../settings';
 import { RootState, Settings } from '../states';

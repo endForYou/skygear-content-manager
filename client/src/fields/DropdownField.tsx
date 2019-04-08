@@ -1,6 +1,6 @@
 import classnames from 'classnames';
 import * as React from 'react';
-import Select, { Option, OptionValues } from 'react-select';
+import Select, { Option } from 'react-select';
 
 import { RequiredFieldProps } from './Field';
 

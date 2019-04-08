@@ -5,7 +5,7 @@ import * as moment from 'moment';
 import * as React from 'react';
 // tslint:disable-next-line: no-submodule-imports
 import 'react-datetime/css/react-datetime.css';
-import { Option, OptionValues } from 'react-select';
+import { Option } from 'react-select';
 
 import {
   BaseFilterQueryType,
@@ -251,10 +251,7 @@ export class FilterList extends React.PureComponent<FilterListProps> {
     );
   }
 
-  renderDateTimeInput(
-    filter: DateTimeFilter,
-    config: DateTimeFilterConfig
-  ) {
+  renderDateTimeInput(filter: DateTimeFilter, config: DateTimeFilterConfig) {
     return (
       <TzDatetimeInput
         className="datetime-input-container"
@@ -282,10 +279,7 @@ export class FilterList extends React.PureComponent<FilterListProps> {
     );
   }
 
-  renderReferenceInput(
-    filter: ReferenceFilter,
-    config: ReferenceFilterConfig
-  ) {
+  renderReferenceInput(filter: ReferenceFilter, config: ReferenceFilterConfig) {
     const { handleReferenceChange } = this.props;
     return (
       <ReferenceFilterInput
@@ -316,10 +310,7 @@ export class FilterList extends React.PureComponent<FilterListProps> {
     this.props.handleDateTimeValueChange(filter, event.toDate());
   }
 
-  private handleQueryTypeChange(
-    filter: Filter,
-    value: Option | null
-  ) {
+  private handleQueryTypeChange(filter: Filter, value: Option | null) {
     const { handleQueryTypeChange } = this.props;
     if (value == null || value.value == null) {
       return;

@@ -2,7 +2,7 @@ import './FilterMenu.scss';
 
 import classnames from 'classnames';
 import * as React from 'react';
-import Select, { Option, OptionValues } from 'react-select';
+import Select, { Option } from 'react-select';
 
 import {
   Filter,
@@ -76,9 +76,7 @@ export class FilterMenu extends React.PureComponent<Props, State> {
     );
   }
 
-  private onSelectedFilterConfigChange = (
-    option: Option | null
-  ) => {
+  private onSelectedFilterConfigChange = (option: Option | null) => {
     const { filterConfigs } = this.props;
     this.setState({
       selectedFilterConfig:
