@@ -7,8 +7,8 @@ import skygear, { Record, Reference } from 'skygear';
 import {
   EmbeddedAssociationReferenceListFieldConfig,
   FieldConfig,
-  SortOrder,
   isFieldEditable,
+  SortOrder,
 } from '../cmsConfig';
 import { Arrow, ArrowDirection } from '../components/Arrow';
 import {

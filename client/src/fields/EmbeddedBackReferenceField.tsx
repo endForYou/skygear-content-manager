@@ -8,8 +8,8 @@ import {
   DeleteAction,
   EmbeddedBackReferenceListFieldConfig,
   FieldConfig,
-  SortOrder,
   isFieldEditable,
+  SortOrder,
 } from '../cmsConfig';
 import { Arrow, ArrowDirection } from '../components/Arrow';
 import { PrimaryButton } from '../components/PrimaryButton';
