@@ -73,6 +73,7 @@
     "format": "prettier --write --list-different 'src/**/*.{js,jsx,ts,tsx,css,scss}'"
   },
   "devDependencies": {
+    "@oursky/tslint-oursky": "0.11.0",
     "@types/classnames": "2.2.3",
     "@types/jest": "21.1.5",
     "@types/js-yaml": "3.9.1",
