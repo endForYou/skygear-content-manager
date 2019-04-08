@@ -2,5 +2,17 @@
   "extends": [
     "@oursky/tslint-oursky",
     "tslint-react"
-  ]
+  ],
+  "rules": {
+    "cyclomatic-complexity": [true, 30],
+    "no-floating-promises": false,
+    "no-inferred-empty-object-type": false,
+    "no-non-null-assertion": false,
+    "no-parameter-reassignment": false,
+    "no-void-expression": [true, "ignore-arrow-function-shorthand"],
+    "restrict-plus-operands": false,
+    "jsx-no-lambda": false,
+    "jsx-no-multiline-js": false,
+    "oursky-no-static-literal": false
+  }
 }
