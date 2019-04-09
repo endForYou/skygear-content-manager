@@ -35,7 +35,7 @@ export class ExportModal extends React.PureComponent<ExportModalProps, State> {
     this.onQueryOptionClick = this.onQueryOptionClick.bind(this);
   }
 
-  public renderFilterOptions() {
+  renderFilterOptions() {
     const { exportPredicateOptionIndex } = this.state;
 
     return (
@@ -47,7 +47,7 @@ export class ExportModal extends React.PureComponent<ExportModalProps, State> {
     );
   }
 
-  public render() {
+  render() {
     const { actionConfig, onDismiss, show = true } = this.props;
 
     const { exportPredicateOptionIndex } = this.state;

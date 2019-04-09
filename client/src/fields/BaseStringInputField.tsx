@@ -19,12 +19,12 @@ export class BaseStringInputField<
     };
   }
 
-  public componentWillReceiveProps(nextProps: Props) {
+  componentWillReceiveProps(nextProps: Props) {
     this.setState({ ...this.state, value: nextProps.value });
   }
 
   // subclass should call this when value changes
-  public handleValueChange: (value: string) => void = value => {
+  handleValueChange: (value: string) => void = value => {
     this.setState({ ...this.state, value });
 
     if (this.props.onFieldChange) {

@@ -11,7 +11,7 @@ interface Props {
 }
 
 export class RadioButtonList extends React.PureComponent<Props> {
-  public render() {
+  render() {
     const { className, options, selectedIndex, onChange } = this.props;
 
     return (

@@ -17,7 +17,7 @@ export interface PageItemProps {
 export type OnPageItemClickedType = (page: number) => void;
 
 export class PageItem extends React.PureComponent<PageItemProps> {
-  public render() {
+  render() {
     const {
       children,
       className,

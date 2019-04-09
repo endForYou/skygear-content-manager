@@ -1,7 +1,6 @@
 @import 'styleUtils/common.scss';
 
 .record-form-page {
-
   .record-form-groups {
     & > .record-form-group:not(:first-child) {
       margin-top: to-rem(10px);

@@ -8,7 +8,7 @@ interface Props {
 }
 
 export class ValidationText extends React.PureComponent<Props> {
-  public render() {
+  render() {
     const { validationError } = this.props;
 
     if (

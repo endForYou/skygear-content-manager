@@ -194,7 +194,7 @@ interface State {
 }
 
 class UserListPageImpl extends React.PureComponent<UserListPageProps, State> {
-  public userActionCreator: UserActionDispatcher;
+  userActionCreator: UserActionDispatcher;
 
   constructor(props: UserListPageProps) {
     super(props);
@@ -207,15 +207,13 @@ class UserListPageImpl extends React.PureComponent<UserListPageProps, State> {
 
     this.userActionCreator = new UserActionDispatcher(dispatch);
     this.fetchList = debounce(this.fetchList.bind(this), 200);
-
-    this.onCMSAccessChange = this.onCMSAccessChange.bind(this);
   }
 
-  public componentDidMount() {
+  componentDidMount() {
     this.reloadList(this.props);
   }
 
-  public componentWillReceiveProps(nextProps: UserListPageProps) {
+  componentWillReceiveProps(nextProps: UserListPageProps) {
     const { filters, page } = this.props;
 
     if (filters !== nextProps.filters || page !== nextProps.page) {
@@ -223,16 +221,16 @@ class UserListPageImpl extends React.PureComponent<UserListPageProps, State> {
     }
   }
 
-  public toggleFilterMenu() {
+  toggleFilterMenu() {
     this.setState({ showfilterMenu: !this.state.showfilterMenu });
   }
 
-  public onFilterChange = (filters: Filter[]) => {
+  onFilterChange = (filters: Filter[]) => {
     this.props.onChangePage();
     this.props.onChangeFilter(filters);
   };
 
-  public onFilterItemClicked(filterConfig: FilterConfig) {
+  onFilterItemClicked(filterConfig: FilterConfig) {
     const newFilter = filterFactory(filterConfig);
 
     const filters =
@@ -249,7 +247,7 @@ class UserListPageImpl extends React.PureComponent<UserListPageProps, State> {
     this.toggleFilterMenu();
   }
 
-  public render() {
+  render() {
     const {
       adminRole,
       currentUserId,
@@ -346,19 +344,19 @@ class UserListPageImpl extends React.PureComponent<UserListPageProps, State> {
     );
   }
 
-  public reloadList(props: UserListPageProps) {
+  reloadList(props: UserListPageProps) {
     const { filters, page } = props;
     this.fetchList(page, UserListPerPageCount, filters);
   }
 
-  public fetchList(page: number, perPage: number, filters: Filter[]) {
+  fetchList(page: number, perPage: number, filters: Filter[]) {
     this.userActionCreator.fetchList(page, perPage, filters);
   }
 
-  public onCMSAccessChange(user: SkygearUser, hasAccess: boolean) {
+  onCMSAccessChange = (user: SkygearUser, hasAccess: boolean) => {
     const { adminRole } = this.props;
     this.userActionCreator.updateUserCMSAccess(user.id, hasAccess, adminRole);
-  }
+  };
 }
 
 function UserListPageFactory() {

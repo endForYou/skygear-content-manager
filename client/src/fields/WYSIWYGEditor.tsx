@@ -45,11 +45,11 @@ class WYSIWYGEditorImpl extends React.PureComponent<WYSIWYGEditorProps, State> {
     };
   }
 
-  public componentWillReceiveProps(nextProps: WYSIWYGEditorProps) {
+  componentWillReceiveProps(nextProps: WYSIWYGEditorProps) {
     this.setState({ value: nextProps.value });
   }
 
-  public render() {
+  render() {
     const { className, validationError } = this.props;
     const { config: userConfig, editable } = this.props.config;
     const { value } = this.state;

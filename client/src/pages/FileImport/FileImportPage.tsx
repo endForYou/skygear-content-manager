@@ -178,11 +178,11 @@ class FileImportPage extends React.Component<FileImportPageProps, State> {
     this.fetchList = debounce(this.fetchList.bind(this), 200);
   }
 
-  public componentDidMount() {
+  componentDidMount() {
     this.reloadList(this.props);
   }
 
-  public componentWillReceiveProps(nextProps: FileImportPageProps) {
+  componentWillReceiveProps(nextProps: FileImportPageProps) {
     const { filters, page, sortState } = this.props;
     // Handle filters & page change by browser navigation
     if (
@@ -194,16 +194,16 @@ class FileImportPage extends React.Component<FileImportPageProps, State> {
     }
   }
 
-  public onFilterChange = (filters: Filter[]) => {
+  onFilterChange = (filters: Filter[]) => {
     this.props.onChangePage();
     this.props.onChangeFilter(filters);
   };
 
-  public toggleFilterMenu() {
+  toggleFilterMenu() {
     this.setState({ showfilterMenu: !this.state.showfilterMenu });
   }
 
-  public render() {
+  render() {
     const {
       files,
       filterConfigs,

@@ -28,7 +28,7 @@ interface DispatchProps {
 type Props = SidebarProps & DispatchProps;
 
 class Sidebar extends React.PureComponent<Props> {
-  public render() {
+  render() {
     const { user } = this.props;
 
     return (

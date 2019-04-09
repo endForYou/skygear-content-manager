@@ -74,13 +74,13 @@ export function syncSortWithUrl<P extends InjectedProps>(
       };
     }
 
-    public getSortState(props: Props) {
+    getSortState(props: Props) {
       const search = qs.parse(props.location.search || '');
       return urlParamsToSortState(search.sortBy, search.order);
     }
 
     // tslint:disable:jsx-wrap-multiline
-    public render() {
+    render() {
       const { dispatch, location } = this.props;
 
       const { sortState } = this.state;

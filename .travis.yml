@@ -16,11 +16,12 @@ jobs:
         directories:
           - client/node_modules
       install: &node_install
-        - npm --prefix=client install
+        - npm --prefix=client ci
       script:
         - cd client
-        - node_modules/.bin/prettier --list-different "src/**/*.ts*"
+        - npm run format
         - npm run lint
+        - npm run typecheck
         - CI=1 npm run test
         - npm run build
 

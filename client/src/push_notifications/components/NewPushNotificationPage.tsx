@@ -71,7 +71,7 @@ class NewPushNotificationPageImpl extends React.PureComponent<
   NewPushNotificationPageProps,
   State
 > {
-  public notificationActionDispatcher: PushCampaignActionDispatcher;
+  notificationActionDispatcher: PushCampaignActionDispatcher;
 
   constructor(props: NewPushNotificationPageProps) {
     super(props);
@@ -96,7 +96,7 @@ class NewPushNotificationPageImpl extends React.PureComponent<
     this.fetchUserList();
   }
 
-  public componentWillReceiveProps(nextProps: NewPushNotificationPageProps) {
+  componentWillReceiveProps(nextProps: NewPushNotificationPageProps) {
     if (
       this.props.savingPushCampaign != null &&
       this.props.savingPushCampaign.type === RemoteType.Loading &&
@@ -115,7 +115,7 @@ class NewPushNotificationPageImpl extends React.PureComponent<
     }
   }
 
-  public render() {
+  render() {
     const { className, filterConfigs, savingPushCampaign } = this.props;
     const {
       newPushCampaign: { type, numberOfAudiences, title, content },
@@ -210,7 +210,7 @@ class NewPushNotificationPageImpl extends React.PureComponent<
   }
 
   // tslint:disable-next-line: no-any
-  public handleSelectTypeChange = (selectedOption: any) => {
+  handleSelectTypeChange = (selectedOption: any) => {
     if (selectedOption != null) {
       if (selectedOption.value === PushCampaignType.AllUsers) {
         this.setState(preState => {
@@ -241,7 +241,7 @@ class NewPushNotificationPageImpl extends React.PureComponent<
     }
   };
 
-  public handleSubmit: React.FormEventHandler<HTMLFormElement> = event => {
+  handleSubmit: React.FormEventHandler<HTMLFormElement> = event => {
     event.preventDefault();
 
     const { newPushCampaign } = this.state;
@@ -260,11 +260,7 @@ class NewPushNotificationPageImpl extends React.PureComponent<
     this.notificationActionDispatcher.savePushCampaign(newPushCampaign);
   };
 
-  public handleFilterChange: FilterChangeHandler = (
-    name,
-    filterType,
-    value
-  ) => {
+  handleFilterChange: FilterChangeHandler = (name, filterType, value) => {
     const newFilterOptionsByName = {
       ...this.state.filterOptionsByName,
       [name]: { value, filterType },
@@ -278,9 +274,7 @@ class NewPushNotificationPageImpl extends React.PureComponent<
     this.fetchUserList(newFilterOptionsByName);
   };
 
-  public handleTitleChange: React.ChangeEventHandler<
-    HTMLInputElement
-  > = event => {
+  handleTitleChange: React.ChangeEventHandler<HTMLInputElement> = event => {
     const value = event.target.value;
     this.setState(preState => {
       return {

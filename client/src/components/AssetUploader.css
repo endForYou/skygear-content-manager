@@ -1,30 +1,30 @@
 .drop-description {
-    cursor: default;
+  cursor: default;
 }
 
 .dropzone {
-    border: 2px dashed silver;
-    border-radius: 5px;
+  border: 2px dashed silver;
+  border-radius: 5px;
 
-    padding: 1rem;
+  padding: 1rem;
 
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .dropzone-accept {
-    border-color: green;
+  border-color: green;
 }
 
 .dropzone-reject {
-    border-color: red;
+  border-color: red;
 }
 
 .dropzone-image {
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
 .file-link {

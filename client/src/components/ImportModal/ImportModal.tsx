@@ -25,7 +25,7 @@ export class ImportModal extends React.PureComponent<ImportModalProps, State> {
     this.state = this.initialState(props);
   }
 
-  public render() {
+  render() {
     const { importConfig, onDismiss, show = true } = this.props;
 
     return (

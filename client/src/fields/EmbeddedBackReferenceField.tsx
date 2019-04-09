@@ -65,27 +65,16 @@ export class EmbeddedBackReferenceListField extends React.PureComponent<
 
     this.embeddedRecordBeforeEffects = embeddedRecords.map(() => ({}));
     this.embeddedRecordAfterEffects = embeddedRecords.map(() => ({}));
-
-    this.handleEmbeddedRecordChange = this.handleEmbeddedRecordChange.bind(
-      this
-    );
-    this.handleEmbeddedRecordRemove = this.handleEmbeddedRecordRemove.bind(
-      this
-    );
-    this.handleEmbeddedRecordCreate = this.handleEmbeddedRecordCreate.bind(
-      this
-    );
-    this.handleEmbeddedRecordMove = this.handleEmbeddedRecordMove.bind(this);
   }
 
-  public handleEmbeddedRecordChange(
+  handleEmbeddedRecordChange = (
     index: number,
     name: string,
     // tslint:disable-next-line: no-any
     value: any,
     beforeEffect?: Effect,
     afterEffect?: Effect
-  ) {
+  ) => {
     if (value !== undefined) {
       this.setState(prevState => {
         prevState.embeddedRecordUpdate[index][name] = value;
@@ -103,9 +92,9 @@ export class EmbeddedBackReferenceListField extends React.PureComponent<
     }
 
     this.applyEmbeddedRecordChange();
-  }
+  };
 
-  public handleEmbeddedRecordRemove(index: number) {
+  handleEmbeddedRecordRemove = (index: number) => {
     this.setState(prevState => {
       prevState.embeddedRecordDelete.push(prevState.embeddedRecords[index]);
       prevState.embeddedRecordUpdate.splice(index, 1);
@@ -117,9 +106,9 @@ export class EmbeddedBackReferenceListField extends React.PureComponent<
     this.embeddedRecordAfterEffects.splice(index, 1);
 
     this.applyEmbeddedRecordChange();
-  }
+  };
 
-  public handleEmbeddedRecordCreate() {
+  handleEmbeddedRecordCreate = () => {
     const { config, context } = this.props;
     const RecordCls = Record.extend(
       config.reference.targetCmsRecord.recordType
@@ -136,9 +125,9 @@ export class EmbeddedBackReferenceListField extends React.PureComponent<
     this.embeddedRecordAfterEffects.push({});
 
     this.applyEmbeddedRecordChange();
-  }
+  };
 
-  public handleEmbeddedRecordMove(from: number, to: number) {
+  handleEmbeddedRecordMove = (from: number, to: number) => {
     this.setState(prevState => {
       swap(prevState.embeddedRecordUpdate, from, to);
       swap(prevState.embeddedRecords, from, to);
@@ -149,9 +138,9 @@ export class EmbeddedBackReferenceListField extends React.PureComponent<
     swap(this.embeddedRecordAfterEffects, from, to);
 
     this.applyEmbeddedRecordChange();
-  }
+  };
 
-  public render() {
+  render() {
     const { config, className, validationError } = this.props;
     const { embeddedRecords } = this.state;
     const addable = (config.editable && config.addButton.enabled) || false;

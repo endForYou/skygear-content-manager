@@ -23,11 +23,11 @@ class BooleanFieldImpl extends React.PureComponent<BooleanFieldProps, State> {
     };
   }
 
-  public componentWillReceiveProps(nextProps: BooleanFieldProps) {
+  componentWillReceiveProps(nextProps: BooleanFieldProps) {
     this.setState({ ...this.state, value: nextProps.value });
   }
 
-  public render() {
+  render() {
     const {
       config: { editable },
       className,
@@ -61,7 +61,7 @@ class BooleanFieldImpl extends React.PureComponent<BooleanFieldProps, State> {
     );
   }
 
-  public handleChange: React.ReactEventHandler<ReactToggleElement> = event => {
+  handleChange: React.ReactEventHandler<ReactToggleElement> = event => {
     const checked = event.currentTarget.checked;
 
     this.setState({ ...this.state, value: checked });

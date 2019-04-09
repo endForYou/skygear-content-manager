@@ -3,7 +3,7 @@ import './SettingsPage.scss';
 import moment from 'moment-timezone';
 import * as React from 'react';
 import { connect, Dispatch } from 'react-redux';
-import Select, { Option, OptionValues } from 'react-select';
+import Select, { Option } from 'react-select';
 import { updateTimezone } from '../actions/settings';
 import { getCombinedSettings } from '../settings';
 import { RootState, Settings } from '../states';
@@ -25,7 +25,7 @@ const timezoneOptions = moment.tz.names().map(n => ({
 }));
 
 const TzPicker: React.SFC<TzPickerProps> = ({ value, onChange }) => {
-  const handleTimezoneChange = (option: Option<OptionValues> | null) => {
+  const handleTimezoneChange = (option: Option | null) => {
     if (option == null) {
       return;
     }
@@ -52,7 +52,7 @@ const TzPicker: React.SFC<TzPickerProps> = ({ value, onChange }) => {
 };
 
 class SettingsPage extends React.PureComponent<Props> {
-  public render() {
+  render() {
     return (
       <div className="settings-page">
         <div className="topbar">

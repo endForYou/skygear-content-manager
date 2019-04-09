@@ -1,7 +1,6 @@
 @import 'styleUtils/common.scss';
 
 .push-form-page {
-
   .push-form-groups {
     @include record-form;
 
@@ -36,7 +35,7 @@
     padding-right: to-rem(18px);
     padding-top: to-rem(24px);
     padding-bottom: to-rem(24px);
-    background-color: rgba(#EEE, 0.3);
+    background-color: rgba(#eee, 0.3);
     border-radius: 4px;
     display: flex;
     flex-direction: column;
@@ -73,7 +72,7 @@
 
   .push-form-display {
     @include text-input;
-    border-color: rgba(#CCC, 0.3);
+    border-color: rgba(#ccc, 0.3);
     width: 100%;
     display: flex;
     flex-direction: column;

@@ -5,7 +5,7 @@ import * as moment from 'moment';
 import * as React from 'react';
 // tslint:disable-next-line: no-submodule-imports
 import 'react-datetime/css/react-datetime.css';
-import { Option, OptionValues } from 'react-select';
+import { Option } from 'react-select';
 
 import {
   BaseFilterQueryType,
@@ -51,7 +51,7 @@ const DATE_FORMAT = 'YYYY-MM-DD';
 const TIME_FORMAT = 'HH:mm:ssZ';
 
 export class FilterList extends React.PureComponent<FilterListProps> {
-  public renderFilter(filter: Filter, index: number) {
+  renderFilter(filter: Filter, index: number) {
     const { className, filterConfigs, onCloseFilterClicked } = this.props;
     const config = filterConfigs.find(c => c.name === filter.name);
     if (config == null) {
@@ -75,7 +75,7 @@ export class FilterList extends React.PureComponent<FilterListProps> {
     );
   }
 
-  public renderFilterSelect(filter: Filter) {
+  renderFilterSelect(filter: Filter) {
     switch (filter.type) {
       case FilterType.StringFilterType:
         return this.renderStringFilterSelect(filter);
@@ -94,7 +94,7 @@ export class FilterList extends React.PureComponent<FilterListProps> {
     }
   }
 
-  public renderNullFilterSelect(filter: Filter) {
+  renderNullFilterSelect(filter: Filter) {
     if (!filter.nullable) {
       return null;
     }
@@ -106,12 +106,12 @@ export class FilterList extends React.PureComponent<FilterListProps> {
     ];
   }
 
-  public renderStringFilterSelect(filter: Filter) {
+  renderStringFilterSelect(filter: Filter) {
     return (
       <ReactSelectWrapper
         clearable={false}
         value={filter.query}
-        onChange={(value: Option<OptionValues> | null) =>
+        onChange={(value: Option | null) =>
           this.handleQueryTypeChange(filter, value)
         }
       >
@@ -124,12 +124,12 @@ export class FilterList extends React.PureComponent<FilterListProps> {
     );
   }
 
-  public renderNumberFilterSelect(filter: Filter) {
+  renderNumberFilterSelect(filter: Filter) {
     return (
       <ReactSelectWrapper
         clearable={false}
         value={filter.query}
-        onChange={(value: Option<OptionValues> | null) =>
+        onChange={(value: Option | null) =>
           this.handleQueryTypeChange(filter, value)
         }
       >
@@ -148,12 +148,12 @@ export class FilterList extends React.PureComponent<FilterListProps> {
     );
   }
 
-  public renderBooleanFilterSelect(filter: Filter) {
+  renderBooleanFilterSelect(filter: Filter) {
     return (
       <ReactSelectWrapper
         clearable={false}
         value={filter.query}
-        onChange={(value: Option<OptionValues> | null) =>
+        onChange={(value: Option | null) =>
           this.handleQueryTypeChange(filter, value)
         }
       >
@@ -164,12 +164,12 @@ export class FilterList extends React.PureComponent<FilterListProps> {
     );
   }
 
-  public renderDateTimeFilterSelect(filter: Filter) {
+  renderDateTimeFilterSelect(filter: Filter) {
     return (
       <ReactSelectWrapper
         clearable={false}
         value={filter.query}
-        onChange={(value: Option<OptionValues> | null) =>
+        onChange={(value: Option | null) =>
           this.handleQueryTypeChange(filter, value)
         }
       >
@@ -180,12 +180,12 @@ export class FilterList extends React.PureComponent<FilterListProps> {
     );
   }
 
-  public renderReferenceFilterSelect(filter: Filter) {
+  renderReferenceFilterSelect(filter: Filter) {
     return (
       <ReactSelectWrapper
         clearable={false}
         value={filter.query}
-        onChange={(value: Option<OptionValues> | null) =>
+        onChange={(value: Option | null) =>
           this.handleQueryTypeChange(filter, value)
         }
       >
@@ -195,7 +195,7 @@ export class FilterList extends React.PureComponent<FilterListProps> {
     );
   }
 
-  public renderInput(filter: Filter, config: FilterConfig) {
+  renderInput(filter: Filter, config: FilterConfig) {
     switch (filter.query) {
       case BaseFilterQueryType.IsNull:
       case BaseFilterQueryType.IsNotNull:
@@ -223,7 +223,7 @@ export class FilterList extends React.PureComponent<FilterListProps> {
     }
   }
 
-  public renderStringInput(filter: StringFilter) {
+  renderStringInput(filter: StringFilter) {
     const { handleFilterValueChange } = this.props;
 
     return (
@@ -237,7 +237,7 @@ export class FilterList extends React.PureComponent<FilterListProps> {
     );
   }
 
-  public renderNumberInput(filter: NumberFilter) {
+  renderNumberInput(filter: NumberFilter) {
     const { handleNumberValueChange } = this.props;
 
     return (
@@ -251,10 +251,7 @@ export class FilterList extends React.PureComponent<FilterListProps> {
     );
   }
 
-  public renderDateTimeInput(
-    filter: DateTimeFilter,
-    config: DateTimeFilterConfig
-  ) {
+  renderDateTimeInput(filter: DateTimeFilter, config: DateTimeFilterConfig) {
     return (
       <TzDatetimeInput
         className="datetime-input-container"
@@ -268,7 +265,7 @@ export class FilterList extends React.PureComponent<FilterListProps> {
     );
   }
 
-  public renderGeneralInput(filter: GeneralFilter) {
+  renderGeneralInput(filter: GeneralFilter) {
     const { handleFilterValueChange } = this.props;
 
     return (
@@ -282,10 +279,7 @@ export class FilterList extends React.PureComponent<FilterListProps> {
     );
   }
 
-  public renderReferenceInput(
-    filter: ReferenceFilter,
-    config: ReferenceFilterConfig
-  ) {
+  renderReferenceInput(filter: ReferenceFilter, config: ReferenceFilterConfig) {
     const { handleReferenceChange } = this.props;
     return (
       <ReferenceFilterInput
@@ -296,7 +290,7 @@ export class FilterList extends React.PureComponent<FilterListProps> {
     );
   }
 
-  public render() {
+  render() {
     const { filters } = this.props;
     return (
       <div className="filter-list">
@@ -305,7 +299,7 @@ export class FilterList extends React.PureComponent<FilterListProps> {
     );
   }
 
-  public handleDateTimeChange(
+  handleDateTimeChange(
     filter: Filter,
     // tslint:disable-next-line: no-any
     event: string | moment.Moment | React.ChangeEvent<any>
@@ -316,10 +310,7 @@ export class FilterList extends React.PureComponent<FilterListProps> {
     this.props.handleDateTimeValueChange(filter, event.toDate());
   }
 
-  private handleQueryTypeChange(
-    filter: Filter,
-    value: Option<OptionValues> | null
-  ) {
+  private handleQueryTypeChange(filter: Filter, value: Option | null) {
     const { handleQueryTypeChange } = this.props;
     if (value == null || value.value == null) {
       return;

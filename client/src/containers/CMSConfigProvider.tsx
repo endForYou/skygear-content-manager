@@ -18,19 +18,19 @@ interface DispatchProps {
 type Props = StateProps & DispatchProps;
 
 class CMSConfigProviderImpl extends React.PureComponent<Props> {
-  public componentDidMount() {
+  componentDidMount() {
     if (this.props.auth.user && this.props.cmsConfig === null) {
       this.fetchCmsConfig();
     }
   }
 
-  public componentWillReceiveProps(nextProps: Props) {
+  componentWillReceiveProps(nextProps: Props) {
     if (!this.props.auth.user && nextProps.auth.user) {
       this.fetchCmsConfig();
     }
   }
 
-  public render() {
+  render() {
     return this.props.children;
   }
 

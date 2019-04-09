@@ -14,7 +14,7 @@ export interface PaginationProps {
 }
 
 export default class Pagination extends React.PureComponent<PaginationProps> {
-  public render() {
+  render() {
     return (
       <div className={classnames(this.props.className, 'pagination-container')}>
         {this.renderPaginationItems()}

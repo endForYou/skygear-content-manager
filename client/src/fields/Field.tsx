@@ -74,7 +74,7 @@ export function FieldContext(record: Record): FieldContext {
 }
 
 export class Field extends React.PureComponent<FieldProps> {
-  public render() {
+  render() {
     const { config, ...rest } = this.props;
     switch (config.type) {
       case FieldConfigTypes.TextDisplay:

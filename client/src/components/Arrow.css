@@ -1,28 +1,28 @@
 .arrow-button {
-    background: 0 0;
-    border: 0;
-    padding: 0;
+  background: 0 0;
+  border: 0;
+  padding: 0;
 }
 
 .arrow {
-    border: solid black;
-    display: inline-block;
-    border-width: 0 0.25rem 0.25rem 0;
-    padding: 0.25rem;
+  border: solid black;
+  display: inline-block;
+  border-width: 0 0.25rem 0.25rem 0;
+  padding: 0.25rem;
 }
 
 .arrow.right {
-    transform: rotate(-45deg);
+  transform: rotate(-45deg);
 }
 
 .arrow.left {
-    transform: rotate(135deg);
+  transform: rotate(135deg);
 }
 
 .arrow.up {
-    transform: translateY(0.125rem) rotate(-135deg);
+  transform: translateY(0.125rem) rotate(-135deg);
 }
 
 .arrow.down {
-    transform: translateY(-0.125rem) rotate(45deg);
+  transform: translateY(-0.125rem) rotate(45deg);
 }

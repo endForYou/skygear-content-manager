@@ -55,11 +55,11 @@ class DateTimePickerFieldImpl extends React.PureComponent<
     };
   }
 
-  public componentWillReceiveProps(nextProps: DateTimePickerFieldProps) {
+  componentWillReceiveProps(nextProps: DateTimePickerFieldProps) {
     this.setState({ ...this.state, value: nextProps.value });
   }
 
-  public render() {
+  render() {
     const {
       config: { timezone, datePicker, timePicker, editable },
       className,
@@ -91,7 +91,7 @@ class DateTimePickerFieldImpl extends React.PureComponent<
     );
   }
 
-  public handleChange: (
+  handleChange: (
     // tslint:disable-next-line: no-any
     event: string | moment.Moment | React.ChangeEvent<any>
   ) => void = event => {
@@ -109,7 +109,7 @@ class DateTimePickerFieldImpl extends React.PureComponent<
     this.updateValue(d);
   };
 
-  public updateValue(value: Date | null) {
+  updateValue(value: Date | null) {
     this.setState({ ...this.state, value });
     if (this.props.onFieldChange) {
       this.props.onFieldChange(value);

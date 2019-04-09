@@ -29,7 +29,7 @@ interface DispatchProps {
 }
 
 class EditPageContainerImpl extends React.PureComponent<Props> {
-  public recordDispatcher: RecordActionDispatcher;
+  recordDispatcher: RecordActionDispatcher;
 
   constructor(props: Props) {
     super(props);
@@ -42,11 +42,11 @@ class EditPageContainerImpl extends React.PureComponent<Props> {
     );
   }
 
-  public componentDidMount() {
+  componentDidMount() {
     this.recordDispatcher.fetch(this.props.recordId);
   }
 
-  public render() {
+  render() {
     const { config, dispatch, remoteRecord, savingRecord } = this.props;
     let content;
     switch (remoteRecord.type) {

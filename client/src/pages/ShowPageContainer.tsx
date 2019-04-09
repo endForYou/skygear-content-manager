@@ -28,7 +28,7 @@ class ShowPageContainerImpl extends React.PureComponent<Props> {
     this.showPageFetcher = makeShowPage(dispatch, config, recordId);
   }
 
-  public render() {
+  render() {
     const ShowPageFetcher = this.showPageFetcher;
     return <ShowPageFetcher />;
   }

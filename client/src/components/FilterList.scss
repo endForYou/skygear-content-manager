@@ -10,7 +10,7 @@ $filter-select-width: 140px;
     align-items: center;
     height: to-rem(62px);
     padding: 0 to-rem(9px);
-    border-top: 1px solid #F0F0F0;
+    border-top: 1px solid #f0f0f0;
   }
 
   .filter-name {
@@ -53,15 +53,15 @@ $filter-select-width: 140px;
 
   .btn-close {
     cursor: pointer;
-    color: #0275D8;
+    color: #0275d8;
     opacity: 1;
     font-weight: 100;
     font-size: to-rem(21px);
     line-height: to-rem(21px);
 
     &:hover {
-      color: #0275D8;
-      opacity: .75;
+      color: #0275d8;
+      opacity: 0.75;
     }
   }
 }

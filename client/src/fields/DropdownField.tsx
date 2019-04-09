@@ -1,6 +1,6 @@
 import classnames from 'classnames';
 import * as React from 'react';
-import Select, { Option, OptionValues } from 'react-select';
+import Select, { Option } from 'react-select';
 
 import { RequiredFieldProps } from './Field';
 
@@ -33,9 +33,6 @@ export class DropdownField extends React.PureComponent<
       ...this.deriveValueStates(props.config, props.value),
       expanded: false,
     };
-
-    this.handleSelectChange = this.handleSelectChange.bind(this);
-    this.handleCustomValueChange = this.handleCustomValueChange.bind(this);
   }
 
   // Does not handle componentWillReceiveProps for value changes while the field
@@ -43,7 +40,7 @@ export class DropdownField extends React.PureComponent<
   //
   // props does not have enough information to distinguish matched value or
   // custom value with matched value
-  public componentWillReceiveProps(nextProps: DropdownFieldProps) {
+  componentWillReceiveProps(nextProps: DropdownFieldProps) {
     const isFieldReused =
       this.props.config.name !== nextProps.config.name ||
       nextProps.context.record.recordType !==
@@ -61,7 +58,7 @@ export class DropdownField extends React.PureComponent<
     }
   }
 
-  public deriveValueStates(config: DropdownFieldConfig, value: ValueType) {
+  deriveValueStates(config: DropdownFieldConfig, value: ValueType) {
     const { customOption, options } = config;
 
     const matched = options.filter(opt => opt.value === value).length > 0;
@@ -81,7 +78,7 @@ export class DropdownField extends React.PureComponent<
     };
   }
 
-  public handleSelectChange(option: Option<OptionValues> | null) {
+  handleSelectChange = (option: Option | null) => {
     if (option == null) {
       // throw new Error('Unexpected null selected');
       return;
@@ -113,9 +110,9 @@ export class DropdownField extends React.PureComponent<
     if (this.props.onFieldChange) {
       this.props.onFieldChange(newValue);
     }
-  }
+  };
 
-  public handleCustomValueChange(event: React.ChangeEvent<HTMLInputElement>) {
+  handleCustomValueChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
     this.setState({
       value,
@@ -124,7 +121,7 @@ export class DropdownField extends React.PureComponent<
     if (this.props.onFieldChange) {
       this.props.onFieldChange(value);
     }
-  }
+  };
 
   get selectOptions() {
     const {
@@ -163,7 +160,7 @@ export class DropdownField extends React.PureComponent<
     return combinedOptions;
   }
 
-  public render() {
+  render() {
     const {
       config: { compact, editable, name, nullOption, options },
       className,

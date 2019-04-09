@@ -33,7 +33,7 @@ class ReferenceFilterInputImpl extends React.PureComponent<
   ReferenceFilterInputProps,
   State
 > {
-  public render() {
+  render() {
     const {
       config: config,
       onFieldChange: _onFieldChange,
@@ -53,7 +53,7 @@ class ReferenceFilterInputImpl extends React.PureComponent<
     );
   }
 
-  public loadOptions: LoadOptionsAsyncHandler<string> = input => {
+  loadOptions: LoadOptionsAsyncHandler<string> = input => {
     const { displayFieldName, predicates, targetCmsRecord } = this.props.config;
 
     const RecordCls = Record.extend(targetCmsRecord.recordType);
@@ -81,11 +81,12 @@ class ReferenceFilterInputImpl extends React.PureComponent<
   };
 
   // tslint:disable-next-line: member-ordering
-  public debouncedLoadOptions: LoadOptionsAsyncHandler<
-    string
-  > = debouncePromise1(this.loadOptions, 300);
+  debouncedLoadOptions: LoadOptionsAsyncHandler<string> = debouncePromise1(
+    this.loadOptions,
+    300
+  );
 
-  public onChange: OnChangeHandler<string> = value => {
+  onChange: OnChangeHandler<string> = value => {
     const values = makeArray(value).map(a => a.value);
 
     if (value == null) {

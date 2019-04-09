@@ -12,7 +12,7 @@ export type ImageAssetUploaderProps = RequiredFieldProps<
 class ImageAssetUploaderImpl extends React.PureComponent<
   ImageAssetUploaderProps
 > {
-  public render() {
+  render() {
     const {
       config: { editable },
       onFieldChange,

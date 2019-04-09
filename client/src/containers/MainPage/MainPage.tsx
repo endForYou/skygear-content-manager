@@ -41,7 +41,7 @@ class MainPage extends React.PureComponent<MainPageProps> {
     this.fileImportRoutes = fileImportRoutes();
   }
 
-  public render() {
+  render() {
     const {
       fileImportEnabled,
       pushNotificationEnabled,

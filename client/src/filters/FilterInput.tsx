@@ -27,7 +27,7 @@ export interface ChildProps<C extends FilterConfig> {
 export type FieldChangeHandler = (value: any) => void;
 
 export class FilterInput extends React.PureComponent<FilterFieldProps> {
-  public render() {
+  render() {
     const { config, ...rest } = this.props;
     switch (config.type) {
       case FilterConfigTypes.Reference:

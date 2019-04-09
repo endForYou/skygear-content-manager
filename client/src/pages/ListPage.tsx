@@ -295,7 +295,7 @@ export interface DispatchProps {
 }
 
 class ListPageImpl extends React.PureComponent<ListPageProps, State> {
-  public recordActionCreator: RecordActionDispatcher;
+  recordActionCreator: RecordActionDispatcher;
 
   constructor(props: ListPageProps) {
     super(props);
@@ -318,17 +318,14 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
       'list'
     );
 
-    this.fetchList = debounce(this.fetchList.bind(this), 200);
-
-    this.onImportFile = this.onImportFile.bind(this);
-    this.onSortButtonClick = this.onSortButtonClick.bind(this);
+    this.fetchList = debounce(this.fetchList, 200);
   }
 
-  public componentDidMount() {
+  componentDidMount() {
     this.reloadList(this.props);
   }
 
-  public componentWillReceiveProps(nextProps: ListPageProps) {
+  componentWillReceiveProps(nextProps: ListPageProps) {
     const {
       filters,
       import: { importResult },
@@ -350,26 +347,26 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
     }
   }
 
-  public toggleFilterMenu() {
+  toggleFilterMenu() {
     this.setState({ showfilterMenu: !this.state.showfilterMenu });
   }
 
-  public onImportFile(actionConfig: ImportActionConfig, attrs: ImportAttrs) {
+  onImportFile = (actionConfig: ImportActionConfig, attrs: ImportAttrs) => {
     const { dispatch } = this.props;
     dispatch(importRecords(actionConfig.name, attrs));
-  }
+  };
 
-  public onFilterChange = (filters: Filter[]) => {
+  onFilterChange = (filters: Filter[]) => {
     this.props.onChangePage();
     this.props.onChangeFilter(filters);
   };
 
-  public onSortButtonClick(name: string) {
+  onSortButtonClick = (name: string) => {
     const sortState = nextSortState(this.props.sortState, name);
     this.props.onChangeSort(sortState);
-  }
+  };
 
-  public renderActionButton(
+  renderActionButton(
     cmsRecord: CmsRecord,
     actionConfig: ListActionConfig,
     index: number
@@ -409,7 +406,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
     }
   }
 
-  public renderActionButtons() {
+  renderActionButtons() {
     const {
       pageConfig: { actions, cmsRecord },
     } = this.props;
@@ -425,7 +422,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
    * 1. Whole import process -> this.state.importing: ImportActionConfig
    * 2. After importing starts -> this.props.import: ImportState
    */
-  public renderImportModal() {
+  renderImportModal() {
     if (!this.state.importing) {
       return undefined;
     }
@@ -465,7 +462,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
     }
   }
 
-  public renderExportModal() {
+  renderExportModal() {
     if (!this.state.exporting) {
       return undefined;
     }
@@ -483,7 +480,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
     );
   }
 
-  public render() {
+  render() {
     const {
       filters,
       location,
@@ -589,13 +586,13 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
     );
   }
 
-  public fetchList(
+  fetchList = (
     page: number,
     perPage: number,
     filters: Filter[],
     predicates: Predicate[],
     sortState: SortState
-  ) {
+  ) => {
     this.recordActionCreator.fetchList(
       page,
       perPage,
@@ -604,9 +601,9 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
       sortState.fieldName,
       sortState.order === SortOrder.Ascending
     );
-  }
+  };
 
-  public reloadList(props: ListPageProps) {
+  reloadList(props: ListPageProps) {
     const { filters, page, pageConfig, sortState } = props;
     const derivedSortState =
       sortState.fieldName === undefined ? pageConfig.defaultSort : sortState;

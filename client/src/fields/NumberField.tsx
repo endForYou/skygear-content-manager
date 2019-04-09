@@ -42,7 +42,7 @@ export class FloatInputField extends React.PureComponent<
     };
   }
 
-  public componentWillReceiveProps(nextProps: FloatInputFieldProps) {
+  componentWillReceiveProps(nextProps: FloatInputFieldProps) {
     if (nextProps.value !== this.state.value) {
       this.setState({
         ...this.state,
@@ -51,7 +51,7 @@ export class FloatInputField extends React.PureComponent<
     }
   }
 
-  public render() {
+  render() {
     const {
       config: { editable, name },
       className,
@@ -80,7 +80,7 @@ export class FloatInputField extends React.PureComponent<
     );
   }
 
-  public handleChange = (value: number) => {
+  handleChange = (value: number) => {
     if (this.props.onFieldChange) {
       this.props.onFieldChange(value);
     }

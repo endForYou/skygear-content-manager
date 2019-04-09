@@ -4,18 +4,18 @@
 .pagination-container {
   .pagination-item {
     background: white;
-    border-top: 1px solid #CCCCCC;
-    border-bottom: 1px solid #CCCCCC;
-    border-left: 1px solid #CCCCCC;
+    border-top: 1px solid #cccccc;
+    border-bottom: 1px solid #cccccc;
+    border-left: 1px solid #cccccc;
   }
 
   .pagination-item:first-child {
-    border-left: 1px solid #CCCCCC;
+    border-left: 1px solid #cccccc;
     border-radius: 2px 0 0 2px;
   }
 
   .pagination-item:last-child {
-    border-right: 1px solid #CCCCCC;
+    border-right: 1px solid #cccccc;
     border-radius: 0 2px 2px 0;
   }
 }
@@ -24,7 +24,7 @@
   .link {
     display: inline-block;
     padding: to-rem(10px) to-rem(14px);
-    color: #4A4A4A;
+    color: #4a4a4a;
     @include btn-hover-effect-darken(white);
 
     &:hover {
@@ -33,16 +33,16 @@
   }
 
   &.active {
-    color: #0275D8;
-    border: 1px solid #0275D8;
+    color: #0275d8;
+    border: 1px solid #0275d8;
 
     .link {
-      color: #0275D8;
+      color: #0275d8;
     }
   }
 
   .disabled {
-    color: #CCCCCC;
+    color: #cccccc;
     cursor: default;
   }
 }

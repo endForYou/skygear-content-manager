@@ -358,19 +358,15 @@ export class UserActionDispatcher {
     this.dispatch = dispatch;
   }
 
-  public fetchList(page: number, perPage: number, filters: Filter[]) {
+  fetchList(page: number, perPage: number, filters: Filter[]) {
     this.dispatch(fetchUsers(page, perPage, filters));
   }
 
-  public updateUserCMSAccess(
-    userId: string,
-    hasAccess: boolean,
-    adminRole: string
-  ) {
+  updateUserCMSAccess(userId: string, hasAccess: boolean, adminRole: string) {
     this.dispatch(updateUserCMSAccess(userId, hasAccess, adminRole));
   }
 
-  public fetchUser(userId: string) {
+  fetchUser(userId: string) {
     this.dispatch(fetchUser(userId));
   }
 }

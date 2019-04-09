@@ -11,7 +11,7 @@
     flex-direction: row;
     padding: to-rem(9px) to-rem(16px);
     margin: to-rem(5px) to-rem(5px);
-    background: #EFF3F5;
+    background: #eff3f5;
     border-radius: 100px;
     align-items: center;
   }
@@ -28,7 +28,7 @@
   .query-type {
     margin-left: to-rem(5px);
     line-height: to-rem(14px);
-    color: #0275D8;
+    color: #0275d8;
   }
 
   .value {
@@ -39,13 +39,13 @@
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
-    color: #0275D8;
+    color: #0275d8;
   }
 
   .btn-close {
     cursor: pointer;
     position: relative;
-    color: #0275D8;
+    color: #0275d8;
     opacity: 1;
     font-weight: 100;
     font-size: to-rem(21px);
@@ -57,8 +57,8 @@
     margin-left: to-rem(5px);
 
     &:hover {
-      color: #0275D8;
-      opacity: .75;
+      color: #0275d8;
+      opacity: 0.75;
     }
 
     span {

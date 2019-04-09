@@ -6,7 +6,7 @@ interface Props {
 }
 
 export class ValidationAlert extends React.PureComponent<Props> {
-  public render() {
+  render() {
     const { validationError } = this.props;
 
     if (

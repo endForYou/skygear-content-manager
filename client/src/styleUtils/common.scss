@@ -14,9 +14,9 @@ $input-horizontal-padding: to-rem(16px);
   background-color: #fff;
   background-image: none;
   background-clip: padding-box;
-  border: 1px solid #CCCCCC;
+  border: 1px solid #cccccc;
   border-radius: 4px;
-  transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+  transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
 
   &::placeholder {
     color: #999999;
@@ -45,14 +45,14 @@ $input-horizontal-padding: to-rem(16px);
   $btn-secondary-bg-color: white;
 
   background-color: $btn-secondary-bg-color;
-  border: 1px solid #CCCCCC;
-  color: #373A3C;
+  border: 1px solid #cccccc;
+  color: #373a3c;
 
   @include btn-hover-effect-darken($btn-secondary-bg-color);
 
   &[disabled] {
     cursor: default;
-    color: rgba(#373A3C, 0.3);
+    color: rgba(#373a3c, 0.3);
   }
 }
 
@@ -66,9 +66,9 @@ $input-horizontal-padding: to-rem(16px);
     float: left;
     background-color: #fff;
     background-clip: padding-box;
-    border: 1px solid #DEDEDE;
+    border: 1px solid #dedede;
     border-radius: 4px;
-    box-shadow: 0 0 2px 0 rgba(0,0,0,0.30);
+    box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.3);
 
     &.show {
       display: block;

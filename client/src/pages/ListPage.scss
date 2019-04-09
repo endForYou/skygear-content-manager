@@ -30,7 +30,8 @@ $horizontal-spacing: to-rem(32px);
     @include pagination-position;
   }
 
-  .list-loading, .list-empty {
+  .list-loading,
+  .list-empty {
     padding: to-rem(24px) $horizontal-spacing;
     font-weight: 300;
     font-size: 18px;
@@ -61,7 +62,7 @@ $horizontal-spacing: to-rem(32px);
     display: table-cell;
     height: to-rem(66px);
     padding-right: to-rem(32px);
-    border-bottom: 1px #ECEEEF solid;
+    border-bottom: 1px #eceeef solid;
     font-family: HelveticaNeue, sans-serif;
     vertical-align: middle;
     min-width: to-rem(150px);
@@ -73,7 +74,7 @@ $horizontal-spacing: to-rem(32px);
 
   .table-header {
     display: table-header-group;
-    background: #FFFFFF;
+    background: #ffffff;
 
     .table-cell {
       height: to-rem(50px);
@@ -86,7 +87,7 @@ $horizontal-spacing: to-rem(32px);
     display: table-row-group;
 
     .table-row:nth-child(2n-1) {
-      background-color: #F9F9F9;
+      background-color: #f9f9f9;
     }
   }
 

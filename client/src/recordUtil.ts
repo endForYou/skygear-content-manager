@@ -46,7 +46,7 @@ export function errorMessageFromError(e: Error) {
 }
 
 export class RecordsOperationError extends Error {
-  public errors: Error[];
+  errors: Error[];
 
   constructor(message: string, errors: Error[]) {
     super(message);

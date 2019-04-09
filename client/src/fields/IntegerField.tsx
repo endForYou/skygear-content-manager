@@ -48,7 +48,7 @@ class IntegerFieldImpl extends React.PureComponent<
     };
   }
 
-  public componentWillReceiveProps(nextProps: IntegerInputFieldProps) {
+  componentWillReceiveProps(nextProps: IntegerInputFieldProps) {
     if (nextProps.value !== this.state.value) {
       this.setState({
         ...this.state,
@@ -57,7 +57,7 @@ class IntegerFieldImpl extends React.PureComponent<
     }
   }
 
-  public render() {
+  render() {
     const {
       config: { compact, editable },
       className,
@@ -98,7 +98,7 @@ class IntegerFieldImpl extends React.PureComponent<
     }
   }
 
-  public handleChange = (value: number) => {
+  handleChange = (value: number) => {
     if (this.props.onFieldChange) {
       this.props.onFieldChange(value);
     }
