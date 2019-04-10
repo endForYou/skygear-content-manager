@@ -739,7 +739,7 @@ export function parseReferenceDropdownFieldConfig(
   );
 
   const addButton = {
-    enabled: false,
+    enabled: true,
     label: '',
   };
   if (input.add_button != null) {
@@ -748,7 +748,7 @@ export function parseReferenceDropdownFieldConfig(
       'enabled',
       'reference.add_button'
     );
-    addButton.enabled = enabled == null ? false : enabled;
+    addButton.enabled = enabled !== false;
     addButton.label =
       parseOptionalString(input.add_button, 'label', 'reference.add_button') ||
       `Create New ${attrs.label}`;
@@ -848,7 +848,7 @@ function parseEmbeddedReferenceListFieldConfig(
   );
 
   const addButton = {
-    enabled: false,
+    enabled: true,
   };
   if (input.add_button != null) {
     const enabled = parseOptionalBoolean(
