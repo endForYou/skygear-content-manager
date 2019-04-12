@@ -410,6 +410,9 @@ records:
             - name: _id
             - name: name
               type: string
+              default_value: it_works
+          add_button:
+            enabled: true
         - name: asso_refs_embedded
           type: embedded_reference_list
           reference_via_association_record: field_asso_ref
@@ -419,6 +422,9 @@ records:
             - name: _id
             - name: name
               type: string
+              default_value: it_works_here_as_well
+          add_button:
+            enabled: true
         - name: imageasset
           type: image
         - name: fileasset

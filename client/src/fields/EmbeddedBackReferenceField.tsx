@@ -8,6 +8,7 @@ import {
   DeleteAction,
   EmbeddedBackReferenceListFieldConfig,
   FieldConfig,
+  isFieldEditable,
   SortOrder,
 } from '../cmsConfig';
 import { Arrow, ArrowDirection } from '../components/Arrow';
@@ -333,6 +334,12 @@ interface FieldProps {
 
 function FormGroup(props: FieldProps): JSX.Element {
   const { fieldConfig, onFieldChange, record, validationError } = props;
+  const fieldName = fieldConfig.name;
+  const value = Object.prototype.hasOwnProperty.call(record, fieldName)
+    ? record[fieldName]
+    : isFieldEditable(fieldConfig)
+    ? fieldConfig.defaultValue
+    : undefined;
   return (
     <div className="record-form-group">
       <label
@@ -346,7 +353,7 @@ function FormGroup(props: FieldProps): JSX.Element {
       <Field
         className="record-form-field"
         config={fieldConfig}
-        value={record[fieldConfig.name]}
+        value={value}
         context={FieldContext(record)}
         onFieldChange={onFieldChange}
         validationError={validationError}
