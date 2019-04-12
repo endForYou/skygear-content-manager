@@ -411,15 +411,15 @@ Object {
           Object {
             "compact": false,
             "datePicker": Object {
-              "enabled": false,
-              "format": undefined,
+              "enabled": true,
+              "format": "YYYY-MM-DD",
             },
             "defaultValue": undefined,
             "label": "Datetime",
             "name": "datetime",
             "timePicker": Object {
-              "enabled": false,
-              "format": undefined,
+              "enabled": true,
+              "format": "HH:mm:ssZ",
             },
             "timezone": undefined,
             "type": "date_time_picker",
@@ -1349,15 +1349,15 @@ Object {
           Object {
             "compact": false,
             "datePicker": Object {
-              "enabled": false,
-              "format": undefined,
+              "enabled": true,
+              "format": "YYYY-MM-DD",
             },
             "defaultValue": undefined,
             "label": "Datetime",
             "name": "datetime",
             "timePicker": Object {
-              "enabled": false,
-              "format": undefined,
+              "enabled": true,
+              "format": "HH:mm:ssZ",
             },
             "timezone": undefined,
             "type": "date_time_picker",
