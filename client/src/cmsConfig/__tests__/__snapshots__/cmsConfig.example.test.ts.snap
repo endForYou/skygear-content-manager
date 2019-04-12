@@ -115,7 +115,7 @@ Object {
           },
           Object {
             "addButton": Object {
-              "enabled": false,
+              "enabled": true,
               "label": "",
             },
             "compact": false,
@@ -149,7 +149,7 @@ Object {
         "references": Array [
           Object {
             "addButton": Object {
-              "enabled": false,
+              "enabled": true,
               "label": "",
             },
             "compact": false,
@@ -187,7 +187,7 @@ Object {
           },
           Object {
             "addButton": Object {
-              "enabled": false,
+              "enabled": true,
               "label": "",
             },
             "compact": false,
@@ -221,7 +221,7 @@ Object {
         "references": Array [
           Object {
             "addButton": Object {
-              "enabled": false,
+              "enabled": true,
               "label": "",
             },
             "compact": false,
@@ -509,7 +509,7 @@ Object {
           },
           Object {
             "addButton": Object {
-              "enabled": false,
+              "enabled": true,
             },
             "compact": false,
             "deleteButton": Object {
@@ -554,7 +554,7 @@ Object {
           },
           Object {
             "addButton": Object {
-              "enabled": false,
+              "enabled": true,
             },
             "compact": false,
             "deleteButton": Object {
@@ -762,7 +762,7 @@ Object {
           },
           Object {
             "addButton": Object {
-              "enabled": false,
+              "enabled": true,
             },
             "compact": false,
             "deleteButton": Object {
@@ -807,7 +807,7 @@ Object {
           },
           Object {
             "addButton": Object {
-              "enabled": false,
+              "enabled": true,
             },
             "compact": false,
             "deleteButton": Object {
@@ -1392,7 +1392,7 @@ Object {
           },
           Object {
             "addButton": Object {
-              "enabled": false,
+              "enabled": true,
               "label": "",
             },
             "compact": false,
@@ -1622,7 +1622,7 @@ Object {
         "references": Array [
           Object {
             "addButton": Object {
-              "enabled": false,
+              "enabled": true,
               "label": "",
             },
             "compact": false,
@@ -2056,7 +2056,7 @@ Object {
           },
           Object {
             "addButton": Object {
-              "enabled": false,
+              "enabled": true,
             },
             "compact": false,
             "deleteButton": Object {
@@ -2098,7 +2098,7 @@ Object {
           },
           Object {
             "addButton": Object {
-              "enabled": false,
+              "enabled": true,
             },
             "compact": false,
             "deleteButton": Object {
@@ -2371,7 +2371,7 @@ Object {
           },
           Object {
             "addButton": Object {
-              "enabled": false,
+              "enabled": true,
             },
             "compact": false,
             "deleteButton": Object {
@@ -2413,7 +2413,7 @@ Object {
           },
           Object {
             "addButton": Object {
-              "enabled": false,
+              "enabled": true,
             },
             "compact": false,
             "deleteButton": Object {
