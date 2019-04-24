@@ -47,8 +47,8 @@ def register_lambdas(settings):
         with scoped_session() as session:
             query = session.query(Auth).join(Auth.user)
             query = apply_filters(query, filter, filter_name_to_col)
-            query = query.limit(page_size).offset(page_size * (page - 1))
             total_count = query.count()
+            query = query.limit(page_size).offset(page_size * (page - 1))
             result = query.all()
             users = UserSchema(many=True).dump(result)
             inject_user_record(users)
