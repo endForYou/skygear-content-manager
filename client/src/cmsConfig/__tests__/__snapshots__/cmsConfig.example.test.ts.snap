@@ -554,7 +554,7 @@ Object {
           },
           Object {
             "addButton": Object {
-              "enabled": true,
+              "enabled": false,
             },
             "compact": false,
             "deleteButton": Object {
@@ -807,7 +807,7 @@ Object {
           },
           Object {
             "addButton": Object {
-              "enabled": true,
+              "enabled": false,
             },
             "compact": false,
             "deleteButton": Object {

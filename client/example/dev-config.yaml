@@ -351,6 +351,8 @@ records:
             - name: _id
             - name: name
               type: string
+          add_button:
+            enabled: false
         - name: imageasset
           type: image
         - name: fileasset
