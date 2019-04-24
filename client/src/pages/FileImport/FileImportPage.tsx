@@ -131,10 +131,12 @@ class TableRow extends React.PureComponent<TableRowProps, TableRowState> {
     const { file } = this.props;
     const { isPreviewing } = this.state;
 
+    const isImage = (/\.(gif|jpg|jpe?g|tiff|png|webp)$/i).test(file.url)
+
     return (
       <div className="table-row">
         <div className="table-cell">
-          <div className="table-image" onClick={() => this.togglePreview(true)}>
+          <div className={`table-file ${isImage && 'table-image'}`} onClick={() => isImage && this.togglePreview(true)}>
             {file.name}
           </div>
         </div>
