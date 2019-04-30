@@ -135,7 +135,9 @@
 }
 
 .image-asset-image {
-  background-size: cover;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 .btn-add {
