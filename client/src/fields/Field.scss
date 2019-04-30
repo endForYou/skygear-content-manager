@@ -84,7 +84,7 @@
   &.full {
     @include text-input;
     border-color: rgba(#ccc, 0.3);
-    height: to-rem(38px);
+    min-height: to-rem(38px);
     vertical-align: middle;
   }
 }
