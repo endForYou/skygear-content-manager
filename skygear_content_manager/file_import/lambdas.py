@@ -28,6 +28,7 @@ class CmsImportedFileSchema(Schema):
     url = fields.String(dump_only=True)
     uploaded_at = fields.DateTime(format="%Y-%m-%dT%H:%M:%SZ", dump_only=True)
     size = fields.Method('get_size')
+    content_type = fields.Method('get_content_type')
 
     def get_asset(self, obj):
         return obj.asset.id
@@ -37,6 +38,9 @@ class CmsImportedFileSchema(Schema):
 
     def get_size(self, obj):
         return obj.asset.size
+
+    def get_content_type(self, obj):
+        return obj.asset.content_type
 
 
 def register_lambda(settings):
