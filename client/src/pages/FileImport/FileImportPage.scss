@@ -104,6 +104,12 @@ $horizontal-spacing: to-rem(32px);
     text-overflow: ellipsis;
   }
 
+  .table-image {
+    cursor: pointer;
+    font-weight: bold;
+    text-decoration: underline;
+  }
+
   .table-header {
     display: table-header-group;
     background: #ffffff;

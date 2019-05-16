@@ -42,5 +42,13 @@
 
   .modal-body {
     position: relative;
+    max-height: 80vh;
+    overflow: auto;
+  }
+
+  .modal-img {
+    display: block;
+    margin: auto;
+    max-width: 100%;
   }
 }

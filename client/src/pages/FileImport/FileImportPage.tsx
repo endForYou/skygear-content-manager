@@ -7,6 +7,7 @@ import { connect, Dispatch } from 'react-redux';
 
 import { FileImportActionDispatcher } from '../../actions/fileImport';
 import { Filter, FilterConfig, FilterConfigTypes } from '../../cmsConfig';
+import { Modal } from '../../components/Modal';
 import { FilterMenu } from '../../components/FilterMenu';
 import { FilterTagList } from '../../components/FilterTagList';
 import Pagination from '../../components/Pagination';
@@ -113,21 +114,60 @@ interface TableRowProps {
   file: ImportedFile;
 }
 
-const TableRow: React.SFC<TableRowProps> = ({ file }) => {
-  return (
-    <div className="table-row">
-      <div className="table-cell">
-        <div>{file.name}</div>
+interface TableRowState {
+  isPreviewing: boolean;
+}
+
+class TableRow extends React.PureComponent<TableRowProps, TableRowState> {
+  state: TableRowState = {
+    isPreviewing: false,
+  };
+
+  togglePreview = (preview = false) => {
+    this.setState({ isPreviewing: preview });
+  };
+
+  render() {
+    const { file } = this.props;
+    const { isPreviewing } = this.state;
+
+    const isImage = file.contentType.startsWith('image/');
+
+    return (
+      <div className="table-row">
+        <div className="table-cell">
+          <div
+            className={`table-file ${isImage && 'table-image'}`}
+            onClick={() => {
+              if (isImage) {
+                this.togglePreview(true);
+              }
+            }}
+          >
+            {file.name}
+          </div>
+        </div>
+        <div className="table-cell">
+          <TzDatetime
+            value={file.uploadedAt}
+            datetimeFormat={DATETIME_FORMAT}
+          />
+        </div>
+        <div className="table-cell">
+          <div>{file.size}</div>
+        </div>
+        <Modal
+          show={isPreviewing}
+          title={file.name}
+          onDismiss={() => this.setState({ isPreviewing: false })}
+          body={() => (
+            <img className="modal-img" src={file.url} alt={file.name} />
+          )}
+        />
       </div>
-      <div className="table-cell">
-        <TzDatetime value={file.uploadedAt} datetimeFormat={DATETIME_FORMAT} />
-      </div>
-      <div className="table-cell">
-        <div>{file.size}</div>
-      </div>
-    </div>
-  );
-};
+    );
+  }
+}
 
 interface TableBodyProps {
   files: ImportedFile[];
