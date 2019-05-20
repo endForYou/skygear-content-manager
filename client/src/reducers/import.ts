@@ -25,22 +25,31 @@ export default function importReducer(
     case ImportActionTypes.DismissImport:
       return {
         ...state,
+        importProgress: undefined,
         importResult: undefined,
       };
     case ImportActionTypes.ImportRequest:
       return {
         ...state,
+        importProgress: undefined,
         importResult: RemoteLoading,
+      };
+    case ImportActionTypes.ImportProgress:
+      return {
+        ...state,
+        importProgress: action.payload.progress,
       };
     case ImportActionTypes.ImportSuccess:
       return {
         ...state,
+        importProgress: undefined,
         importResult: RemoteSuccess<ImportResult>(action.payload.result),
       };
     case ImportActionTypes.ImportFailure:
       return {
         ...state,
         errorMessage: errorMessageFromError(action.payload.error),
+        importProgress: undefined,
         importResult: RemoteFailure(action.payload.error),
       };
     default:

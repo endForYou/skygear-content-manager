@@ -72,10 +72,17 @@ export const ImportResultModal: React.SFC<ImportModalResultProps> = props => {
 
 export const ImportingModal = ({
   importConfig,
+  importProgress,
 }: {
   importConfig: ImportActionConfig;
+  importProgress?: number;
 }) => {
-  return <LoadingModal title={importConfig.label} />;
+  return (
+    <LoadingModal
+      title={importConfig.label}
+      progressPercentage={importProgress}
+    />
+  );
 };
 
 export const ImportFailureModal = ({

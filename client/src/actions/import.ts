@@ -12,12 +12,14 @@ const CSV_NEWLINE_REGEX = /\r?\n/g;
 
 export type ImportActions =
   | ImportRequest
+  | ImportProgress
   | ImportSuccess
   | ImportFailure
   | DismissImport;
 
 export enum ImportActionTypes {
   ImportRequest = 'IMPORT_REQUEST',
+  ImportProgress = 'IMPORT_PROGRESS',
   ImportSuccess = 'IMPORT_SUCCESS',
   ImportFailure = 'IMPORT_FAILURE',
   DismissImport = 'DISMISS_IMPORT',
@@ -31,6 +33,14 @@ export interface ImportAttrs {
 export interface ImportRequest {
   type: ImportActionTypes.ImportRequest;
   payload: undefined;
+  context: undefined;
+}
+
+export interface ImportProgress {
+  type: ImportActionTypes.ImportProgress;
+  payload: {
+    progress: number;
+  };
   context: undefined;
 }
 
@@ -61,6 +71,14 @@ function importRequest(): ImportRequest {
     context: undefined,
     payload: undefined,
     type: ImportActionTypes.ImportRequest,
+  };
+}
+
+function importProgress(progress: number): ImportProgress {
+  return {
+    context: undefined,
+    payload: { progress },
+    type: ImportActionTypes.ImportProgress,
   };
 }
 
@@ -118,6 +136,8 @@ function transformImportResult(result: ImportAPIResult): ImportResult {
   };
 }
 
+type ImportProgressReporter = (progress: number) => void;
+
 export function importRecords(
   name: string,
   attrs: ImportAttrs
@@ -125,7 +145,16 @@ export function importRecords(
   return (dispatch, getState) => {
     dispatch(importRequest());
 
-    return performImportRecord(name, attrs, getState().appConfig.largeCsv)
+    const onImportProgressed: ImportProgressReporter = progress => {
+      dispatch(importProgress(progress));
+    };
+
+    return performImportRecord(
+      name,
+      attrs,
+      onImportProgressed,
+      getState().appConfig.largeCsv
+    )
       .then((result: ImportAPIResult) => {
         dispatch(importSuccess(transformImportResult(result)));
       })
@@ -138,13 +167,15 @@ export function importRecords(
 function performImportRecord(
   name: string,
   attrs: ImportAttrs,
+  onImportProgressed: ImportProgressReporter,
   largeCsvConfig: LargeCsvConfig
 ): Promise<ImportAPIResult> {
   if (!attrs.atomic && attrs.file.size > largeCsvConfig.fileSize) {
     return performImportRecordByBatch(
       name,
       attrs.file,
-      largeCsvConfig.importBatchSize
+      largeCsvConfig.importBatchSize,
+      onImportProgressed
     );
   }
   return callImportRecordAPI(name, attrs.file, attrs.atomic);
@@ -153,7 +184,8 @@ function performImportRecord(
 function performImportRecordByBatch(
   name: string,
   csvData: Blob,
-  batchSize: number
+  batchSize: number,
+  onImportProgressed: ImportProgressReporter
 ): Promise<ImportAPIResult> {
   return new Response(csvData).text().then(csv => {
     const lines = csv.split(CSV_NEWLINE_REGEX);
@@ -164,13 +196,22 @@ function performImportRecordByBatch(
     const headerLine = `${lines.shift()}${CSV_NEWLINE}`;
 
     const pendingRecords = lines;
+    const totalNumberOfRecords: number = pendingRecords.length;
     const uploadResults: ImportAPIResult[] = [];
 
+    const reportProgress = () => {
+      onImportProgressed(
+        (totalNumberOfRecords - pendingRecords.length) / totalNumberOfRecords
+      );
+    };
+
     const finalizeResult = (): Promise<ImportAPIResult> => {
+      reportProgress();
       return Promise.resolve(mergeImportAPIResult(uploadResults));
     };
 
     const uploadBatch = (): Promise<ImportAPIResult> => {
+      reportProgress();
       const batch = pendingRecords.splice(0, batchSize);
       return callImportRecordAPI(
         name,
