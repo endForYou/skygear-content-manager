@@ -101,37 +101,9 @@ export function importRecords(
   attrs: ImportAttrs
 ): ThunkAction<Promise<void>, {}, {}> {
   return dispatch => {
-    const data = new FormData();
-    data.append('file', attrs.file);
-    data.append('key', skygear.auth.accessToken!);
-    data.append('import_name', name);
-
-    const options = {
-      atomic: attrs.atomic,
-    };
-    data.append('options', JSON.stringify(options));
-
     dispatch(importRequest());
 
-    let status: number = 500;
-    return fetch(`${skygear.endPoint}import`, {
-      body: data,
-      method: 'POST',
-    })
-      .then((response: Response) => {
-        status = response.status;
-        return response.json();
-      })
-      .then(json => {
-        if (status >= 400) {
-          return Promise.reject({
-            error: json.error,
-            status,
-          });
-        }
-
-        return json;
-      })
+    return performImportRecord(name, attrs)
       .then((result: ImportAPIResult) => {
         dispatch(importSuccess(transformImportResult(result)));
       })
@@ -139,4 +111,48 @@ export function importRecords(
         dispatch(importFailure(error));
       });
   };
+}
+
+function performImportRecord(
+  name: string,
+  attrs: ImportAttrs
+): Promise<ImportAPIResult> {
+  return callImportRecordAPI(name, attrs.file, attrs.atomic);
+}
+
+function callImportRecordAPI(
+  name: string,
+  data: Blob,
+  atomic: boolean
+): Promise<ImportAPIResult> {
+  return Promise.resolve()
+    .then(() => {
+      const formData = new FormData();
+      formData.append('file', data);
+      formData.append('key', skygear.auth.accessToken!);
+      formData.append('import_name', name);
+
+      const options = { atomic };
+      formData.append('options', JSON.stringify(options));
+      return formData;
+    })
+    .then((formData: FormData) => {
+      return fetch(`${skygear.endPoint}import`, {
+        body: formData,
+        method: 'POST',
+      });
+    })
+    .then((response: Response) => {
+      return response.json().then(json => ({ json, status: response.status }));
+    })
+    .then(({ json, status }) => {
+      if (status >= 400) {
+        return Promise.reject({
+          error: json.error,
+          status,
+        });
+      }
+
+      return json;
+    });
 }
