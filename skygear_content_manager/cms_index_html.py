@@ -30,6 +30,10 @@ INDEX_HTML_FORMAT = """<!doctype html>
             sidebarColor: "{CMS_THEME_SIDEBAR_COLOR}",
             logoPath: "{CMS_THEME_LOGO}",
         }},
+        largeCsv: {{
+            fileSize: {CMS_LARGE_CSV_FILE_SIZE},
+            importBatchSize: {CMS_LARGE_CSV_IMPORT_BATCH_SIZE},
+        }},
       }});
     </script>
   </body>

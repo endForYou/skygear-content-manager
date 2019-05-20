@@ -4,6 +4,11 @@ export interface AppTheme {
   sidebarColor: string;
 }
 
+export interface LargeCsvConfig {
+  fileSize: number;
+  importBatchSize: number;
+}
+
 export interface AppConfig {
   adminRole: string;
   cmsConfigUrl: string;
@@ -12,6 +17,7 @@ export interface AppConfig {
   skygearEndpoint: string;
   staticUrl: string;
   style: AppTheme;
+  largeCsv: LargeCsvConfig;
 }
 
 /**
@@ -32,5 +38,9 @@ export default {
     logoPath: process.env.REACT_APP_LOGO,
     primaryColor: process.env.REACT_APP_PRIMARY_COLOR || '#0275D8',
     sidebarColor: process.env.REACT_APP_SIDEBAR_COLOR || '#19c2bf',
+  },
+  largeCsv: {
+    fileSize: 1024 * 1024,
+    importBatchSize: 1000,
   },
 };
