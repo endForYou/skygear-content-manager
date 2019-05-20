@@ -3,7 +3,12 @@ import 'whatwg-fetch';
 import { ThunkAction } from 'redux-thunk';
 import skygear from 'skygear';
 
+import { LargeCsvConfig } from '../config';
+import { RootState } from '../states';
 import { ImportResult, ImportResultItem } from '../types';
+
+const CSV_NEWLINE = '\n';
+const CSV_NEWLINE_REGEX = /\r?\n/g;
 
 export type ImportActions =
   | ImportRequest
@@ -88,6 +93,23 @@ interface ImportAPIResult {
   error_count: number;
   result: ImportResultItem[];
 }
+function mergeImportAPIResult(
+  partialResults: ImportAPIResult[]
+): ImportAPIResult {
+  const finalResult: ImportAPIResult = {
+    success_count: 0,
+    error_count: 0,
+    result: ([] as ImportResultItem[]).concat.apply(
+      [],
+      partialResults.map(partialResult => partialResult.result)
+    ),
+  };
+  for (const partialResult of partialResults) {
+    finalResult.success_count += partialResult.success_count;
+    finalResult.error_count += partialResult.error_count;
+  }
+  return finalResult;
+}
 function transformImportResult(result: ImportAPIResult): ImportResult {
   return {
     errorCount: result.error_count,
@@ -99,11 +121,11 @@ function transformImportResult(result: ImportAPIResult): ImportResult {
 export function importRecords(
   name: string,
   attrs: ImportAttrs
-): ThunkAction<Promise<void>, {}, {}> {
-  return dispatch => {
+): ThunkAction<Promise<void>, RootState, {}> {
+  return (dispatch, getState) => {
     dispatch(importRequest());
 
-    return performImportRecord(name, attrs)
+    return performImportRecord(name, attrs, getState().appConfig.largeCsv)
       .then((result: ImportAPIResult) => {
         dispatch(importSuccess(transformImportResult(result)));
       })
@@ -115,9 +137,58 @@ export function importRecords(
 
 function performImportRecord(
   name: string,
-  attrs: ImportAttrs
+  attrs: ImportAttrs,
+  largeCsvConfig: LargeCsvConfig
 ): Promise<ImportAPIResult> {
+  if (!attrs.atomic && attrs.file.size > largeCsvConfig.fileSize) {
+    return performImportRecordByBatch(
+      name,
+      attrs.file,
+      largeCsvConfig.importBatchSize
+    );
+  }
   return callImportRecordAPI(name, attrs.file, attrs.atomic);
+}
+
+function performImportRecordByBatch(
+  name: string,
+  csvData: Blob,
+  batchSize: number
+): Promise<ImportAPIResult> {
+  return new Response(csvData).text().then(csv => {
+    const lines = csv.split(CSV_NEWLINE_REGEX);
+    if (lines.length < 1) {
+      // imported CSV must have header
+      throw new Error('Malformed CSV');
+    }
+    const headerLine = `${lines.shift()}${CSV_NEWLINE}`;
+
+    const pendingRecords = lines;
+    const uploadResults: ImportAPIResult[] = [];
+
+    const finalizeResult = (): Promise<ImportAPIResult> => {
+      return Promise.resolve(mergeImportAPIResult(uploadResults));
+    };
+
+    const uploadBatch = (): Promise<ImportAPIResult> => {
+      const batch = pendingRecords.splice(0, batchSize);
+      return callImportRecordAPI(
+        name,
+        new Blob([headerLine, batch.join(CSV_NEWLINE)]),
+        false
+      ).then(result => {
+        uploadResults.push(result);
+
+        if (pendingRecords.length > 0) {
+          return uploadBatch();
+        } else {
+          return finalizeResult();
+        }
+      });
+    };
+
+    return uploadBatch();
+  });
 }
 
 function callImportRecordAPI(
