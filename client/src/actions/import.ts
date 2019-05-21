@@ -215,7 +215,7 @@ function performImportRecordByBatch(
       const batch = pendingRecords.splice(0, batchSize);
       return callImportRecordAPI(
         name,
-        new Blob([headerLine, batch.join(CSV_NEWLINE)]),
+        new Blob([headerLine, batch.join(CSV_NEWLINE), CSV_NEWLINE]),
         false
       ).then(result => {
         uploadResults.push(result);
