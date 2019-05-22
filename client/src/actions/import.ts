@@ -188,7 +188,7 @@ function performImportRecordByBatch(
   onImportProgressed: ImportProgressReporter
 ): Promise<ImportAPIResult> {
   return new Response(csvData).text().then(csv => {
-    const lines = csv.split(CSV_NEWLINE_REGEX);
+    const lines = csv.trim().split(CSV_NEWLINE_REGEX);
     if (lines.length < 1) {
       // imported CSV must have header
       throw new Error('Malformed CSV');
