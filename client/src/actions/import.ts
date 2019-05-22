@@ -170,7 +170,7 @@ function performImportRecord(
   onImportProgressed: ImportProgressReporter,
   largeCsvConfig: LargeCsvConfig
 ): Promise<ImportAPIResult> {
-  if (!attrs.atomic && attrs.file.size > largeCsvConfig.fileSize) {
+  if (!attrs.atomic) {
     return performImportRecordByBatch(
       name,
       attrs.file,
