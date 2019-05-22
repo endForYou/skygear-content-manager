@@ -2,13 +2,11 @@ import 'whatwg-fetch';
 
 import { ThunkAction } from 'redux-thunk';
 import skygear from 'skygear';
+import papaparse from 'papaparse';
 
 import { ImportConfig } from '../config';
 import { RootState } from '../states';
 import { ImportResult, ImportResultItem } from '../types';
-
-const CSV_NEWLINE = '\n';
-const CSV_NEWLINE_REGEX = /\r?\n/g;
 
 export type ImportActions =
   | ImportRequest
@@ -183,19 +181,18 @@ function performImportRecord(
 
 function performImportRecordByBatch(
   name: string,
-  csvData: Blob,
+  csvData: File,
   batchSize: number,
   onImportProgressed: ImportProgressReporter
 ): Promise<ImportAPIResult> {
-  return new Response(csvData).text().then(csv => {
-    const lines = csv.trim().split(CSV_NEWLINE_REGEX);
-    if (lines.length < 1) {
+  return deserializeCSV(csvData).then(records => {
+    if (records.length < 1) {
       // imported CSV must have header
       throw new Error('Malformed CSV');
     }
-    const headerLine = `${lines.shift()}${CSV_NEWLINE}`;
+    const headerRecord = records[0];
 
-    const pendingRecords = lines;
+    const pendingRecords = records.slice(1);
     const totalNumberOfRecords: number = pendingRecords.length;
     const uploadResults: ImportAPIResult[] = [];
 
@@ -213,19 +210,17 @@ function performImportRecordByBatch(
     const uploadBatch = (): Promise<ImportAPIResult> => {
       reportProgress();
       const batch = pendingRecords.splice(0, batchSize);
-      return callImportRecordAPI(
-        name,
-        new Blob([headerLine, batch.join(CSV_NEWLINE), CSV_NEWLINE]),
-        false
-      ).then(result => {
-        uploadResults.push(result);
+      return serializeCSV([headerRecord, ...batch])
+        .then(csv => callImportRecordAPI(name, new Blob([csv]), false))
+        .then(result => {
+          uploadResults.push(result);
 
-        if (pendingRecords.length > 0) {
-          return uploadBatch();
-        } else {
-          return finalizeResult();
-        }
-      });
+          if (pendingRecords.length > 0) {
+            return uploadBatch();
+          } else {
+            return finalizeResult();
+          }
+        });
     };
 
     return uploadBatch();
@@ -267,4 +262,17 @@ function callImportRecordAPI(
 
       return json;
     });
+}
+
+function deserializeCSV(csvFile: File): Promise<string[][]> {
+  return new Promise<string[][]>((resolve, reject) => {
+    papaparse.parse(csvFile, {
+      complete: result => resolve(result.data),
+      error: error => reject(error),
+    });
+  });
+}
+
+function serializeCSV(records: string[][]): Promise<string> {
+  return Promise.resolve(papaparse.unparse(records));
 }
