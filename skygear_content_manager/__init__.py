@@ -18,8 +18,7 @@ from .schema.skygear_schema import SkygearSchemaSchema
 from .settings import CLIENT_SKYGEAR_ENDPOINT
 from .settings import CMS_AUTH_TOKEN_EXPIRY
 from .settings import CMS_CONFIG_FILE_URL
-from .settings import CMS_LARGE_CSV_FILE_SIZE
-from .settings import CMS_LARGE_CSV_IMPORT_BATCH_SIZE
+from .settings import CMS_IMPORT_BATCH_SIZE
 from .settings import CMS_PUBLIC_URL
 from .settings import CMS_SITE_TITLE
 from .settings import CMS_SKYGEAR_API_KEY
@@ -86,10 +85,8 @@ def includeme(settings):
             CMS_THEME_LOGO if CMS_THEME_LOGO is not None else '',
             'CMS_USER_PERMITTED_ROLE':
             CMS_USER_PERMITTED_ROLE,
-            'CMS_LARGE_CSV_FILE_SIZE':
-            CMS_LARGE_CSV_FILE_SIZE,
-            'CMS_LARGE_CSV_IMPORT_BATCH_SIZE':
-            CMS_LARGE_CSV_IMPORT_BATCH_SIZE,
+            'CMS_IMPORT_BATCH_SIZE':
+            CMS_IMPORT_BATCH_SIZE,
         }
         return skygear.Response(
             INDEX_HTML_FORMAT.format(**context),

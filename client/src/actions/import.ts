@@ -3,7 +3,7 @@ import 'whatwg-fetch';
 import { ThunkAction } from 'redux-thunk';
 import skygear from 'skygear';
 
-import { LargeCsvConfig } from '../config';
+import { ImportConfig } from '../config';
 import { RootState } from '../states';
 import { ImportResult, ImportResultItem } from '../types';
 
@@ -153,7 +153,7 @@ export function importRecords(
       name,
       attrs,
       onImportProgressed,
-      getState().appConfig.largeCsv
+      getState().appConfig.import
     )
       .then((result: ImportAPIResult) => {
         dispatch(importSuccess(transformImportResult(result)));
@@ -168,13 +168,13 @@ function performImportRecord(
   name: string,
   attrs: ImportAttrs,
   onImportProgressed: ImportProgressReporter,
-  largeCsvConfig: LargeCsvConfig
+  importConfig: ImportConfig
 ): Promise<ImportAPIResult> {
   if (!attrs.atomic) {
     return performImportRecordByBatch(
       name,
       attrs.file,
-      largeCsvConfig.importBatchSize,
+      importConfig.batchSize,
       onImportProgressed
     );
   }

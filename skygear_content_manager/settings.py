@@ -34,18 +34,10 @@ CMS_THEME_PRIMARY_COLOR = os.environ.get('CMS_THEME_PRIMARY_COLOR', '#0275D8')
 CMS_THEME_SIDEBAR_COLOR = os.environ.get('CMS_THEME_SIDEBAR_COLOR', '#19c2bf')
 CMS_THEME_LOGO = os.environ.get('CMS_THEME_LOGO')
 
-# cms large csv import config
-CMS_LARGE_CSV_FILE_SIZE = 1024 * 1024  # default 1 MB
+# cms csv import config
+CMS_IMPORT_BATCH_SIZE = 1000
 try:
-    CMS_LARGE_CSV_FILE_SIZE = float(CMS_LARGE_CSV_FILE_SIZE)
-except ValueError:
-    pass
-except TypeError:
-    pass
-
-CMS_LARGE_CSV_IMPORT_BATCH_SIZE = 1000
-try:
-    CMS_LARGE_CSV_IMPORT_BATCH_SIZE = int(CMS_LARGE_CSV_IMPORT_BATCH_SIZE)
+    CMS_IMPORT_BATCH_SIZE = int(CMS_IMPORT_BATCH_SIZE)
 except ValueError:
     pass
 except TypeError:
