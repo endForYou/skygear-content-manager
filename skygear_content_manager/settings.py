@@ -33,3 +33,12 @@ CMS_CONFIG_FILE_URL = os.environ.get('CMS_CONFIG_FILE_URL')
 CMS_THEME_PRIMARY_COLOR = os.environ.get('CMS_THEME_PRIMARY_COLOR', '#0275D8')
 CMS_THEME_SIDEBAR_COLOR = os.environ.get('CMS_THEME_SIDEBAR_COLOR', '#19c2bf')
 CMS_THEME_LOGO = os.environ.get('CMS_THEME_LOGO')
+
+# cms csv import config
+CMS_IMPORT_BATCH_SIZE = 1000
+try:
+    CMS_IMPORT_BATCH_SIZE = int(CMS_IMPORT_BATCH_SIZE)
+except ValueError:
+    pass
+except TypeError:
+    pass

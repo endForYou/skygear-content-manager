@@ -428,7 +428,7 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
     }
 
     const importState = this.props.import;
-    const { importResult, errorMessage } = importState;
+    const { importProgress, importResult, errorMessage } = importState;
 
     if (!importResult) {
       return (
@@ -450,7 +450,12 @@ class ListPageImpl extends React.PureComponent<ListPageProps, State> {
           />
         );
       case RemoteType.Loading:
-        return <ImportingModal importConfig={this.state.importing} />;
+        return (
+          <ImportingModal
+            importConfig={this.state.importing}
+            importProgress={importProgress}
+          />
+        );
       case RemoteType.Success:
         return (
           <ImportResultModal

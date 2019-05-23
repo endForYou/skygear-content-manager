@@ -113,11 +113,13 @@ export const initialRecordViewState: RecordViewState = {
 
 export interface ImportState {
   errorMessage: string;
+  importProgress?: number;
   importResult?: Remote<ImportResult>;
 }
 
 export const initialImportState: ImportState = {
   errorMessage: '',
+  importProgress: undefined,
   importResult: undefined,
 };
 

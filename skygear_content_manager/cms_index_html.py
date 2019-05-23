@@ -30,6 +30,9 @@ INDEX_HTML_FORMAT = """<!doctype html>
             sidebarColor: "{CMS_THEME_SIDEBAR_COLOR}",
             logoPath: "{CMS_THEME_LOGO}",
         }},
+        import: {{
+            batchSize: {CMS_IMPORT_BATCH_SIZE},
+        }},
       }});
     </script>
   </body>

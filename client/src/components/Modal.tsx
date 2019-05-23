@@ -58,9 +58,18 @@ export const Modal: React.SFC<ModalProps> = props => {
 interface LoadingModalProps {
   show?: boolean;
   title: string;
+  progressPercentage?: number;
 }
 
-export const LoadingModal = ({ show = true, title }: LoadingModalProps) => {
+export const LoadingModal = ({
+  show = true,
+  title,
+  progressPercentage,
+}: LoadingModalProps) => {
+  const progressText =
+    typeof progressPercentage === 'number'
+      ? ` (${(progressPercentage * 100).toFixed(1)}%)`
+      : '';
   return (
     <Modal
       show={show}
@@ -72,7 +81,7 @@ export const LoadingModal = ({ show = true, title }: LoadingModalProps) => {
             src={loading}
             alt="Loading"
           />
-          <p className="modal-loading-text">In Progress...</p>
+          <p className="modal-loading-text">In Progress...{progressText}</p>
         </div>
       )}
     />
