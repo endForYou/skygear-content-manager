@@ -36,8 +36,9 @@ CMS_THEME_LOGO = os.environ.get('CMS_THEME_LOGO')
 
 # cms csv import config
 CMS_IMPORT_BATCH_SIZE = 1000
+CMS_IMPORT_BATCH_SIZE_STR = os.environ.get('CMS_IMPORT_BATCH_SIZE')
 try:
-    CMS_IMPORT_BATCH_SIZE = int(CMS_IMPORT_BATCH_SIZE)
+    CMS_IMPORT_BATCH_SIZE = int(CMS_IMPORT_BATCH_SIZE_STR)
 except ValueError:
     pass
 except TypeError:
